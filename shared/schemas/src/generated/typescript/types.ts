@@ -438,7 +438,7 @@ export enum PlaybackStateEnum {
 */
 export type PlaybackState = `${PlaybackStateEnum}`;
 /**
-* Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.
+* Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time. Mirrors session-state.yaml — see comment above.
 */
 export enum DisplayModeEnum {
     
@@ -505,6 +505,73 @@ export enum ErrorCategory {
     algorithm_failure = "algorithm_failure",
     /** Required feature or data not found */
     resource_not_found = "resource_not_found",
+};
+/**
+* Provenance of a Scene's stored polygon geometry. Render-side consumers use this to decide whether to trust the on-disk polygon ('bounds') or recompute it from (viewport, map dimensions) when the stored polygon pre-dates Spec #258 ('placeholder') or was hand-drawn ('manual').
+*/
+export enum PolygonSourceEnum {
+    
+    /** Polygon was computed from real Leaflet map bounds at capture time (post-#258 norm). Renderers trust the on-disk geometry. */
+    bounds = "bounds",
+    /** Pre-#258 ~100m placeholder square or otherwise non-bounds-derived. Renderers recompute from (viewport, map dimensions); the on-disk value is preserved (Article III.2 source preservation). */
+    placeholder = "placeholder",
+    /** Reserved for future user-drawn rectangles. Renderers recompute (current behaviour) until manual editing of scene geometry ships. */
+    manual = "manual",
+};
+/**
+* Template-literal derivation of the permissible polygon-source values
+* from PolygonSourceEnum. Narrows the `_polygon_source` field on
+* SceneProperties so TypeScript rejects an unknown provenance value at
+* compile time (Feature 258).
+*/
+export type PolygonSource = `${PolygonSourceEnum}`;
+/**
+* Authoritative list of session-state MCP tool names. Must mirror the `TOOLS` const at services/session-state/src/server/mcp.ts. Research R-001: replaces the TS-only `type ToolName = keyof typeof TOOLS` projection with a cross-language permissible-values enum.
+*/
+export enum SessionMCPToolName {
+    
+    sessionFULL_STOPgetState = "session.getState",
+    sessionFULL_STOPgetTemporalState = "session.getTemporalState",
+    sessionFULL_STOPgetSpatialState = "session.getSpatialState",
+    sessionFULL_STOPgetFeaturesState = "session.getFeaturesState",
+    sessionFULL_STOPgetDocumentState = "session.getDocumentState",
+    sessionFULL_STOPsetCurrentTime = "session.setCurrentTime",
+    sessionFULL_STOPsetViewport = "session.setViewport",
+    sessionFULL_STOPsetSelection = "session.setSelection",
+    sessionFULL_STOPsetHiddenFeatures = "session.setHiddenFeatures",
+    sessionFULL_STOPsetPlaybackRate = "session.setPlaybackRate",
+    sessionFULL_STOPsetRotation = "session.setRotation",
+};
+/**
+* Discriminator for MCPContentItem variants.
+*/
+export enum MCPContentItemTypeEnum {
+    
+    text = "text",
+    resource_link = "resource_link",
+    image = "image",
+    structured = "structured",
+};
+/**
+* JSON-Schema-compatible primitive types for tool parameters.
+*/
+export enum MCPParamTypeEnum {
+    
+    string = "string",
+    number = "number",
+    integer = "integer",
+    boolean = "boolean",
+    array = "array",
+    object = "object",
+};
+/**
+* Outcome of resolving a logged tool invocation at replay time.
+*/
+export enum ReplayStatusEnum {
+    
+    unchanged = "unchanged",
+    version_drift = "version_drift",
+    tool_removed = "tool_removed",
 };
 
 
@@ -1483,6 +1550,8 @@ export interface ToolParameter {
     default_value?: string,
     /** References a schema-defined parameter-type enum by name. When set, the client resolves enum values from generated types rather than using inline choices. */
     param_type?: string,
+    /** Explicit choice list for enum-typed parameters when the client cannot (or chooses not to) resolve a schema-defined `param_type`. Used by both the ToolMatch picker (shared/components) and the VS Code activity-panel adapter (apps/vscode/src/services/mcpToolAdapter.ts). Added under spec 222 (P2) to collapse the drift cluster attributed to ToolParameter (audit §3.2 rows 37 and 86). */
+    choices?: string[],
 }
 
 
@@ -2136,6 +2205,10 @@ export interface SceneProperties extends BaseFeatureProperties {
     thumbnail_asset_ref: string,
     /** Playback transition duration in milliseconds. Default 500. */
     transition_duration_ms: number,
+    /** Time-controller display mode at capture time (full = entire track history; trail = only the tail behind each platform). Reuses DisplayModeEnum from session-state.yaml. Optional for legacy compatibility (Spec #258): readers MUST leave the time controller untouched when this slot is absent (FR-003). Writers populate it from session.displayMode at the moment the scene is created. */
+    display_mode?: DisplayMode,
+    /** Provenance of the scene's stored polygon geometry (Spec #258). 'bounds' = computed from real Leaflet map bounds at capture time; 'placeholder' = pre-#258 ~100m square; 'manual' = reserved for future user-drawn rectangles. Render-side consumers recompute the polygon from (viewport, map dimensions) when this value is anything other than 'bounds' (including absent, for legacy scenes). The stored geometry is NEVER rewritten on read (Article III.2 source preservation). */
+    _polygon_source?: PolygonSource,
 }
 
 
@@ -2205,6 +2278,205 @@ export interface SceneThumbnailAssetEntry {
     roles: string[],
     /** Optional human label. Storyboarding writer emits "Scene thumbnail" (large) or "Scene thumbnail (small)" (small). */
     title?: string,
+}
+
+
+/**
+ * MCP tool invocation envelope. Sent by consumers (VS Code, web-shell) to the MCP server. Closes audit §3.1 row 13.
+ */
+export interface MCPRequest {
+    /** Tool name (one of SessionMCPToolName for the session-state server). */
+    tool: string,
+    /** Free-form per-tool input payload (Article XV.2 exception — narrowed by per-tool Pydantic input model at dispatch). */
+    input: unknown,
+}
+
+
+/**
+ * A single MCP content item (resource, text, or image). Carries Debrief-specific annotations (debrief:* keys) on every item. Closes audit §3.1 row 15.
+ */
+export interface MCPContentItem {
+    /** Content-item discriminator. Current consumers emit `resource`, `text`, `image`. Kept as string to remain additive over any future MCP content-item types. */
+    type: string,
+    /** Nested resource descriptor `{ uri, mimeType, text }` when type=resource. Free-form per Article XV.2 (the inner shape is driven by individual tool authors). */
+    resource?: unknown,
+    /** Body text when type=text. */
+    text?: string,
+    /** Base64-encoded payload when type=image. */
+    data?: string,
+    /** IANA media type when type=image or type=resource. */
+    mimeType?: string,
+    /** Debrief-specific annotations (`debrief:resultType`, `debrief:label`, `debrief:sourceFeatures`, etc). Free-form per Article XV.2 because the key set is open-ended and uses colons (`debrief:*`) that LinkML cannot constrain as slot names. */
+    annotations: unknown,
+}
+
+
+/**
+ * Successful MCP tool response. Closes audit §3.1 row 16. The `duration_ms` slot preserves the wire format used by the live MCP server and replay subsystem.
+ */
+export interface MCPToolResponse {
+    /** Ordered list of content items returned by the tool. */
+    content: MCPContentItem[],
+    /** Wall-clock duration of the tool invocation in milliseconds. */
+    duration_ms: number,
+    /** Reserved for streaming partial-error responses (additive over the live wire format). */
+    is_error?: boolean,
+    /** Reserved for top-level free-form payload (e.g. vega-spec) — Article XV.2 exception. Additive over the live wire format. */
+    structured_content?: unknown,
+}
+
+
+/**
+ * MCP error response envelope. Closes audit §3.1 row 17. The error payload is nested (matches the JSON-RPC convention used by the live server).
+ */
+export interface MCPErrorResponse {
+    /** Nested error object `{ code, message, data: { debrief:errorCategory, debrief:affectedFeatures } }`. Free-form per Article XV.2 because the inner `data` map uses colon-bearing keys outside LinkML slot syntax. */
+    error: unknown,
+    /** Wall-clock duration before failure. */
+    duration_ms?: number,
+}
+
+
+/**
+ * JSON-Schema-like parameter fragment used inside MCPToolDefinition.input_schema. Closes audit §3.1 rows 1 and 27 (two-site drift). Open at the wire level — consumers narrow with additional fields (`enum`, `default`, `x-debrief-param-type`) via intersection in the local adapter modules.
+ */
+export interface MCPParamSchema {
+    /** JSON-Schema primitive type (string / number / integer / boolean / array / object). */
+    type?: string,
+    /** Human-readable parameter description. */
+    description?: string,
+}
+
+
+/**
+ * Predicate describing what feature selection a tool needs (e.g. "at least one Track", "exactly one Point"). Closes audit §3.1 row 18. Slot names match shared/utils/src/mcp-types.ts (`kind`, `min`, `max`).
+ */
+export interface MCPSelectionRequirement {
+    /** Feature kind this requirement applies to. Supports flat values (e.g. "TRACK", "POINT") and dot-delimited hierarchical paths (e.g. "TRACK.SEGMENT"). */
+    kind: string,
+    /** Minimum number of features of this kind required. */
+    min: number,
+    /** Maximum number of features of this kind allowed. */
+    max?: number,
+}
+
+
+/**
+ * Static catalogue entry advertised by the MCP server. Closes audit §3.1 row 19. `input_schema` and `annotations` are free-form per Article XV.2 — `input_schema` is a JSON-Schema fragment and `annotations` carries open-ended `debrief:*` keys (colons in key names cannot be slot-modelled).
+ */
+export interface MCPToolDefinition {
+    /** Tool identifier. */
+    name: string,
+    /** Human-readable tool description. */
+    description: string,
+    /** JSON-Schema fragment describing the tool's input payload. Free-form per Article XV.2 — consumers narrow at point of use. */
+    input_schema: unknown,
+    /** Debrief-specific annotations (`debrief:selectionRequirements`, `debrief:category`, `debrief:version`, `debrief:outputKind`, `debrief:uiCategory`). Free-form per Article XV.2. */
+    annotations: unknown,
+}
+
+
+/**
+ * Tunable parameter metadata recorded alongside a tool result for provenance. Closes audit §3.1 row 21. Matches the live web-shell mock shape — three slots tracking value, default-ness, and whether the parameter is operator-tunable.
+ */
+export interface ToolParameterMeta {
+    /** Parameter value used during the invocation. */
+    value: unknown,
+    /** Whether the parameter took its default value. */
+    default: boolean,
+    /** Whether the parameter is operator-tunable. */
+    tunable: boolean,
+}
+
+
+/**
+ * Consumer-facing flattened view of a tool catalogue entry. Closes audit §3.1 row 22. Slot names match `apps/web-shell/src/mocks/calcService.ts` (`min_tracks`, `max_tracks`, `min_features` — preserved as-is).
+ */
+export interface ToolDefinition {
+    /** Unique tool identifier. */
+    id: string,
+    /** Human-readable name. */
+    name: string,
+    /** Brief description. */
+    description: string,
+    /** Minimum number of tracks required. */
+    minTracks?: number,
+    /** Maximum number of tracks (absent = no upper limit). */
+    maxTracks?: number,
+    /** Minimum number of features required (any type). */
+    minFeatures?: number,
+}
+
+
+/**
+ * Logical tool invocation result as seen by the consumer (after the MCP layer has unwrapped MCPToolResponse). Closes audit §3.1 row 20. Slot names match `apps/web-shell/src/mocks/calcService.ts` — includes `resultLayer`, `resultLayers`, `parameters`, `datasets` which are free-form per Article XV.2 (their inner shapes are tool-specific).
+ */
+export interface ToolResult {
+    /** Whether the tool succeeded. */
+    success: boolean,
+    /** Status / explanation message. */
+    message: string,
+    /** Optional single result layer (e.g. bounding-box polygon). */
+    resultLayer?: unknown,
+    /** Optional multiple result layers (e.g. buffer-zone polygons). */
+    resultLayers?: unknown[],
+    /** Optional record of operator-tunable parameters and their values (keyed by parameter name, values shaped like ToolParameterMeta). Free-form per Article XV.2 (a LinkML `inlined_as_dict` of ToolParameterMeta would express it, but consumers already build a plain `Record<string, ToolParameterMeta>` and narrow on the way out — keeping it free-form preserves the live wire shape). */
+    parameters?: unknown,
+    /** Optional dataset results for the Results panel (range-bearing charts, etc). Each entry shaped like `{ filename: string, envelope: Record<string, unknown> }`. */
+    datasets?: unknown[],
+}
+
+
+/**
+ * Persisted tool-result shape written by the live tool-result logger and read back by the replay subsystem. Closes audit §3.1 row 4. Slot names match `services/session-state/src/log/types.ts:97` verbatim so existing log fixtures under the session-state fixtures directories continue to deserialise unchanged (FR-011).
+ */
+export interface ToolResultForLog {
+    /** Whether the tool succeeded. */
+    success: boolean,
+    /** GeoJSON FeatureCollection produced by the tool. Free-form per Article XV.2 (the tool's output shape is its own contract). */
+    features?: unknown,
+    /** Wall-clock duration of the tool invocation in milliseconds. */
+    duration_ms: number,
+    /** Hierarchical result type (e.g. mutation/track/smoothed). */
+    result_type?: string,
+    /** IDs of input features used to generate this result. */
+    source_feature_ids?: string[],
+    /** Path to an exported artifact (for non-GeoJSON tool results). */
+    artifact_href?: string,
+    /** Tool identifier (mirrors LogEntry.was_generated_by.tool). */
+    tool_id?: string,
+    /** Pre-tool geometry snapshot for mutation tools — passed through to LogEntry. Free-form per Article XV.2 (the inner InputFeatureState shape is owned by #224 session-state). */
+    input_state?: unknown[],
+}
+
+
+/**
+ * Minimal tool-execution result returned by the Replay Engine's `execute_tool` callback. Closes audit §3.1 row 6. Distinct from `ToolResultForLog` (no inheritance) because the replay path's observable surface is intentionally narrower — see services/session-state/src/log/types.ts:373.
+ */
+export interface ToolExecutionResultForReplay {
+    /** Whether the tool succeeded. */
+    success: boolean,
+    /** GeoJSON FeatureCollection produced by the tool during replay. Free-form per Article XV.2. */
+    features?: unknown,
+    /** Wall-clock duration of the replay invocation in milliseconds. */
+    duration_ms: number,
+    /** Tool version observed at replay time. */
+    tool_version?: string,
+    /** Path to an exported artifact (for non-GeoJSON tool results). */
+    artifact_href?: string,
+    /** Stable result identifier (used by the activity panel). */
+    result_id?: string,
+}
+
+
+/**
+ * Push notification from the extension host to the activity-panel webview when the tool catalogue changes. Closes audit §3.1 row 28. `payload` is free-form per Article XV.2 — its inner shape `{ tools: ToolsPanelItem[], hasToolInventory?, hasSelection? }` is narrowed at the activity-panel consumer.
+ */
+export interface ToolsUpdateMessage {
+    /** Discriminator — always the literal `tools:update`. */
+    type: string,
+    /** Nested payload `{ tools, hasToolInventory?, hasSelection? }`. Free-form per Article XV.2. */
+    payload: unknown,
 }
 
 

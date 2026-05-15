@@ -1,0 +1,6 @@
+{
+  "id": "track-length",
+  "name": "Track Length",
+  "description": "Calculate total length of selected tracks",
+  "minTracks": 1
+}

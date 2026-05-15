@@ -25,6 +25,7 @@ import type {
 } from '@debrief/components';
 import type { DebriefFeature } from '@debrief/components';
 import type { MatchResult } from '@debrief/components';
+import type { ToolsUpdateMessage as ToolsUpdateMessageSchema } from '@debrief/schemas';
 
 // VS Code API type
 declare function acquireVsCodeApi(): {
@@ -50,14 +51,20 @@ interface TemporalUpdateMessage {
   };
 }
 
-interface ToolsUpdateMessage {
-  type: 'tools:update';
+/**
+ * Schema-rooted on `ToolsUpdateMessage` from `@debrief/schemas` (LinkML
+ * `mcp.yaml`) and narrowed with the concrete payload shape used by the
+ * activity panel. The schema base contributes the `type: 'tools:update'`
+ * literal discriminator; this projection materialises the live payload
+ * shape. Per FR-004 the audit treats this file as schema-rooted.
+ */
+type ToolsUpdateMessage = Omit<ToolsUpdateMessageSchema, 'payload'> & {
   payload: {
     tools: ToolsPanelItem[];
     hasToolInventory?: boolean;
     hasSelection?: boolean;
   };
-}
+};
 
 interface LayersUpdateMessage {
   type: 'layers:update';

@@ -997,6 +997,19 @@ export class MapPanel {
             type: 'setDisplayMode',
             displayMode: state.displayMode,
           });
+          // Seed drawing state into freshly-mounted webview (#108) — the
+          // change-subscription path above only fires on changes, so the
+          // initial values must be flushed here. Posted unconditionally
+          // (including null/0) so the webview cannot confuse "host has no
+          // opinion" with "host says null"; see research.md Decision 3.
+          this.postMessage({
+            type: 'setDrawingMode',
+            drawingMode: state.drawingMode,
+          });
+          this.postMessage({
+            type: 'setDrawingPaletteIndex',
+            paletteIndex: state.drawingPaletteIndex,
+          });
         }
         break;
 

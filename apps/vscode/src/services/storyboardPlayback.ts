@@ -20,6 +20,7 @@ import {
   renameStoryboard as crudRenameStoryboard,
   deleteStoryboard as crudDeleteStoryboard,
   detectMissingDataForScene,
+  getActiveStoryboardDefault,
   getActiveStoryboardSelection,
   getMostRecentlyModifiedStoryboard,
   getScene,
@@ -357,6 +358,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const state = this.states.get(documentUri);
     if (!state || !state.plotValid) {return;}
     if (state.transitionId !== null) {return;}
+    this.ensureSceneOrderSeeded(state);
     if (state.currentSceneIndex >= state.sceneOrder.length - 1) {return;}
     await this.stepTo(state, state.currentSceneIndex + 1, 'forward');
   }
@@ -365,6 +367,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const state = this.states.get(documentUri);
     if (!state || !state.plotValid) {return;}
     if (state.transitionId !== null) {return;}
+    this.ensureSceneOrderSeeded(state);
     if (state.currentSceneIndex <= 0) {return;}
     await this.stepTo(state, state.currentSceneIndex - 1, 'backward');
   }
@@ -373,6 +376,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const state = this.states.get(documentUri);
     if (!state || !state.plotValid) {return;}
     if (state.transitionId !== null) {return;}
+    this.ensureSceneOrderSeeded(state);
     const index = state.sceneOrder.indexOf(sceneId);
     if (index < 0) {return;}
     // Re-fly even when the click target equals `currentSceneIndex`. The
@@ -383,6 +387,38 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const direction: 'forward' | 'backward' =
       index >= state.currentSceneIndex ? 'forward' : 'backward';
     await this.stepTo(state, index, direction);
+  }
+
+  /**
+   * Lazy-seed `state.activeStoryboardId` + `sceneOrder` from the current
+   * plot when no seeding event has populated them yet.
+   *
+   * Background: `onPlotOpened` and `onPlotFeaturesChanged` are the
+   * normal seeding paths, but they are not guaranteed to have fired by
+   * the time the user clicks a Scene row — the panel's row list is
+   * sourced independently via `StoryboardPanelView.refresh()`
+   * (`getActiveStoryboardDefault`), so the panel can display Scenes
+   * while transport state is still empty. Without this fallback,
+   * `goToScene` silently no-ops and clicks appear dead.
+   *
+   * Priority mirrors the existing fallbacks in `onPlotOpened` /
+   * `onPlotFeaturesChanged`: most-recently-modified Storyboard first,
+   * then the alphabetic default used by the panel.
+   */
+  private ensureSceneOrderSeeded(state: TransportState): void {
+    if (state.activeStoryboardId !== null && state.sceneOrder.length > 0) {
+      return;
+    }
+    const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
+    if (state.activeStoryboardId === null) {
+      const candidate =
+        getMostRecentlyModifiedStoryboard(plot) ??
+        getActiveStoryboardDefault(plot);
+      if (candidate === null) {return;}
+      state.activeStoryboardId = candidate.properties.id;
+    }
+    this.recomputeSceneOrder(state, plot);
+    this.applyScrubbableRange(state, plot);
   }
 
   public setActiveStoryboard(
@@ -609,6 +645,14 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const session = this.sessionManager.getSession(state.documentUri);
     if (session && !Number.isNaN(targetEpoch)) {
       session.getState().setCurrentTime(targetEpoch);
+    }
+
+    // Spec #258 / FR-002: restore the captured display mode alongside the
+    // viewport flyTo. Legacy scenes that pre-date #258 do not carry the
+    // slot — leave the time controller untouched in that case (FR-003).
+    const capturedDisplayMode = targetScene.properties.display_mode;
+    if (session && capturedDisplayMode !== undefined && capturedDisplayMode !== null) {
+      session.getState().setDisplayMode(capturedDisplayMode);
     }
 
     // Safety timer (R8).

@@ -532,6 +532,47 @@ def generate_typescript() -> bool:
             enum_end = content.index("};\n", enum_start)
             content = content[:enum_end] + _display_mode_decl + content[enum_end + len("};\n") :]
 
+        # Post-process (Feature 258 / FR-001, FR-006): narrow
+        # `SceneProperties.display_mode` and `SceneProperties._polygon_source`
+        # from `string` to the corresponding template-literal types. Same
+        # post-processing rationale as the TemporalSlice case above:
+        # gen-typescript collapses enum-ranged slots to bare `string`, and the
+        # spec only "means" what it says once these are narrowed.
+        _polygon_source_decl = (
+            "};\n"
+            "/**\n"
+            "* Template-literal derivation of the permissible polygon-source values\n"
+            "* from PolygonSourceEnum. Narrows the `_polygon_source` field on\n"
+            "* SceneProperties so TypeScript rejects an unknown provenance value at\n"
+            "* compile time (Feature 258).\n"
+            "*/\n"
+            "export type PolygonSource = `${PolygonSourceEnum}`;\n"
+        )
+        _polygon_source_sentinel = "export enum PolygonSourceEnum {"
+        if _polygon_source_sentinel in content and "export type PolygonSource" not in content:
+            enum_start = content.index(_polygon_source_sentinel)
+            enum_end = content.index("};\n", enum_start)
+            content = content[:enum_end] + _polygon_source_decl + content[enum_end + len("};\n") :]
+
+        _scene_props_start = content.find("export interface SceneProperties ")
+        if _scene_props_start == -1:
+            raise RuntimeError(
+                "generate.py: gen-typescript did not emit `export interface SceneProperties`."
+            )
+        _scene_props_end = content.index("}\n", _scene_props_start) + 2
+        _scene_props_block = content[_scene_props_start:_scene_props_end]
+        _new_scene_props_block = _scene_props_block.replace(
+            "    display_mode?: string,\n", "    display_mode?: DisplayMode,\n", 1
+        ).replace("    _polygon_source?: string,\n", "    _polygon_source?: PolygonSource,\n", 1)
+        if _new_scene_props_block == _scene_props_block:
+            raise RuntimeError(
+                "generate.py: SceneProperties enum-slot post-processor had no "
+                "effect — gen-typescript output no longer contains the expected "
+                "`display_mode?: string` / `_polygon_source?: string` tokens. Update "
+                "generate.py (Feature 258)."
+            )
+        content = content[:_scene_props_start] + _new_scene_props_block + content[_scene_props_end:]
+
         # Narrow the two TemporalSlice fields from string → template-literal type.
         _temporal_slice_start = content.find("export interface TemporalSlice {\n")
         if _temporal_slice_start == -1:
@@ -650,16 +691,39 @@ def generate_typescript() -> bool:
             content,
         )
 
+        # Post-process: any remaining `Any`-typed slot fields (`: Any,`,
+        # `?: Any,`, `: Any[]`, etc.) come from LinkML `range: Any` slots
+        # that did not get a per-field post-processor (the RawGeoJSONFeature
+        # block above handles RawGeoJSON.properties specifically; this is
+        # the general fallback used by the MCP envelope cluster (#222) and
+        # any future schemas that use `range: Any`).
+        #
+        # Mapping rule: `Any` becomes `unknown` so consumers MUST narrow
+        # before reading (Article XV.2 spirit). `unknown` is preferred over
+        # `Record<string, unknown>` because not every `Any` slot is an
+        # object — some carry primitives or arrays (e.g. tool result
+        # payloads).
+        content = _re_any.sub(
+            r"(?<![A-Za-z_])Any(?![A-Za-z_])",
+            "unknown",
+            content,
+        )
+
         # Prepend DO NOT EDIT header
         content = "// AUTO-GENERATED — DO NOT EDIT\n" + content
 
         output_file.write_text(content, encoding="utf-8", newline="\n")
         print(f"  [OK] Generated: {output_file}")
 
-        # Create index.ts that re-exports everything
+        # Create index.ts that re-exports everything (generated types,
+        # union helpers, and the TS-only function aliases for the MCP
+        # cluster — spec 222 Research R-002).
         index_file = TYPESCRIPT_OUT / "index.ts"
         index_file.write_text(
-            'export * from "./types.js";\nexport * from "./unions.js";\n',
+            'export * from "./types.js";\n'
+            'export * from "./unions.js";\n'
+            "export type { ToolExecutor, ToolVersionResolver } "
+            'from "../../typescript/aliases/mcp-functions.js";\n',
             encoding="utf-8",
             newline="\n",
         )

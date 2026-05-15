@@ -153,7 +153,14 @@ export function FeatureRow({
 }: FeatureRowProps) {
   // Determine label, type, color based on whether this is a feature row or child row
   const isChildRow = !feature && displayItem;
-  const label = feature ? getFeatureLabel(feature) : (displayItem?.label ?? '');
+  const baseLabel = feature ? getFeatureLabel(feature) : (displayItem?.label ?? '');
+  // Spec #258 / FR-013, NEW-C — storyboard rows render `name (N)` with the
+  // scene count always visible regardless of expand/collapse state.
+  const isStoryboardRow = displayItem?.type === 'storyboard';
+  const label =
+    isStoryboardRow && typeof displayItem?.childCount === 'number'
+      ? `${baseLabel} (${displayItem.childCount})`
+      : baseLabel;
   const type = feature ? getFeatureType(feature) : null;
   const color = feature ? getFeatureColor(feature) : null;
   const info = feature ? getFeatureInfo(feature) : null;
@@ -212,6 +219,18 @@ export function FeatureRow({
           {childSelected && !isExpanded && (
             <span className="debrief-feature-row__child-selected-dot" />
           )}
+        </button>
+      ) : isStoryboardRow ? (
+        // Spec #258 / FR-013 — empty storyboard renders a disabled chevron
+        // so the parent row is still visually a parent (not mistaken for a
+        // leaf alongside tracks).
+        <button
+          className="debrief-feature-row__expand-btn"
+          disabled
+          aria-label="No scenes to expand"
+          tabIndex={-1}
+        >
+          <ChevronIcon expanded={false} />
         </button>
       ) : depth > 0 ? (
         <span className="debrief-feature-row__expand-spacer" />

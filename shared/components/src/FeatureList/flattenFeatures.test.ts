@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { flattenFeatures, hasChildSelected, getRootFeatureId } from './flattenFeatures';
 import type { TrackFeature, MultiPointFeature, MultiPolygonFeature, ReferenceLocation } from '@debrief/schemas';
 
@@ -931,6 +931,148 @@ describe('flattenFeatures — sensor-aware rendering', () => {
       expect(items).toHaveLength(10004);
       expect(elapsed).toBeLessThan(200);
     });
+  });
+});
+
+// ─── Storyboard grouping (Spec #258 / US4) ─────────────────────────
+
+describe('flattenFeatures — storyboard grouping (#258)', () => {
+  function makeStoryboard(id: string, name: string): unknown {
+    return {
+      type: 'Feature',
+      id,
+      geometry: {
+        type: 'Polygon',
+        coordinates: [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+      },
+      properties: {
+        kind: 'STORYBOARD',
+        id,
+        name,
+        schema_version: 1,
+      },
+    };
+  }
+
+  function makeScene(id: string, storyboardId: string, timestamp: string, title?: string): unknown {
+    return {
+      type: 'Feature',
+      id,
+      geometry: {
+        type: 'Polygon',
+        coordinates: [[[0, 0], [0.1, 0], [0.1, 0.1], [0, 0.1], [0, 0]]],
+      },
+      properties: {
+        kind: 'STORYBOARD_SCENE',
+        id,
+        storyboard_id: storyboardId,
+        title: title ?? id,
+        viewport: { center: [0, 0], zoom: 10, bearing: 0 },
+        timestamp,
+        visible_feature_ids: [],
+        feature_set_hash: '0'.repeat(64),
+        thumbnail_asset_ref: `thumbs/${id}.png`,
+        transition_duration_ms: 500,
+      },
+    };
+  }
+
+  it('one Storyboard + 3 Scenes — produces 1 parent row when collapsed (T051)', () => {
+    const sb = makeStoryboard('sb-1', 'My Scenario');
+    const features = [
+      sb as never,
+      makeScene('s1', 'sb-1', '2026-04-20T10:00:00Z') as never,
+      makeScene('s2', 'sb-1', '2026-04-20T10:01:00Z') as never,
+      makeScene('s3', 'sb-1', '2026-04-20T10:02:00Z') as never,
+    ];
+    const items = flattenFeatures(features, new Set<string>());
+    expect(items).toHaveLength(1);
+    expect(items[0]!.type).toBe('storyboard');
+    expect(items[0]!.childCount).toBe(3);
+    expect(items[0]!.isExpandable).toBe(true);
+  });
+
+  it('expanded storyboard produces parent + 3 indented children (T051)', () => {
+    const features = [
+      makeStoryboard('sb-1', 'My Scenario') as never,
+      makeScene('s2', 'sb-1', '2026-04-20T10:01:00Z') as never,
+      makeScene('s1', 'sb-1', '2026-04-20T10:00:00Z') as never,
+      makeScene('s3', 'sb-1', '2026-04-20T10:02:00Z') as never,
+    ];
+    const items = flattenFeatures(features, new Set(['sb-1']));
+    expect(items).toHaveLength(4);
+    expect(items[0]!.type).toBe('storyboard');
+    expect(items[0]!.childCount).toBe(3);
+    // Children ordered by timestamp ascending.
+    expect(items[1]!.id).toBe('s1');
+    expect(items[2]!.id).toBe('s2');
+    expect(items[3]!.id).toBe('s3');
+    // Children carry depth: 1 and parentId pointing at the storyboard.
+    for (let i = 1; i <= 3; i++) {
+      expect(items[i]!.depth).toBe(1);
+      expect(items[i]!.parentId).toBe('sb-1');
+    }
+  });
+
+  it('empty storyboard produces a parent row with childCount=0 and isExpandable=false (T052 / FR-013)', () => {
+    const items = flattenFeatures(
+      [makeStoryboard('sb-empty', 'Lonely Storyboard') as never],
+      new Set<string>(),
+    );
+    expect(items).toHaveLength(1);
+    expect(items[0]!.type).toBe('storyboard');
+    expect(items[0]!.childCount).toBe(0);
+    expect(items[0]!.isExpandable).toBe(false);
+  });
+
+  it('two storyboards each with their own scenes — children routed under correct parents (T053)', () => {
+    const features = [
+      makeStoryboard('sb-A', 'Alpha') as never,
+      makeStoryboard('sb-B', 'Bravo') as never,
+      makeScene('a1', 'sb-A', '2026-04-20T10:00:00Z') as never,
+      makeScene('b1', 'sb-B', '2026-04-20T10:00:00Z') as never,
+      makeScene('a2', 'sb-A', '2026-04-20T10:01:00Z') as never,
+    ];
+    const items = flattenFeatures(features, new Set(['sb-A', 'sb-B']));
+    // 2 parents + 2 a-children + 1 b-child = 5 rows
+    expect(items).toHaveLength(5);
+    const sbA = items[0]!;
+    expect(sbA.id).toBe('sb-A');
+    expect(sbA.childCount).toBe(2);
+    expect(items[1]!.parentId).toBe('sb-A');
+    expect(items[2]!.parentId).toBe('sb-A');
+    const sbB = items[3]!;
+    expect(sbB.id).toBe('sb-B');
+    expect(sbB.childCount).toBe(1);
+    expect(items[4]!.parentId).toBe('sb-B');
+  });
+
+  it('orphan scene with non-existent storyboard_id emits top-level row with a warning (T054 / Article I.3)', () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      const features = [makeScene('orphan-1', 'sb-MISSING', '2026-04-20T10:00:00Z') as never];
+      const items = flattenFeatures(features, new Set<string>());
+      expect(items).toHaveLength(1);
+      // Top-level row, not buried under a non-existent parent.
+      expect(items[0]!.depth).toBe(0);
+      expect(items[0]!.parentId).toBe(null);
+      expect(consoleWarn).toHaveBeenCalledTimes(1);
+      expect(consoleWarn.mock.calls[0]?.[0]).toContain('orphan');
+    } finally {
+      consoleWarn.mockRestore();
+    }
+  });
+
+  it('scenes never appear at the top level when their storyboard parent is present', () => {
+    const features = [
+      makeStoryboard('sb-1', 'Foo') as never,
+      makeScene('s1', 'sb-1', '2026-04-20T10:00:00Z') as never,
+    ];
+    // Collapsed — only the parent row is emitted; the scene is not also
+    // emitted as a sibling top-level row.
+    const items = flattenFeatures(features, new Set<string>());
+    expect(items).toHaveLength(1);
+    expect(items[0]!.id).toBe('sb-1');
   });
 });
 

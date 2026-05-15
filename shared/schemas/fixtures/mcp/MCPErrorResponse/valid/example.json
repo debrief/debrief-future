@@ -1,0 +1,11 @@
+{
+  "error": {
+    "code": -32600,
+    "message": "Tool execution failed: selection mismatch.",
+    "data": {
+      "debrief:errorCategory": "selection",
+      "debrief:affectedFeatures": ["track-1", "track-2"]
+    }
+  },
+  "duration_ms": 3
+}

@@ -1,0 +1,8 @@
+{
+  "name": "units",
+  "type": "enum",
+  "description": "Output units",
+  "required": false,
+  "default_value": "m",
+  "choices": ["m", "nm", "km"]
+}

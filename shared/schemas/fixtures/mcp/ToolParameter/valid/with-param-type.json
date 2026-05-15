@@ -1,0 +1,7 @@
+{
+  "name": "color",
+  "type": "enum",
+  "description": "Track colour",
+  "required": false,
+  "param_type": "NamedColor"
+}
