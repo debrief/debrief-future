@@ -90,13 +90,13 @@ Threats specific to a public GitHub Pages SPA driven by Actions:
    practice but lower priority than pinning third-party actions.
 
 4. **`.env*` files never enter source control.**
-   The kit's `.gitignore` includes `.env` and `.env.local`. `extract.sh`
-   has a Step 3b guard that refuses to proceed if a `.env*` file is
-   present anywhere in the extracted tree — protecting against a stray
-   committed env file travelling out of the monorepo. If extract.sh
-   reports an `.env*` file: rotate any secrets it contains immediately,
-   remove the file from the source repo's history (`git filter-repo` or
-   BFG), then re-run.
+   The kit's `.gitignore` includes `.env` and `.env.local`. The
+   `import-from-source.sh` script has a Step 3 guard that refuses to
+   proceed if a `.env*` file is present anywhere in the extracted
+   branch — protecting against a stray committed env file travelling
+   out of the monorepo. If the guard fires: rotate any secrets the file
+   contains immediately, remove the file from the source repo's history
+   (`git filter-repo` or BFG), then re-run.
 
 5. **Service-worker scope confined to the app's base path.**
    `vite-plugin-pwa` is configured so the service worker registers at

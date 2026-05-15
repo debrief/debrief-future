@@ -12,7 +12,7 @@ excerpt: "Second SPA out of the monorepo. Same UI byte-for-byte; the kit knows t
 
 | Day-one of #248 spec-navigator extraction | Day-one of #249 backlog-navigator extraction |
 |---|---|
-| First push: every CI job failed in under ten seconds — monorepo lockfile didn't travel with the subtree split | `extract.sh` regenerates `pnpm-lock.yaml` inside the split tree before pushing |
+| First push: every CI job failed in under ten seconds — monorepo lockfile didn't travel with the subtree split | The kit regenerates `pnpm-lock.yaml` inside the extracted tree before the first commit |
 | `pnpm/action-setup@v3` refused to run — no `packageManager` field in the extracted `package.json` | `packageManager` field baked into the seam during Phase 1 |
 | Per-PR previews bolted on a week later as a follow-up patch | `pr-preview.yml` and `pr-preview-cleanup.yml` ship from the first push, with a bundled dummy `BACKLOG.md` so the default URL renders |
 | Kit hardcoded to `debrief/spec-navigator` — every adopter grep-replaced their way to a working repo | Kit scripts accept `--destination <org>/<repo>`; templates use `{{ORG}}`, `{{REPO}}`, `{{HOST}}` placeholders |
@@ -61,7 +61,7 @@ apps/backlog-navigator/              →  deepbluecltd/backlog-navigator/
                                              ├── README.md
                                              ├── CONFIGURATION.md
                                              ├── SECURITY.md
-                                             └── bootstrap-new-repo.sh
+                                             └── import-from-source.sh
 ```
 
 That right-hand column is what the kit produces. Every file in the kit's drop-in template directory is a fix-by-construction for something #248 found out the hard way.
@@ -76,18 +76,18 @@ That right-hand column is what the kit produces. Every file in the kit's drop-in
 | Workflows shipped in the kit | 6 |
 | Drop-in template files (replacing #248's markdown patches) | 7 |
 | Bundled dummy `BACKLOG.md` content (items + epics + strikethrough row) | 8 + 3 + 1 |
-| Files staged in a single `bootstrap-new-repo.sh --dry-run` | 17 |
+| Files staged in a single `import-from-source.sh --dry-run` | 13 |
 | Unsubstituted `{{ORG}}` / `{{REPO}}` / `{{HOST}}` placeholders after substitution | 0 |
 | Enumerated lessons from #248's hand-off, each mapped to an FR / R-NNN | 12 |
 | Commits processed by `git subtree split` in the dry-run | 275 |
 
-The audit (§1 and §1b of `plan.md`) drove the relocation count. Nine literals — `gh-pages` branch refs, `/backlog-navigator/` base paths, the Vite `base` option, the manifest scope, two hardcoded `debrief/` strings inside scripts, and three doc-only mentions — became `{{ORG}}` / `{{REPO}}` / `{{HOST}}` placeholders before the seam was cut. After `bootstrap-new-repo.sh` substitutes, the dry-run sweeps the staged tree for stragglers and exits non-zero if anything remains. Zero, every time.
+The audit (§1 and §1b of `plan.md`) drove the relocation count. Nine literals — `gh-pages` branch refs, `/backlog-navigator/` base paths, the Vite `base` option, the manifest scope, two hardcoded `debrief/` strings inside scripts, and three doc-only mentions — became `{{ORG}}` / `{{REPO}}` / `{{HOST}}` placeholders before the seam was cut. After `import-from-source.sh` substitutes, the dry-run sweeps the staged tree for stragglers and exits non-zero if anything remains. Zero, every time.
 
 ## Lessons Learned
 
 Twelve lessons came out of the #248 hand-off. The four below carried the most weight on day one of this extraction — both because they fail fast and because the fix is small enough to land in the kit rather than the runbook.
 
-**Lockfile didn't travel with the subtree split (Lesson 1).** The first push of #248 died in under ten seconds: every CI job failed `pnpm install` because `pnpm-lock.yaml` was the monorepo's, not the extracted app's. The split tree had no lockfile of its own, and `pnpm` won't synthesise one inside CI on a frozen-lockfile install. Fix: `extract.sh` now runs `pnpm install --lockfile-only` against the split tree before the first push, and CI asserts the lockfile is present and current. The extracted repo is push-ready, not "almost push-ready".
+**Lockfile didn't travel with the subtree split (Lesson 1).** The first push of #248 died in under ten seconds: every CI job failed `pnpm install` because `pnpm-lock.yaml` was the monorepo's, not the extracted app's. The split tree had no lockfile of its own, and `pnpm` won't synthesise one inside CI on a frozen-lockfile install. Fix: the kit's `import-from-source.sh` runs `pnpm install --lockfile-only` against the split tree before the first commit, and CI asserts the lockfile is present and current. The extracted repo is push-ready, not "almost push-ready".
 
 **`packageManager` field was missing (Lesson 2).** Compounding the above: even with a lockfile, `pnpm/action-setup@v3` refused to run because the extracted `package.json` had no `packageManager` field — that field lives in the monorepo root, not in `apps/backlog-navigator/package.json`. The kit now bakes `"packageManager": "pnpm@9.x.x"` into the seam during Phase 1, so the field exists before the subtree split, not after. Two lines of JSON; hours saved.
 
@@ -101,7 +101,7 @@ The remaining eight lessons (config-file precedence, manifest scope vs base, the
 
 Phase 3 — the cutover PR that deletes `apps/backlog-navigator/` from the monorepo and switches the `?pr=<n>` comment template to the new host — is gated by at least seven consecutive days of green CI on `deepbluecltd/backlog-navigator`. That window catches the slow-burn failure modes: a Lighthouse regression on a real PR, a service-worker update path that goes wrong on a returning visitor, a per-PR preview cleanup that doesn't clean up. Until that window closes green, `apps/backlog-navigator/` stays in the monorepo and the extracted repo runs as a parallel deploy.
 
-After that, the kit itself becomes the durable artefact. Two extractions in, three of the workflows (`ci`, `lighthouse`, `pr-preview`) are now identical between spec-navigator and backlog-navigator — the differences are entirely in placeholder substitution. Any speckit-based project with a `BACKLOG.md` can run `bootstrap-new-repo.sh --destination <org>/<repo>` against their monorepo and get the same shape: own repo, own CI, own per-PR previews, Lighthouse budget enforced, runbook in `ops/`. The `--destination` flag is what makes the kit reusable past the second time — and the second time was where the kit had to earn that.
+After that, the kit itself becomes the durable artefact. Two extractions in, three of the workflows (`ci`, `lighthouse`, `pr-preview`) are now identical between spec-navigator and backlog-navigator — the differences are entirely in placeholder substitution. Any speckit-based project with a `BACKLOG.md` can open a Claude Code session in their (empty) destination repo and run `import-from-source.sh` to get the same shape: own repo, own CI, own per-PR previews, Lighthouse budget enforced, runbook in `ops/`. Auto-detection of the destination from `origin` is what makes the kit reusable past the second time — and the second time was where the kit had to earn that. (The kit's design also flipped mid-PR from a local-operator push-from-source model to a destination-session pull-from-source model — see `why-pull-not-push.md` for the operator-experience rationale.)
 
 → [Spec](https://github.com/debrief/debrief-future/tree/main/specs/249-extract-backlog-navigator)
 → [Extraction kit](https://github.com/debrief/debrief-future/tree/main/specs/249-extract-backlog-navigator/extraction-kit)

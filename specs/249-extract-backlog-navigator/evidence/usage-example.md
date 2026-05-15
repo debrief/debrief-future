@@ -65,106 +65,100 @@ $ grep -l "octocat" apps/backlog-navigator/dist/assets/*.js
 
 ## Example B — Run the extraction kit end-to-end (Phase 2)
 
-The kit ships under `specs/249-extract-backlog-navigator/extraction-kit/`.
-This example uses `--dry-run` against a stub destination so no remote
-repo is created.
+The kit ships under `specs/249-extract-backlog-navigator/extraction-kit/`
+as a single `import-from-source.sh` script. It runs **inside the
+destination repo** (CC session opened in `<org>/<repo>`, or a local
+clone of the destination) and pulls everything from debrief-future
+itself. The script's only push target is the current repo's `origin`
+— it never tries to push across repo boundaries.
 
-### Step 1: extract
-
-```sh
-$ ./specs/249-extract-backlog-navigator/extraction-kit/scripts/extract.sh \
-    --destination test-org/test-repo --dry-run
-
-==> extract.sh
-    Source:      debrief/debrief-future (prefix: apps/backlog-navigator)
-    Destination: test-org/test-repo
-    Mode:        DRY RUN
-
-==> Step 1: cloning debrief/debrief-future into /tmp/backlog-nav-extract-2h1QDQ
-==> Step 2: git subtree split --prefix=apps/backlog-navigator -b extracted
-Created branch 'extracted'
-==> Step 3: sed-replace vite.config.ts base default → /test-repo/
-    OK — base default now /test-repo/
-==> Step 4: pnpm install --lockfile-only
-==> Step 5: validate lockfile
-    OK — lockfile parseable, deps resolve
-
-==> extract.sh complete
-    Working tree:  /tmp/backlog-nav-extract-2h1QDQ/repo
-    Branch:        extracted
-    Mode:          DRY RUN — tree preserved for inspection; no push performed.
-```
-
-The subtree split preserved every commit since the app's inception
-(275 commits across the whole monorepo, with `--prefix=apps/backlog-navigator`
-yielding the backlog-navigator-only subset).
-
-### Step 2: bootstrap
+This example uses `--dry-run` against a stub destination so no commit
+or push actually lands.
 
 ```sh
-$ ./specs/249-extract-backlog-navigator/extraction-kit/scripts/bootstrap-new-repo.sh \
-    --destination acme/foo --host acme.github.io --dry-run
+# In a Claude Code session opened on the destination repo,
+# or a local clone of it:
 
-==> Step 2: copy templates with {{ORG}}, {{REPO}}, {{HOST}} substitution
-    -> README.md
-    -> CONFIGURATION.md
-    -> SECURITY.md
-    -> .eslintrc.cjs
-    -> tsconfig.json
-    -> tsconfig.node.json
-    -> .gitignore
-    -> BACKLOG.md
-==> Step 3: copy workflows into .github/workflows/
-    -> .github/workflows/ci.yml
-    -> .github/workflows/deploy.yml
-    -> .github/workflows/lighthouse.yml
-    -> .github/workflows/pr-preview-cleanup.yml
-    -> .github/workflows/pr-preview.yml
+$ git clone --depth 100 https://github.com/debrief/debrief-future.git /tmp/debrief-source
+$ bash /tmp/debrief-source/specs/249-extract-backlog-navigator/extraction-kit/scripts/import-from-source.sh --dry-run
+
+==> import-from-source.sh
+    Destination:   acme/foo-navigator (origin)
+    Host:          acme.github.io
+    Source repo:   debrief/debrief-future
+    Mode:          DRY RUN — no push
+
+==> Step 1: use existing source clone at /tmp/debrief-source
+    OK — source path verified
+==> Step 2: subtree split apps/backlog-navigator/ in source clone
+    OK — extracted branch produced in source clone
+==> Step 3: scan extracted tree for stray .env* files
+    OK — no .env* files in extracted tree
+==> Step 4: merge extracted history into destination
+    OK — main created from extracted (empty destination)
+==> Step 5: rewrite vite.config.ts base default → /foo-navigator/
+    OK — base default now /foo-navigator/
+==> Step 6: apply templates with {{ORG}}/{{REPO}}/{{HOST}} substitution
+    -> README.md, CONFIGURATION.md, SECURITY.md, .eslintrc.cjs,
+       tsconfig.json, tsconfig.node.json, .gitignore, BACKLOG.md
+    OK — 8 template files rendered
+==> Step 7: install workflows into .github/workflows/
+    -> ci.yml, deploy.yml, lighthouse.yml, pr-preview-cleanup.yml, pr-preview.yml
     -> .github/workflows-optional/live.yml (NOT enabled by default)
-==> Step 4: copy bundled dummy spec dirs
-    -> specs/ populated from templates/specs-dummy/
+    OK — 5 workflows installed
+==> Step 8: copy bundled dummy spec dirs
+    OK — bundled dummy dataset in place
+==> Step 9: regenerate pnpm-lock.yaml
+    OK — pnpm-lock.yaml generated
+==> Step 10: smoke (pnpm install && pnpm test && pnpm build)
+    OK — smoke green
+==> Placeholder leakage check:  OK — no remaining {{ORG}}/{{REPO}}/{{HOST}} markers
 
-==> Dry-run substitution complete. Staged files (not committed):
- (17 files staged, totalling 910 insertions)
-
-==> Placeholder leakage check:
-    OK — no remaining {{ORG}}/{{REPO}}/{{HOST}} markers
-
-==> Dry run complete. Working tree: /tmp/bootstrap-dryrun-Yaacto
+==> Dry-run complete. Staged files (not committed):
+    Working tree:  /tmp/test-dest-empty-pBthtZ
+    Report:        /tmp/test-dest-empty-pBthtZ/import-report.json
 ```
 
-The bootstrap substitutes every `{{ORG}}` → `acme`, `{{REPO}}` → `foo`,
-`{{HOST}}` → `acme.github.io`. The post-substitution check confirms
-zero leakage — every template placeholder is replaced.
+The script substitutes every `{{ORG}}` → `acme`, `{{REPO}}` →
+`foo-navigator`, `{{HOST}}` → `acme.github.io`. The post-substitution
+placeholder-leakage check confirms zero unsubstituted `{{...}}`
+markers remain. The destination is auto-detected from the current
+repo's `origin` remote; pass `--destination <org>/<repo>` to override
+(useful when `origin` isn't configured yet).
 
-### What `extract.sh` and `bootstrap-new-repo.sh` do, side by side
+### Step boundaries and the JSON report
 
-| Step | extract.sh | bootstrap-new-repo.sh |
-|---|---|---|
-| 1 | Clone source into temp dir | Probe destination repo (empty? non-empty?) |
-| 2 | `git subtree split --prefix=apps/backlog-navigator` | Copy templates with placeholder substitution |
-| 3 | sed-replace `vite.config.ts` base default | Copy workflows into `.github/workflows/` |
-| 4 | Regenerate `pnpm-lock.yaml` + commit | Copy bundled dummy `BACKLOG.md` + spec dirs |
-| 5 | Validate lockfile via `--frozen-lockfile --ignore-scripts` | Full smoke (`pnpm install + test + build`) — abort on failure |
-| 6 | (DRY) leave tree for inspection; (live) write `.last-extract-path` | (live) Commit + push to `<destination>:main` |
+Every step closes with a single-line `OK —` or `FAIL —` trailer so an
+AI-driven runbook can branch on grep rather than exit-code parsing.
+`import-report.json` is written at every script exit (success or
+failure) for machine-readable evidence:
+
+```json
+{
+  "destination": "acme/foo-navigator",
+  "host": "acme.github.io",
+  "mode": "dry-run",
+  "filesRendered": 13,
+  "tokensReplaced": 33,
+  "placeholderCheck": "ok",
+  "smokeTestExitCode": 0,
+  "sourceRepo": "debrief/debrief-future"
+}
+```
 
 ### Real-world execution
 
-Outside `--dry-run`, the final live `bootstrap-new-repo.sh` step is:
+Outside `--dry-run`, the final step is `git push -u origin HEAD:main`.
+That push targets the destination repo's own `origin` — the same repo
+the script is running in. No cross-repo push, no GitHub App
+authorisation needed for *other* repos (only for the repo the CC
+session is opened in).
 
-```
-==> Step 5: push to git@github.com:<org>/<repo>.git
-==> bootstrap-new-repo.sh complete
-    Pushed to:     git@github.com:<org>/<repo>.git (main)
-    Next steps:
-      1. Settings → Pages → Source: 'Deploy from a branch' → gh-pages → /
-         (wait for the first deploy to create the branch first)
-      2. Open a small test PR and watch pr-preview.yml deploy a preview.
-      3. Hold for ≥7 days of green CI before starting Phase 3 (cutover).
-```
-
-The kit aborts with explicit guidance on the two most common
-operator-side failures: 403 push (GitHub App not authorised — see
-R-011 / #248 Lesson 9) and non-empty target repo (init checkboxes left
-on — see R-011 / #248 Lesson 10). Both gotchas are documented in the
-runbook's prereq section as Step 0a / Step 0b / Step 0c.
+The script aborts with explicit guidance on the three operator-side
+failure modes:
+- **`.env*` files found in extracted tree** → rotate any secrets, remove
+  from source, re-run.
+- **Destination non-empty without `--merge-unrelated-histories`** →
+  either recreate the repo empty, or re-run with the flag.
+- **403 on push** → the CC session's GitHub App isn't authorised on
+  the destination; install it via the web UI and re-run.

@@ -96,7 +96,7 @@ Phase 3 lands two decision-record updates:
 Records:
 - The three-phase extraction shape (carried from #248).
 - The decision to use `gh-pages` branch + `JamesIves/github-pages-deploy-action@v4` from day one (R-003).
-- The destination slug (operator-supplied via `--destination`; recommended `deepbluecltd/backlog-navigator`).
+- The destination slug (auto-detected from the destination repo's `origin` by `import-from-source.sh`; recommended `deepbluecltd/backlog-navigator`).
 - The cutover gate (≥7 days green CI).
 - Cross-references to ADR-030, ADR-031 (#248's extraction ADR), and
   the relevant lessons-from-248 entries.

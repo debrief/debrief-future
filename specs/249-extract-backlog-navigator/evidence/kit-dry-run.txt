@@ -1,25 +1,68 @@
-==> extract.sh
-    Source:      debrief/debrief-future (prefix: apps/backlog-navigator)
-    Destination: test-org/test-repo
-    Mode:        DRY RUN
+==> import-from-source.sh
+    Destination:   acme/foo-navigator (origin)
+    Host:          acme.github.io
+    Source repo:   debrief/debrief-future
+    Mode:          DRY RUN — no push
 
-==> Step 1: cloning debrief/debrief-future into /tmp/backlog-nav-extract-N2MiCF
-    OK — source clone ready
-==> Step 2: git subtree split --prefix=apps/backlog-navigator -b extracted
-1/277 (0) [0]2/277 (1) [0]3/277 (2) [0]4/277 (3) [0]5/277 (4) [0]6/277 (5) [0]7/277 (6) [0]8/277 (7) [0]9/277 (8) [0]10/277 (9) [0]11/277 (10) [0]12/277 (11) [0]13/277 (12) [0]14/277 (13) [0]15/277 (14) [0]16/277 (15) [0]17/277 (16) [0]18/277 (17) [0]19/277 (18) [0]20/277 (19) [0]21/277 (20) [0]22/277 (21) [0]23/277 (22) [0]24/277 (23) [0]25/277 (24) [0]26/277 (25) [0]27/277 (26) [0]28/277 (27) [0]29/277 (28) [0]30/277 (29) [0]31/277 (30) [0]32/277 (31) [0]33/277 (32) [0]34/277 (33) [0]35/277 (34) [0]36/277 (35) [0]37/277 (36) [0]38/277 (37) [0]39/277 (38) [0]40/277 (39) [0]41/277 (40) [0]42/277 (41) [0]43/277 (42) [0]44/277 (43) [0]45/277 (44) [0]46/277 (45) [0]47/277 (46) [0]48/277 (47) [0]49/277 (48) [0]50/277 (49) [0]51/277 (50) [0]52/277 (51) [0]53/277 (52) [0]54/277 (53) [0]55/277 (54) [0]56/277 (55) [0]57/277 (56) [0]58/277 (57) [0]59/277 (58) [0]60/277 (59) [0]61/277 (60) [0]62/277 (61) [0]63/277 (62) [0]64/277 (63) [0]65/277 (64) [0]66/277 (65) [0]67/277 (66) [0]68/277 (67) [0]69/277 (68) [0]70/277 (69) [0]71/277 (70) [0]72/277 (71) [0]73/277 (72) [0]74/277 (73) [0]75/277 (74) [0]76/277 (75) [0]77/277 (76) [0]78/277 (77) [0]79/277 (78) [0]80/277 (79) [0]81/277 (80) [0]82/277 (81) [0]83/277 (82) [0]84/277 (83) [0]85/277 (84) [0]86/277 (85) [0]87/277 (86) [0]88/277 (87) [0]89/277 (88) [0]90/277 (89) [0]91/277 (90) [0]92/277 (91) [0]93/277 (92) [0]94/277 (93) [0]95/277 (94) [0]96/277 (95) [0]97/277 (96) [0]98/277 (97) [0]99/277 (98) [0]100/277 (99) [0]101/277 (100) [0]102/277 (101) [0]103/277 (102) [0]104/277 (103) [0]105/277 (104) [0]106/277 (105) [0]107/277 (106) [0]108/277 (107) [0]109/277 (108) [0]110/277 (109) [0]111/277 (110) [0]112/277 (111) [0]113/277 (112) [0]114/277 (113) [0]115/277 (114) [0]116/277 (115) [0]117/277 (116) [0]118/277 (117) [0]119/277 (118) [0]120/277 (119) [0]121/277 (120) [0]122/277 (121) [0]123/277 (122) [0]124/277 (123) [0]125/277 (124) [0]126/277 (125) [0]127/277 (126) [0]128/277 (127) [0]129/277 (128) [0]130/277 (129) [0]131/277 (130) [0]132/277 (131) [0]133/277 (132) [0]134/277 (133) [0]135/277 (134) [0]136/277 (135) [0]137/277 (136) [0]138/277 (137) [0]139/277 (138) [0]140/277 (139) [0]141/277 (140) [0]142/277 (141) [0]143/277 (142) [0]144/277 (143) [0]145/277 (144) [0]146/277 (145) [0]147/277 (146) [0]148/277 (147) [0]149/277 (148) [0]150/277 (149) [0]151/277 (150) [0]152/277 (151) [0]153/277 (152) [0]154/277 (153) [0]155/277 (154) [0]156/277 (155) [0]157/277 (156) [0]158/277 (157) [0]159/277 (158) [0]160/277 (159) [0]161/277 (160) [0]162/277 (161) [0]163/277 (162) [0]164/277 (163) [0]165/277 (164) [0]166/277 (165) [0]167/277 (166) [0]168/277 (167) [0]169/277 (168) [0]170/277 (169) [0]171/277 (170) [0]172/277 (171) [0]173/277 (172) [0]174/277 (173) [0]175/277 (174) [0]176/277 (175) [0]177/277 (176) [0]178/277 (177) [0]179/277 (178) [0]180/277 (179) [0]181/277 (180) [0]182/277 (181) [0]183/277 (182) [0]184/277 (183) [0]185/277 (184) [0]186/277 (185) [0]187/277 (186) [0]188/277 (187) [0]189/277 (188) [0]190/277 (189) [0]191/277 (190) [0]192/277 (191) [0]193/277 (192) [0]194/277 (193) [0]195/277 (194) [0]196/277 (195) [0]197/277 (196) [0]198/277 (197) [0]199/277 (198) [0]200/277 (199) [0]201/277 (200) [0]202/277 (201) [0]203/277 (202) [0]204/277 (203) [0]205/277 (204) [0]206/277 (205) [0]207/277 (206) [0]208/277 (207) [0]209/277 (208) [0]210/277 (209) [0]211/277 (210) [0]212/277 (211) [0]213/277 (212) [0]214/277 (213) [0]215/277 (214) [0]216/277 (215) [0]217/277 (216) [0]218/277 (217) [0]219/277 (218) [0]220/277 (219) [0]221/277 (220) [0]222/277 (221) [0]223/277 (222) [0]224/277 (223) [0]225/277 (224) [0]226/277 (225) [0]227/277 (226) [0]228/277 (227) [0]229/277 (228) [0]230/277 (229) [0]231/277 (230) [0]232/277 (231) [0]233/277 (232) [0]234/277 (233) [0]235/277 (234) [0]236/277 (235) [0]237/277 (236) [0]238/277 (237) [0]239/277 (238) [0]240/277 (239) [0]241/277 (240) [0]242/277 (241) [0]243/277 (242) [0]244/277 (243) [0]245/277 (244) [0]246/277 (245) [0]247/277 (246) [0]248/277 (247) [0]249/277 (248) [0]250/277 (249) [0]251/277 (250) [0]252/277 (251) [0]253/277 (252) [0]254/277 (253) [0]255/277 (254) [0]256/277 (255) [0]257/277 (256) [0]258/277 (257) [0]259/277 (258) [0]260/277 (259) [0]261/277 (260) [0]262/277 (261) [0]263/277 (262) [0]264/277 (263) [0]265/277 (264) [0]266/277 (265) [0]267/277 (266) [0]268/277 (267) [0]269/277 (268) [0]270/277 (269) [0]271/277 (270) [0]272/277 (271) [0]273/277 (272) [0]274/277 (273) [0]275/277 (274) [0]276/277 (275) [0]277/277 (276) [0]Created branch 'extracted'
-    OK — extracted branch checked out
-==> Step 3: sed-replace vite.config.ts base default → /test-repo/
-    OK — base default now /test-repo/
-==> Step 3b: scan for stray .env* files
+==> Step 1: use existing source clone at /home/user/debrief-future
+    OK — source path verified
+==> Step 2: subtree split apps/backlog-navigator/ in source clone
+    OK — extracted branch produced in source clone
+==> Step 3: scan extracted tree for stray .env* files
     OK — no .env* files in extracted tree
-==> Step 4: pnpm install --lockfile-only
+==> Step 4: merge extracted history into destination
+Switched to a new branch 'main'
+branch 'main' set up to track 'backlog-source-tmp/extracted'.
+    OK — main created from extracted (empty destination)
+==> Step 5: rewrite vite.config.ts base default → /foo-navigator/
+    OK — base default now /foo-navigator/
+==> Step 6: apply templates with {{ORG}}/{{REPO}}/{{HOST}} substitution
+    -> README.md
+    -> CONFIGURATION.md
+    -> SECURITY.md
+    -> .eslintrc.cjs
+    -> tsconfig.json
+    -> tsconfig.node.json
+    -> .gitignore
+    -> BACKLOG.md
+    OK — 8 template files rendered
+==> Step 7: install workflows into .github/workflows/
+    -> .github/workflows/ci.yml
+    -> .github/workflows/deploy.yml
+    -> .github/workflows/lighthouse.yml
+    -> .github/workflows/pr-preview-cleanup.yml
+    -> .github/workflows/pr-preview.yml
+    -> .github/workflows-optional/live.yml (NOT enabled by default)
+    OK — 5 workflows installed
+==> Step 8: copy bundled dummy spec dirs
+    OK — bundled dummy dataset in place
+==> Step 9: regenerate pnpm-lock.yaml
     OK — pnpm-lock.yaml generated
-==> Step 5: validate lockfile
-    OK — lockfile parseable, deps resolve
+==> Step 10: smoke SKIPPED (--no-smoke supplied)
+==> Placeholder leakage check:  OK — no remaining {{ORG}}/{{REPO}}/{{HOST}} markers
 
-==> extract.sh complete
-    OK — extract phase done
-    Working tree:  /tmp/backlog-nav-extract-N2MiCF/repo
-    Branch:        extracted
-    Mode:          DRY RUN — tree preserved for inspection; no push performed.
-    Next:          inspect, then run live mode without --dry-run.
+==> Dry-run complete. Staged files (not committed):
+ .eslintrc.cjs                            |   24 +-
+ .github/workflows-optional/live.yml      |   59 +
+ .github/workflows/ci.yml                 |   76 +
+ .github/workflows/deploy.yml             |   46 +
+ .github/workflows/lighthouse.yml         |   92 +
+ .github/workflows/pr-preview-cleanup.yml |   45 +
+ .github/workflows/pr-preview.yml         |   85 +
+ .gitignore                               |    7 +-
+ BACKLOG.md                               |   29 +
+ CONFIGURATION.md                         |  111 +
+ README.md                                |  127 +-
+ SECURITY.md                              |  168 +
+ pnpm-lock.yaml                           | 7320 ++++++++++++++++++++++++++++++
+ specs/001-dummy-spec/plan.md             |    3 +
+ specs/001-dummy-spec/spec.md             |   37 +
+ specs/001-dummy-spec/tasks.md            |    3 +
+ tsconfig.json                            |   13 +-
+ vite.config.ts                           |    2 +-
+ 18 files changed, 8211 insertions(+), 36 deletions(-)
+
+    Working tree:  /tmp/evidence-dest-rXiNUo
+    Report:        /tmp/evidence-dest-rXiNUo/import-report.json
+
+    To recover: git reset HEAD && git clean -fd to undo all changes.

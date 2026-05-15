@@ -30,20 +30,26 @@ coverage_pct: null
 | `pnpm --filter @debrief/backlog-navigator typecheck` (T029) | Pass |
 | `pnpm --filter @debrief/backlog-navigator test` (T030) | Pass — 139/139 Vitest tests across 19 files |
 | Smoke build with non-default env vars (T032) | Pass — `VITE_DEFAULT_OWNER=octocat VITE_DEFAULT_REPO=hello-world pnpm build` bakes the foreign slug into `dist/assets/index-*.js` |
-| Grep guard — no production debrief literals (T034) | Pass — remaining matches limited to comment prose in `defaults.ts`/`strings.ts` and the `vite.config.ts` base default (which `extract.sh` sed-substitutes at extraction time) |
+| Grep guard — no production debrief literals (T034) | Pass — remaining matches limited to comment prose in `defaults.ts`/`strings.ts` and the `vite.config.ts` base default (which `import-from-source.sh` sed-substitutes at extraction time) |
 | Grep guard — no `@debrief` imports (T035) | Pass — only the package's own `name` field and prose comments remain |
 
 ### Phase 2 — Extraction kit (specs/249-extract-backlog-navigator/extraction-kit/)
 
+The kit was refactored mid-PR from a two-script push-from-source flow
+(operator's local machine pushes to destination) to a single-script
+pull-from-source flow (destination's CC session pulls from
+debrief-future). See `extraction-kit/docs/why-pull-not-push.md` for
+rationale. The verification table below reflects the final flow.
+
 | Gate | Status |
 |------|--------|
-| `bash -n extract.sh` (T059) | Pass — syntax clean |
-| `bash -n bootstrap-new-repo.sh` (T059) | Pass — syntax clean |
-| `shellcheck` (T059) | Not installed in sandbox; recorded as environmental gap |
-| `yamllint` / `actionlint` (T060) | Not installed in sandbox; recorded as environmental gap |
-| Grep for debrief in templates/workflows/scripts (T061) | Pass — all matches are source-repo provenance refs (audit-allowed) |
-| `extract.sh --dry-run --destination test-org/test-repo` (T058) | Pass — subtree split (275 commits), vite base sed, lockfile regen, lockfile validation all green |
-| `bootstrap-new-repo.sh --dry-run --destination acme/foo` (T062) | Pass — 17 files staged; zero unsubstituted `{{...}}` placeholders |
+| `bash -n import-from-source.sh` | Pass — syntax clean |
+| `shellcheck` | Not installed in sandbox; recorded as environmental gap |
+| `yamllint` / `actionlint` | Not installed in sandbox; recorded as environmental gap |
+| Grep for debrief in templates/workflows/scripts | Pass — all matches are source-repo provenance refs (audit-allowed) |
+| `import-from-source.sh --dry-run` against fresh empty destination | Pass — subtree split (278 commits), checkout-as-main, vite base sed, lockfile regen, placeholder check all green; 13 files rendered, 33 tokens replaced |
+| `import-from-source.sh --dry-run` against non-empty destination, without `--merge-unrelated-histories` | Pass — aborts at Step 4 with explicit guidance to re-run with the flag |
+| `import-from-source.sh --dry-run --merge-unrelated-histories` against non-empty destination | Pass — merges with init commits; same 13 files rendered, same zero placeholder leakage |
 
 ### Vitest detail (139 tests across 19 files)
 
@@ -86,10 +92,12 @@ coverage_pct: null
 - **`packageManager` field is present** so the post-extraction CI's
   `pnpm/action-setup@v4` step resolves a version. (FR-010 / #248 Lesson 2.)
 - **Extraction kit produces a buildable standalone tree end-to-end.**
-  `extract.sh --dry-run` completes the subtree split, sed, and lockfile
-  regen; `bootstrap-new-repo.sh --dry-run` applies all 17 template files
-  with zero remaining placeholder leakage; the post-substitution tree
-  has standalone tsconfig / eslintrc that no longer reference monorepo paths.
+  `import-from-source.sh --dry-run` against a fresh empty destination
+  completes subtree split → merge into destination → vite-base sed →
+  template substitution → lockfile regen → placeholder-leakage check,
+  all green; 13 files rendered, 33 tokens replaced, zero remaining
+  `{{...}}` markers. The post-substitution tree has standalone tsconfig
+  / eslintrc that no longer reference monorepo paths.
 - **No hardcoded destination in the kit.** All kit templates, workflows,
   and scripts use `{{ORG}}`/`{{REPO}}`/`{{HOST}}` placeholders; the only
   `debrief` matches are source-repo provenance references (audit-allowed).

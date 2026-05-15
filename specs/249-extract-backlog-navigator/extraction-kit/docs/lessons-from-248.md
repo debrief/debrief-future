@@ -18,7 +18,7 @@ Each lesson maps to the FR / R-NNN that codifies the fix.
 **Cause**: The monorepo's `pnpm-lock.yaml` lives at the repo root, not in
 `apps/<name>/`; the subtree split therefore carries no lockfile.
 
-**Fix in this kit**: `extract.sh` runs `pnpm install --lockfile-only`
+**Fix in this kit**: `import-from-source.sh` runs `pnpm install --lockfile-only`
 after the subtree split, then commits the resulting lockfile on top of
 the extracted history. (R-010 / FR-015.)
 
@@ -39,10 +39,11 @@ split happens. (FR-010 / T023.)
 `debrief/spec-navigator` baked in. For a destination of
 `deepbluecltd/speckit-navigator`, every line had to be patched by hand.
 
-**Fix in this kit**: Scripts accept `--destination <org>/<repo>` and
-`--host <host>` flags (or read them from `kit-config.json`). Templates
-use `{{ORG}}`, `{{REPO}}`, `{{HOST}}` placeholders; `bootstrap-new-repo.sh`
-substitutes from the flags. (R-009 / FR-017.)
+**Fix in this kit**: The single `import-from-source.sh` script
+auto-detects the destination from the current repo's `origin` remote
+(or accepts `--destination <org>/<repo>` for override). Templates use
+`{{ORG}}`, `{{REPO}}`, `{{HOST}}` placeholders; the script substitutes
+from the detected values. (R-009 / FR-017.)
 
 ### 4. `actions/deploy-pages` blocks PR previews
 
@@ -67,19 +68,20 @@ the monorepo-relative paths" — mechanical but easy to misapply.
 
 **Fix in this kit**: `templates/.eslintrc.cjs`, `templates/tsconfig.json`,
 and `templates/tsconfig.node.json` are drop-in files that
-`bootstrap-new-repo.sh` copies verbatim (with `{{ORG}}` etc. substituted).
-The patch markdown becomes rationale doc, not implementation. (R-012.)
+`import-from-source.sh` copies verbatim (with `{{ORG}}` etc.
+substituted). The patch markdown becomes rationale doc, not
+implementation. (R-012.)
 
 ### 6. Patch 01 (vite base flip) was a one-line edit dressed up as a recipe
 
-**Fix in this kit**: `extract.sh` performs the sed replacement
-automatically using the `--destination` repo slug. No manual edit
-step. (R-009 / R-012.)
+**Fix in this kit**: `import-from-source.sh` performs the sed
+replacement automatically using the auto-detected destination repo
+slug. No manual edit step. (R-009 / R-012.)
 
 ### 7. README/CONFIGURATION/SECURITY templates had `debrief.github.io` hardcoded
 
 **Fix in this kit**: Templates use `{{ORG}}`, `{{REPO}}`, `{{HOST}}`
-placeholders throughout. `bootstrap-new-repo.sh --dry-run` checks for
+placeholders throughout. `import-from-source.sh --dry-run` checks for
 unsubstituted placeholders before push. (R-009 / FR-018.)
 
 ### 8. Missing PR preview workflow + dummy spec
@@ -102,9 +104,12 @@ from the very first PR. (R-004 / R-005 / FR-012 / FR-013 / FR-016.)
 403 silently until the Claude/agent GitHub App was installed via the
 GitHub web UI on the destination repo. #248 lost ~30 minutes here.
 
-**Fix in this kit**: Prereq Step 0a in `README.md` includes the
-web-UI navigation path. `bootstrap-new-repo.sh` detects a 403 push
-response and prints the same instructions inline. (R-011.)
+**Fix in this kit**: Prereq Step 0b in `README.md` includes the
+web-UI navigation path. The Step 12 push in `import-from-source.sh`
+detects a 403 response and prints the same instructions inline. The
+required scope is narrower than in #248's kit: only the destination
+repo needs the GitHub App authorised, because the script never
+pushes to anywhere else. (R-011.)
 
 ### 10. Target repo must be empty
 
@@ -112,14 +117,16 @@ response and prints the same instructions inline. (R-011.)
 and "Choose a license" toggles to checked. If any is left on, the
 first push fails (non-empty target). #248 hit this rescue path mid-flight.
 
-**Fix in this kit**: Prereq Step 0b explicitly says "uncheck all three
-init options". Prereq Step 0c describes the `--merge-unrelated-histories`
-fallback. `bootstrap-new-repo.sh` detects a non-empty target and offers
-the merge fallback rather than aborting. (R-011 / FR-020.)
+**Fix in this kit**: Prereq Step 0a explicitly says "uncheck all three
+init options". `import-from-source.sh` Step 4 detects an existing
+HEAD in the destination and either aborts with explicit guidance or
+merges with `--allow-unrelated-histories` if the flag is supplied.
+Conflicts on `README.md`/`LICENSE`/`.gitignore` are auto-resolved in
+favour of the imported tree. (R-011 / FR-020.)
 
 ### 11. Workflow logs inaccessible to the agent during debugging
 
-Not strictly a kit issue — the agent operating `bootstrap-new-repo.sh`
+Not strictly a kit issue — the agent operating `import-from-source.sh`
 typically has no MCP/API path to fetch CI job logs when a workflow
 fails. Diagnosis in #248 worked only because the failure category was
 guessable from the sub-10-second completion time.
@@ -157,15 +164,15 @@ rationale.
 
 | # | Lesson | Fix lives at |
 |---|---|---|
-| 1 | No lockfile shipped | `scripts/extract.sh` step 4 |
+| 1 | No lockfile shipped | `scripts/import-from-source.sh` step 9 |
 | 2 | No `packageManager` field | Phase 1 source edit (T023) — pre-extraction |
-| 3 | Hardcoded destination | `--destination` flag throughout kit |
+| 3 | Hardcoded destination | Auto-detected from current repo's `origin`; `--destination` flag for override |
 | 4 | `actions/deploy-pages` blocks previews | `workflows/deploy.yml` uses JamesIves action |
 | 5 | Markdown-recipe configs | `templates/*` drop-in files |
-| 6 | Vite base flip as recipe | `scripts/extract.sh` step 3 (automated sed) |
+| 6 | Vite base flip as recipe | `scripts/import-from-source.sh` step 5 (automated sed) |
 | 7 | Hardcoded host in templates | `{{HOST}}` placeholder throughout |
 | 8 | No PR previews / no dummy | `workflows/pr-preview*.yml` + `templates/BACKLOG.dummy.md` |
-| 9 | GitHub App authorisation gap | `README.md` Step 0a + bootstrap 403 detection |
+| 9 | GitHub App authorisation gap | `README.md` Step 0b + import-from-source 403 detection |
 | 10 | Non-empty target repo | `README.md` Step 0b + `--merge-unrelated-histories` |
 | 11 | Workflow logs inaccessible | `README.md` debugging note (coordination only) |
 | 12 | Patch 03 was overkill | Kit drops patch 03; `live.yml` is opt-in only |

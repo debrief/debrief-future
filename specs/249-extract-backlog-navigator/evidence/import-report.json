@@ -1,10 +1,11 @@
 {
-  "destination": "acme/foo",
+  "destination": "acme/foo-navigator",
   "host": "acme.github.io",
   "mode": "dry-run",
   "filesRendered": 13,
   "tokensReplaced": 33,
   "placeholderCheck": "ok",
   "smokeTestExitCode": "skipped",
-  "extractPath": "/tmp/bootstrap-dryrun-T391Gs"
+  "sourceRepo": "debrief/debrief-future",
+  "sourcePath": "/home/user/debrief-future"
 }
