@@ -344,6 +344,7 @@ echo "==> Step 6: apply templates with {{ORG}}/{{REPO}}/{{HOST}} substitution"
 
 TEMPLATE_FILES=(
   README.md
+  ADOPTING.md
   CONFIGURATION.md
   SECURITY.md
   .eslintrc.cjs
@@ -411,6 +412,31 @@ if [[ -d "$KIT_ROOT/templates/specs-dummy" ]]; then
   mkdir -p specs
   cp -r "$KIT_ROOT/templates/specs-dummy/"* specs/
   echo "    OK — bundled dummy dataset in place"
+fi
+
+# -- Step 8b: consumer-workflow templates -----------------------------------
+#
+# These workflow YAMLs are for ADOPTERS to drop into THEIR repos (not the
+# navigator's own .github/workflows/). They're shipped in `docs/consumer-
+# workflows/` so adopters following ADOPTING.md's Path 3 can copy them
+# verbatim and edit the navigator URL.
+
+if [[ -d "$KIT_ROOT/templates/consumer-workflows" ]]; then
+  echo "==> Step 8b: copy consumer-workflow templates"
+  mkdir -p docs/consumer-workflows
+  for wf in "$KIT_ROOT/templates/consumer-workflows/"*.yml; do
+    [[ -f "$wf" ]] || continue
+    BASENAME="$(basename "$wf")"
+    PRE_TOKENS="$(count_tokens "$wf")"
+    TOKENS_REPLACED=$((TOKENS_REPLACED + PRE_TOKENS))
+    sed -e "s|{{ORG}}|$DEST_ORG|g" \
+        -e "s|{{REPO}}|$DEST_REPO|g" \
+        -e "s|{{HOST}}|$HOST|g" \
+      "$wf" > "docs/consumer-workflows/$BASENAME"
+    FILES_RENDERED=$((FILES_RENDERED + 1))
+    echo "    -> docs/consumer-workflows/$BASENAME"
+  done
+  echo "    OK — consumer-workflow templates copied"
 fi
 
 # -- Step 9: regenerate pnpm-lock.yaml -------------------------------------

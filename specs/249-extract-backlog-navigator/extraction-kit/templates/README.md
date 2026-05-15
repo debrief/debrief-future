@@ -9,6 +9,11 @@ extracted from `debrief/debrief-future` (`apps/backlog-navigator/`) so
 any project with a `BACKLOG.md` and speckit can adopt it without
 depending on the source monorepo.
 
+> **Adopting this for your own project?** Start with
+> [ADOPTING.md](ADOPTING.md) — it walks the three deployment paths
+> (zero-infra link, self-hosted fork, sticky-comment workflow), the
+> required `BACKLOG.md` shape, and PAT setup.
+
 ---
 
 ## Quickstart
