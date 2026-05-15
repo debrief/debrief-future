@@ -7,7 +7,7 @@ by `/speckit.pr` to assemble the top of `media/shipped-post.md`.
 
 | Day-one of #248 spec-navigator extraction | Day-one of #249 backlog-navigator extraction |
 |---|---|
-| First push: every CI job failed in under ten seconds — monorepo lockfile didn't travel with the subtree split | `extract.sh` regenerates `pnpm-lock.yaml` inside the split tree before pushing |
+| First push: every CI job failed in under ten seconds — monorepo lockfile didn't travel with the subtree split | The kit regenerates `pnpm-lock.yaml` inside the extracted tree before the first commit |
 | `pnpm/action-setup@v3` refused to run — no `packageManager` field in the extracted `package.json` | `packageManager` field baked into the seam during Phase 1 |
 | Per-PR previews bolted on a week later as a follow-up patch | `pr-preview.yml` and `pr-preview-cleanup.yml` ship from the first push, with a bundled dummy `BACKLOG.md` so the default URL renders |
 | Kit hardcoded to `debrief/spec-navigator` — every adopter grep-replaced their way to a working repo | Kit scripts accept `--destination <org>/<repo>`; templates use `{{ORG}}`, `{{REPO}}`, `{{HOST}}` placeholders |

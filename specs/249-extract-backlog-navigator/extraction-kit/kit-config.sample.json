@@ -1,0 +1,16 @@
+{
+  "_comment": "Sample kit configuration. The kit's import-from-source.sh script auto-detects destination from the current repo's origin remote and host from the org name. This file is a reference for adopters who want to capture their intended configuration in a checked-in artefact alongside the kit; the script does NOT consume it directly.",
+  "destination": {
+    "org": "deepbluecltd",
+    "repo": "backlog-navigator"
+  },
+  "host": "deepbluecltd.github.io",
+  "source": {
+    "repo": "debrief/debrief-future",
+    "prefix": "apps/backlog-navigator"
+  },
+  "options": {
+    "smokeTestAfterExtract": true,
+    "abortOnSmokeFailure": true
+  }
+}
