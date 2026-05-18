@@ -773,37 +773,35 @@ export class StoryboardEditService implements vscode.Disposable {
       throw new UnknownSceneError(input.sceneId);
     }
     const now = new Date().toISOString();
-    try {
-      const { plot: nextPlot, scene } = await crudDuplicateScene(plot, {
-        sceneId: input.sceneId,
-        newTimestamp: input.newTimestamp,
-        actor: input.actor,
-        now,
-      });
-      this.writePlot(input.documentUri, nextPlot);
-      // T071 — insert a stale flag for the duplicated Scene.
-      await this.recomputeStaleFlagFor(
-        input.documentUri,
-        nextPlot,
-        scene.properties.id,
-      );
-      const logEntryActivityId = await this.emitLogEntry(
-        input.documentUri,
-        'duplicate',
-        scene.properties.storyboard_id,
-        scene.properties.id,
-        scene.properties.thumbnail_asset_ref,
-        input.actor,
-        `duplicate scene → ${scene.properties.timestamp}`,
-        now,
-        this.readLastActivityId(scene),
-      );
-      return { kind: 'ok', scene, logEntryActivityId };
-    } catch (err) {
-      // #259 — duplicateScene no longer throws DuplicateTimestampError;
-      // unexpected errors are re-thrown.
-      throw err;
-    }
+    // #259 — duplicateScene no longer throws DuplicateTimestampError; tied
+    // timestamps are accepted and the duplicate receives a fresh
+    // creation_order. Any unexpected error propagates naturally without a
+    // catch wrapper.
+    const { plot: nextPlot, scene } = await crudDuplicateScene(plot, {
+      sceneId: input.sceneId,
+      newTimestamp: input.newTimestamp,
+      actor: input.actor,
+      now,
+    });
+    this.writePlot(input.documentUri, nextPlot);
+    // T071 — insert a stale flag for the duplicated Scene.
+    await this.recomputeStaleFlagFor(
+      input.documentUri,
+      nextPlot,
+      scene.properties.id,
+    );
+    const logEntryActivityId = await this.emitLogEntry(
+      input.documentUri,
+      'duplicate',
+      scene.properties.storyboard_id,
+      scene.properties.id,
+      scene.properties.thumbnail_asset_ref,
+      input.actor,
+      `duplicate scene → ${scene.properties.timestamp}`,
+      now,
+      this.readLastActivityId(scene),
+    );
+    return { kind: 'ok', scene, logEntryActivityId };
   }
 
   // ── Copy-to-other-storyboard (review 3A two-card emission) ─────────
