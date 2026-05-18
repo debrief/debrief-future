@@ -87,12 +87,14 @@ export interface PersistentSessionState {
   schemaVersion: string;
   savedAt: string;
   temporal: Omit<TemporalSlice, 'playbackState'>;
-  spatial: Omit<SpatialSlice, 'viewportLocked'>;
+  spatial: Omit<SpatialSlice, 'viewportLocked' | 'drawingMode' | 'drawingPaletteIndex'>;
   features: FeaturesSlice;
 }
 ```
 
-**Rationale**: Constitution Article IV.5 — boundary types are derived via `Omit<>`, never re-listed. Adding any future ephemeral spatial field is a one-line edit (`'viewportLocked' | 'newField'`). The compile-time guarantee is that `extractPersistentState`'s returned object cannot include `viewportLocked` — if someone tries to add it back at the persistence boundary, `tsc` rejects.
+**Rationale**: Constitution Article IV.5 — boundary types are derived via `Omit<>`, never re-listed. The `Omit` excludes **all three** ephemeral spatial fields (`viewportLocked`, plus the pre-existing `drawingMode` and `drawingPaletteIndex` that are today hand-reset inside `extractPersistentState`). Adding any future ephemeral spatial field is a one-line union edit; the compile-time guarantee is that `extractPersistentState`'s returned spatial object cannot include any of the three — if someone tries to put them back at the persistence boundary, `tsc` rejects.
+
+This is a tail-cleanup of pre-Article-IV.5 debt riding along with this feature, applied per `/speckit.review` decision 2A. The two existing hand-reset lines at `services/session-state/src/persistence/save.ts:42-43` (`drawingMode: null` / `drawingPaletteIndex: 0`) are deleted alongside the type change. Safe because `load.ts:237-238` already defensively coalesces missing fields back to defaults on read.
 
 ### Load-path defaulting
 

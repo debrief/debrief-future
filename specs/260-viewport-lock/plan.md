@@ -14,11 +14,11 @@ This realises Section E of `docs/project_notes/viewport-mutation-audit.md` and c
 **Language/Version**: TypeScript 5.x strict (per Constitution Article XV). No new languages.
 **Primary Dependencies**: React 18.x, Zustand ^5 (`@debrief/session-state`), Leaflet 1.9.x via `react-leaflet` 4.2 (`MapView`), `@debrief/components` (`LeafletToolbar`, `StoryboardPanel`), `@debrief/schemas` (existing types — no schema changes), VS Code Extension API ^1.85.0 (host messaging only — no command palette additions). **No new runtime dependencies.**
 **Storage**: N/A — the lock is runtime state only; explicitly **NOT** persisted to `.debrief.json`. The session-load path produces `viewportLocked: false` by always emitting it as `false` via the typed exclusion pattern (see Constitution Article IV.5 / ADR-033 framing in CLAUDE.md).
-**Testing**: Vitest unit tests for the slice reducer + the MCP `setViewport` reject branch; React Testing Library for the StoryboardPanel padlock + on-map banner; Playwright web-shell E2E covering Story 1 (locked multi-scene capture series with identical thumbnails) and Story 3 (auto-unlock on plot switch); existing `shared/components/e2e/StoryboardPanel.spec.ts` extended to cover the padlock toggle a11y contract.
+**Testing**: Vitest unit tests for the slice reducer + the MCP `setViewport` reject branch (one test asserting reject + errorCode, one regression test asserting unlocked path unchanged); **a snapshot-restore correctness test for the six Leaflet handlers** — mount `MapView` with one handler pre-disabled by a host (e.g. `keyboard` off), toggle `viewportLocked` on then off, assert the pre-disabled handler is still disabled after the cycle (closes GAP-1 from `/speckit.review`, Article I.3); React Testing Library for the StoryboardPanel padlock + on-map banner; Playwright web-shell E2E covering Story 1 (locked multi-scene capture series — viewport-equality verified by `page.evaluate` against `scene.properties.viewport.coordinates`, not by pixel comparison or by the unrelated `viewport-invariants.ts` helper) and Story 3 (auto-unlock on plot switch); existing `shared/components/e2e/StoryboardPanel.spec.ts` extended to cover the padlock toggle a11y contract.
 **Target Platform**: VS Code extension host (Node 20.x) + web-shell (Chromium via `@sparticuz/chromium` in CI). Identical behaviour required in both (the spec is host-agnostic by design).
 **Project Type**: Single monorepo (pnpm workspaces). This feature touches three workspaces — `services/session-state/`, `shared/components/`, `apps/vscode/` — plus the existing Playwright surface in `apps/web-shell/`.
 **Performance Goals**: Toggle latency imperceptible (< 16ms — single boolean state update + React re-render in the affected subtree). No allocation pressure: the handler-snapshot is six booleans on a single ref.
-**Constraints**: Lock state changes MUST NOT cause map flicker (no re-mount of the Leaflet `Map` instance — handler toggles only). Banner overlay MUST NOT intercept clicks meant for the toolbar (z-order discipline). Disabled toolbar buttons MUST remain visually present (no reflow — see FR-004).
+**Constraints**: Lock state changes MUST NOT cause map flicker (no re-mount of the Leaflet `Map` instance — handler toggles only). Banner overlay MUST NOT intercept clicks meant for the toolbar — implemented via `pointer-events: none` on the banner container and `pointer-events: auto` only on the inner unlock-button element (same pattern `DrawingGuidanceOverlay.css` uses). Disabled toolbar buttons MUST remain visually present (no reflow — see FR-004).
 **Scale/Scope**: ~13 functional requirements, 3 user stories, ~5 source files touched plus tests + 3 Storybook stories.
 
 ## Constitution Check
@@ -69,9 +69,9 @@ Files touched (with brief role):
 ```text
 services/session-state/
 ├── src/types/spatial.ts                  # ADD: viewportLocked field + setViewportLocked action signature
-├── src/types/index.ts                    # ADD: Omit<SpatialSlice, 'viewportLocked'> on PersistentSessionState.spatial
+├── src/types/index.ts                    # CHANGE: Omit<SpatialSlice, 'viewportLocked' | 'drawingMode' | 'drawingPaletteIndex'> on PersistentSessionState.spatial — unifies the ephemeral-field pattern (per /speckit.review 2A)
 ├── src/store/slices/spatial.ts           # ADD: setViewportLocked reducer + default false
-├── src/persistence/save.ts               # No code change required — Omit propagates; existing extractPersistentState already constructs spatial explicitly so the type-check enforces the exclusion
+├── src/persistence/save.ts               # DELETE the two hand-reset lines for drawingMode/drawingPaletteIndex at lines 42-43; the widened Omit now enforces exclusion at type level. tsc will guide.
 ├── src/persistence/load.ts               # ADD: always restore viewportLocked: false (force-unlock on session load — FR-011, FR-012)
 ├── src/server/tools/setViewport.ts       # ADD: reject branch returning { success: false, errorCode: 'VIEWPORT_LOCKED', error: ... }
 └── tests/                                # ADD: slice unit test + MCP reject branch test
@@ -85,7 +85,7 @@ shared/components/src/
 │   ├── MapView.tsx                       # ADD: useEffect to snapshot + toggle 6 handlers on viewportLocked change; on-map banner overlay child
 │   ├── ViewportLockBanner.tsx (new)      # ADD: small overlay component; click-to-unlock
 │   ├── ViewportLockBanner.stories.tsx (new) # ADD: Storybook story (locked + unlocked variants)
-│   └── LeafletToolbar/LeafletToolbar.tsx # ADD: disabled-with-tooltip state for zoom-in, zoom-out, fit-to-window when viewportLocked
+│   └── LeafletToolbar/LeafletToolbar.tsx # EXTEND ToolbarControl (a Leaflet L.Control.extend class, NOT a React component): new `viewportLocked` field, extend `updateProps()` to accept it, add private `setZoomInEnabled` / `setZoomOutEnabled` / `setFitEnabled` methods that toggle a `--disabled` CSS class + `aria-disabled="true"` + the anchor's `title` attribute (browser-native tooltip on hover). Plus matching CSS for the disabled state.
 
 apps/vscode/src/webview/
 └── mapPanel.ts                           # No new mutation gates needed (per spec scoping decision); only relays the viewportLocked field over the existing setFeatures/loadPlot wire and reads back lock toggles from webview→host (one new message kind: 'viewportLockChanged')
@@ -145,7 +145,7 @@ Two Storybook stories are added (new visual surfaces) and one is updated:
 
 | Workflow | Panels/Components Involved | Key Selectors | Interactions |
 |----------|---------------------------|---------------|--------------|
-| **Story 1 — Multi-scene capture with consistent framing** | `MapView`, `LeafletToolbar`, `StoryboardPanel` | `.leaflet-container`, `[data-testid="viewport-lock-toggle"]`, `[data-testid="capture-button"]`, `.leaflet-toolbar-button.zoom-in`, scene thumbnails | load plot → pan/zoom to a region → click padlock → assert banner visible + toolbar buttons disabled with tooltip → click Capture three times at three different `currentTime` values → assert all three thumbnails have identical centre+zoom via the existing `viewport-invariants.ts` helper from `apps/web-shell/playwright/helpers/` |
+| **Story 1 — Multi-scene capture with consistent framing** | `MapView`, `LeafletToolbar`, `StoryboardPanel` | `.leaflet-container`, `[data-testid="viewport-lock-toggle"]`, `[data-testid="capture-button"]`, `.leaflet-toolbar-button.zoom-in`, scene thumbnails | load plot → pan/zoom to a region → click padlock → assert banner visible + toolbar buttons disabled with tooltip → click Capture three times at three different `currentTime` values → after each capture read the new scene's `properties.viewport.coordinates` via `page.evaluate` against the live session store (the storyboard test suite already inspects session state this way — **NOT** via `viewport-invariants.ts`, which is the occlusion-invariant helper and unrelated to viewport equality). Assert all three coordinate arrays are exactly equal. |
 | **Story 1b — Gesture inertness while locked** | `MapView` | `.leaflet-container` | with lock on: drag the map, scroll-wheel zoom, double-click; assert the map's `center` + `zoom` are unchanged after each gesture (use the same `getLeafletViewport()` helper the storyboard tests use) |
 | **Story 3 — Auto-unlock on plot switch** | `MapView`, `StoryboardPanel` | `[data-testid="viewport-lock-toggle"]`, plot-switcher chrome | lock viewport → open a different plot via the catalog → assert padlock returns to unlocked state, banner gone, drag works on new map |
 

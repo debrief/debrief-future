@@ -37,6 +37,8 @@ pnpm --filter @debrief/web-shell dev
 10. Repeat for a third capture.
 11. **Verify**: the three scene thumbnails along the right edge all show the same framing — same coastline, same orientation — and differ only in time-dependent track content. This is SC-001.
 
+> **Note for automated verification (Story 1 in the Playwright spec)**: the test asserts the same property in a hermetic way by reading each captured scene's `properties.viewport.coordinates` directly from the session store (via `page.evaluate(...)`) and comparing the three coordinate arrays for exact equality. **Do NOT use `apps/web-shell/playwright/helpers/viewport-invariants.ts`** for this assertion — despite its name, that helper checks map-control *occlusion* during a flow, not viewport equality across captured scenes.
+
 ### Story 3 — Auto-unlock on plot switch
 
 12. With the lock still on, open a different plot from the catalog.
