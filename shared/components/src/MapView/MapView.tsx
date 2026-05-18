@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import type { PathOptions, LatLngBoundsExpression } from 'leaflet';
+import type { Map as LeafletMap, PathOptions, LatLngBoundsExpression } from 'leaflet';
 import type { DebriefFeature, DebriefFeatureCollection, Bounds, DisplayMode } from '../utils/types';
 import { calculateBounds, expandBounds } from '@debrief/utils';
 import { getFeatureColor, getFeatureLabel } from '../utils/labels';
@@ -126,6 +126,17 @@ export interface MapViewProps {
   onFlyToComplete?: (token: number) => void;
 
   /**
+   * PR #627 — callback invoked once with the Leaflet `Map` instance after the
+   * `MapContainer` has mounted. Hosts can store this in a ref and read the
+   * live viewport synchronously via `map.getCenter()` / `map.getZoom()` /
+   * `map.getBounds()` at capture time, bypassing every async queue between
+   * Leaflet and `session-state.viewport`. The MapView never owns the
+   * resulting reference — it's the consumer's responsibility to drop it on
+   * unmount.
+   */
+  onMapReady?: (map: LeafletMap) => void;
+
+  /**
    * The Scene Features to render as faint rectangles on the map. When
    * provided, a `SceneRectangleLayer` is rendered inside the `MapContainer`.
    */
@@ -172,6 +183,7 @@ function MapController({
   onZoomChange,
   onBoundsChange,
   onBackgroundClick,
+  onMapReady,
 }: {
   bounds: Bounds | null;
   autoFitBounds: boolean;
@@ -182,9 +194,18 @@ function MapController({
   onZoomChange?: (zoom: number) => void;
   onBoundsChange?: (bounds: Bounds) => void;
   onBackgroundClick?: () => void;
+  onMapReady?: (map: LeafletMap) => void;
 }) {
   const map = useMap();
   const prevBoundsRef = useRef<Bounds | null>(null);
+
+  // PR #627 — hand the Leaflet map instance to the host as soon as it's
+  // available so capture-time viewport queries can read it synchronously.
+  useEffect(() => {
+    onMapReady?.(map);
+    // intentionally fires once per (map, callback) pair; callback identity
+    // changes are caller-controlled via useCallback.
+  }, [map, onMapReady]);
 
   // #230 FR-050 — emit an initial bounds report as soon as Leaflet is
   // ready, so downstream capture flows don't fail with "map has not
@@ -375,6 +396,7 @@ export function MapView({
   onShapeCreated,
   flyToTarget,
   onFlyToComplete,
+  onMapReady,
   sceneRectangles,
   onSceneRectangleClick,
   shouldRenderInBaseLayer,
@@ -702,6 +724,7 @@ export function MapView({
           onZoomChange={onZoomChange}
           onBoundsChange={onBoundsChange}
           onBackgroundClick={onBackgroundClick}
+          onMapReady={onMapReady}
         />
 
         {sceneRectangles && (

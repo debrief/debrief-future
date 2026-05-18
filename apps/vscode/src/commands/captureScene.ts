@@ -261,9 +261,30 @@ async function captureSceneInner(
   // what the analyst composed.
   mapPanel.flushPendingViewportUpdate();
 
+  // PR #627 — query the LIVE Leaflet viewport synchronously-ish so the
+  // captured scene matches what the analyst is currently looking at, even
+  // if the moveend → postMessage → debounce → state.viewport chain hasn't
+  // propagated for this round (the very first capture is the case in point:
+  // the analyst zooms to compose, then clicks Capture before any pan
+  // gives `state.viewport` a chance to absorb the zoom). The webview
+  // returns `map.getCenter()` + `map.getZoom()` + the 4 bounds corners
+  // direct from Leaflet. On timeout/Leaflet-not-ready (`liveViewport ===
+  // null`) we fall back to `state.viewport` so the rejection path below
+  // still catches a truly empty session.
+  const liveViewport = await mapPanel.requestCurrentViewport(1000);
+
   // Step 3 — read snapshot
   const state: SessionStoreWithUndo = sessionStore.getState();
-  const viewport = state.viewport;
+  const stateViewport = state.viewport;
+  const viewport: typeof stateViewport = liveViewport !== null
+    ? {
+        coordinates: liveViewport.bounds.map(([lng, lat]) => ({
+          longitude: lng,
+          latitude: lat,
+        })),
+        zoom: liveViewport.zoom,
+      }
+    : stateViewport;
   const currentTime = state.currentTime;
   const timeRange = state.timeRange;
   const hiddenIds = new Set(state.hiddenFeatureIds);

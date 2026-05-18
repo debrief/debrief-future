@@ -440,6 +440,46 @@ export interface ThumbnailCaptureResponseMessage extends ResponseMessage {
 }
 
 // ============================================================================
+// Live Viewport Query (PR #627)
+// ============================================================================
+//
+// PR #625/#626 fixed the asynchronous viewport sync (debounce flush +
+// echo-suppression + moveend zoom race), but `captureScene` still relies on
+// `state.viewport` having propagated through that chain by the time the
+// capture command runs. For the very first capture — where the analyst has
+// composed but never panned (only zoomed, or zoomed-and-clicked-quickly) —
+// `state.viewport` can still lag the live Leaflet view because either
+// `moveend` hasn't fired in time, or the `postMessage` is in flight, or the
+// 100 ms debounce hasn't drained. The defensive fix is a synchronous-ish RPC:
+// the host asks the webview for the *current* Leaflet viewport at capture
+// time, and the webview responds with `map.getCenter()` + `map.getZoom()` +
+// the 4 bounds corners, bypassing every queue in between.
+
+/** Request the current Leaflet viewport from the webview (Extension → Webview) */
+export interface RequestCurrentViewportMessage extends RequestMessage {
+  type: 'requestCurrentViewport';
+}
+
+/** Current Leaflet viewport response (Webview → Extension) */
+export interface CurrentViewportResponseMessage extends ResponseMessage {
+  type: 'currentViewportResponse';
+  /** Map centre as [longitude, latitude] (matches `Viewport.center` schema). */
+  center: [number, number];
+  /** Map zoom level (`map.getZoom()`). */
+  zoom: number;
+  /**
+   * Viewport bounds polygon as 4 corners in `[NW, NE, SE, SW]` order, each
+   * `[longitude, latitude]` — the same shape `viewportChanged` already uses.
+   */
+  bounds: [
+    [number, number],
+    [number, number],
+    [number, number],
+    [number, number],
+  ];
+}
+
+// ============================================================================
 // Tabular Results Messages (#177)
 // ============================================================================
 
@@ -577,6 +617,7 @@ export type ExtensionToWebviewMessage =
   | ImportProgressMessage
   | ImportCompleteMessage
   | RequestThumbnailCaptureMessage
+  | RequestCurrentViewportMessage
   | ResultSavedMessage
   // Results panel (#178)
   | ResultsSetTabsMessage
@@ -604,6 +645,7 @@ export type WebviewToExtensionMessage =
   | FeatureDrawnMessage
   | DrawingModeChangedMessage
   | ThumbnailCaptureResponseMessage
+  | CurrentViewportResponseMessage
   | SaveResultMessage
   | SaveResultAsMessage
   | RetryToolMessage

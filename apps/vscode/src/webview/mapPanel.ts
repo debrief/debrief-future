@@ -539,6 +539,24 @@ export class MapPanel {
   private thumbnailCaptureResolve: ((result: { largePngBase64: string | null; smallPngBase64: string | null }) => void) | null = null;
 
   /**
+   * PR #627 — pending resolver for `requestCurrentViewport`. The host RPC
+   * round-trips through the webview message channel so the resolver pairs
+   * with the in-flight request; `null` between requests.
+   */
+  private currentViewportResolve:
+    | ((result: {
+        center: [number, number];
+        zoom: number;
+        bounds: [
+          [number, number],
+          [number, number],
+          [number, number],
+          [number, number],
+        ];
+      } | null) => void)
+    | null = null;
+
+  /**
    * Request thumbnail capture from the webview.
    * Returns base64-encoded PNG data for both large and small thumbnails,
    * or null values if capture fails.
@@ -559,6 +577,44 @@ export class MapPanel {
       const requestId = `thumb-${Date.now()}`;
       this.postMessage({
         type: 'requestThumbnailCapture',
+        requestId,
+      });
+    });
+  }
+
+  /**
+   * PR #627 — synchronous-ish RPC to read the live Leaflet viewport from
+   * the webview, used by `captureScene` to guarantee the captured viewport
+   * matches what the analyst is looking at right now (not whatever stale
+   * value `state.viewport` may have lagging behind the moveend → debounce
+   * chain). Returns `null` on timeout or if Leaflet hasn't reported ready
+   * yet — the caller falls back to `state.viewport` in that case.
+   */
+  public requestCurrentViewport(timeoutMs: number = 1000): Promise<{
+    center: [number, number];
+    zoom: number;
+    bounds: [
+      [number, number],
+      [number, number],
+      [number, number],
+      [number, number],
+    ];
+  } | null> {
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        this.currentViewportResolve = null;
+        resolve(null);
+      }, timeoutMs);
+
+      this.currentViewportResolve = (result) => {
+        clearTimeout(timer);
+        this.currentViewportResolve = null;
+        resolve(result);
+      };
+
+      const requestId = `viewport-${Date.now()}`;
+      this.postMessage({
+        type: 'requestCurrentViewport',
         requestId,
       });
     });
@@ -1199,6 +1255,23 @@ export class MapPanel {
             largePngBase64: message.largePngBase64,
             smallPngBase64: message.smallPngBase64,
           });
+        }
+        break;
+
+      case 'currentViewportResponse':
+        // PR #627 — pair the response with the in-flight resolver. On
+        // `success === false` (Leaflet not ready) report `null` so the
+        // caller falls back to `state.viewport`.
+        if (this.currentViewportResolve) {
+          if (message.success) {
+            this.currentViewportResolve({
+              center: message.center,
+              zoom: message.zoom,
+              bounds: message.bounds,
+            });
+          } else {
+            this.currentViewportResolve(null);
+          }
         }
         break;
 
