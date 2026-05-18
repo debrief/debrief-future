@@ -1,8 +1,8 @@
 ---
 feature: "260-viewport-lock"
-captured_at: "2026-05-18T21:21:47Z"
-git_sha: "d0dd2be"
-tests_passed: 27
+captured_at: "2026-05-18T21:50:00Z"
+git_sha: "989e2e3"
+tests_passed: 47
 tests_failed: 0
 tests_skipped: 0
 coverage_pct: null
@@ -14,13 +14,13 @@ coverage_pct: null
 
 | Metric | Value |
 |--------|-------|
-| New / extended tests for spec 260 | 27 |
-| Passed | 27 |
+| New / extended tests for spec 260 | 47 |
+| Passed | 47 |
 | Failed | 0 |
 | Skipped | 0 |
-| Total project tests (run alongside, all green) | 3582 (TS) + 1952 (Python) |
+| Total project tests (run alongside, all green) | 3582 (TS unit) + 1952 (Python) + 20 (new Playwright E2E) |
 
-The 27 figure counts only assertions added or materially extended by this feature. The full suite (3582 TypeScript + 1952 Python tests) was run after every push to verify no regression.
+The 47 figure splits as: 27 unit/integration (Vitest) + 16 Storybook Playwright + 4 web-shell Playwright. The full suite (3582 TypeScript unit + 1952 Python) was run after every push to verify no regression; the 20 Playwright cases were run in-session and captured the eight evidence screenshots.
 
 ## Test Breakdown
 
@@ -97,18 +97,30 @@ The 27 figure counts only assertions added or materially extended by this featur
 | Focus inside `<input>` suppresses the shortcut | Pass | UX safety |
 | No callback → safe no-op | Pass | Robustness |
 
-### E2E — Storybook (`shared/components/e2e/ViewportLock.spec.ts`) — DOCUMENTED, EXECUTED IN CI
+### E2E — Storybook (`shared/components/e2e/ViewportLock.spec.ts`) — ✅ RAN IN-SESSION
 
-Storybook E2E spec landed and exercises the 3 stories × 3 themes (light / dark / vscode). Captures screenshots into `evidence/screenshots/`. Runs as part of `pnpm --filter @debrief/components test:e2e` once Storybook is up.
+16 tests, all green. Captured via `cd shared/components && node run-playwright.mjs ViewportLock` under Claude Code (cloud), which:
+1. Built `storybook-static/` (32s).
+2. Extracted `/tmp/chromium` via `@sparticuz/chromium`.
+3. Served the static build on `http-server :6006`.
+4. Ran the 16 cases — three stories × three theme variants × interaction + the click-to-unlock interactive — in 10.2s, single worker.
 
-### E2E — Web-shell Playwright (`apps/web-shell/playwright/tests/viewport-lock.spec.ts`) — DOCUMENTED, EXECUTED IN CI
+Screenshots landed: `banner-{light,dark,vscode}.png` + `storyboard-padlock-{light,dark,vscode}.png` + `storyboard-padlock-locked-light.png`.
 
-Web-shell Playwright spec lands for Stories 1 + 3 + the `L` shortcut:
+### E2E — Web-shell Playwright (`apps/web-shell/playwright/tests/viewport-lock.spec.ts`) — ✅ RAN IN-SESSION
 
+4 tests, all green (16.4s, single worker). Captured via `cd apps/web-shell && node run-playwright.mjs viewport-lock` under Claude Code (cloud), which:
+1. Extracted `/tmp/chromium` via `@sparticuz/chromium`.
+2. Started Vite dev server on :5173 (auto, via Playwright config webServer).
+3. Drove the full Analysis view flow against the live web-shell.
+
+Coverage:
 - Padlock toggle locks/unlocks; banner appears/disappears; toolbar buttons gain/lose `aria-disabled="true"` and the "Viewport locked" tooltip.
 - Locked drag and scroll-wheel gestures leave `state.viewport` unchanged (read directly via `page.evaluate`, NOT via `viewport-invariants.ts` which is the unrelated occlusion helper).
 - Back-to-catalog force-unlocks (Story 3).
 - `L` shortcut on a focused map toggles the lock end-to-end.
+
+Hero screenshot landed: `locked-map.png` — the full Analysis view with all three lock surfaces visible at once (banner + padlock + dimmed toolbar buttons).
 
 ## Key Scenarios Verified
 

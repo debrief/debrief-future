@@ -10,7 +10,7 @@ tags: [viewport-lock, storyboarding, session-state, mcp, mapview, leaflet, acces
 excerpt: "A single boolean turns 'don't touch anything' into a real guarantee — three captures, one frame."
 ---
 
-![Three storyboard scene thumbnails captured at different times but sharing identical framing, sitting beneath a locked map with the viewport-lock banner visible along the top edge](../evidence/screenshots/multi-scene-thumbnails.png)
+![The web-shell Analysis view with the viewport lock engaged — banner across the top of the map reading "Viewport locked — click to unlock", padlock toggle highlighted in the Storyboard panel header next to Capture, and the toolbar zoom/fit buttons rendered in a disabled state](../evidence/screenshots/locked-map.png)
 
 ## What We're Building
 
@@ -31,35 +31,37 @@ The viewport lock sits at the seam between session state and the map. One new fi
 
 ## Screenshots
 
-The Storybook E2E and web-shell Playwright suites produce these into `evidence/screenshots/` as part of CI. A couple have landed already; the rest will appear when the E2E run completes against the merged branch.
+All captured by the new Playwright suites — `shared/components/e2e/ViewportLock.spec.ts` for the Storybook variants and `apps/web-shell/playwright/tests/viewport-lock.spec.ts` for the live web-shell flow. Twenty tests, all green.
 
-**Locked map banner** — the `🔒 Viewport locked — click to unlock` bar that runs across the top of the `MapView`. The banner renders as a `role="status"` region with `aria-live="polite"`, so it announces itself to screen readers when it appears.
+**Locked map in the web-shell** (the hero image above) — the `🔒 Viewport locked — click to unlock` bar runs across the top of the `MapView` (a `role="status"` region with `aria-live="polite"`, so it announces itself to screen readers when it appears). The padlock toggle in the Storyboard panel header is highlighted; the toolbar zoom and fit buttons sit visibly dimmed alongside it. Three places to discover the lock, one canonical state behind them all.
 
-![The locked-state banner spanning the top of the map, reading "Viewport locked — click to unlock" with a padlock icon](../evidence/screenshots/locked-map.png)
+**Storyboard panel padlock — locked state, light theme**:
 
-**Storyboard panel padlock** — the padlock toggle sitting immediately left of Capture in the panel header. `aria-pressed="true"` when locked, `aria-pressed="false"` when not; disabled when no plot is loaded.
+![The Storyboard panel header showing the padlock button in its locked/pressed state, adjacent to the Capture button, with three scene rows below](../evidence/screenshots/storyboard-padlock-locked-light.png)
 
-![The Storyboard panel header showing the padlock button in its locked/pressed state, adjacent to the Capture button](../evidence/screenshots/storyboard-padlock-locked-light.png)
+**Storyboard panel padlock — unlocked state, all three themes**:
 
-**Banner in isolation (light theme)** — the standalone `ViewportLockBanner` component story, which the E2E suite exercises across light, dark, and VS Code themes.
+![Storyboard panel header in the light theme with the open-padlock unlocked toggle next to Capture](../evidence/screenshots/storyboard-padlock-light.png)
+![Storyboard panel header in the dark theme with the open-padlock unlocked toggle next to Capture](../evidence/screenshots/storyboard-padlock-dark.png)
+![Storyboard panel header in the VS Code theme with the open-padlock unlocked toggle next to Capture](../evidence/screenshots/storyboard-padlock-vscode.png)
 
-![The ViewportLockBanner component rendered in the light theme, showing the padlock icon and unlock affordance](../evidence/screenshots/banner-light.png)
+**Banner in isolation — `ViewportLockBanner` standalone story across light / dark / VS Code themes**:
 
-**Multi-scene thumbnails** — the goal state: three scene thumbnails captured at different simulation times, all sharing one centre and one zoom level. This is the capture workflow the lock exists to support.
-
-![Three storyboard scene thumbnails in the rail, framed identically despite being captured at different times](../evidence/screenshots/multi-scene-thumbnails.png)
-
-The interaction GIF (`evidence/screenshots/interaction.gif`) — lock → capture → advance time → capture → unlock — will land with the full E2E run.
+![ViewportLockBanner rendered in the light theme, showing the padlock icon and unlock affordance](../evidence/screenshots/banner-light.png)
+![ViewportLockBanner rendered in the dark theme](../evidence/screenshots/banner-dark.png)
+![ViewportLockBanner rendered in the VS Code theme](../evidence/screenshots/banner-vscode.png)
 
 ## By the Numbers
 
 | | |
 |---|---|
-| New / extended tests for this feature | 27 |
+| New / extended tests for this feature | 47 (27 Vitest unit + 16 Storybook Playwright + 4 web-shell Playwright) |
 | Tests failed | 0 |
 | Tests skipped | 0 |
-| Total TypeScript tests passing | 3,582 |
+| Total TypeScript unit tests passing | 3,582 |
 | Total Python tests passing | 1,952 |
+| Playwright wall-clock to run in cloud | 26.6s (16.4 web-shell + 10.2 Storybook) |
+| Evidence screenshots produced in-session | 8 PNGs (banner × 3 themes, padlock × 3 themes + locked variant, full locked Analysis view) |
 | New runtime dependencies | 0 |
 | New LinkML schema fields | 0 |
 | Source files touched | ~10 (3 in `session-state`, 4 in `shared/components`, 3 across the two apps) |

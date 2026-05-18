@@ -115,7 +115,12 @@ You **MUST** consider the user input before proceeding (if not empty).
        - Run tests: `cd apps/web-shell && node run-playwright.mjs [workflow]` (cloud) or `pnpm --filter @debrief/web-shell test [workflow]` (local).
        - **Do NOT** reach for the openvscode-server / `xvfb-run --config tests/e2e/playwright.config.ts` path to capture screenshots — it was explored in #142 and is unreliable; use it only if a test genuinely requires the real VS Code chrome (command palette, sidebar host).
 
-> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip Playwright tests because you think browsers can't be installed. Standard browser CDN downloads are blocked (403), but `@sparticuz/chromium` bundles a Linux Chromium binary via npm and works fully. The project's `playwright.config.ts` auto-detects the environment and uses the bundled binary when `CLAUDE_CODE=1` is set. Run via `node apps/web-shell/run-playwright.mjs` to extract and configure the bundled browser. Full details: `docs/project_notes/playwright-installation-research.md`
+> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS — AND PRODUCES REAL SCREENSHOTS.** Do NOT skip Playwright tests because you think browsers can't be installed, and do NOT defer screenshot capture to a future CI run. Standard browser CDN downloads are blocked (403), but `@sparticuz/chromium` bundles a Linux Chromium binary via npm and the per-workspace `run-playwright.mjs` wrappers wire it in transparently. Confirmed in cloud on 2026-05-18 (spec #260): 4 web-shell tests + 16 Storybook tests + 8 real PNGs landed in `evidence/screenshots/` from one session. Run from the relevant workspace:
+> - Web-shell flows: `cd apps/web-shell && node run-playwright.mjs <spec-basename>`
+> - Storybook variants: `cd shared/components && node run-playwright.mjs <spec-basename>` (builds storybook-static + serves on :6006 automatically)
+> - Spec Navigator: `cd apps/spec-navigator && node run-playwright.mjs`
+>
+> If a task lists screenshots under "Evidence Requirements", the Playwright specs are the producers — write the spec, run the wrapper, the PNGs land into `specs/<feature>/evidence/screenshots/`. The blog post then references real paths. Full details: `docs/project_notes/playwright-installation-research.md`.
 
 8. Progress tracking and error handling:
    - Report progress after each completed task
