@@ -94,6 +94,19 @@ export interface MapViewProps {
      * `SceneRectangleLayer`). See `map-view-flyto.md` §5 / FR-PLAY-015.
      */
     shouldRenderInBaseLayer?: (feature: GeoJSON.Feature) => boolean;
+    /**
+     * When `true`, every Leaflet gesture handler that can change the map's
+     * centre or zoom (drag, scroll-wheel, double-click, pinch/touch, box,
+     * keyboard) is disabled and the on-map `ViewportLockBanner` is shown.
+     * Restoring to `false` re-enables only the handlers that were enabled
+     * BEFORE the lock — a host-disabled handler stays disabled (spec FR-006).
+     */
+    viewportLocked?: boolean;
+    /**
+     * Toggle callback — fires from the on-map banner (click-to-unlock) and
+     * from the `L` keyboard shortcut. The host owns the lock state.
+     */
+    onViewportLockChange?: (locked: boolean) => void;
 }
 /**
  * Animated viewport target for the {@link MapView.flyToTarget} prop.
@@ -122,5 +135,5 @@ export interface FlyToTarget {
  * />
  * ```
  */
-export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, viewport, autoFitBounds, fitBoundsTrigger, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, drawingMode, onDrawingModeChange, onShapeCreated, flyToTarget, onFlyToComplete, onMapReady, sceneRectangles, onSceneRectangleClick, shouldRenderInBaseLayer, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
+export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, viewport, autoFitBounds, fitBoundsTrigger, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, drawingMode, onDrawingModeChange, onShapeCreated, flyToTarget, onFlyToComplete, onMapReady, sceneRectangles, onSceneRectangleClick, shouldRenderInBaseLayer, viewportLocked, onViewportLockChange, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=MapView.d.ts.map

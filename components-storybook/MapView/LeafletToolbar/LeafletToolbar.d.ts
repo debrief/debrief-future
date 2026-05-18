@@ -19,9 +19,16 @@ export interface LeafletToolbarProps {
     onDrawingModeChange?: (mode: DrawingMode) => void;
     /** Callback when a shape is drawn via Geoman. Called with raw GeoJSON and the active drawing mode. */
     onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
+    /**
+     * Spec 260 / FR-004 — when `true`, the zoom-in, zoom-out, and
+     * fit-to-window buttons are rendered in a visibly-disabled state with
+     * the tooltip "Viewport locked". Clicks are short-circuited in JS so the
+     * map cannot be zoomed via the toolbar while the lock is on.
+     */
+    viewportLocked?: boolean;
 }
 /**
  * React wrapper component for the LeafletToolbar control.
  */
-export declare function LeafletToolbar({ position, visibleBounds, fitPadding, showZoomControls, showFitButton, drawingMode, onDrawingModeChange, onShapeCreated, }: LeafletToolbarProps): null;
+export declare function LeafletToolbar({ position, visibleBounds, fitPadding, showZoomControls, showFitButton, drawingMode, onDrawingModeChange, onShapeCreated, viewportLocked, }: LeafletToolbarProps): null;
 //# sourceMappingURL=LeafletToolbar.d.ts.map
