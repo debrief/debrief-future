@@ -35,7 +35,7 @@ An analyst captures Scenes across a longer engagement, sometimes pausing time to
 
 1. **Given** Scenes with strictly increasing timestamps, **When** the Storyboard is listed or played, **Then** they appear in ascending timestamp order (unchanged from today).
 2. **Given** a tied-timestamp group within an otherwise time-ordered Storyboard, **When** the Storyboard is listed or played, **Then** the tied group is internally ordered by creation order and the group as a whole sits between the prior smaller timestamp and the next larger timestamp.
-3. **Given** an existing Storyboard from before this change (all timestamps unique), **When** it is opened and played, **Then** its order is identical to before the change.
+3. **Given** an existing Storyboard from before this change (Scenes lacking a creation-order indicator), **When** it is opened, **Then** the system surfaces a clear, explicit error identifying the missing field; the plot is not silently coerced into an order and the user is not left guessing why playback fails.
 
 ---
 
@@ -76,7 +76,7 @@ When several Scenes share a timestamp, the analyst can still reorder them, delet
 - **FR-007**: Manual reordering of Scenes within a tied-timestamp group MUST be supported and MUST be expressed by adjusting the creation-order indicator of the affected Scenes, so that the new order is durable across sessions and machines.
 - **FR-008**: Deleting a Scene from a tied-timestamp group MUST NOT renumber or reshuffle the remaining Scenes. The surviving Scenes retain their relative order.
 - **FR-009**: Editing any field of a Scene *other than* its position MUST NOT change its position in the Storyboard. In particular, editing the viewport, title, description, or visible-feature set MUST leave the (timestamp, creation-order) ordering untouched.
-- **FR-010**: Legacy Storyboards created before this change MUST continue to load and play in exactly the same order as before. The migration path MUST assign creation-order indicators to existing Scenes in a way that reproduces their pre-change order.
+- **FR-010**: Plots that contain Scenes lacking a creation-order indicator (i.e., produced before this change) MUST be rejected with a clear, explicit error that names the missing field and identifies the offending Storyboard. The system MUST NOT silently coerce such plots into an order. This is acceptable because the project is in pre-release development (Article XIV) and no shipped user data requires forward-compatibility.
 - **FR-011**: When the user captures a new Scene at the same timestamp as one or more existing Scenes, the new Scene MUST appear *after* all existing Scenes sharing that timestamp. Inserting into the middle of a tied group is only possible via the explicit reorder operation (FR-007).
 - **FR-012**: The platform MUST NOT expose the raw creation-order indicator as a primary user-facing field. Users see Scenes by title, timestamp, and position; the indicator is a behind-the-scenes ordering mechanism.
 
@@ -90,7 +90,7 @@ When several Scenes share a timestamp, the analyst can still reorder them, delet
 ### Measurable Outcomes
 
 - **SC-001**: An analyst can capture three Scenes at the same timestamp with three different viewports in under 30 seconds, with zero rejections from the platform.
-- **SC-002**: 100% of legacy Storyboards (created before this change) load and play in the same order as their pre-change behaviour.
+- **SC-002**: 100% of plots created before this change surface the missing-creation-order error within the first second of load; zero such plots are silently coerced into an order.
 - **SC-003**: For any Storyboard, two readers on different machines produce the same ordered list of Scenes 100% of the time, regardless of how many Scenes share a timestamp.
 - **SC-004**: Zero support reports of "I can't capture two Scenes at the same time" within 30 days of release (this is currently a known workaround-friction point logged by analysts).
 - **SC-005**: Reordering a Scene within a tied-timestamp group completes in a single user action and the new order persists across export, re-import, and a second reader opening the same Storyboard.
@@ -98,6 +98,7 @@ When several Scenes share a timestamp, the analyst can still reorder them, delet
 ## Assumptions
 
 - The current platform behaviour for a Scene captured at a timestamp *earlier* than the latest existing Scene is unchanged by this work. The schema's existing wording ("MUST be unique within a Storyboard") is the only constraint being relaxed, and only with respect to equality.
+- No backward-compatibility shim for pre-change plots is provided. The project is in pre-release development (Article XIV grants this freedom); shipped user data does not exist. Pre-change plots are surfaced as explicit errors rather than silently migrated.
 - "Creation order" is determined by the order in which the platform commits the captures, not by any clock value the client reports. The platform is the source of truth for creation order.
 - Tied-timestamp groups are expected to be small (typically 2–5 Scenes); no performance concerns arise from group size for any realistic Storyboard.
 - The user-facing default label for a Scene (DTG of timestamp in DDHHmmZ MMM YY) may now be non-unique within a Storyboard. This is acceptable; users can edit titles to disambiguate. Automatic disambiguation is out of scope.
