@@ -84,6 +84,16 @@ After Capture click on `main` (pre-#623):
 
 ## E. Future "lock viewport" feature
 
+> **Realised in spec 260** — see `specs/260-viewport-lock/`. The realisation
+> narrowed the original sketch: the **UI cannot trigger viewport mutation
+> while locked** (drag, scroll, double-click, box-zoom, keyboard, fit, zoom-in,
+> zoom-out are all gated at the gesture-handler / disabled-button layer), so
+> the explicit reject branch is only added at the externally-callable MCP
+> surface (B11). The remaining host-internal mutation sites (B1–B10) are
+> intentionally not gated in #260 — backlog #262 captures the cross-host
+> guard layer for when a future feature exposes a B-site path to the user
+> UI while the lock is plausibly active.
+
 Sketch only — full requirements live in the spec when written.
 
 - A boolean `state.viewportLocked` slice on `session-state`, with a corresponding lock icon UI.

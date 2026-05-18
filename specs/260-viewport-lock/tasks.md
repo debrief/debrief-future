@@ -149,11 +149,11 @@ Per `/speckit.review` decision 2A, the `Omit<>` widening also excludes `drawingM
 - [x] T034 [test] Vitest snapshot-restore correctness test for `MapView`'s handler toggle (closes GAP-1 from `/speckit.review`): render `MapView` with a stub host that disables the `keyboard` handler before any lock toggle; flip `viewportLocked` true → false → true → false; assert at the end that `map.keyboard.enabled() === false` (the host's prior decision is preserved), while `map.dragging.enabled() === true` (the default-on handler is properly restored) `shared/components/src/MapView/__tests__/MapView.viewportLock.test.tsx`
 - [x] T035 [P][test] RTL test for `ViewportLockBanner`: renders nothing when `locked={false}`; renders `role="status"` element with click handler when `locked={true}`; clicking fires `onUnlock` `shared/components/src/MapView/ViewportLockBanner/__tests__/ViewportLockBanner.test.tsx`
 - [x] T036 [P][test] RTL test for `StoryboardPanel` padlock: `aria-pressed` reflects `viewportLocked` prop; click fires `onViewportLockToggle`; the button is `disabled` when `hasActivePlot === false`; follows the pattern at `shared/components/src/StacBrowser/__tests__/ThumbnailSizeToggle.test.tsx` `shared/components/src/panels/StoryboardPanel/__tests__/ViewportLockToggle.test.tsx`
-- [ ] T037 [P][test] Storybook E2E spec covering the three new visual states (banner locked variant, toolbar disabled variant, storyboard padlock-pressed variant) — light / dark / vscode theme variants each; captures screenshots into `specs/260-viewport-lock/evidence/screenshots/` from the spec file using the path-resolution pattern in `apps/web-shell/playwright/tests/properties-screenshots.spec.ts` `shared/components/e2e/ViewportLock.spec.ts`
+- [x] T037 [P][test] Storybook E2E spec covering the three new visual states (banner locked variant, toolbar disabled variant, storyboard padlock-pressed variant) — light / dark / vscode theme variants each; captures screenshots into `specs/260-viewport-lock/evidence/screenshots/` from the spec file using the path-resolution pattern in `apps/web-shell/playwright/tests/properties-screenshots.spec.ts` `shared/components/e2e/ViewportLock.spec.ts`
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip Playwright E2E tasks. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Standard browser CDN downloads are blocked (403) but the bundled binary works fully. Run `node apps/web-shell/run-playwright.mjs` (or the equivalent for shared-components Playwright) to extract and configure. See `docs/project_notes/playwright-installation-research.md`.
 
-- [ ] T038 [test] Web-shell Playwright E2E spec for Story 1 (the headline workflow): load plot → pan/zoom → click padlock → assert banner visible + toolbar zoom/fit `aria-disabled="true"` with `title="Viewport locked"` → exercise every gesture (drag, scroll-wheel, double-click, box-zoom, arrow keys) and assert map centre+zoom unchanged after each → capture three scenes at three different `currentTime` values → read each captured scene's `properties.viewport.coordinates` via `page.evaluate` against the live session store (NOT via `viewport-invariants.ts` — that helper is for occlusion) → assert all three coordinate arrays are exactly equal → unlock → assert all gestures restored → assert toolbar buttons re-enabled. Record video; the post-spec hook converts it to `evidence/screenshots/interaction.gif` (< 5s, < 2MB) `apps/web-shell/playwright/tests/viewport-lock-story1.spec.ts`
+- [x] T038 [test] Web-shell Playwright E2E spec for Story 1 (the headline workflow): load plot → pan/zoom → click padlock → assert banner visible + toolbar zoom/fit `aria-disabled="true"` with `title="Viewport locked"` → exercise every gesture (drag, scroll-wheel, double-click, box-zoom, arrow keys) and assert map centre+zoom unchanged after each → capture three scenes at three different `currentTime` values → read each captured scene's `properties.viewport.coordinates` via `page.evaluate` against the live session store (NOT via `viewport-invariants.ts` — that helper is for occlusion) → assert all three coordinate arrays are exactly equal → unlock → assert all gestures restored → assert toolbar buttons re-enabled. Record video; the post-spec hook converts it to `evidence/screenshots/interaction.gif` (< 5s, < 2MB) `apps/web-shell/playwright/tests/viewport-lock-story1.spec.ts`
 
 **Story 1 checkpoint**: P1 acceptance scenarios 1.1–1.5 must all map green to T034–T038. SC-001, SC-002, SC-005 are exercised here. After this phase Story 1 ships independently — Stories 2 and 3 can land separately if needed.
 
@@ -167,12 +167,12 @@ Per `/speckit.review` decision 2A, the `Omit<>` widening also excludes `drawingM
 
 ### Integration evidence
 
-- [ ] T039 [test] End-to-end MCP test: drive the actual MCP server harness (not the in-process `setViewport` function), call `session.setViewport` over the MCP transport with the store locked, assert the returned envelope carries `errorCode: 'VIEWPORT_LOCKED'` at the JSON-RPC level. Existing MCP test infra in `services/session-state/tests/` is the model `services/session-state/tests/integration/setViewport-mcp.test.ts`
-- [ ] T040 Capture a sample locked rejection response as `evidence/mcp-locked-response.json` — the literal JSON-RPC envelope a caller would observe `specs/260-viewport-lock/evidence/mcp-locked-response.json`
+- [x] T039 [test] End-to-end MCP test: drive the actual MCP server harness (not the in-process `setViewport` function), call `session.setViewport` over the MCP transport with the store locked, assert the returned envelope carries `errorCode: 'VIEWPORT_LOCKED'` at the JSON-RPC level. Existing MCP test infra in `services/session-state/tests/` is the model `services/session-state/tests/integration/setViewport-mcp.test.ts`
+- [x] T040 Capture a sample locked rejection response as `evidence/mcp-locked-response.json` — the literal JSON-RPC envelope a caller would observe `specs/260-viewport-lock/evidence/mcp-locked-response.json`
 
 ### Caller-contract documentation
 
-- [ ] T041 Update the MCP tool description in `setViewport.ts` (the `description` string registered with the tool) to mention the `errorCode: 'VIEWPORT_LOCKED'` branch so LLM callers reading the tool's manifest discover the contract `services/session-state/src/server/tools/setViewport.ts`
+- [x] T041 Update the MCP tool description in `setViewport.ts` (the `description` string registered with the tool) to mention the `errorCode: 'VIEWPORT_LOCKED'` branch so LLM callers reading the tool's manifest discover the contract `services/session-state/src/server/tools/setViewport.ts`
 
 **Story 2 checkpoint**: P2 acceptance scenarios 2.1–2.2 map green to T013, T014, T039. SC-003 is fully exercised.
 
@@ -197,7 +197,7 @@ Per `/speckit.review` decision 2A, the `Omit<>` widening also excludes `drawingM
 ### Story 3 tests
 
 - [x] T046 [P][test] Vitest test for the `L` shortcut: render `MapView`, programmatically focus the container, dispatch `KeyboardEvent('keydown', { key: 'l' })`, assert `onViewportLockChange` called with `!viewportLocked`. Negative case: same event with `metaKey: true` (or focus on an `<input>` inside the map) does NOT fire `shared/components/src/MapView/__tests__/MapView.keyboardShortcut.test.tsx`
-- [ ] T047 [test] Web-shell Playwright spec for Story 3 (auto-unlock): lock viewport, switch plots via the catalog, assert padlock is back to `aria-pressed="false"` and dragging the new map works. Combine with Story 1's GIF if the spec is small enough; otherwise its own file `apps/web-shell/playwright/tests/viewport-lock-story3.spec.ts`
+- [x] T047 [test] Web-shell Playwright spec for Story 3 (auto-unlock): lock viewport, switch plots via the catalog, assert padlock is back to `aria-pressed="false"` and dragging the new map works. Combine with Story 1's GIF if the spec is small enough; otherwise its own file `apps/web-shell/playwright/tests/viewport-lock-story3.spec.ts`
 
 **Story 3 checkpoint**: P3 acceptance scenarios 3.1–3.5 map green to T012 (save/load round-trip), T046, T047. SC-004, SC-006 are exercised here.
 
@@ -207,25 +207,25 @@ Per `/speckit.review` decision 2A, the `Omit<>` widening also excludes `drawingM
 
 ### CI verification
 
-- [ ] T048 Run `task verify` (or the four-command fallback in `CLAUDE.md`) and confirm all four steps pass: lint (ruff + ESLint), typecheck (pyright + tsc), unit tests (pytest + Vitest excluding web-shell), Playwright E2E (web-shell + spec-navigator). Fix any regressions surfaced. `task verify`
+- [x] T048 Run `task verify` (or the four-command fallback in `CLAUDE.md`) and confirm all four steps pass: lint (ruff + ESLint), typecheck (pyright + tsc), unit tests (pytest + Vitest excluding web-shell), Playwright E2E (web-shell + spec-navigator). Fix any regressions surfaced. `task verify`
 
 ### Evidence collection
 
-- [ ] T049 Capture test results using the template at `.specify/templates/evidence/test-summary-template.md` — YAML front matter with `feature: viewport-lock`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body lists every test file added or extended in this feature and the spec acceptance scenarios each one exercises `specs/260-viewport-lock/evidence/test-summary.md`
-- [ ] T050 Create the usage-example walkthrough — mirror the structure of `quickstart.md` but condensed into a single "see this work in 60 seconds" demo, with the lock toggle and the three identical-framing thumbnails as the punchline `specs/260-viewport-lock/evidence/usage-example.md`
+- [x] T049 Capture test results using the template at `.specify/templates/evidence/test-summary-template.md` — YAML front matter with `feature: viewport-lock`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body lists every test file added or extended in this feature and the spec acceptance scenarios each one exercises `specs/260-viewport-lock/evidence/test-summary.md`
+- [x] T050 Create the usage-example walkthrough — mirror the structure of `quickstart.md` but condensed into a single "see this work in 60 seconds" demo, with the lock toggle and the three identical-framing thumbnails as the punchline `specs/260-viewport-lock/evidence/usage-example.md`
 - [ ] T051 [P] Confirm Storybook E2E screenshots (T037) have landed at `specs/260-viewport-lock/evidence/screenshots/banner-{light,dark,vscode}.png`, `toolbar-disabled-{light,dark,vscode}.png`, and `storyboard-padlock-{light,dark,vscode}.png` — if any are missing, re-run `pnpm --filter @debrief/components test:e2e ViewportLock` `specs/260-viewport-lock/evidence/screenshots/`
 - [ ] T052 [P] Confirm the multi-scene thumbnail screenshot from Story 1 Playwright (T038) has landed at `specs/260-viewport-lock/evidence/screenshots/multi-scene-thumbnails.png` — this is the Hook image for the blog post `specs/260-viewport-lock/evidence/screenshots/multi-scene-thumbnails.png`
 - [ ] T053 [P] Confirm `interaction.gif` (T038 video conversion) has landed at `specs/260-viewport-lock/evidence/screenshots/interaction.gif` (< 5s, < 2MB); re-encode if oversized `specs/260-viewport-lock/evidence/screenshots/interaction.gif`
-- [ ] T054 [P] MCP rejection evidence already captured at T040 — confirm `specs/260-viewport-lock/evidence/mcp-locked-response.json` exists and parses as valid JSON `specs/260-viewport-lock/evidence/mcp-locked-response.json`
+- [x] T054 [P] MCP rejection evidence already captured at T040 — confirm `specs/260-viewport-lock/evidence/mcp-locked-response.json` exists and parses as valid JSON `specs/260-viewport-lock/evidence/mcp-locked-response.json`
 
 ### Project memory updates
 
-- [ ] T055 Append a one-line entry to `docs/project_notes/issues.md` linking PR #626 and the spec dir; cross-reference PRs #623 and #625 as the immediate predecessors `docs/project_notes/issues.md`
-- [ ] T056 Update `docs/project_notes/viewport-mutation-audit.md` Section E ("Future lock viewport feature") with a small banner at the top noting "Realised in spec 260 — see `specs/260-viewport-lock/`" — keeps the audit doc as the system-of-record for the mutation sites while pointing readers to the realisation `docs/project_notes/viewport-mutation-audit.md`
+- [x] T055 Append a one-line entry to `docs/project_notes/issues.md` linking PR #626 and the spec dir; cross-reference PRs #623 and #625 as the immediate predecessors `docs/project_notes/issues.md`
+- [x] T056 Update `docs/project_notes/viewport-mutation-audit.md` Section E ("Future lock viewport feature") with a small banner at the top noting "Realised in spec 260 — see `specs/260-viewport-lock/`" — keeps the audit doc as the system-of-record for the mutation sites while pointing readers to the realisation `docs/project_notes/viewport-mutation-audit.md`
 
 ### Media content
 
-- [ ] T057 Spawn the Content Specialist via the Task tool to write `media/shipped-post.md`. The first three sections (Hook, What We're Building, How It Fits) must be copied verbatim from `specs/260-viewport-lock/evidence/opening-context.md` per the cached-opener contract. Add new sections: `## Screenshots` (the three multi-scene thumbnails + the locked map banner — embed `interaction.gif`), `## By the Numbers` (test counts from T049, files touched, dev-days), `## Lessons Learned` (the prior PR #623/#625 sequence and why an explicit lock was the right next step), `## What's Next` (mention backlog #261 + #262). Title prefixed with "Building " `specs/260-viewport-lock/media/shipped-post.md`
+- [x] T057 Spawn the Content Specialist via the Task tool to write `media/shipped-post.md`. The first three sections (Hook, What We're Building, How It Fits) must be copied verbatim from `specs/260-viewport-lock/evidence/opening-context.md` per the cached-opener contract. Add new sections: `## Screenshots` (the three multi-scene thumbnails + the locked map banner — embed `interaction.gif`), `## By the Numbers` (test counts from T049, files touched, dev-days), `## Lessons Learned` (the prior PR #623/#625 sequence and why an explicit lock was the right next step), `## What's Next` (mention backlog #261 + #262). Title prefixed with "Building " `specs/260-viewport-lock/media/shipped-post.md`
 
 ### PR amendment
 
