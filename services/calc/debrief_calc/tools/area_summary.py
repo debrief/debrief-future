@@ -1,11 +1,17 @@
 """
 Area summary tool.
 
-Summarizes features within a geographic region (bounding box or polygon).
+Summarises features within a geographic region. Accepts either:
 
-Accepts both REGION context (with explicit bounds) and MULTI context
-(extracting bbox from feature coordinates), aligning Python and TypeScript
-implementations per #107 (F-2.6).
+- An explicit bounding box via ``context.bounds`` (REGION-style context), or
+- A list of selected features whose coordinates are unioned into a bbox
+  (MULTI-style context).
+
+The TypeScript counterpart at
+``apps/web-shell/src/tools/region/analysis/areaSummary.ts`` accepts the same
+two inputs: ``params.bounds`` (mirrors ``context.bounds``) and the selected
+features. Both implementations return ``[]`` when neither path yields a valid
+bbox. See #107 (F-2.6) for the alignment record.
 """
 
 from __future__ import annotations
@@ -88,7 +94,9 @@ def _bounds_from_features(features: list[GeoJSONFeatureDict]) -> list[float] | N
 @tool(
     name="area-summary",
     description="Summarize the geographic extent and properties of selected features or a region",
-    input_kinds=["TRACK", "POINT", "RECTANGLE", "CIRCLE", "ZONE", "REGION", "POLYGON", "POLY"],
+    # Canonical FeatureKindEnum values that yield a meaningful bbox.
+    # Kept in sync with apps/web-shell/src/tools/region/analysis/areaSummary.ts (#107).
+    input_kinds=["TRACK", "POINT", "RECTANGLE", "CIRCLE", "ZONE", "POLY"],
     output_kind=OutputKindEnum.regionSOLIDUSstatistics,
     context_type=ContextType.MULTI,
     category=ToolCategoryEnum.calc,

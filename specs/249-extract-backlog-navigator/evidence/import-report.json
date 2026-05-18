@@ -1,0 +1,11 @@
+{
+  "destination": "acme/foo-navigator",
+  "host": "acme.github.io",
+  "mode": "dry-run",
+  "filesRendered": 13,
+  "tokensReplaced": 33,
+  "placeholderCheck": "ok",
+  "smokeTestExitCode": "skipped",
+  "sourceRepo": "debrief/debrief-future",
+  "sourcePath": "/home/user/debrief-future"
+}

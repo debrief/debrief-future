@@ -1,0 +1,21 @@
+{
+  "name": "track-length",
+  "description": "Calculate total length of selected tracks.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "params": {
+        "type": "object",
+        "properties": {
+          "units": { "type": "string", "enum": ["m", "nm"], "default": "m" }
+        }
+      }
+    }
+  },
+  "annotations": {
+    "debrief:selectionRequirements": [{ "kind": "TRACK", "min": 1 }],
+    "debrief:category": "calc",
+    "debrief:version": "1.0.0",
+    "debrief:outputKind": "track/statistics"
+  }
+}

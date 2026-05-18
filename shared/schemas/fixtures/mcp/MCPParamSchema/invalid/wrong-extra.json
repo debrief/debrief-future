@@ -1,0 +1,5 @@
+{
+  "type": "string",
+  "description": "Extra field not allowed under Pydantic extra=forbid.",
+  "unknown_extra_key": 42
+}

@@ -1,0 +1,7 @@
+{
+  "success": true,
+  "message": "Track length: 12 345 m",
+  "parameters": {
+    "units": { "value": "m", "default": true, "tunable": true }
+  }
+}

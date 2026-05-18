@@ -8,9 +8,26 @@
 
 import type { Tool, SelectionRequirement, ToolParameter } from './types';
 import type { MCPToolDefinition, MCPSelectionRequirement } from '@debrief/utils';
-import type { ToolCategoryEnum } from '@debrief/schemas';
+import type { MCPParamSchema as MCPParamSchemaBase, ToolCategoryEnum } from '@debrief/schemas';
 
 export type { MCPToolDefinition, MCPSelectionRequirement };
+
+/**
+ * Schema for a single parameter within the MCP inputSchema params section.
+ *
+ * Schema-rooted on `MCPParamSchema` from `@debrief/schemas` (LinkML
+ * `mcp.yaml`) and narrowed with the consumer-side `enum`, `default`,
+ * and `x-debrief-param-type` extensions that the live wire format
+ * carries on each parameter. The base contributes `type` and
+ * `description`; consumers add the rest via intersection. Per FR-004
+ * (R4 import-based schema rooting) the audit treats this file as
+ * schema-rooted.
+ */
+type MCPParamSchema = MCPParamSchemaBase & {
+  enum?: unknown[];
+  default?: unknown;
+  'x-debrief-param-type'?: string;
+};
 
 /**
  * Canonical set of visual category values — the five `ToolCategoryEnum`
@@ -98,17 +115,6 @@ export function fromMCPTool(mcpTool: MCPToolDefinition): Tool {
  */
 export function fromMCPTools(mcpTools: MCPToolDefinition[]): Tool[] {
   return mcpTools.map(fromMCPTool);
-}
-
-/**
- * Schema for a single parameter within the MCP inputSchema params section.
- */
-interface MCPParamSchema {
-  type?: string;
-  description?: string;
-  enum?: unknown[];
-  default?: unknown;
-  'x-debrief-param-type'?: string;
 }
 
 /**

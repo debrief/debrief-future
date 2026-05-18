@@ -6,7 +6,18 @@
  */
 
 import type { Request, Response } from 'express';
+import type { MCPRequest } from '@debrief/schemas';
+import { SessionMCPToolName } from '@debrief/schemas';
 import type { SessionStoreApi } from '../store/index.js';
+
+/**
+ * Discriminator string union over the registered tool names. Derived from
+ * the LinkML-rooted `SessionMCPToolName` enum (spec 222 R-001) so adding
+ * a tool requires updating the enum at
+ * `shared/schemas/src/linkml/mcp.yaml` first; the compile-time check
+ * below then enforces that the local `TOOLS` const stays in lockstep.
+ */
+type ToolName = `${SessionMCPToolName}`;
 import {
   getState,
   setCurrentTime,
@@ -16,14 +27,6 @@ import {
   setPlaybackRate,
   setRotation,
 } from './tools/index.js';
-
-/**
- * MCP tool request format.
- */
-interface MCPRequest {
-  tool: string;
-  input: Record<string, unknown>;
-}
 
 /**
  * Available MCP tools.
@@ -46,7 +49,15 @@ const TOOLS = {
   'session.setRotation': setRotation,
 } as const;
 
-type ToolName = keyof typeof TOOLS;
+// Compile-time guard: `TOOLS` keys MUST mirror `SessionMCPToolName` exactly.
+// If either drifts, this assignment fails to typecheck — see spec 222 R-001.
+type _ToolNameCheck = keyof typeof TOOLS extends ToolName
+  ? ToolName extends keyof typeof TOOLS
+    ? true
+    : never
+  : never;
+const _toolNameCheck: _ToolNameCheck = true;
+void _toolNameCheck;
 
 /**
  * List available tools.

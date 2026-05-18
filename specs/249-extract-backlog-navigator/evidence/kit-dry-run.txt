@@ -1,0 +1,68 @@
+==> import-from-source.sh
+    Destination:   acme/foo-navigator (origin)
+    Host:          acme.github.io
+    Source repo:   debrief/debrief-future
+    Mode:          DRY RUN — no push
+
+==> Step 1: use existing source clone at /home/user/debrief-future
+    OK — source path verified
+==> Step 2: subtree split apps/backlog-navigator/ in source clone
+    OK — extracted branch produced in source clone
+==> Step 3: scan extracted tree for stray .env* files
+    OK — no .env* files in extracted tree
+==> Step 4: merge extracted history into destination
+Switched to a new branch 'main'
+branch 'main' set up to track 'backlog-source-tmp/extracted'.
+    OK — main created from extracted (empty destination)
+==> Step 5: rewrite vite.config.ts base default → /foo-navigator/
+    OK — base default now /foo-navigator/
+==> Step 6: apply templates with {{ORG}}/{{REPO}}/{{HOST}} substitution
+    -> README.md
+    -> CONFIGURATION.md
+    -> SECURITY.md
+    -> .eslintrc.cjs
+    -> tsconfig.json
+    -> tsconfig.node.json
+    -> .gitignore
+    -> BACKLOG.md
+    OK — 8 template files rendered
+==> Step 7: install workflows into .github/workflows/
+    -> .github/workflows/ci.yml
+    -> .github/workflows/deploy.yml
+    -> .github/workflows/lighthouse.yml
+    -> .github/workflows/pr-preview-cleanup.yml
+    -> .github/workflows/pr-preview.yml
+    -> .github/workflows-optional/live.yml (NOT enabled by default)
+    OK — 5 workflows installed
+==> Step 8: copy bundled dummy spec dirs
+    OK — bundled dummy dataset in place
+==> Step 9: regenerate pnpm-lock.yaml
+    OK — pnpm-lock.yaml generated
+==> Step 10: smoke SKIPPED (--no-smoke supplied)
+==> Placeholder leakage check:  OK — no remaining {{ORG}}/{{REPO}}/{{HOST}} markers
+
+==> Dry-run complete. Staged files (not committed):
+ .eslintrc.cjs                            |   24 +-
+ .github/workflows-optional/live.yml      |   59 +
+ .github/workflows/ci.yml                 |   76 +
+ .github/workflows/deploy.yml             |   46 +
+ .github/workflows/lighthouse.yml         |   92 +
+ .github/workflows/pr-preview-cleanup.yml |   45 +
+ .github/workflows/pr-preview.yml         |   85 +
+ .gitignore                               |    7 +-
+ BACKLOG.md                               |   29 +
+ CONFIGURATION.md                         |  111 +
+ README.md                                |  127 +-
+ SECURITY.md                              |  168 +
+ pnpm-lock.yaml                           | 7320 ++++++++++++++++++++++++++++++
+ specs/001-dummy-spec/plan.md             |    3 +
+ specs/001-dummy-spec/spec.md             |   37 +
+ specs/001-dummy-spec/tasks.md            |    3 +
+ tsconfig.json                            |   13 +-
+ vite.config.ts                           |    2 +-
+ 18 files changed, 8211 insertions(+), 36 deletions(-)
+
+    Working tree:  /tmp/evidence-dest-rXiNUo
+    Report:        /tmp/evidence-dest-rXiNUo/import-report.json
+
+    To recover: git reset HEAD && git clean -fd to undo all changes.
