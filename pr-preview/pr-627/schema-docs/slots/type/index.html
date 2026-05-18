@@ -13744,8 +13744,28 @@ Alias: type</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../../classes/RectangleAnnotation/">RectangleAnnotation</a></td>
-<td>GeoJSON Feature for rectangle annotations</td>
+<td><a href="../../classes/GeoJSONPoint/">GeoJSONPoint</a></td>
+<td>GeoJSON Point geometry</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/FileProvEntry/">FileProvEntry</a></td>
+<td>File-level provenance event (snapshot or branch creation)</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/ToolsUpdateMessage/">ToolsUpdateMessage</a></td>
+<td>Push notification from the extension host to the activity-panel webview when ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/RawGeoJSONFeatureCollection/">RawGeoJSONFeatureCollection</a></td>
+<td>Parse-boundary GeoJSON FeatureCollection (RFC 7946 §3</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/GeoJSONPolygon/">GeoJSONPolygon</a></td>
+<td>GeoJSON Polygon geometry</td>
 <td>no</td>
 </tr>
 <tr>
@@ -13754,38 +13774,8 @@ Alias: type</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/TextAnnotation/">TextAnnotation</a></td>
-<td>GeoJSON Feature for text annotations at a position</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/NarrativeEntry/">NarrativeEntry</a></td>
-<td>GeoJSON Feature for timestamped narrative/log entries</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/ToolParameter/">ToolParameter</a></td>
-<td>A configurable parameter for a tool</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/GeoJSONMultiLineString/">GeoJSONMultiLineString</a></td>
-<td>GeoJSON MultiLineString geometry for compound tracks</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/PolyAnnotation/">PolyAnnotation</a></td>
-<td>GeoJSON Feature for arbitrary polygon annotations</td>
-<td>no</td>
-</tr>
-<tr>
 <td><a href="../../classes/CircleAnnotation/">CircleAnnotation</a></td>
 <td>GeoJSON Feature for circle annotations</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/RawGeoJSONFeatureCollection/">RawGeoJSONFeatureCollection</a></td>
-<td>Parse-boundary GeoJSON FeatureCollection (RFC 7946 §3</td>
 <td>no</td>
 </tr>
 <tr>
@@ -13799,48 +13789,23 @@ Alias: type</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/GeoJSONLineString/">GeoJSONLineString</a></td>
-<td>GeoJSON LineString geometry</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/VectorAnnotation/">VectorAnnotation</a></td>
-<td>GeoJSON Feature for vector annotations</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/MultiPolygonFeature/">MultiPolygonFeature</a></td>
-<td>GeoJSON Feature for multi-polygon tool results</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/DatasetAxisMetadata/">DatasetAxisMetadata</a></td>
-<td>Axis label and type metadata for a dataset chart</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/RawGeoJSONFeature/">RawGeoJSONFeature</a></td>
-<td>Parse-boundary GeoJSON Feature (RFC 7946 §3</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/DatasetEntry/">DatasetEntry</a></td>
-<td>Standard envelope for all tool result datasets, matching the runtime DatasetE...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../../classes/GeoJSONEmptyPoint/">GeoJSONEmptyPoint</a></td>
-<td>GeoJSON Point geometry with empty coordinates (for non-spatial features)</td>
-<td>no</td>
-</tr>
-<tr>
 <td><a href="../../classes/LineAnnotation/">LineAnnotation</a></td>
 <td>GeoJSON Feature for line segment annotations</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/ToolsUpdateMessage/">ToolsUpdateMessage</a></td>
-<td>Push notification from the extension host to the activity-panel webview when ...</td>
+<td><a href="../../classes/MultiPointFeature/">MultiPointFeature</a></td>
+<td>GeoJSON Feature for multi-point tool results</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/StoryboardFeature/">StoryboardFeature</a></td>
+<td>GeoJSON Feature representing a Storyboard parent entity</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/SceneFeature/">SceneFeature</a></td>
+<td>GeoJSON Feature representing a Scene child entity</td>
 <td>no</td>
 </tr>
 <tr>
@@ -13854,38 +13819,63 @@ Alias: type</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/MultiPointFeature/">MultiPointFeature</a></td>
-<td>GeoJSON Feature for multi-point tool results</td>
+<td><a href="../../classes/DatasetEntry/">DatasetEntry</a></td>
+<td>Standard envelope for all tool result datasets, matching the runtime DatasetE...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/GeoJSONPoint/">GeoJSONPoint</a></td>
-<td>GeoJSON Point geometry</td>
+<td><a href="../../classes/RawGeoJSONFeature/">RawGeoJSONFeature</a></td>
+<td>Parse-boundary GeoJSON Feature (RFC 7946 §3</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/FileProvEntry/">FileProvEntry</a></td>
-<td>File-level provenance event (snapshot or branch creation)</td>
+<td><a href="../../classes/GeoJSONLineString/">GeoJSONLineString</a></td>
+<td>GeoJSON LineString geometry</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/SystemState/">SystemState</a></td>
-<td>GeoJSON Feature for storing non-spatial system state</td>
+<td><a href="../../classes/TrackFeature/">TrackFeature</a></td>
+<td>GeoJSON Feature representing a vessel track</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/SceneFeature/">SceneFeature</a></td>
-<td>GeoJSON Feature representing a Scene child entity</td>
+<td><a href="../../classes/TextAnnotation/">TextAnnotation</a></td>
+<td>GeoJSON Feature for text annotations at a position</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/GeoJSONPolygon/">GeoJSONPolygon</a></td>
-<td>GeoJSON Polygon geometry</td>
+<td><a href="../../classes/PolyAnnotation/">PolyAnnotation</a></td>
+<td>GeoJSON Feature for arbitrary polygon annotations</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/StoryboardFeature/">StoryboardFeature</a></td>
-<td>GeoJSON Feature representing a Storyboard parent entity</td>
+<td><a href="../../classes/ToolParameter/">ToolParameter</a></td>
+<td>A configurable parameter for a tool</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/VectorAnnotation/">VectorAnnotation</a></td>
+<td>GeoJSON Feature for vector annotations</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/MultiPolygonFeature/">MultiPolygonFeature</a></td>
+<td>GeoJSON Feature for multi-polygon tool results</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/GeoJSONEmptyPoint/">GeoJSONEmptyPoint</a></td>
+<td>GeoJSON Point geometry with empty coordinates (for non-spatial features)</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/NarrativeEntry/">NarrativeEntry</a></td>
+<td>GeoJSON Feature for timestamped narrative/log entries</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/RectangleAnnotation/">RectangleAnnotation</a></td>
+<td>GeoJSON Feature for rectangle annotations</td>
 <td>no</td>
 </tr>
 <tr>
@@ -13894,8 +13884,18 @@ Alias: type</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../../classes/TrackFeature/">TrackFeature</a></td>
-<td>GeoJSON Feature representing a vessel track</td>
+<td><a href="../../classes/SystemState/">SystemState</a></td>
+<td>GeoJSON Feature for storing non-spatial system state</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/DatasetAxisMetadata/">DatasetAxisMetadata</a></td>
+<td>Axis label and type metadata for a dataset chart</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../../classes/GeoJSONMultiLineString/">GeoJSONMultiLineString</a></td>
+<td>GeoJSON MultiLineString geometry for compound tracks</td>
 <td>no</td>
 </tr>
 </tbody>
