@@ -1,6 +1,6 @@
 # Feature Specification: Viewport Lock
 
-**Feature Branch**: `259-viewport-lock`
+**Feature Branch**: `260-viewport-lock`
 **Created**: 2026-05-18
 **Status**: Draft
 **Input**: User description: "Viewport lock — a session-runtime toggle that freezes the map's viewport (centre + zoom) so a user can capture a series of storyboard scenes that all share the same framing, while still varying time / display mode / selection / visibility between captures."
