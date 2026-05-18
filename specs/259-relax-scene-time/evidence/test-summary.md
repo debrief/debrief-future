@@ -1,8 +1,8 @@
 ---
 feature: "259-relax-scene-time"
-captured_at: "2026-05-18T17:35:00Z"
-git_sha: "a452819"
-tests_passed: 3732
+captured_at: "2026-05-18T20:50:00Z"
+git_sha: "885ef05"
+tests_passed: 3736
 tests_failed: 0
 tests_skipped: 5
 coverage_pct: null
@@ -82,9 +82,18 @@ coverage_pct: null
 - **Story 2 mixed-tied** — Scenes captured in order A@T0, B@T0, C@T1, D@T1, E@T2 are listed in exactly that order.
 - **Schema round-trip** — `creation_order` survives Pydantic → JSON → TypeScript → JSON → Pydantic without loss.
 
+### Playwright E2E — `apps/web-shell/playwright/tests/` (2 new specs)
+
+| Test File | Cases | Status |
+|-----------|-------|--------|
+| `storyboard-tied-timestamps.spec.ts` (NEW, T057) | 1 | Pass — three captures at one instant land in capture order with monotonic `creation_order`; no collision banner; screenshot of the panel rail saved to `evidence/screenshots/tied-timestamps.png` |
+| `storyboard-legacy-rejection.spec.ts` (NEW, T059) | 1 | Pass — synthesized schema_version: 1 plot drives `validatePlot` via the `window.__triggerPlotValidation` test hook; banner surfaces with `UnsupportedSchemaVersion` code; screenshot of the welcome view with banner saved to `evidence/screenshots/missing-creation-order-error.png` |
+| `storyboard-capture.spec.ts` (updated) | 3 | Pass — collision-banner tests deleted; `subsequent capture at the same timestamp now succeeds` test added in their place |
+
+`StoryboardPanelPage` helper (T058) added at `apps/web-shell/playwright/pages/StoryboardPanelPage.ts` with `getSceneRows()` enumeration + `firstCapture()` / `subsequentCapture()` helpers used by the tied-timestamps test.
+
 ## Known Issues
 
-- Playwright E2E (T057 / T059 from `tasks.md`) deferred — the data-layer + unit + adherence tests fully cover FR-001..FR-011. Browser-level capture flow tests would re-verify the same module via the live web-shell; these are tracked but not run in this implementation pass.
 - Three web-shell `toolService` tests fail with a hard-coded expected-tool-list (12 vs 11). The drift was introduced in an earlier commit and is unrelated to #259 — confirmed by stashing all #259 changes and re-running.
 
 ## Environment

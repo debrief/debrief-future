@@ -41,7 +41,17 @@ This sits in the schema layer of the Storyboarding feature line (#215 onwards) �
 
 ## Screenshots
 
-> **Note on screenshots**: this is a data-model + CRUD-semantics change. The user-visible Storyboard panel renders identically — three rows in the same component, same colours, same typography. The before/after that matters happens at the capture step: in `Before`, the second `Ctrl+Alt+C` at the same timestamp surfaces a Replace/Offset/Cancel banner; in `After`, it silently appends a third row to the tied group. A captured GIF of that gesture is the right asset for the eventual deployed post; the implementation pass focused on the data layer.
+### Three Scenes captured at one instant
+
+The headline outcome of the change. Each row is a Scene captured at the same `timestamp` but at a different map viewport. The panel lists them in capture order — the new secondary sort key (`creation_order`) does the work the old "no duplicate timestamps" constraint used to do, without making the analyst fake the clock.
+
+![Three tied-timestamp Scenes in capture order](../evidence/screenshots/tied-timestamps.png)
+
+### Pre-#259 plot — explicit hard-fail
+
+A Storyboard saved before this change carries `schema_version: 1` and Scenes without `creation_order`. The reader rejects it on load with a clear, named error. No silent coercion, no quiet guess — Article XIV authorises the hard break because no shipped user data exists that this could regress (FR-010).
+
+![UnsupportedSchemaVersionError banner blocking a pre-#259 plot from loading](../evidence/screenshots/missing-creation-order-error.png)
 
 ## By the Numbers
 

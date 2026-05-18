@@ -146,7 +146,7 @@ test.describe('Storyboard capture — web-shell (#235 US1)', () => {
     ).toBeHidden();
   });
 
-  test('subsequent capture at the same timestamp surfaces the collision banner with Replace / Offset / Cancel', async ({
+  test('subsequent capture at the same timestamp now succeeds (#259 — relaxed constraint)', async ({
     page,
   }) => {
     // First capture — creates Storyboard + Scene at the current playhead.
@@ -175,85 +175,11 @@ test.describe('Storyboard capture — web-shell (#235 US1)', () => {
       checkId: 'after-first-capture',
     });
 
-    // Second capture — playhead unchanged, so the same timestamp collides.
+    // #259 — second capture at the same timestamp now succeeds silently.
+    // No collision banner; the new Scene appends to the tied group.
     await page.locator('[data-testid="capture-button"]').click();
 
-    // The inline collision banner should appear with all three buttons.
-    await expect(
-      page.locator('[data-testid="storyboard-collision-banner"]'),
-    ).toBeVisible({ timeout: 5000 });
-    await expect(
-      page.locator('[data-testid="collision-replace"]'),
-    ).toBeVisible();
-    await expect(
-      page.locator('[data-testid="collision-offset"]'),
-    ).toBeVisible();
-    await expect(
-      page.locator('[data-testid="collision-cancel"]'),
-    ).toBeVisible();
-
-    await assertViewportControlsRemainAccessible(page, {
-      checkId: 'collision-banner-open',
-    });
-
-    // Cancel — banner dismisses, scene count unchanged.
-    await page.locator('[data-testid="collision-cancel"]').click();
-    await expect(
-      page.locator('[data-testid="storyboard-collision-banner"]'),
-    ).not.toBeVisible({ timeout: 3000 });
-    const sceneCount = await page.evaluate(() => {
-      const fc = window.__currentPlotFeatures ?? [];
-      return fc.filter(
-        (f) => (f.properties as { kind?: string })?.kind === 'STORYBOARD_SCENE',
-      ).length;
-    });
-    expect(sceneCount).toBe(1);
-  });
-
-  test('collision banner Offset advances the timestamp by 1 s and lands a second Scene', async ({
-    page,
-  }) => {
-    // First capture.
-    await page.locator('[data-testid="capture-scene-button"]').click();
-    await expect(
-      page.locator('[data-testid="storyboard-naming-row"]'),
-    ).toBeVisible({ timeout: 5000 });
-    await page
-      .locator('[data-testid="storyboard-naming-row-input"]')
-      .fill('Exercise Bravo');
-    await page.locator('[data-testid="storyboard-naming-row-confirm"]').click();
-    await expect(
-      page.locator('[data-testid="storyboard-naming-row"]'),
-    ).not.toBeVisible({ timeout: 5000 });
-    await page.waitForFunction(
-      () => {
-        const fc = window.__currentPlotFeatures ?? [];
-        return fc.some(
-          (f) => (f.properties as { kind?: string })?.kind === 'STORYBOARD_SCENE',
-        );
-      },
-      { timeout: 10000 },
-    );
-
-    const firstTs = await page.evaluate(() => {
-      const fc = window.__currentPlotFeatures ?? [];
-      const scene = fc.find(
-        (f) => (f.properties as { kind?: string })?.kind === 'STORYBOARD_SCENE',
-      );
-      return (scene?.properties as { timestamp?: string })?.timestamp ?? null;
-    });
-    expect(firstTs).not.toBeNull();
-
-    // Second capture — collision banner appears.
-    await page.locator('[data-testid="capture-button"]').click();
-    await expect(
-      page.locator('[data-testid="storyboard-collision-banner"]'),
-    ).toBeVisible({ timeout: 5000 });
-
-    // Click Offset — should advance the timestamp by 1 s and create the Scene.
-    await page.locator('[data-testid="collision-offset"]').click();
-
-    // Wait for the second Scene to appear in plot features.
+    // Wait for the second Scene to land (no banner to interact with).
     await page.waitForFunction(
       () => {
         const fc = window.__currentPlotFeatures ?? [];
@@ -267,26 +193,37 @@ test.describe('Storyboard capture — web-shell (#235 US1)', () => {
       { timeout: 10000 },
     );
 
-    // The new Scene's timestamp should be exactly firstTs + 1000 ms.
-    const timestamps = await page.evaluate(() => {
+    // The collision banner is structurally gone — assert it never appears.
+    await expect(
+      page.locator('[data-testid="storyboard-collision-banner"]'),
+    ).not.toBeVisible();
+
+    // Both Scenes share the timestamp; creation_order differs.
+    const scenes = await page.evaluate(() => {
       const fc = window.__currentPlotFeatures ?? [];
       return fc
         .filter(
           (f) =>
             (f.properties as { kind?: string })?.kind === 'STORYBOARD_SCENE',
         )
-        .map((f) => (f.properties as { timestamp: string }).timestamp)
-        .sort();
+        .map((f) => ({
+          timestamp: (f.properties as { timestamp: string }).timestamp,
+          creation_order: (f.properties as { creation_order: number })
+            .creation_order,
+        }));
     });
-    expect(timestamps).toHaveLength(2);
-    const firstMs = new Date(timestamps[0]!).getTime();
-    const secondMs = new Date(timestamps[1]!).getTime();
-    expect(secondMs - firstMs).toBe(1000);
+    expect(scenes).toHaveLength(2);
+    expect(scenes[0]!.timestamp).toBe(scenes[1]!.timestamp);
+    expect(scenes[0]!.creation_order).not.toBe(scenes[1]!.creation_order);
 
     await assertViewportControlsRemainAccessible(page, {
-      checkId: 'after-offset',
+      checkId: 'after-tied-capture',
     });
   });
+
+  // #259 — Offset / Replace / Cancel banner tests removed. The collision
+  // banner is structurally gone now that captures unconditionally succeed
+  // at the timestamp level.
 
   test('cancel naming row leaves rail empty (no Storyboard, no Scene)', async ({
     page,

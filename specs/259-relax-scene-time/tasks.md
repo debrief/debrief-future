@@ -156,9 +156,9 @@
 
 ### E2E workflow (web-shell)
 
-- [ ] T057 [test] New Playwright workflow: open sample plot → freeze time controller → capture Scene → pan viewport → capture Scene → pan again → capture Scene → assert three rows present in the StoryboardPanel in capture order → write screenshot directly into `specs/259-relax-scene-time/evidence/screenshots/tied-timestamps.png` `apps/web-shell/playwright/tests/storyboard-tied-timestamps.spec.ts`
-- [ ] T058 [P] Add `StoryboardPanelPage` helper (or extend the existing analysis page object) with a `getSceneRows()` enumeration method `apps/web-shell/playwright/pages/storyboardPanelPage.ts`
-- [ ] T059 [test] Second Playwright workflow: attempt to load a fixture plot with `schema_version: 1` → assert the explicit load error dialogue surfaces with the `MissingCreationOrderError` / `UnsupportedSchemaVersionError` text → screenshot into `specs/259-relax-scene-time/evidence/screenshots/missing-creation-order-error.png` `apps/web-shell/playwright/tests/storyboard-legacy-rejection.spec.ts`
+- [x] T057 [test] New Playwright workflow: open sample plot → freeze time controller → capture Scene → pan viewport → capture Scene → pan again → capture Scene → assert three rows present in the StoryboardPanel in capture order → write screenshot directly into `specs/259-relax-scene-time/evidence/screenshots/tied-timestamps.png` `apps/web-shell/playwright/tests/storyboard-tied-timestamps.spec.ts`
+- [x] T058 [P] Add `StoryboardPanelPage` helper (or extend the existing analysis page object) with a `getSceneRows()` enumeration method `apps/web-shell/playwright/pages/storyboardPanelPage.ts`
+- [x] T059 [test] Second Playwright workflow: attempt to load a fixture plot with `schema_version: 1` → assert the explicit load error dialogue surfaces with the `MissingCreationOrderError` / `UnsupportedSchemaVersionError` text → screenshot into `specs/259-relax-scene-time/evidence/screenshots/missing-creation-order-error.png` `apps/web-shell/playwright/tests/storyboard-legacy-rejection.spec.ts`
 
 ### Full verification gate
 
