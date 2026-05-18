@@ -63,11 +63,14 @@
   stroke: currentColor;
 }
 
-/* Disabled state (when no features to fit) */
+/* Disabled state (e.g. viewport locked — spec 260 / FR-004).
+   pointer-events stays AUTO so the browser's native title tooltip fires on
+   hover ("Viewport locked"); the click is short-circuited in JS via the
+   aria-disabled check in createButton(). */
 .debrief-leaflet-toolbar__button--disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .debrief-leaflet-toolbar__button--disabled:hover {

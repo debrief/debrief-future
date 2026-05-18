@@ -158,6 +158,16 @@ export interface SetDrawingPaletteIndexMessage {
   paletteIndex: number;
 }
 
+/**
+ * Push the current viewport-lock state to the webview (host → webview).
+ * Spec 260 — fires whenever the spatial slice's `viewportLocked` changes
+ * server-side (e.g. on plot switch, where the host force-unlocks).
+ */
+export interface SetViewportLockedMessage {
+  type: 'setViewportLocked';
+  viewportLocked: boolean;
+}
+
 /** Response to export PNG request */
 export interface RequestExportPngResponse extends ResponseMessage {
   type: 'requestExportPngResponse';
@@ -312,6 +322,17 @@ export interface FeatureDrawnMessage {
 export interface DrawingModeChangedMessage {
   type: 'drawingModeChanged';
   drawingMode: 'point' | 'rectangle' | 'polygon' | 'polyline' | null;
+}
+
+/**
+ * Notify extension that the user toggled the viewport lock from the webview
+ * (banner click, padlock click, or `L` shortcut). Spec 260 / FR-001..FR-005.
+ * The host updates the spatial slice and the next render echoes the new
+ * value back via `SetViewportLockedMessage`.
+ */
+export interface ViewportLockChangedMessage {
+  type: 'viewportLockChanged';
+  viewportLocked: boolean;
 }
 
 /** Notify extension of viewport change for session state (Feature: 029) */
@@ -612,6 +633,7 @@ export type ExtensionToWebviewMessage =
   | SetHiddenIdsMessage
   | SetDrawingModeMessage
   | SetDrawingPaletteIndexMessage
+  | SetViewportLockedMessage
   | RequestExportPngResponse
   | RequestTrackDetailsResponse
   | ImportProgressMessage
@@ -644,6 +666,7 @@ export type WebviewToExtensionMessage =
   | RequestRedoMessage
   | FeatureDrawnMessage
   | DrawingModeChangedMessage
+  | ViewportLockChangedMessage
   | ThumbnailCaptureResponseMessage
   | CurrentViewportResponseMessage
   | SaveResultMessage

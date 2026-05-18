@@ -259,6 +259,33 @@ pnpm --filter @debrief/spec-navigator build && cd apps/spec-navigator && node ru
 
 **Playwright note:** Step 4 uses `run-playwright.mjs` which extracts Chromium via `@sparticuz/chromium` — this works in both cloud (Claude Code) and CI environments. For local macOS/Windows, use `pnpm exec playwright install chromium` then `pnpm --filter @debrief/web-shell test` instead. See `docs/project_notes/playwright-installation-research.md` for details.
 
+### Playwright in Claude Code on the web — works fully, captures screenshots
+
+**Cloud sessions can — and should — run Playwright tests and capture real screenshots.** Standard `playwright install chromium` is blocked by the CDN 403 in cloud, but the project bundles `@sparticuz/chromium` via npm and the `run-playwright.mjs` wrappers handle extraction + flag wiring transparently. **Do not skip Playwright tasks under the assumption screenshots can't be produced** — they can, and the evidence pipeline (per-feature `evidence/screenshots/*.png`, blog-post media) is built around running these in-session.
+
+Three wrappers exist, one per surface:
+
+```sh
+# Web-shell flows (the one most feature posts need — full plot load + capture)
+cd apps/web-shell && node run-playwright.mjs <spec-basename>
+# e.g. node run-playwright.mjs viewport-lock
+
+# Shared components Storybook (builds storybook-static + serves on :6006 + runs e2e/*.spec.ts)
+cd shared/components && node run-playwright.mjs <spec-basename>
+# e.g. node run-playwright.mjs ViewportLock
+
+# Spec Navigator
+cd apps/spec-navigator && node run-playwright.mjs
+```
+
+Each wrapper:
+1. Extracts the bundled Chromium binary to `/tmp/chromium` via `@sparticuz/chromium`.
+2. Starts the necessary dev / static server (Vite for web-shell, http-server for the Storybook build).
+3. Runs `pnpm exec playwright test` with `CHROMIUM_PATH` / `CLAUDE_CODE=1` set so `playwright.config.ts` picks the bundled binary.
+4. Cleans up.
+
+**Workflow note for feature delivery:** when a spec lists screenshots under "Evidence Requirements" (e.g. `evidence/screenshots/banner-{light,dark,vscode}.png`), the Playwright specs are the producers — write the spec, run the appropriate wrapper, and the PNGs land directly into the evidence directory. The post then references real paths, not placeholders. See `docs/project_notes/playwright-installation-research.md` for the full diagnostic trail.
+
 ### What CI actually runs (`.github/workflows/ci.yml`)
 
 | CI Step | Command | What it catches |

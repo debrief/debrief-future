@@ -338,6 +338,18 @@ export function StoryboardPanelMount({
     actor,
   ]);
 
+  // Spec 260 — viewport lock state via Zustand subscription, mirroring the
+  // pattern used elsewhere in this file (`useSyncExternalStore` against the
+  // store's `subscribe` + `getState` pair).
+  const viewportLocked = useSyncExternalStore(
+    sessionStore.subscribe,
+    () => sessionStore.getState().viewportLocked,
+  );
+  const handleViewportLockToggle = useCallback(() => {
+    const current = sessionStore.getState().viewportLocked;
+    sessionStore.getState().setViewportLocked(!current);
+  }, [sessionStore]);
+
   // ─── Naming row handlers ─────────────────────────────────────────
   const onNamingRowTextChanged = useCallback(
     (pendingName: string) => setNamingRowPendingName(pendingName),
@@ -573,6 +585,10 @@ export function StoryboardPanelMount({
           captureInFlight={state.captureInFlight}
           onCaptureClick={handleCaptureClick}
           onSceneRowClick={handleSceneRowClick}
+          // Spec 260 — viewport lock padlock in the panel header.
+          viewportLocked={viewportLocked}
+          onViewportLockToggle={handleViewportLockToggle}
+          hasActivePlot={true}
           storyboards={
             storyboardOptions.length > 0 ? storyboardOptions : undefined
           }

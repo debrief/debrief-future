@@ -98,6 +98,8 @@ export class MapPanel {
   private temporalUnsubscribe?: () => void;
   private hiddenUnsubscribe?: () => void;
   private drawingUnsubscribe?: () => void;
+  /** Spec 260 — push `viewportLocked` from store to webview on change. */
+  private viewportLockUnsubscribe?: () => void;
   private sessionChangeDisposable?: vscode.Disposable;
   private viewportUpdateTimeout?: NodeJS.Timeout;
   /**
@@ -242,6 +244,13 @@ export class MapPanel {
 
     // Update panel title
     this.panel.title = plot.title;
+
+    // Spec 260 / FR-012 — opening a different plot force-unlocks the
+    // viewport. Done BEFORE the loadPlot message goes out so the
+    // webview's first paint at the new plot is unlocked.
+    if (this.activeSession) {
+      this.activeSession.getState().setViewportLocked(false);
+    }
 
     // Send to webview
     this.postMessage({
@@ -853,11 +862,13 @@ export class MapPanel {
     this.temporalUnsubscribe?.();
     this.hiddenUnsubscribe?.();
     this.drawingUnsubscribe?.();
+    this.viewportLockUnsubscribe?.();
     this.spatialUnsubscribe = undefined;
     this.selectionUnsubscribe = undefined;
     this.temporalUnsubscribe = undefined;
     this.hiddenUnsubscribe = undefined;
     this.drawingUnsubscribe = undefined;
+    this.viewportLockUnsubscribe = undefined;
 
     this.activeSession = session ?? undefined;
 
@@ -963,6 +974,25 @@ export class MapPanel {
             this.postMessage({
               type: 'setDrawingPaletteIndex',
               paletteIndex: drawing.drawingPaletteIndex,
+            });
+          }
+        }
+      );
+
+      // Spec 260 — push viewportLocked changes to the webview so the banner,
+      // toolbar disabled state, and padlock all reflect the canonical store.
+      type ViewportLockState = { viewportLocked: boolean };
+      const viewportLockSelector = (state: SessionStoreWithUndo): ViewportLockState => ({
+        viewportLocked: state.viewportLocked,
+      });
+      this.viewportLockUnsubscribe = subscribeToSlice(
+        session,
+        viewportLockSelector,
+        (curr: ViewportLockState, prev: ViewportLockState) => {
+          if (curr.viewportLocked !== prev.viewportLocked) {
+            this.postMessage({
+              type: 'setViewportLocked',
+              viewportLocked: curr.viewportLocked,
             });
           }
         }
@@ -1076,6 +1106,7 @@ export class MapPanel {
     this.selectionUnsubscribe?.();
     this.temporalUnsubscribe?.();
     this.drawingUnsubscribe?.();
+    this.viewportLockUnsubscribe?.();
     this.sessionChangeDisposable?.dispose();
     if (this.viewportUpdateTimeout) {
       clearTimeout(this.viewportUpdateTimeout);
@@ -1175,6 +1206,12 @@ export class MapPanel {
             type: 'setDrawingPaletteIndex',
             paletteIndex: state.drawingPaletteIndex,
           });
+          // Spec 260 — seed viewport lock state. Always sent so the webview
+          // padlock / banner / toolbar start consistent with the store.
+          this.postMessage({
+            type: 'setViewportLocked',
+            viewportLocked: state.viewportLocked,
+          });
         }
         break;
 
@@ -1245,6 +1282,15 @@ export class MapPanel {
         // Handle drawing mode change from webview (#108)
         if (this.activeSession) {
           this.activeSession.getState().setDrawingMode(message.drawingMode);
+        }
+        break;
+
+      case 'viewportLockChanged':
+        // Spec 260 — user toggled the lock via banner / padlock / shortcut.
+        // The store update fires the subscription which echoes the new
+        // value back via setViewportLocked.
+        if (this.activeSession) {
+          this.activeSession.getState().setViewportLocked(message.viewportLocked);
         }
         break;
 

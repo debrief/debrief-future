@@ -1,5 +1,29 @@
 # Playwright Installation in Claude Code Sessions
 
+> **2026-05-18 confirmation — screenshots land in evidence/ from a cloud
+> session.** A `/speckit.implement` session running spec #260
+> (viewport-lock) ran both `apps/web-shell/run-playwright.mjs viewport-lock`
+> (4 tests) and `shared/components/run-playwright.mjs ViewportLock` (16
+> tests) under the standard cloud config and produced eight real PNGs into
+> `specs/260-viewport-lock/evidence/screenshots/`. The blog post then
+> embedded those exact paths. **Do not skip Playwright tasks in cloud on
+> the assumption screenshots can't be produced — they can.** If a feature's
+> evidence list calls for `evidence/screenshots/*.png`, the Playwright
+> specs are the producers; run the appropriate `run-playwright.mjs`
+> wrapper from the relevant workspace and the files land directly. The
+> three wrappers and what each does:
+>
+> | Workspace | Wrapper | Server it starts | Use for |
+> |---|---|---|---|
+> | `apps/web-shell` | `node run-playwright.mjs <spec-basename>` | `pnpm dev` (Vite, port 5173) | Full extension workflows + per-feature flow screenshots / GIFs |
+> | `shared/components` | `node run-playwright.mjs <spec-basename>` | Builds `storybook-static/`, serves with `http-server` on port 6006 | Storybook component variants × theme matrix |
+> | `apps/spec-navigator` | `node run-playwright.mjs` | (per its own config) | Spec Navigator E2E |
+>
+> Each wrapper extracts `/tmp/chromium` via `@sparticuz/chromium`, sets the
+> right env vars so `playwright.config.ts` picks the bundled binary, runs
+> the suite, and cleans up. No npm-side `playwright install chromium` is
+> needed — that's the CDN call that 403s. The wrappers route around it.
+
 > **2026-04-26 note.** "NPM Package Installation works ✅" depends on the
 > cloud environment's **Network access** mode in Claude Code on the web. If
 > the env is on `None` or a narrow custom allowlist, `npm install` 403s on

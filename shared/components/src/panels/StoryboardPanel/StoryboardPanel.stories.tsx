@@ -113,6 +113,58 @@ export const Capturing: Story = {
   },
 };
 
+// ─── Spec 260 — viewport-lock padlock variants ────────────────────────
+
+/**
+ * Padlock toggle unlocked — open-padlock glyph, `aria-pressed="false"`.
+ * The control sits immediately to the left of Capture.
+ */
+export const ViewportUnlocked: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    viewportLocked: false,
+    onViewportLockToggle: () => undefined,
+    hasActivePlot: true,
+  },
+};
+
+/**
+ * Padlock toggle locked — closed-padlock glyph, `aria-pressed="true"`,
+ * highlighted background. Demonstrates the visual relationship to Capture.
+ */
+export const ViewportLocked: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    viewportLocked: true,
+    onViewportLockToggle: () => undefined,
+    hasActivePlot: true,
+  },
+};
+
+/**
+ * Padlock toggle disabled — no plot loaded (spec 260 / FR-013).
+ */
+export const ViewportLockEmptyState: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    viewportLocked: false,
+    onViewportLockToggle: () => undefined,
+    hasActivePlot: false,
+  },
+};
+
 // ─── #217 stories ─────────────────────────────────────────────────────
 
 const TRANSPORT_AT_1: TransportViewModel = {

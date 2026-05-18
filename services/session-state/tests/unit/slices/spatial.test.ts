@@ -208,4 +208,37 @@ describe('Spatial Slice', () => {
       expect(store.getState().drawingMode).toBeNull();
     });
   });
+
+  // Spec 260 — viewport lock (FR-001, FR-006, FR-011, FR-012).
+  describe('viewportLocked (spec 260)', () => {
+    it('should default to false', () => {
+      expect(store.getState().viewportLocked).toBe(false);
+    });
+
+    it('should flip true on setViewportLocked(true)', () => {
+      store.getState().setViewportLocked(true);
+      expect(store.getState().viewportLocked).toBe(true);
+    });
+
+    it('should flip back to false on setViewportLocked(false)', () => {
+      store.getState().setViewportLocked(true);
+      store.getState().setViewportLocked(false);
+      expect(store.getState().viewportLocked).toBe(false);
+    });
+
+    it('should be idempotent — setting same value is a no-op', () => {
+      store.getState().setViewportLocked(false);
+      expect(store.getState().viewportLocked).toBe(false);
+      store.getState().setViewportLocked(true);
+      store.getState().setViewportLocked(true);
+      expect(store.getState().viewportLocked).toBe(true);
+    });
+
+    it('should reset to false on store.reset()', () => {
+      store.getState().setViewportLocked(true);
+      expect(store.getState().viewportLocked).toBe(true);
+      store.getState().reset();
+      expect(store.getState().viewportLocked).toBe(false);
+    });
+  });
 });
