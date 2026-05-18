@@ -85,7 +85,15 @@ export interface PersistentSessionState {
   schemaVersion: string;
   savedAt: string;
   temporal: Omit<TemporalSlice, 'playbackState'>;
-  spatial: SpatialSlice;
+  // Spec 260: ephemeral spatial fields (viewportLocked + the pre-existing
+  // drawingMode / drawingPaletteIndex) are excluded structurally per
+  // Constitution Article IV.5. Adding another ephemeral spatial field is a
+  // one-line edit here; tsc enforces that extractPersistentState does not
+  // re-introduce them at the boundary.
+  spatial: Omit<
+    SpatialSlice,
+    'viewportLocked' | 'drawingMode' | 'drawingPaletteIndex'
+  >;
   features: FeaturesSlice;
 }
 

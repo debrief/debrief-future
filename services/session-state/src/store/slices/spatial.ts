@@ -51,6 +51,10 @@ export const createSpatialSlice: StateCreator<
     set({ drawingPaletteIndex: get().drawingPaletteIndex + 1 });
   },
 
+  setViewportLocked: (locked: boolean) => {
+    set({ viewportLocked: locked });
+  },
+
   getCenter: (): Coordinate | null => {
     const { viewport } = get();
     if (!viewport) return null;

@@ -51,6 +51,7 @@ export function getState(
           rotation: state.rotation,
           drawingMode: state.drawingMode,
           drawingPaletteIndex: state.drawingPaletteIndex,
+          viewportLocked: state.viewportLocked,
         },
         features: {
           featureCollectionUri: state.featureCollectionUri,
@@ -92,6 +93,7 @@ export function getState(
           rotation: state.rotation,
           drawingMode: state.drawingMode,
           drawingPaletteIndex: state.drawingPaletteIndex,
+          viewportLocked: state.viewportLocked,
         },
       };
     case 'features':

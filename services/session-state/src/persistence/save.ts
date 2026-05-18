@@ -39,8 +39,6 @@ export function extractPersistentState(store: SessionStoreApi): PersistentSessio
     spatial: {
       viewport: state.viewport,
       rotation: state.rotation,
-      drawingMode: null, // Ephemeral — always null in persisted state (FR-010)
-      drawingPaletteIndex: 0, // Ephemeral — always reset in persisted state (FR-096)
     },
     features: {
       featureCollectionUri: state.featureCollectionUri,

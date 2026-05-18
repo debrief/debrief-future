@@ -71,13 +71,21 @@ describe('Persistence', () => {
       expect((persistent.temporal as Record<string, unknown>).playbackState).toBeUndefined();
     });
 
-    it('should exclude ephemeral drawingMode (T006)', () => {
+    it('should exclude all ephemeral spatial fields (spec 260 T011)', () => {
+      // Mutate every ephemeral field in-memory so the test surfaces a
+      // regression if any one of them leaks back into the persisted shape.
       store.getState().setDrawingMode('rectangle');
+      store.getState().incrementDrawingPaletteIndex();
+      store.getState().setViewportLocked(true);
 
       const persistent = extractPersistentState(store);
+      const keys = Object.keys(persistent.spatial as Record<string, unknown>);
 
-      // drawingMode should always be null in persistent state (FR-010)
-      expect((persistent.spatial as Record<string, unknown>).drawingMode).toBeNull();
+      // Article IV.5 — Omit<> at the type boundary means none of these
+      // ephemeral keys appear at runtime either.
+      expect(keys).not.toContain('drawingMode');
+      expect(keys).not.toContain('drawingPaletteIndex');
+      expect(keys).not.toContain('viewportLocked');
     });
 
     it('should include schema version', () => {
@@ -188,6 +196,58 @@ describe('Persistence round-trip', () => {
     expect(store2.getState().rotation).toBe(90);
     expect(store2.getState().selection.featureIds).toEqual(['f1']);
     expect(store2.getState().displayMode).toBe('trail');
+  });
+});
+
+describe('Persistence loadSession — viewport lock force-unlock (spec 260)', () => {
+  it('forces viewportLocked to false on load even when persisted value is true (FR-011)', async () => {
+    const { readFile } = await import('fs/promises');
+    // Defence-in-depth: even if a buggy save smuggled the field back into
+    // the on-disk shape, load.ts overwrites it to false (per T007).
+    const payloadWithLockSmuggledIn = {
+      version: '1.1.0',
+      savedAt: '2026-05-18T00:00:00.000Z',
+      temporal: {
+        currentTime: null,
+        timeRange: null,
+        timeFilter: null,
+        stepSize: { value: 1, unit: 'minute' },
+        playbackRate: 1,
+        playbackState: 'stopped',
+        displayMode: 'full',
+      },
+      spatial: {
+        viewport: null,
+        rotation: 0,
+        // Smuggled-in ephemeral fields — load.ts MUST ignore.
+        viewportLocked: true,
+        drawingMode: null,
+        drawingPaletteIndex: 0,
+      },
+      features: {
+        featureCollectionUri: null,
+        selection: {
+          featureIds: [],
+          primary: undefined,
+          timestamp: { epoch: 0, iso: '1970-01-01T00:00:00.000Z' },
+        },
+        hiddenFeatureIds: [],
+      },
+    };
+    (readFile as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      JSON.stringify(payloadWithLockSmuggledIn),
+    );
+
+    const store = createSessionStore();
+    // Pre-set in-memory lock so the test surfaces a regression if load.ts
+    // forgets to reset (the prior `store.reset()` would mask this).
+    store.getState().setViewportLocked(true);
+
+    const { loadSession } = await import('../../src/persistence/index.js');
+    const result = await loadSession(store, '/fake/session.debrief.json');
+
+    expect(result.success).toBe(true);
+    expect(store.getState().viewportLocked).toBe(false);
   });
 });
 

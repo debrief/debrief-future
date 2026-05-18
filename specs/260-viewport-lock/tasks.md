@@ -59,8 +59,8 @@ description: "Task list for spec 260 — viewport lock"
 
 **Purpose**: confirm working environment + active-feature pointer + branch hygiene before any code changes. No new dependencies, no new packages — this feature adds nothing to either `package.json` or `pyproject.toml`. Zero scaffolding beyond what already exists.
 
-- [ ] T001 Verify `.specify/.active-feature` resolves to `260-viewport-lock` and the working branch is `claude/implement-viewport-lock-rjNkL` `.specify/.active-feature`
-- [ ] T002 Confirm pre-push verification commands pass on a clean tree before edits: `task verify` (or the four-command fallback in `CLAUDE.md` → "Before Pushing") — establishes the green baseline this feature must hold `CLAUDE.md`
+- [x] T001 Verify `.specify/.active-feature` resolves to `260-viewport-lock` and the working branch is `claude/implement-viewport-lock-rjNkL` `.specify/.active-feature`
+- [x] T002 Confirm pre-push verification commands pass on a clean tree before edits: `task verify` (or the four-command fallback in `CLAUDE.md` → "Before Pushing") — establishes the green baseline this feature must hold `CLAUDE.md`
 
 ## Phase 2: Foundation — Session-state slice + MCP contract (blocks all stories)
 
@@ -70,30 +70,30 @@ Per `/speckit.review` decision 2A, the `Omit<>` widening also excludes `drawingM
 
 ### Type model
 
-- [ ] T003 Add `viewportLocked: boolean` to `SpatialSlice`, append `viewportLocked: false` to `DEFAULT_SPATIAL_SLICE`, add `setViewportLocked: (locked: boolean) => void` to `SpatialActions` `services/session-state/src/types/spatial.ts`
-- [ ] T004 Widen `PersistentSessionState.spatial` to `Omit<SpatialSlice, 'viewportLocked' | 'drawingMode' | 'drawingPaletteIndex'>` (per `/speckit.review` 2A) `services/session-state/src/types/index.ts`
+- [x] T003 Add `viewportLocked: boolean` to `SpatialSlice`, append `viewportLocked: false` to `DEFAULT_SPATIAL_SLICE`, add `setViewportLocked: (locked: boolean) => void` to `SpatialActions` `services/session-state/src/types/spatial.ts`
+- [x] T004 Widen `PersistentSessionState.spatial` to `Omit<SpatialSlice, 'viewportLocked' | 'drawingMode' | 'drawingPaletteIndex'>` (per `/speckit.review` 2A) `services/session-state/src/types/index.ts`
 
 ### Store slice implementation
 
-- [ ] T005 Implement `setViewportLocked` reducer in the spatial slice creator `services/session-state/src/store/slices/spatial.ts`
+- [x] T005 Implement `setViewportLocked` reducer in the spatial slice creator `services/session-state/src/store/slices/spatial.ts`
 
 ### Persistence boundary
 
-- [ ] T006 Delete the two hand-reset lines for `drawingMode: null` and `drawingPaletteIndex: 0` in `extractPersistentState` (the widened `Omit<>` from T004 now enforces exclusion at type level — `tsc` will fail if any of the three ephemeral fields leak into the persisted shape) `services/session-state/src/persistence/save.ts`
-- [ ] T007 In the spatial-slice restoration block of `loadSession`, always set `viewportLocked: false` regardless of what is on disk (FR-011 / FR-012 — session/plot load is the canonical force-unlock event) `services/session-state/src/persistence/load.ts`
+- [x] T006 Delete the two hand-reset lines for `drawingMode: null` and `drawingPaletteIndex: 0` in `extractPersistentState` (the widened `Omit<>` from T004 now enforces exclusion at type level — `tsc` will fail if any of the three ephemeral fields leak into the persisted shape) `services/session-state/src/persistence/save.ts`
+- [x] T007 In the spatial-slice restoration block of `loadSession`, always set `viewportLocked: false` regardless of what is on disk (FR-011 / FR-012 — session/plot load is the canonical force-unlock event) `services/session-state/src/persistence/load.ts`
 
 ### MCP setViewport reject branch
 
-- [ ] T008 Add optional `errorCode?: 'VIEWPORT_LOCKED'` to `SetViewportOutput` (string-literal type per `contracts/mcp-setViewport.md`) `services/session-state/src/server/tools/setViewport.ts`
-- [ ] T009 At the top of the `setViewport` function (before validation), short-circuit when `store.getState().viewportLocked === true` and return `{ success: false, error: 'Viewport is locked — unlock to change view.', errorCode: 'VIEWPORT_LOCKED' }` — the reject runs **before** input validation per the contract (locked is the dominant signal) `services/session-state/src/server/tools/setViewport.ts`
+- [x] T008 Add optional `errorCode?: 'VIEWPORT_LOCKED'` to `SetViewportOutput` (string-literal type per `contracts/mcp-setViewport.md`) `services/session-state/src/server/tools/setViewport.ts`
+- [x] T009 At the top of the `setViewport` function (before validation), short-circuit when `store.getState().viewportLocked === true` and return `{ success: false, error: 'Viewport is locked — unlock to change view.', errorCode: 'VIEWPORT_LOCKED' }` — the reject runs **before** input validation per the contract (locked is the dominant signal) `services/session-state/src/server/tools/setViewport.ts`
 
 ### Foundation tests (run in parallel — independent fixtures)
 
-- [ ] T010 [P][test] Extend the existing spatial-slice test with `setViewportLocked` cases: default is `false`; toggle on flips to `true`; toggle off flips to `false`; setting same value is idempotent `services/session-state/tests/unit/slices/spatial.test.ts`
-- [ ] T011 [P][test] Extend the existing persistence test: assert that `extractPersistentState(store)` returns a `spatial` object that does NOT contain `viewportLocked`, `drawingMode`, or `drawingPaletteIndex` keys regardless of their in-memory values (use `Object.keys()` rather than property reads — this is the strongest signal that the `Omit<>` is actually applied) `services/session-state/tests/unit/persistence.test.ts`
-- [ ] T012 [P][test] Add load-path test: a persisted session with `viewportLocked: true` injected into the JSON loads back with `viewportLocked: false` in the store (FR-011 — defence-in-depth even though save shouldn't emit the field) `services/session-state/tests/unit/persistence.test.ts`
-- [ ] T013 [P][test] Create `setViewport-locked-rejects.test.ts`: given store with `viewportLocked: true`, `setViewport({ coordinates: <valid 4 corners> })` returns `{ success: false, error: <non-empty>, errorCode: 'VIEWPORT_LOCKED' }`; assert `store.getState().viewport` is unchanged `services/session-state/tests/unit/server/setViewport-locked.test.ts`
-- [ ] T014 [P][test] Add unlocked-regression case to the same file: given store with `viewportLocked: false`, the same `setViewport` call returns `success: true`, `errorCode === undefined`, and `store.getState().viewport` reflects the new value (FR-010 — no regression) `services/session-state/tests/unit/server/setViewport-locked.test.ts`
+- [x] T010 [P][test] Extend the existing spatial-slice test with `setViewportLocked` cases: default is `false`; toggle on flips to `true`; toggle off flips to `false`; setting same value is idempotent `services/session-state/tests/unit/slices/spatial.test.ts`
+- [x] T011 [P][test] Extend the existing persistence test: assert that `extractPersistentState(store)` returns a `spatial` object that does NOT contain `viewportLocked`, `drawingMode`, or `drawingPaletteIndex` keys regardless of their in-memory values (use `Object.keys()` rather than property reads — this is the strongest signal that the `Omit<>` is actually applied) `services/session-state/tests/unit/persistence.test.ts`
+- [x] T012 [P][test] Add load-path test: a persisted session with `viewportLocked: true` injected into the JSON loads back with `viewportLocked: false` in the store (FR-011 — defence-in-depth even though save shouldn't emit the field) `services/session-state/tests/unit/persistence.test.ts`
+- [x] T013 [P][test] Create `setViewport-locked-rejects.test.ts`: given store with `viewportLocked: true`, `setViewport({ coordinates: <valid 4 corners> })` returns `{ success: false, error: <non-empty>, errorCode: 'VIEWPORT_LOCKED' }`; assert `store.getState().viewport` is unchanged `services/session-state/tests/unit/server/setViewport-locked.test.ts`
+- [x] T014 [P][test] Add unlocked-regression case to the same file: given store with `viewportLocked: false`, the same `setViewport` call returns `success: true`, `errorCode === undefined`, and `store.getState().viewport` reflects the new value (FR-010 — no regression) `services/session-state/tests/unit/server/setViewport-locked.test.ts`
 
 **Foundation gate**: T003–T014 must all be green before Phase 3 starts. Run `pnpm --filter @debrief/session-state test` to verify.
 
