@@ -92,7 +92,7 @@ function makeScene(id: string, lonLatCorners: [number, number][]): SceneFeature 
       viewport: { center: [lonLatCorners[0]![0], lonLatCorners[0]![1]], zoom: 10, bearing: 0 },
       timestamp: '2026-04-20T10:00:00Z',
       title: 'Scene',
-      schema_version: 1,
+      creation_order: 0,
     },
   } as unknown as SceneFeature;
 }

@@ -27,7 +27,6 @@ import {
   createScene as crudCreateScene,
   createStoryboard as crudCreateStoryboard,
   type DebriefFeature,
-  DuplicateTimestampError,
   ThumbnailDeepCopyFailedError,
   UnknownSceneError,
 } from '@debrief/components';
@@ -382,29 +381,9 @@ describe('StoryboardEditService — updateSceneToCurrent (review 1A pre-flight)'
     expect(logService.calls[0]!.op).toBe('update-to-current');
   });
 
-  it('pre-flight: returns collision WITHOUT invoking captureThumbnail (review 9B — SC-002 spy)', async () => {
-    const captureSpy = vi.fn(async () => ({ assetKey: 'should-not-be-called' }));
-    const svc = makeService(mapPanel, {
-      logService,
-      thumbnailService: { captureThumbnail: captureSpy },
-    });
-    // Pre-collision: timestamp collides with secondScene's 11:00:00Z
-    const result = await svc.updateSceneToCurrent({
-      documentUri: DOC,
-      sceneId: fixture.sceneId,
-      currentView: {
-        viewport: { center: [-6, 51], zoom: 12, bearing: 0 },
-        timestamp: '2026-04-20T11:00:00Z', // collides with secondSceneId
-        visibleFeatureIds: ['track-1'],
-      },
-      actor: ALICE,
-    });
-    expect(result.kind).toBe('duplicate-timestamp-collision');
-    if (result.kind === 'duplicate-timestamp-collision') {
-      expect(result.existingSceneId).toBe(fixture.secondSceneId);
-    }
-    expect(captureSpy).not.toHaveBeenCalled();
-  });
+  // #259 — pre-flight duplicate-timestamp collision test removed; tied
+  // timestamps are accepted, so updateSceneToCurrent always runs the
+  // thumbnail capture and proceeds to write.
 
   it('thumbnail-failed: plot byte-identical on capture throw (SC-002)', async () => {
     const plotBefore = JSON.stringify(plotFromFeatures(mapPanel.getCurrentFeatures()));
@@ -456,19 +435,8 @@ describe('StoryboardEditService — duplicateScene', () => {
     expect(logService.calls[0]!.op).toBe('duplicate');
   });
 
-  it('collision: returns duplicate-timestamp-collision with suggested offset (+1s)', async () => {
-    const result = await service.duplicateScene({
-      documentUri: DOC,
-      sceneId: fixture.sceneId,
-      newTimestamp: '2026-04-20T11:00:00Z', // collides with scene 2
-      actor: ALICE,
-    });
-    expect(result.kind).toBe('duplicate-timestamp-collision');
-    if (result.kind === 'duplicate-timestamp-collision') {
-      expect(result.existingSceneId).toBe(fixture.secondSceneId);
-      expect(result.suggestedOffsetTimestamp).toBe('2026-04-20T11:00:01.000Z');
-    }
-  });
+  // #259 — duplicateScene duplicate-timestamp-collision test removed; tied
+  // timestamps are accepted and the duplicate receives a fresh creation_order.
 });
 
 describe('StoryboardEditService — copySceneToOtherStoryboard (review 3A)', () => {
@@ -532,37 +500,9 @@ describe('StoryboardEditService — copySceneToOtherStoryboard (review 3A)', () 
     expect(logService.calls).toHaveLength(0);
   });
 
-  it('destination collision: returns duplicate-timestamp-collision', async () => {
-    // Seed the destination with a scene at the target timestamp.
-    const curr = plotFromFeatures(mapPanel.getCurrentFeatures());
-    const { plot: next } = await crudCreateScene(curr, {
-      storyboardId: fixture.secondStoryboardId,
-      viewport: { center: [-5, 50], zoom: 10, bearing: 0 },
-      timestamp: '2026-04-20T13:00:00Z',
-      visibleFeatureIds: [],
-      thumbnailAssetRef: 'scene-thumbnail-01JSC00000000000000000000X',
-      actor: ALICE,
-      now: '2026-04-20T13:00:00Z',
-      idOverride: '01JSC00000000000000000000X',
-      activityIdOverride: '10000000-0000-4000-8000-00000000000X',
-    });
-    mapPanel.replaceAll(featuresFromPlot(next));
-
-    const svc = makeService(mapPanel, {
-      logService,
-      thumbnailService: {
-        deepCopyAsset: async (ref, dest) => `${dest}/${ref}`,
-      },
-    });
-    const result = await svc.copySceneToOtherStoryboard({
-      documentUri: DOC,
-      sceneId: fixture.sceneId,
-      destinationStoryboardId: fixture.secondStoryboardId,
-      newTimestamp: '2026-04-20T13:00:00Z',
-      actor: ALICE,
-    });
-    expect(result.kind).toBe('duplicate-timestamp-collision');
-  });
+  // #259 — copySceneToOtherStoryboard duplicate-timestamp-collision test
+  // removed; tied timestamps on the destination Storyboard are accepted and
+  // the copy receives a fresh creation_order in the destination scope.
 });
 
 describe('StoryboardEditService — storyboard-level ops', () => {
@@ -986,9 +926,6 @@ describe('StoryboardEditService — sanity: unknown scene guards', () => {
     ).rejects.toBeInstanceOf(UnknownSceneError);
   });
 
-  // Re-imports DuplicateTimestampError as a smoke check for tree-shakers;
-  // the duplicate-collision path is covered above.
-  it('DuplicateTimestampError remains accessible to consumers', () => {
-    expect(DuplicateTimestampError).toBeTruthy();
-  });
+  // #259 — DuplicateTimestampError class deleted from the storyboard module
+  // along with the constraint it enforced.
 });

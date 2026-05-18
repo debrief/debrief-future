@@ -67,4 +67,44 @@ describe("listScenesOrdered", () => {
     listScenesOrdered(plot, storyboardId);
     expect(plot).toEqual(snapshot);
   });
+
+  // ── #259 — tied-timestamp ordering -----------------------------------
+  it("AT-003 (FR-003) breaks ties on (timestamp) by creation_order ASC", async () => {
+    // Three Scenes at the same timestamp; capture order = creation_order
+    // order = expected listing order.
+    const { plot, storyboardId } = await buildWithScenes([
+      "2026-04-20T10:00:00Z",
+      "2026-04-20T10:00:00Z",
+      "2026-04-20T10:00:00Z",
+    ]);
+    const ordered = listScenesOrdered(plot, storyboardId);
+    expect(ordered.map((s) => s.properties.creation_order)).toEqual([0, 1, 2]);
+  });
+
+  it("AT-006 (FR-006) deterministic: same input ordering for any in-memory permutation", async () => {
+    const { plot, storyboardId } = await buildWithScenes([
+      "2026-04-20T10:00:00Z",
+      "2026-04-20T10:00:00Z",
+      "2026-04-20T10:05:00Z",
+    ]);
+    const permuted: Plot = {
+      ...plot,
+      features: [...plot.features].reverse(),
+    };
+    const a = listScenesOrdered(plot, storyboardId).map((s) => s.properties.id);
+    const b = listScenesOrdered(permuted, storyboardId).map((s) => s.properties.id);
+    expect(a).toEqual(b);
+  });
+
+  it("Story 2 scenario 2: mixed tied + non-tied scenes order A,B,C,D,E", async () => {
+    const { plot, storyboardId } = await buildWithScenes([
+      "2026-04-20T10:00:00Z", // A
+      "2026-04-20T10:00:00Z", // B (tied with A)
+      "2026-04-20T10:05:00Z", // C
+      "2026-04-20T10:05:00Z", // D (tied with C)
+      "2026-04-20T10:10:00Z", // E
+    ]);
+    const ordered = listScenesOrdered(plot, storyboardId);
+    expect(ordered.map((s) => s.properties.creation_order)).toEqual([0, 1, 2, 3, 4]);
+  });
 });

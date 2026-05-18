@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  checkSceneTimestamp,
   copySceneToOtherStoryboard,
   createScene,
   createStoryboard,
@@ -13,6 +12,7 @@ import {
   restoreScene,
   updateScene,
 } from "../crud";
+import { listScenesOrdered } from "../ordering";
 import { OrphanSceneError, UnknownStoryboardError } from "../errors";
 import type { Plot } from "../types";
 import { isSceneFeature, isStoryboardFeature } from "../types";
@@ -73,7 +73,7 @@ describe("createStoryboard", () => {
     expect(stored).toBe(storyboard);
     expect(isStoryboardFeature(stored)).toBe(true);
     expect(storyboard.properties.name).toBe("My Brief");
-    expect(storyboard.properties.schema_version).toBe(1);
+    expect(storyboard.properties.schema_version).toBe(2);
     expect(storyboard.properties.provenance).toHaveLength(1);
     const first = storyboard.properties.provenance?.[0];
     expect(first?.agent).toBe(ALICE);
@@ -171,20 +171,109 @@ describe("createScene", () => {
     );
   });
 
-  it("throws DuplicateTimestamp when two Scenes collide", async () => {
+  // ── #259 — relax timestamp uniqueness; creation_order is the tie-breaker.
+  it("AT-001 (FR-001) accepts a Scene at a timestamp that another Scene already uses", async () => {
     const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "A");
-    const { plot: p1 } = await seedScene(p0, storyboardId, "2026-04-20T10:00:00Z");
-    await expect(
-      createScene(p1, {
-        storyboardId,
-        viewport: { center: [-5.0, 50.0], zoom: 10, bearing: 0 },
-        timestamp: "2026-04-20T10:00:00Z",
-        visibleFeatureIds: [],
-        thumbnailAssetRef: "x",
-        actor: ALICE,
-        now: NOW,
-      }),
-    ).rejects.toMatchObject({ code: "DuplicateTimestamp" });
+    const { plot: p1, scene: first } = await seedScene(
+      p0,
+      storyboardId,
+      "2026-04-20T10:00:00Z",
+    );
+    const { plot: p2, scene: second } = await createScene(p1, {
+      storyboardId,
+      viewport: { center: [-5.0, 50.0], zoom: 12, bearing: 0 },
+      timestamp: "2026-04-20T10:00:00Z",
+      visibleFeatureIds: [],
+      thumbnailAssetRef: "thumbnails/second.png",
+      actor: ALICE,
+      now: NOW,
+      idOverride: "01JSC00000000000000000XXX1",
+      activityIdOverride: "11000000-0000-4000-8000-000000000001",
+    });
+    const ordered = listScenesOrdered(p2, storyboardId);
+    expect(ordered.map((s) => s.properties.id)).toEqual([
+      first.properties.id,
+      second.properties.id,
+    ]);
+    // New Scene always appended after existing tied-group members (FR-011)
+    expect(second.properties.creation_order).toBeGreaterThan(
+      first.properties.creation_order,
+    );
+  });
+
+  it("AT-004 / AT-011 (FR-004, FR-011) assigns monotonic creation_order to three captures at the same timestamp", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "A");
+    const { plot: p1, scene: a } = await seedScene(
+      p0,
+      storyboardId,
+      "2026-04-20T10:00:00Z",
+      { id: "01JSC00000000000000000AAA1" },
+    );
+    const { plot: p2, scene: b } = await createScene(p1, {
+      storyboardId,
+      viewport: { center: [-5.0, 50.0], zoom: 11, bearing: 0 },
+      timestamp: "2026-04-20T10:00:00Z",
+      visibleFeatureIds: [],
+      thumbnailAssetRef: "b.png",
+      actor: ALICE,
+      now: NOW,
+      idOverride: "01JSC00000000000000000BBB1",
+      activityIdOverride: "11000000-0000-4000-8000-000000000002",
+    });
+    const { plot: p3, scene: c } = await createScene(p2, {
+      storyboardId,
+      viewport: { center: [-5.0, 50.0], zoom: 12, bearing: 0 },
+      timestamp: "2026-04-20T10:00:00Z",
+      visibleFeatureIds: [],
+      thumbnailAssetRef: "c.png",
+      actor: ALICE,
+      now: NOW,
+      idOverride: "01JSC00000000000000000CCC1",
+      activityIdOverride: "11000000-0000-4000-8000-000000000003",
+    });
+    expect([
+      a.properties.creation_order,
+      b.properties.creation_order,
+      c.properties.creation_order,
+    ]).toEqual([0, 1, 2]);
+    expect(listScenesOrdered(p3, storyboardId).map((s) => s.properties.id)).toEqual([
+      a.properties.id,
+      b.properties.id,
+      c.properties.id,
+    ]);
+  });
+
+  it("AT-005 (FR-005) persists creation_order on properties (not a sidecar)", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "A");
+    const { scene } = await seedScene(p0, storyboardId, "2026-04-20T10:00:00Z");
+    expect(scene.properties.creation_order).toBeTypeOf("number");
+    expect(scene.properties.creation_order).toBeGreaterThanOrEqual(0);
+    expect(Number.isInteger(scene.properties.creation_order)).toBe(true);
+  });
+
+  it("AT-002 (FR-002) accepts a Scene with an earlier timestamp (out-of-order timestamps unchanged)", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "A");
+    const { plot: p1, scene: later } = await seedScene(
+      p0,
+      storyboardId,
+      "2026-04-20T11:00:00Z",
+    );
+    const { plot: p2, scene: earlier } = await createScene(p1, {
+      storyboardId,
+      viewport: { center: [-5.0, 50.0], zoom: 10, bearing: 0 },
+      timestamp: "2026-04-20T10:00:00Z",
+      visibleFeatureIds: [],
+      thumbnailAssetRef: "earlier.png",
+      actor: ALICE,
+      now: NOW,
+      idOverride: "01JSC00000000000000000EEE1",
+      activityIdOverride: "11000000-0000-4000-8000-000000000004",
+    });
+    // Earlier timestamp sorts first regardless of creation_order
+    expect(listScenesOrdered(p2, storyboardId).map((s) => s.properties.id)).toEqual([
+      earlier.properties.id,
+      later.properties.id,
+    ]);
   });
 
   it("throws ReservedSlotViolation when bearing != 0", async () => {
@@ -330,21 +419,25 @@ describe("duplicateScene", () => {
     );
   });
 
-  it("rejects same-timestamp duplication with DuplicateTimestamp", async () => {
+  it("#259 accepts same-timestamp duplication and assigns a fresh creation_order", async () => {
     const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "A");
     const { plot: p1, scene } = await seedScene(
       p0,
       storyboardId,
       "2026-04-20T10:00:00Z",
     );
-    await expect(
-      duplicateScene(p1, {
-        sceneId: scene.properties.id,
-        newTimestamp: "2026-04-20T10:00:00Z",
-        actor: ALICE,
-        now: NOW,
-      }),
-    ).rejects.toMatchObject({ code: "DuplicateTimestamp" });
+    const { scene: dup } = await duplicateScene(p1, {
+      sceneId: scene.properties.id,
+      newTimestamp: "2026-04-20T10:00:00Z",
+      actor: ALICE,
+      now: NOW,
+      idOverride: "01JSC00000000000000000DUP1",
+      activityIdOverride: "12000000-0000-4000-8000-000000000001",
+    });
+    expect(dup.properties.creation_order).toBeGreaterThan(
+      scene.properties.creation_order,
+    );
+    expect(dup.properties.timestamp).toBe(scene.properties.timestamp);
   });
 });
 
@@ -390,66 +483,9 @@ describe("copySceneToOtherStoryboard", () => {
 // #218 additive extensions
 // ──────────────────────────────────────────────────────────────────────
 
-describe("checkSceneTimestamp (#218)", () => {
-  it("returns null when no scene has the target timestamp", async () => {
-    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "SB");
-    const { plot: p1 } = await seedScene(p0, storyboardId, "2026-04-20T10:00:00Z");
-    expect(
-      checkSceneTimestamp(p1, storyboardId, "2026-04-20T12:00:00Z", null),
-    ).toBeNull();
-  });
-
-  it("returns the conflicting Scene when timestamps collide", async () => {
-    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "SB");
-    const { plot: p1, scene } = await seedScene(
-      p0,
-      storyboardId,
-      "2026-04-20T10:00:00Z",
-    );
-    const conflict = checkSceneTimestamp(
-      p1,
-      storyboardId,
-      "2026-04-20T10:00:00Z",
-      null,
-    );
-    expect(conflict?.properties.id).toBe(scene.properties.id);
-  });
-
-  it("respects excludingSceneId (self-check), never flagging the excluded scene", async () => {
-    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "SB");
-    const { plot: p1, scene } = await seedScene(
-      p0,
-      storyboardId,
-      "2026-04-20T10:00:00Z",
-    );
-    expect(
-      checkSceneTimestamp(
-        p1,
-        storyboardId,
-        "2026-04-20T10:00:00Z",
-        scene.properties.id,
-      ),
-    ).toBeNull();
-  });
-
-  it("scopes the conflict check to a single Storyboard", async () => {
-    const { plot: p0, storyboardId: a } = await seedStoryboard(
-      emptyPlot(),
-      "A",
-      "01JSBAA000000000000000AAAA",
-    );
-    const { plot: p1, storyboardId: b } = await seedStoryboard(
-      p0,
-      "B",
-      "01JSBBB000000000000000BBBB",
-    );
-    const { plot: p2 } = await seedScene(p1, a, "2026-04-20T10:00:00Z");
-    // Same timestamp on a DIFFERENT storyboard is fine — check scoped per SB.
-    expect(
-      checkSceneTimestamp(p2, b, "2026-04-20T10:00:00Z", null),
-    ).toBeNull();
-  });
-});
+// #259 removes checkSceneTimestamp — duplicate-timestamp pre-flight is no
+// longer needed because createScene / updateScene / duplicateScene /
+// copySceneToOtherStoryboard / restoreScene all accept tied timestamps.
 
 describe("describeStoryboard (#218)", () => {
   it("sets description and appends a describe entry to provenance", async () => {

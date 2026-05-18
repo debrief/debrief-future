@@ -36,7 +36,6 @@ export {
 // ---------------------------------------------------------------------------
 export {
   StoryboardError,
-  DuplicateTimestampError,
   OrphanSceneError,
   UnknownStoryboardError,
   UnknownSceneError,
@@ -45,6 +44,11 @@ export {
   ThumbnailDeepCopyFailedError,
   SchemaMigrationFailedError,
   InvariantViolationError,
+  // #259 — replaces DuplicateTimestampError
+  DuplicateCreationOrderError,
+  CreationOrderOutOfRangeError,
+  MissingCreationOrderError,
+  UnsupportedSchemaVersionError,
 } from "./errors";
 export type { StoryboardErrorCode } from "./errors";
 
@@ -63,10 +67,11 @@ export {
   // #218 additive extensions (review 2A + analyze patch I1)
   describeStoryboard,
   restoreScene,
-  checkSceneTimestamp,
   // #258 — bounds-derived polygon helper exposed for the host capture
   // commands that have a Leaflet map handle.
   bboxToPolygon,
+  // #259 — reorder within a tied-timestamp group
+  reorderSceneInTiedGroup,
 } from "./crud";
 export type {
   CreateStoryboardInput,
@@ -83,6 +88,8 @@ export type {
   RestoreSceneInput,
   // #258 additive extensions
   SceneBounds,
+  // #259 — reorder within a tied-timestamp group
+  ReorderSceneInTiedGroupInput,
 } from "./crud";
 
 // ---------------------------------------------------------------------------

@@ -413,7 +413,8 @@ function MapViewApp(): React.ReactElement {
         feature_set_hash: '',
         thumbnail_asset_ref: '',
         transition_duration_ms: 500,
-        schema_version: 1,
+        // #259 — required creation_order on SceneProperties.
+        creation_order: 0,
         // Spec #258 / FR-006 — restore provenance so `pickPolygonForRender`
         // trusts the stored polygon for `'bounds'` captures and only
         // recomputes for legacy / placeholder scenes.

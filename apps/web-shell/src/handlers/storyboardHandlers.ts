@@ -23,7 +23,6 @@ import {
   restoreScene,
   describeStoryboard,
   isSceneFeature,
-  DuplicateTimestampError,
   type StoryboardPlot,
   type SceneFeature,
 } from '@debrief/components';
@@ -314,108 +313,29 @@ export function createStoryboardHandlers(
           return;
         }
 
-        const tryUpdate = async (
-          ts: string,
-          retries: number,
-        ): Promise<void> => {
-          if (retries >= 5) {
-            deps.notify(
-              'Too many consecutive offset retries — pick a different moment in time.',
-            );
-            return;
-          }
-          const plot = packagePlot(deps.getFeatureCollection().features);
-          try {
-            const result = await updateScene(plot, {
-              sceneId,
-              patch: {
-                viewport: newViewport,
-                timestamp: ts,
-                visibleFeatureIds: visibleIds,
-                thumbnailAssetRef: `scene-thumbnail-${sceneId}`,
-              },
-              actor: deps.actor,
-            });
-            deps.setFeatureCollection(plotToFeatureCollection(result.plot));
-            deps.sessionStore.getState().markDirty();
-            deps.notify('Scene updated.');
-          } catch (err) {
-            if (err instanceof DuplicateTimestampError) {
-              const conflictId = err.conflictingSceneId;
-              const fcLatest = deps.getFeatureCollection();
-              let conflictTitle = 'Existing scene';
-              for (const f of fcLatest.features) {
-                const props = f.properties as {
-                  id?: string;
-                  title?: string;
-                } | null;
-                if (props?.id === conflictId) {
-                  conflictTitle =
-                    typeof props.title === 'string'
-                      ? props.title
-                      : 'Existing scene';
-                  break;
-                }
-              }
-              const range =
-                deps.sessionStore.getState().timeRange;
-              const proposedMs = new Date(ts).getTime();
-              const offsetWouldExceedTimeRange =
-                range !== null && proposedMs + 1000 > range.end;
-              const reply = await deps.panelView.promptCollisionResolution(
-                {
-                  visible: true,
-                  conflictingSceneId: conflictId,
-                  conflictingSceneTitle: conflictTitle,
-                  originalTimestamp: scene.properties.timestamp,
-                  proposedTimestamp: ts,
-                  offsetCount: retries,
-                  offsetWouldExceedTimeRange,
-                  cause: 'update-to-current',
-                },
-              );
-              if (reply.kind === 'cancel') return;
-              if (reply.kind === 'replace') {
-                // Delete the conflicting Scene then retry the update.
-                try {
-                  const fcRetry = packagePlot(
-                    deps.getFeatureCollection().features,
-                  );
-                  const after = await deleteScene(fcRetry, {
-                    sceneId: conflictId,
-                    actor: deps.actor,
-                  });
-                  deps.setFeatureCollection(
-                    plotToFeatureCollection(after.plot),
-                  );
-                } catch (delErr) {
-                  deps.logError?.(
-                    `[storyboardHandlers] update-to-current Replace failed: ${stringifyError(delErr)}`,
-                  );
-                  deps.notify(
-                    'Update failed — could not replace the conflicting scene.',
-                  );
-                  return;
-                }
-                await tryUpdate(ts, 0);
-                return;
-              }
-              // reply.kind === 'offset'
-              if (offsetWouldExceedTimeRange) return;
-              const next = new Date(
-                new Date(ts).getTime() + 1000,
-              ).toISOString();
-              await tryUpdate(next, retries + 1);
-              return;
-            }
-            deps.logError?.(
-              `[storyboardHandlers] updateScene failed: ${stringifyError(err)}`,
-            );
-            deps.notify(`Update failed: ${stringifyError(err)}`);
-          }
-        };
-
-        await tryUpdate(newTimestamp, 0);
+        // #259 — updateScene no longer throws DuplicateTimestampError; the
+        // update always succeeds at the timestamp level.
+        const plot = packagePlot(deps.getFeatureCollection().features);
+        try {
+          const result = await updateScene(plot, {
+            sceneId,
+            patch: {
+              viewport: newViewport,
+              timestamp: newTimestamp,
+              visibleFeatureIds: visibleIds,
+              thumbnailAssetRef: `scene-thumbnail-${sceneId}`,
+            },
+            actor: deps.actor,
+          });
+          deps.setFeatureCollection(plotToFeatureCollection(result.plot));
+          deps.sessionStore.getState().markDirty();
+          deps.notify('Scene updated.');
+        } catch (err) {
+          deps.logError?.(
+            `[storyboardHandlers] updateScene failed: ${stringifyError(err)}`,
+          );
+          deps.notify(`Update failed: ${stringifyError(err)}`);
+        }
       })();
     },
 

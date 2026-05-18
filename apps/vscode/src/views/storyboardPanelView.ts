@@ -15,8 +15,8 @@ import {
   formatDtg,
   getActiveStoryboardDefault,
   isSceneFeature,
+  listScenesOrdered,
   type StoryboardPlot,
-  type SceneFeature,
   type SceneEditViewModel,
   type StoryboardEditViewModel,
 } from '@debrief/components';
@@ -456,15 +456,10 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   ): SceneRowViewModel[] {
     if (activeStoryboardId === null) {return [];}
     const stacItemPath = this.getStacItemDirectory();
-    const scenes: SceneFeature[] = [];
-    for (const f of plot.features) {
-      if (isSceneFeature(f) && f.properties.storyboard_id === activeStoryboardId) {
-        scenes.push(f);
-      }
-    }
-    scenes.sort((a, b) =>
-      a.properties.timestamp < b.properties.timestamp ? -1 : a.properties.timestamp > b.properties.timestamp ? 1 : 0,
-    );
+    // #259 — canonical ordering is (timestamp, creation_order) ASC. The
+    // panel must use the shared helper so tied-timestamp groups appear in
+    // capture order, matching the playback transport (FR-006).
+    const scenes = listScenesOrdered(plot, activeStoryboardId);
     return scenes.map((scene) => {
       const thumbnailHref = this.resolveThumbnailHref(
         webview,

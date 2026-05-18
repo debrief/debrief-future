@@ -49,7 +49,7 @@ function sb(
       kind: 'STORYBOARD',
       id,
       name,
-      schema_version: 1,
+      schema_version: 2,
       provenance: [
         {
           activity_id: `prov-${id}`,
@@ -88,7 +88,7 @@ function scene(
       feature_set_hash: 'deadbeef'.repeat(8),
       thumbnail_asset_ref: `scene-${id}.png`,
       transition_duration_ms: 500,
-      schema_version: 1,
+      creation_order: 0,
     },
   } as unknown as SceneFeature;
 }

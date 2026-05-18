@@ -12,7 +12,6 @@
 
 import * as vscode from 'vscode';
 import {
-  checkSceneTimestamp,
   computeFeatureSetHash,
   copySceneToOtherStoryboard as crudCopyScene,
   deleteScene as crudDeleteScene,
@@ -27,7 +26,6 @@ import {
   restoreScene as crudRestoreScene,
   updateScene as crudUpdateScene,
   DuplicateStoryboardNameError,
-  DuplicateTimestampError,
   ThumbnailDeepCopyFailedError,
   UnknownSceneError,
   UnknownStoryboardError,
@@ -180,22 +178,16 @@ export type UndoDeleteOutcome =
   | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null }
   | { readonly kind: 'unrecoverable-scene'; readonly reason: 'storyboard-gone' | 'buffer-evicted' };
 
+// #259 — duplicate-timestamp-collision results removed. updateScene /
+// duplicateScene / copySceneToOtherStoryboard now accept tied timestamps
+// unconditionally, so these branches are no longer reachable.
+
 export type UpdateToCurrentResult =
   | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null }
-  | { readonly kind: 'thumbnail-failed'; readonly error: Error }
-  | {
-      readonly kind: 'duplicate-timestamp-collision';
-      readonly existingSceneId: string;
-      readonly suggestedOffsetTimestamp: string;
-    };
+  | { readonly kind: 'thumbnail-failed'; readonly error: Error };
 
 export type DuplicateSceneResult =
-  | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null }
-  | {
-      readonly kind: 'duplicate-timestamp-collision';
-      readonly existingSceneId: string;
-      readonly suggestedOffsetTimestamp: string;
-    };
+  | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null };
 
 export type CopySceneResult =
   | {
@@ -203,11 +195,6 @@ export type CopySceneResult =
       readonly scene: SceneFeature;
       readonly logEntryActivityId: string | null;
       readonly pairActivityId: string;
-    }
-  | {
-      readonly kind: 'duplicate-timestamp-collision';
-      readonly existingSceneId: string;
-      readonly suggestedOffsetTimestamp: string;
     }
   | { readonly kind: 'deep-copy-failed'; readonly error: Error };
 
@@ -720,26 +707,9 @@ export class StoryboardEditService implements vscode.Disposable {
       throw new UnknownSceneError(input.sceneId);
     }
 
-    // Pre-flight collision check BEFORE invoking the thumbnail pipeline
-    // (review 1A — eliminates the orphan-thumbnail-on-collision failure
-    // mode from research.md R5).
-    if (input.currentView.timestamp !== existing.properties.timestamp) {
-      const conflict = checkSceneTimestamp(
-        plot,
-        existing.properties.storyboard_id,
-        input.currentView.timestamp,
-        input.sceneId,
-      );
-      if (conflict !== null) {
-        return {
-          kind: 'duplicate-timestamp-collision',
-          existingSceneId: conflict.properties.id,
-          suggestedOffsetTimestamp: offsetTimestampBy1s(
-            input.currentView.timestamp,
-          ),
-        };
-      }
-    }
+    // #259 — duplicate-timestamp pre-flight removed. Multiple Scenes can
+    // share a timestamp; updateScene unconditionally preserves the existing
+    // creation_order so no collision is possible here.
 
     // Capture thumbnail (may be mocked in tests — if no port, reuse
     // the existing ref; tests that rely on capture failure inject a
@@ -830,13 +800,8 @@ export class StoryboardEditService implements vscode.Disposable {
       );
       return { kind: 'ok', scene, logEntryActivityId };
     } catch (err) {
-      if (err instanceof DuplicateTimestampError) {
-        return {
-          kind: 'duplicate-timestamp-collision',
-          existingSceneId: err.conflictingSceneId,
-          suggestedOffsetTimestamp: offsetTimestampBy1s(input.newTimestamp),
-        };
-      }
+      // #259 — duplicateScene no longer throws DuplicateTimestampError;
+      // unexpected errors are re-thrown.
       throw err;
     }
   }
@@ -905,13 +870,8 @@ export class StoryboardEditService implements vscode.Disposable {
       if (err instanceof ThumbnailDeepCopyFailedError) {
         return { kind: 'deep-copy-failed', error: err };
       }
-      if (err instanceof DuplicateTimestampError) {
-        return {
-          kind: 'duplicate-timestamp-collision',
-          existingSceneId: err.conflictingSceneId,
-          suggestedOffsetTimestamp: offsetTimestampBy1s(input.newTimestamp),
-        };
-      }
+      // #259 — copySceneToOtherStoryboard no longer throws
+      // DuplicateTimestampError; unexpected errors are re-thrown.
       throw err;
     }
   }
@@ -1245,13 +1205,8 @@ function collectResolvableFeatureIds(plot: StoryboardPlot): Set<string> {
   return set;
 }
 
-function offsetTimestampBy1s(iso: string): string {
-  const ms = Date.parse(iso);
-  if (Number.isNaN(ms)) {
-    return iso;
-  }
-  return new Date(ms + 1000).toISOString();
-}
+// #259 — offsetTimestampBy1s was used by the now-removed
+// duplicate-timestamp-collision suggestion paths.
 
 function coerceError(err: unknown): Error {
   return err instanceof Error ? err : new Error(String(err));

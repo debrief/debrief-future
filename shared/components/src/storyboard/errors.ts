@@ -1,14 +1,22 @@
 /**
- * Storyboard CRUD error taxonomy (Feature 215, research.md R7).
+ * Storyboard CRUD error taxonomy (Feature 215, research.md R7; updated #259).
  *
  * All errors carry a stable `code` string — consumers MUST match on
  * `err.code`, not on `instanceof` — because bundler name-mangling can
  * rename class identifiers. The codes are enumerable via the
  * `StoryboardErrorCode` union for exhaustiveness checks.
+ *
+ * #259 changes: `DuplicateTimestampError` is removed (the underlying
+ * constraint is relaxed — multiple Scenes may share a timestamp).
+ * Four new errors are added to enforce the replacement invariants
+ * around the new `creation_order` slot:
+ *   - `DuplicateCreationOrderError`        (FC-I4)
+ *   - `CreationOrderOutOfRangeError`       (reorder bounds)
+ *   - `MissingCreationOrderError`          (FC-I5 — pre-#259 plot)
+ *   - `UnsupportedSchemaVersionError`      (FC-V1 — pre-#259 plot)
  */
 
 export type StoryboardErrorCode =
-  | "DuplicateTimestamp"
   | "OrphanScene"
   | "UnknownStoryboard"
   | "UnknownScene"
@@ -16,23 +24,14 @@ export type StoryboardErrorCode =
   | "DuplicateStoryboardName"
   | "ThumbnailDeepCopyFailed"
   | "SchemaMigrationFailed"
-  | "InvariantViolation";
+  | "InvariantViolation"
+  | "DuplicateCreationOrder"
+  | "CreationOrderOutOfRange"
+  | "MissingCreationOrder"
+  | "UnsupportedSchemaVersion";
 
 export abstract class StoryboardError extends Error {
   abstract readonly code: StoryboardErrorCode;
-}
-
-export class DuplicateTimestampError extends StoryboardError {
-  readonly code = "DuplicateTimestamp";
-  constructor(
-    readonly timestamp: string,
-    readonly conflictingSceneId: string,
-  ) {
-    super(
-      `Scene at ${timestamp} already exists (id=${conflictingSceneId})`,
-    );
-    this.name = "DuplicateTimestampError";
-  }
 }
 
 export class OrphanSceneError extends StoryboardError {
@@ -123,5 +122,65 @@ export class InvariantViolationError extends StoryboardError {
   constructor(readonly detail: string) {
     super(`Storyboard module invariant violated: ${detail}`);
     this.name = "InvariantViolationError";
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────
+// #259 — new errors replacing DuplicateTimestampError
+// ───────────────────────────────────────────────────────────────────
+
+export class DuplicateCreationOrderError extends StoryboardError {
+  readonly code = "DuplicateCreationOrder";
+  constructor(
+    readonly storyboardId: string,
+    readonly creationOrder: number,
+    readonly conflictingSceneIds: readonly [string, string],
+  ) {
+    super(
+      `Duplicate creation_order=${creationOrder} in Storyboard ${storyboardId} (Scenes ${conflictingSceneIds[0]}, ${conflictingSceneIds[1]})`,
+    );
+    this.name = "DuplicateCreationOrderError";
+  }
+}
+
+export class CreationOrderOutOfRangeError extends StoryboardError {
+  readonly code = "CreationOrderOutOfRange";
+  constructor(
+    readonly storyboardId: string,
+    readonly sceneId: string,
+    readonly providedIndex: number,
+    readonly tiedGroupSize: number,
+  ) {
+    super(
+      `Position ${providedIndex} is out of range for tied group of size ${tiedGroupSize} (Scene ${sceneId} in Storyboard ${storyboardId})`,
+    );
+    this.name = "CreationOrderOutOfRangeError";
+  }
+}
+
+export class MissingCreationOrderError extends StoryboardError {
+  readonly code = "MissingCreationOrder";
+  constructor(
+    readonly storyboardId: string,
+    readonly sceneId: string,
+  ) {
+    super(
+      `Scene ${sceneId} in Storyboard ${storyboardId} is missing the required creation_order field (pre-#259 plot — no migration provided)`,
+    );
+    this.name = "MissingCreationOrderError";
+  }
+}
+
+export class UnsupportedSchemaVersionError extends StoryboardError {
+  readonly code = "UnsupportedSchemaVersion";
+  constructor(
+    readonly storyboardId: string,
+    readonly foundVersion: number,
+    readonly requiredMinimum: number = 2,
+  ) {
+    super(
+      `Storyboard ${storyboardId} has schema_version=${foundVersion} but the reader requires >= ${requiredMinimum} (pre-#259 plot — no migration provided)`,
+    );
+    this.name = "UnsupportedSchemaVersionError";
   }
 }

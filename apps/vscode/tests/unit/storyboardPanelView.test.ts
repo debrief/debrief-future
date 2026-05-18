@@ -38,11 +38,12 @@ function storyboardFeature(id: string, name: string): DebriefFeature {
       kind: 'STORYBOARD',
       id,
       name,
-      schema_version: 1,
+      schema_version: 2,
     },
   } as unknown as DebriefFeature;
 }
 
+let _sceneFeatureCounter = 0;
 function sceneFeature(
   id: string,
   storyboardId: string,
@@ -63,6 +64,7 @@ function sceneFeature(
       feature_set_hash: 'abc',
       thumbnail_asset_ref: `scene-thumbnail-${id}`,
       transition_duration_ms: 500,
+      creation_order: _sceneFeatureCounter++,
     },
   } as unknown as DebriefFeature;
 }

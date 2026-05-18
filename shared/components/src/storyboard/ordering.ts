@@ -1,10 +1,10 @@
 /**
  * Scene ordering helper.
  *
- * Ordering is **derived** from `properties.timestamp` ascending — no
- * explicit `order` field exists. Scene timestamps are unique within a
- * Storyboard (invariant SC-I1), so the sort is stable w.r.t. the
- * consumer's expectations.
+ * Ordering is **derived** from `(properties.timestamp, properties.creation_order)`
+ * ascending — no explicit `order` field exists. Per #259, multiple Scenes
+ * within a Storyboard MAY share a timestamp; the secondary `creation_order`
+ * key breaks ties deterministically (SC-I1).
  *
  * Sync, pure, no mutation.
  */
@@ -27,6 +27,9 @@ export function listScenesOrdered(
   return scenes.sort((a, b) => {
     const at = a.properties.timestamp;
     const bt = b.properties.timestamp;
-    return at < bt ? -1 : at > bt ? 1 : 0;
+    if (at < bt) return -1;
+    if (at > bt) return 1;
+    // Tied timestamps — break by creation_order ASC (#259 / SC-I1).
+    return a.properties.creation_order - b.properties.creation_order;
   });
 }
