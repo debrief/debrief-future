@@ -1,0 +1,165 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "id": "core--ownship-2",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0.0241038144,
+          0.1857642387
+        ],
+        [
+          0.1665479622,
+          0.1857642387
+        ],
+        [
+          0.1665479622,
+          0.2910438396
+        ],
+        [
+          0.0241038144,
+          0.2910438396
+        ],
+        [
+          0.0241038144,
+          0.1857642387
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0.0241038144,
+    0.1857642387,
+    0.1665479622,
+    0.2910438396
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Ownship 2",
+    "datetime": "1999-12-31T22:00:00+00:00",
+    "description": "Saxon Warrior: Ownship 2 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Defender.",
+    "start_datetime": "1999-12-31T22:00:00+00:00",
+    "end_datetime": "2000-01-01T02:01:40+00:00",
+    "debrief:platforms": [
+      {
+        "id": "OWNSHIP",
+        "name": "HMS Defender",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_type": "type45",
+        "vessel_role": "destroyer"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "gunnery",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "ownship_2 (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/ownship_2.rep",
+      "title": "ownship_2.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-ownship_2": {
+      "href": "./assets/ownship_2.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "ownship_2.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/ownship_2.rep",
+        "load_timestamp": "2026-04-13T23:12:33.313164Z",
+        "tool_version": "0.1.0"
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:33.313Z",
+      "file:size": 50482,
+      "file:checksum": "122082ce0a648e014992cac74800281f6d4edd6d3811fe1329216fded05860a2d94a"
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (200x150)",
+      "roles": [
+        "thumbnail"
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 10751,
+      "file:checksum": "122034563c464b9d80833a56dc060fce5a0f2c0b74d8279b2ce6da61f18e9d37da6f"
+    },
+    "overview": {
+      "href": "./overview.png",
+      "type": "image/png",
+      "title": "Plot overview (800x600)",
+      "roles": [
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 33087,
+      "file:checksum": "1220f246413020ba9542e7d250b9faa533332604098d03df4fbcc075cea861ec7d45"
+    }
+  }
+}
