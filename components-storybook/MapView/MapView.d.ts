@@ -1,3 +1,4 @@
+import { Map as LeafletMap } from 'leaflet';
 import { DebriefFeature, DebriefFeatureCollection, Bounds, DisplayMode } from '../utils/types';
 import { DrawingMode } from './LeafletToolbar';
 import { SceneRectangleLayerProps } from './SceneRectangleLayer';
@@ -68,6 +69,16 @@ export interface MapViewProps {
     /** Fires when an in-flight flyTo animation completes (Leaflet `moveend`). */
     onFlyToComplete?: (token: number) => void;
     /**
+     * PR #627 — callback invoked once with the Leaflet `Map` instance after the
+     * `MapContainer` has mounted. Hosts can store this in a ref and read the
+     * live viewport synchronously via `map.getCenter()` / `map.getZoom()` /
+     * `map.getBounds()` at capture time, bypassing every async queue between
+     * Leaflet and `session-state.viewport`. The MapView never owns the
+     * resulting reference — it's the consumer's responsibility to drop it on
+     * unmount.
+     */
+    onMapReady?: (map: LeafletMap) => void;
+    /**
      * The Scene Features to render as faint rectangles on the map. When
      * provided, a `SceneRectangleLayer` is rendered inside the `MapContainer`.
      */
@@ -111,5 +122,5 @@ export interface FlyToTarget {
  * />
  * ```
  */
-export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, viewport, autoFitBounds, fitBoundsTrigger, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, drawingMode, onDrawingModeChange, onShapeCreated, flyToTarget, onFlyToComplete, sceneRectangles, onSceneRectangleClick, shouldRenderInBaseLayer, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
+export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, viewport, autoFitBounds, fitBoundsTrigger, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, drawingMode, onDrawingModeChange, onShapeCreated, flyToTarget, onFlyToComplete, onMapReady, sceneRectangles, onSceneRectangleClick, shouldRenderInBaseLayer, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=MapView.d.ts.map

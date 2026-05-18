@@ -14,7 +14,7 @@ export { StacFileTree } from './StacFileTree';
 export type { StacFileTreeProps, FilesystemAdapter, DirectoryEntry, FileStat, TreeNodeData, NodeType, } from './StacFileTree';
 export { MapView } from './MapView';
 export type { MapViewProps, FlyToTarget } from './MapView';
-export { SceneRectangleLayer, geoJsonPolygonToLeafletCoords, computeFillOpacity, computeOverlapRanks, } from './MapView/SceneRectangleLayer';
+export { SceneRectangleLayer, geoJsonPolygonToLeafletCoords, computeOverlapRanks, } from './MapView/SceneRectangleLayer';
 export type { SceneRectangleLayerProps } from './MapView/SceneRectangleLayer';
 export { Timeline } from './Timeline';
 export type { TimelineProps } from './Timeline';

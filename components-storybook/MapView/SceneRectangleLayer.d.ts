@@ -39,11 +39,6 @@ export declare function geoJsonPolygonToLeafletCoords(coordinates: GeoJSON.Polyg
  */
 export declare function computeOverlapRanks(scenes: ReadonlyArray<SceneFeature>): number[];
 /**
- * FR-PLAY-018: opacity decreases with overlap rank so multiple Scenes
- * with the same centroid remain individually visible.
- */
-export declare function computeFillOpacity(_scene: SceneFeature, overlapRank: number, isCurrent: boolean): number;
-/**
  * Recompute a scene's rectangle polygon from its stored viewport + current
  * map dimensions (Spec #258 / FR-006). Used as a render-time fallback for
  * legacy scenes whose stored polygon predates the bounds-derived capture
