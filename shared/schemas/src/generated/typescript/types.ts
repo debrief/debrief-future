@@ -2172,7 +2172,7 @@ export interface StoryboardProperties extends BaseFeatureProperties {
     name: string,
     /** Markdown narrative description */
     description?: string,
-    /** Schema version. Starts at 1. Monotonically non-decreasing across edits; bumped only by migrations. */
+    /** Schema version. Bumped to 2 by #259 (relax timestamp uniqueness + add `SceneProperties.creation_order`). Pre-#259 plots carrying `schema_version: 1` are rejected at load with `UnsupportedSchemaVersionError` — no in-place migration is provided (Article XIV pre-release freedom; FR-010 in #259 spec). Monotonically non-decreasing across edits; bumped only by migrations or breaking schema changes. */
     schema_version: number,
 }
 
@@ -2193,8 +2193,10 @@ export interface SceneProperties extends BaseFeatureProperties {
     description?: string,
     /** Map viewport camera state at capture time */
     viewport: Viewport,
-    /** ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard). MUST be unique within a Storyboard. */
+    /** ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard) as the primary sort key. Multiple Scenes MAY share the same timestamp; ties are broken by `creation_order` ascending (see #259). */
     timestamp: string,
+    /** Per-Storyboard monotonic sequence value assigned by the platform at capture time. Acts as the secondary sort key for Scenes — when two Scenes share a `timestamp` the one with the lower `creation_order` comes first. Unique within a Storyboard; gaps are permitted (left by deletion). The platform — not the client — is the source of truth. Introduced by #259; absent on pre-#259 plots which are rejected at load (no migration shim — Article XIV pre-release freedom). */
+    creation_order: number,
     /** Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1. */
     time_range?: string,
     /** Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective. */

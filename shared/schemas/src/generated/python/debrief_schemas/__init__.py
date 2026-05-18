@@ -5188,7 +5188,7 @@ class StoryboardProperties(BaseFeatureProperties):
                        'MCPParamSchema',
                        'MCPToolDefinition',
                        'ToolDefinition']} })
-    schema_version: int = Field(default=..., description="""Schema version. Starts at 1. Monotonically non-decreasing across edits; bumped only by migrations.""", ge=1, json_schema_extra = { "linkml_meta": {'domain_of': ['StoryboardProperties']} })
+    schema_version: int = Field(default=..., description="""Schema version. Bumped to 2 by #259 (relax timestamp uniqueness + add `SceneProperties.creation_order`). Pre-#259 plots carrying `schema_version: 1` are rejected at load with `UnsupportedSchemaVersionError` — no in-place migration is provided (Article XIV pre-release freedom; FR-010 in #259 spec). Monotonically non-decreasing across edits; bumped only by migrations or breaking schema changes.""", ge=2, json_schema_extra = { "linkml_meta": {'domain_of': ['StoryboardProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
@@ -5275,12 +5275,13 @@ class SceneProperties(BaseFeatureProperties):
                        'MCPToolDefinition',
                        'ToolDefinition']} })
     viewport: Viewport = Field(default=..., description="""Map viewport camera state at capture time""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpatialSlice', 'SceneProperties']} })
-    timestamp: datetime  = Field(default=..., description="""ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard). MUST be unique within a Storyboard.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry',
+    timestamp: datetime  = Field(default=..., description="""ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard) as the primary sort key. Multiple Scenes MAY share the same timestamp; ties are broken by `creation_order` ascending (see #259).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry',
                        'TuneAnnotation',
                        'FileProvEntry',
                        'PropertiesProvenanceEntry',
                        'FeatureSelection',
                        'SceneProperties']} })
+    creation_order: int = Field(default=..., description="""Per-Storyboard monotonic sequence value assigned by the platform at capture time. Acts as the secondary sort key for Scenes — when two Scenes share a `timestamp` the one with the lower `creation_order` comes first. Unique within a Storyboard; gaps are permitted (left by deletion). The platform — not the client — is the source of truth. Introduced by #259; absent on pre-#259 plots which are rejected at load (no migration shim — Article XIV pre-release freedom).""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     time_range: Optional[str] = Field(default=None, description="""Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     visible_feature_ids: list[str] = Field(default=..., description="""Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     feature_set_hash: str = Field(default=..., description="""SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })

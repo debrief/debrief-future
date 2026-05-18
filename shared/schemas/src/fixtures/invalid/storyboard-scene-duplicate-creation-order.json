@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "01JBXYZABC0000000000000200",
+      "id": "01JBXYZABC0000000000000800",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18,13 +18,13 @@
       },
       "properties": {
         "kind": "STORYBOARD",
-        "id": "01JBXYZABC0000000000000200",
-        "name": "Duplicate Timestamp Test",
-        "schema_version": 1,
+        "id": "01JBXYZABC0000000000000800",
+        "name": "Duplicate Creation Order Test",
+        "schema_version": 2,
         "tags": [],
         "provenance": [
           {
-            "activity_id": "30000001-0000-4000-8000-000000000001",
+            "activity_id": "90000000-0000-4000-8000-000000000001",
             "timestamp": "2026-04-20T09:00:00Z",
             "agent": "alice",
             "was_generated_by": {
@@ -33,7 +33,7 @@
               "parameters": [{ "value": "create" }]
             },
             "used": [],
-            "generated": ["01JBXYZABC0000000000000200"],
+            "generated": ["01JBXYZABC0000000000000800"],
             "execution_duration": "PT0S"
           }
         ]
@@ -41,7 +41,7 @@
     },
     {
       "type": "Feature",
-      "id": "01JBXYZABC0000000000000201",
+      "id": "01JBXYZABC0000000000000801",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -56,20 +56,21 @@
       },
       "properties": {
         "kind": "STORYBOARD_SCENE",
-        "id": "01JBXYZABC0000000000000201",
-        "storyboard_id": "01JBXYZABC0000000000000200",
+        "id": "01JBXYZABC0000000000000801",
+        "storyboard_id": "01JBXYZABC0000000000000800",
         "title": "Scene A",
         "viewport": { "center": [-4.95, 50.05], "zoom": 10, "bearing": 0 },
         "timestamp": "2026-04-20T10:00:00Z",
         "time_range": null,
         "visible_feature_ids": [],
         "feature_set_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "thumbnail_asset_ref": "thumbnails/dup-a.png",
+        "thumbnail_asset_ref": "thumbnails/dup-co-a.png",
         "transition_duration_ms": 500,
+        "creation_order": 0,
         "tags": [],
         "provenance": [
           {
-            "activity_id": "30000002-0000-4000-8000-000000000002",
+            "activity_id": "90000001-0000-4000-8000-000000000002",
             "timestamp": "2026-04-20T10:00:00Z",
             "agent": "alice",
             "was_generated_by": {
@@ -78,7 +79,7 @@
               "parameters": [{ "value": "create" }]
             },
             "used": [],
-            "generated": ["01JBXYZABC0000000000000201"],
+            "generated": ["01JBXYZABC0000000000000801"],
             "execution_duration": "PT0S"
           }
         ]
@@ -86,7 +87,7 @@
     },
     {
       "type": "Feature",
-      "id": "01JBXYZABC0000000000000202",
+      "id": "01JBXYZABC0000000000000802",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -101,21 +102,22 @@
       },
       "properties": {
         "kind": "STORYBOARD_SCENE",
-        "id": "01JBXYZABC0000000000000202",
-        "storyboard_id": "01JBXYZABC0000000000000200",
-        "title": "Scene B (duplicate timestamp — INVALID)",
+        "id": "01JBXYZABC0000000000000802",
+        "storyboard_id": "01JBXYZABC0000000000000800",
+        "title": "Scene B (duplicate creation_order — INVALID)",
         "viewport": { "center": [-4.95, 50.05], "zoom": 10, "bearing": 0 },
-        "timestamp": "2026-04-20T10:00:00Z",
+        "timestamp": "2026-04-20T10:05:00Z",
         "time_range": null,
         "visible_feature_ids": [],
         "feature_set_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "thumbnail_asset_ref": "thumbnails/dup-b.png",
+        "thumbnail_asset_ref": "thumbnails/dup-co-b.png",
         "transition_duration_ms": 500,
+        "creation_order": 0,
         "tags": [],
         "provenance": [
           {
-            "activity_id": "30000003-0000-4000-8000-000000000003",
-            "timestamp": "2026-04-20T10:00:00Z",
+            "activity_id": "90000002-0000-4000-8000-000000000003",
+            "timestamp": "2026-04-20T10:05:00Z",
             "agent": "alice",
             "was_generated_by": {
               "tool": "storyboard-crud",
@@ -123,7 +125,7 @@
               "parameters": [{ "value": "create" }]
             },
             "used": [],
-            "generated": ["01JBXYZABC0000000000000202"],
+            "generated": ["01JBXYZABC0000000000000802"],
             "execution_duration": "PT0S"
           }
         ]
