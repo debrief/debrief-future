@@ -139,7 +139,17 @@ export interface LeafletToolbarProps {
 
   /** Callback when a shape is drawn via Geoman. Called with raw GeoJSON and the active drawing mode. */
   onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
+
+  /**
+   * Spec 260 / FR-004 — when `true`, the zoom-in, zoom-out, and
+   * fit-to-window buttons are rendered in a visibly-disabled state with
+   * the tooltip "Viewport locked". Clicks are short-circuited in JS so the
+   * map cannot be zoomed via the toolbar while the lock is on.
+   */
+  viewportLocked?: boolean;
 }
+
+const VIEWPORT_LOCKED_TOOLTIP = 'Viewport locked';
 
 /**
  * Custom Leaflet control for the toolbar
@@ -158,6 +168,16 @@ class ToolbarControl extends L.Control {
   private isDropdownOpen: boolean = false;
   private outsideClickHandler: ((e: MouseEvent) => void) | null = null;
   private onShapeCreated: ((geojson: GeoJSON.Feature, mode: DrawingMode) => void) | null = null;
+  // Spec 260 — three button refs kept so we can flip their disabled state on
+  // `viewportLocked` changes without a full re-render (avoids dropping the
+  // active Geoman handlers on the '+' button if drawing was in flight).
+  private viewportLocked: boolean = false;
+  private zoomInButton: HTMLAnchorElement | null = null;
+  private zoomOutButton: HTMLAnchorElement | null = null;
+  private fitButton: HTMLAnchorElement | null = null;
+  private zoomInOriginalTitle: string = 'Zoom in';
+  private zoomOutOriginalTitle: string = 'Zoom out';
+  private fitOriginalTitle: string = 'Fit to visible features';
 
   constructor(options: L.ControlOptions & {
     visibleBounds: Bounds | null;
@@ -167,6 +187,7 @@ class ToolbarControl extends L.Control {
     drawingMode?: DrawingMode;
     onDrawingModeChange?: (mode: DrawingMode) => void;
     onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
+    viewportLocked?: boolean;
   }) {
     super(options);
     this.visibleBounds = options.visibleBounds;
@@ -176,12 +197,16 @@ class ToolbarControl extends L.Control {
     this.drawingMode = options.drawingMode ?? null;
     this.onDrawingModeChange = options.onDrawingModeChange ?? null;
     this.onShapeCreated = options.onShapeCreated ?? null;
+    this.viewportLocked = options.viewportLocked ?? false;
   }
 
   onAdd(map: L.Map): HTMLElement {
     this.map = map;
     this.container = L.DomUtil.create('div', 'debrief-leaflet-toolbar leaflet-bar');
     this.render();
+    // Spec 260 — initial mount may already be locked (e.g. host opens a plot
+    // with a pre-set lock); decorate immediately so the first paint is right.
+    this.applyViewportLockedDecoration();
 
     // Listen for Geoman events to sync state
     if (map.pm) {
@@ -218,8 +243,11 @@ class ToolbarControl extends L.Control {
     drawingMode?: DrawingMode;
     onDrawingModeChange?: (mode: DrawingMode) => void;
     onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
+    viewportLocked?: boolean;
   }): void {
     const drawingModeChanged = this.drawingMode !== (props.drawingMode ?? null);
+    const viewportLockedChanged =
+      this.viewportLocked !== (props.viewportLocked ?? false);
     this.visibleBounds = props.visibleBounds;
     this.fitPadding = props.fitPadding;
     this.showZoomControls = props.showZoomControls;
@@ -227,6 +255,7 @@ class ToolbarControl extends L.Control {
     this.drawingMode = props.drawingMode ?? null;
     this.onDrawingModeChange = props.onDrawingModeChange ?? null;
     this.onShapeCreated = props.onShapeCreated ?? null;
+    this.viewportLocked = props.viewportLocked ?? false;
 
     // Only update the draw trigger button appearance if drawing mode changed
     // to avoid full re-render disrupting active drawing (US3)
@@ -238,6 +267,14 @@ class ToolbarControl extends L.Control {
     } else {
       this.render();
     }
+
+    // Spec 260 — re-apply the lock state after any render path. Cheap
+    // (one classList toggle + two attribute writes per button) and safer
+    // than only-on-change: if `render()` ran above it rebuilt the buttons
+    // and we need to re-decorate them anyway.
+    if (viewportLockedChanged || !drawingModeChanged) {
+      this.applyViewportLockedDecoration();
+    }
   }
 
   private render(): void {
@@ -247,6 +284,9 @@ class ToolbarControl extends L.Control {
     this.container.innerHTML = '';
     this.drawTriggerButton = null;
     this.dropdownContainer = null;
+    this.zoomInButton = null;
+    this.zoomOutButton = null;
+    this.fitButton = null;
 
     // Zoom in button
     if (this.showZoomControls) {
@@ -256,6 +296,8 @@ class ToolbarControl extends L.Control {
         'debrief-leaflet-toolbar__button debrief-leaflet-toolbar__zoom-in',
         () => this.map?.zoomIn()
       );
+      zoomInButton.setAttribute('data-testid', 'zoom-in');
+      this.zoomInButton = zoomInButton;
       this.container.appendChild(zoomInButton);
 
       // Zoom out button
@@ -265,6 +307,8 @@ class ToolbarControl extends L.Control {
         'debrief-leaflet-toolbar__button debrief-leaflet-toolbar__zoom-out',
         () => this.map?.zoomOut()
       );
+      zoomOutButton.setAttribute('data-testid', 'zoom-out');
+      this.zoomOutButton = zoomOutButton;
       this.container.appendChild(zoomOutButton);
     }
 
@@ -278,6 +322,7 @@ class ToolbarControl extends L.Control {
       );
       fitButton.innerHTML = this.getFitIcon();
       fitButton.setAttribute('data-testid', 'fit-to-window');
+      this.fitButton = fitButton;
       this.container.appendChild(fitButton);
     }
 
@@ -316,10 +361,39 @@ class ToolbarControl extends L.Control {
     L.DomEvent.disableClickPropagation(button);
     L.DomEvent.on(button, 'click', (e: Event) => {
       L.DomEvent.preventDefault(e);
+      // Spec 260 / FR-004 — short-circuit clicks when disabled (covers both
+      // viewport-lock disabled state and any other future disabled cause).
+      if (button.getAttribute('aria-disabled') === 'true') return;
       onClick();
     });
 
     return button;
+  }
+
+  /**
+   * Spec 260 / FR-004 — flip the three viewport-affecting buttons between
+   * enabled and disabled states without rebuilding the toolbar. Adds/removes
+   * the `--disabled` CSS class, toggles `aria-disabled`, and swaps the
+   * native `title` attribute so the browser tooltip explains the reason.
+   */
+  private applyViewportLockedDecoration(): void {
+    const triples: Array<{ el: HTMLAnchorElement | null; originalTitle: string }> = [
+      { el: this.zoomInButton, originalTitle: this.zoomInOriginalTitle },
+      { el: this.zoomOutButton, originalTitle: this.zoomOutOriginalTitle },
+      { el: this.fitButton, originalTitle: this.fitOriginalTitle },
+    ];
+    for (const { el, originalTitle } of triples) {
+      if (!el) continue;
+      if (this.viewportLocked) {
+        el.classList.add('debrief-leaflet-toolbar__button--disabled');
+        el.setAttribute('aria-disabled', 'true');
+        el.title = VIEWPORT_LOCKED_TOOLTIP;
+      } else {
+        el.classList.remove('debrief-leaflet-toolbar__button--disabled');
+        el.setAttribute('aria-disabled', 'false');
+        el.title = originalTitle;
+      }
+    }
   }
 
   private createShapePaletteDropdown(): HTMLDivElement {
@@ -519,6 +593,7 @@ export function LeafletToolbar({
   drawingMode,
   onDrawingModeChange,
   onShapeCreated,
+  viewportLocked = false,
 }: LeafletToolbarProps) {
   const map = useMap();
   const controlRef = useRef<ToolbarControl | null>(null);
@@ -541,6 +616,7 @@ export function LeafletToolbar({
       drawingMode,
       onDrawingModeChange,
       onShapeCreated,
+      viewportLocked,
     });
     control.addTo(map);
     controlRef.current = control;
@@ -563,9 +639,10 @@ export function LeafletToolbar({
         drawingMode,
         onDrawingModeChange,
         onShapeCreated,
+        viewportLocked,
       });
     }
-  }, [visibleBounds, fitPadding, showZoomControls, showFitButton, drawingMode, onDrawingModeChange, onShapeCreated]);
+  }, [visibleBounds, fitPadding, showZoomControls, showFitButton, drawingMode, onDrawingModeChange, onShapeCreated, viewportLocked]);
 
   return null;
 }

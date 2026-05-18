@@ -87,6 +87,10 @@ export function StoryboardPanel({
   onCollisionReplace,
   onCollisionOffset,
   onCollisionCancel,
+  // spec 260 — viewport lock
+  viewportLocked = false,
+  onViewportLockToggle,
+  hasActivePlot = true,
 }: StoryboardPanelProps): React.ReactElement {
   const isEmptyNoStoryboard =
     activeStoryboardName === null && scenes.length === 0 && !captureInFlight;
@@ -195,6 +199,38 @@ export function StoryboardPanel({
                 {`Refresh all stale (${staleCount})`}
               </button>
             )}
+          {onViewportLockToggle && (
+            <button
+              type="button"
+              data-testid="viewport-lock-toggle"
+              aria-pressed={viewportLocked}
+              aria-label={viewportLocked ? 'Unlock viewport' : 'Lock viewport'}
+              title={viewportLocked ? 'Unlock viewport' : 'Lock viewport'}
+              disabled={!hasActivePlot}
+              onClick={onViewportLockToggle}
+              className={
+                viewportLocked
+                  ? 'storyboard-panel__viewport-lock storyboard-panel__viewport-lock--active'
+                  : 'storyboard-panel__viewport-lock'
+              }
+              style={{
+                padding: '4px 8px',
+                fontSize: 14,
+                lineHeight: 1,
+                background: viewportLocked
+                  ? 'var(--debrief-color-primary, #0066cc)'
+                  : undefined,
+                color: viewportLocked ? '#fff' : undefined,
+                cursor: hasActivePlot ? 'pointer' : 'not-allowed',
+                opacity: hasActivePlot ? 1 : 0.4,
+              }}
+            >
+              {/* Unicode padlock glyphs — closed (U+1F512) when locked,
+                  open (U+1F513) when unlocked. The visual relationship to
+                  Capture is reinforced by sitting immediately to its left. */}
+              {viewportLocked ? '🔒' : '🔓'}
+            </button>
+          )}
           <button
             type="button"
             data-testid="capture-button"
