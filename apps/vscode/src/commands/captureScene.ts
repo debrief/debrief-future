@@ -253,9 +253,38 @@ async function captureSceneInner(
 ): Promise<CaptureResult> {
   const { mapPanel, sessionStore, stacItemPath, actor } = context;
 
+  // PR #625 — drain any in-flight viewport-debounce so the read of
+  // `state.viewport` below sees the analyst's latest pan/zoom. Without
+  // this, a fresh pan that hasn't yet cleared the 100 ms
+  // `handleViewportChanged` debounce is invisible to capture, and the
+  // first scene gets stamped with the initial-fit viewport instead of
+  // what the analyst composed.
+  mapPanel.flushPendingViewportUpdate();
+
+  // PR #627 — query the LIVE Leaflet viewport synchronously-ish so the
+  // captured scene matches what the analyst is currently looking at, even
+  // if the moveend → postMessage → debounce → state.viewport chain hasn't
+  // propagated for this round (the very first capture is the case in point:
+  // the analyst zooms to compose, then clicks Capture before any pan
+  // gives `state.viewport` a chance to absorb the zoom). The webview
+  // returns `map.getCenter()` + `map.getZoom()` + the 4 bounds corners
+  // direct from Leaflet. On timeout/Leaflet-not-ready (`liveViewport ===
+  // null`) we fall back to `state.viewport` so the rejection path below
+  // still catches a truly empty session.
+  const liveViewport = await mapPanel.requestCurrentViewport(1000);
+
   // Step 3 — read snapshot
   const state: SessionStoreWithUndo = sessionStore.getState();
-  const viewport = state.viewport;
+  const stateViewport = state.viewport;
+  const viewport: typeof stateViewport = liveViewport !== null
+    ? {
+        coordinates: liveViewport.bounds.map(([lng, lat]) => ({
+          longitude: lng,
+          latitude: lat,
+        })),
+        zoom: liveViewport.zoom,
+      }
+    : stateViewport;
   const currentTime = state.currentTime;
   const timeRange = state.timeRange;
   const hiddenIds = new Set(state.hiddenFeatureIds);
@@ -399,6 +428,15 @@ async function captureSceneInner(
     await persistFeatureCollection(context, deps, mapPanel.getCurrentFeatures());
     const withUndo = sessionStore.getState();
     withUndo.markDirty();
+    // PR #624 — restore the captured viewport on the live map. Adding a new
+    // STORYBOARD_SCENE polygon to the feature list expands the overall
+    // bounding box, which (depending on host config) can re-trigger
+    // fit-to-features behaviour and snap the analyst away from the
+    // composition they just captured. Jumping back to (center, zoom) with
+    // animate:false is idempotent when nothing reset the view and corrective
+    // when something did, so we issue it unconditionally on the success
+    // path.
+    mapPanel.flyToViewport({ center, zoom, bearing: 0 }, 0);
     void deps.executeCommand('debrief.storyboardPanel.focus');
     return { status: 'captured', scene: result.scene };
   } catch (err) {
@@ -619,6 +657,9 @@ async function retryCreateScene(
     await persistFeatureCollection(context, deps, context.mapPanel.getCurrentFeatures());
     const withUndo = context.sessionStore.getState();
     withUndo.markDirty();
+    // PR #624 — mirror the viewport-restore on the offset/replace retry path
+    // so duplicate-timestamp resolutions also preserve the analyst's view.
+    context.mapPanel.flyToViewport(inputs.viewport, 0);
     void deps.executeCommand('debrief.storyboardPanel.focus');
     return { status: 'captured', scene: result.scene };
   } catch (err) {

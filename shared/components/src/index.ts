@@ -46,7 +46,6 @@ export type { MapViewProps, FlyToTarget } from './MapView';
 export {
   SceneRectangleLayer,
   geoJsonPolygonToLeafletCoords,
-  computeFillOpacity,
   computeOverlapRanks,
 } from './MapView/SceneRectangleLayer';
 export type { SceneRectangleLayerProps } from './MapView/SceneRectangleLayer';

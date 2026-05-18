@@ -153,18 +153,15 @@ export function computeOverlapRanks(scenes: ReadonlyArray<SceneFeature>): number
 }
 
 /**
- * FR-PLAY-018: opacity decreases with overlap rank so multiple Scenes
- * with the same centroid remain individually visible.
+ * Spec #258 / PR #623 post-merge product decision: scene rectangles are
+ * rendered as outlines only — the previously-graded fill (FR-PLAY-018)
+ * obscured the underlying track data, which analysts need to see through
+ * the rectangle when composing or reviewing a storyboard. The active
+ * scene's halo + thicker stroke + higher stroke opacity carry the visual
+ * distinction that fill used to provide. The polygon body remains
+ * clickable (Leaflet still draws the transparent fill for hit-testing).
  */
-export function computeFillOpacity(
-  _scene: SceneFeature,
-  overlapRank: number,
-  isCurrent: boolean,
-): number {
-  const base = isCurrent ? 0.28 : 0.18;
-  const step = 0.04;
-  return Math.max(0.10, base - step * overlapRank);
-}
+const SCENE_RECTANGLE_FILL_OPACITY = 0;
 
 /**
  * Recompute a scene's rectangle polygon from its stored viewport + current
@@ -277,15 +274,6 @@ export function SceneRectangleLayer({
     return arr;
   }, [scenes]);
 
-  const overlapRanks = useMemo(() => computeOverlapRanks(scenes), [scenes]);
-  const rankById = useMemo(() => {
-    const m = new Map<string, number>();
-    scenes.forEach((scene, i) => {
-      m.set(scene.properties.id, overlapRanks[i] ?? 0);
-    });
-    return m;
-  }, [scenes, overlapRanks]);
-
   // Memoise the polygon-for-render decision keyed on (scene.id, mapZoom) so
   // stable pan/zoom doesn't re-invoke the recompute path for legacy scenes
   // (Spec #258 — see SceneRectangleLayer notes in the plan).
@@ -313,7 +301,6 @@ export function SceneRectangleLayer({
       {renderOrder.map((scene) => {
         const sceneId = scene.properties.id;
         const isCurrent = sceneId === currentSceneId;
-        const overlapRank = rankById.get(sceneId) ?? 0;
         const polygon =
           polygonByScene.get(sceneId) ?? (scene.geometry as GeoJSON.Polygon);
         const positions = geoJsonPolygonToLeafletCoords(polygon.coordinates);
@@ -333,7 +320,7 @@ export function SceneRectangleLayer({
             positions={positions}
             strokeColor={strokeColor}
             fillColor={fillColor}
-            fillOpacity={computeFillOpacity(scene, overlapRank, isCurrent)}
+            fillOpacity={SCENE_RECTANGLE_FILL_OPACITY}
             weight={isCurrent ? 2 : 1}
             opacity={isCurrent ? 0.9 : 0.5}
             className={className}

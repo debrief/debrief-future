@@ -1268,9 +1268,6 @@ as the PWA generator for `apps/backlog-navigator/`. The plugin handles:
 - `specs/244-navigator-mobile-pwa/evidence/lighthouse-pwa.html` (Lighthouse PWA score ≥ 90).
 - `specs/244-navigator-mobile-pwa/evidence/bundle-baseline-244.json` (final budget + delta).
 
-
----
-
 ### Phase-3 deferred ADRs (placeholder, #249)
 
 The cutover PR for spec #249 (Extract `apps/backlog-navigator/` into a
@@ -1294,3 +1291,73 @@ exists so a future-me grepping `decisions.md` for `#249` finds the
 hand-off path documented even before the cutover PR opens.
 
 Reference: `specs/249-extract-backlog-navigator/extraction-kit/PHASE3-RUNBOOK.md`.
+
+---
+
+### ADR-033: Boundary types must be derived, not rewritten — Article IV.5 amendment (#623, 2026-05-13)
+
+> **Numbering note (merge-resolution, 2026-05-14).** Originally drafted as ADR-031, but on `main` ADR-031 is reserved for the #248 spec-navigator extraction and ADR-032 is reserved for the #249 backlog-navigator extraction (both placeholder-referenced from extraction-kit runbooks before this branch merged). Bumped to ADR-033 to avoid the collision; `CLAUDE.md` reference updated to match.
+
+**Status:** Accepted. Constitution amended; CLAUDE.md updated. ESLint rule deferred to a follow-up.
+
+**Context.**
+
+PR #623 fixed a Spec #258 regression where storyboard scene rectangles, captured at the user's current zoom, rendered as ~50px squares instead of filling the captured viewport. Root cause: the host→webview message DTO `SceneRectangleSnapshot` (`apps/vscode/src/webview/messages.ts:198-204`) hand-picked four fields from `SceneProperties` and silently dropped a fifth — `_polygon_source`. When PR #620 added that field to `SceneProperties` (LinkML-generated), the snapshot DTO did not gain it. The webview then synthesised a `SceneFeature` whose `_polygon_source` was always `undefined`, so `pickPolygonForRender` never took the trust-captured-bounds branch and instead recomputed from `(scene.center, current map size)` — which produced tiny polygons mid-layout.
+
+TypeScript could not catch this because the failure mode was **under-declaration**: the boundary type didn't *claim* the field, so the compiler had nothing to enforce. Article XV (Strict Type Safety) addresses missing annotations and `any` leaks, not subset-DTO drift. This was the third instance of the same class of bug in the project — `/speckit.review` had caught earlier cases but the user wants the rule applied at write time, not at review time.
+
+**Decision.**
+
+Amend Constitution Article IV (Architectural Boundaries) with a new clause **IV.5 Boundary types are derived, not rewritten**: any cross-boundary type representing a subset of an existing typed source MUST be expressed structurally (`Pick<T, K>`, `Omit<T, K>`, `Partial<T>`, a generated-schema export, or a schema-derived runtime validator). Hand-rewriting fields by name is forbidden. Where structural derivation is genuinely impossible, the boundary type must carry a compile-time exhaustiveness guard against the source. Mirror the principle in `CLAUDE.md` so every AI session applies it at write time.
+
+The matching ESLint rule is deferred to a follow-up. Two implementation paths considered:
+
+1. **Cheap:** flag interfaces named `*Snapshot`, `*Message`, `*Payload`, `*Dto`, `*Envelope`, `*Response`, `*Request` that lack a `Pick<` / `Omit<` / `extends` reference. Catches the smell with ~30 LoC.
+2. **Strict:** custom TS-ESLint rule that resolves the declared type and verifies every field originates from `keyof T` of an imported source type. Higher fidelity, higher build cost.
+
+Sequencing this work behind the constitutional rule lets the rule guide behaviour immediately while the rule's exact scope (which suffixes, which directories) settles through real-world use.
+
+**Constitution version bump:** 1.4 → 1.5 (MINOR — new clause, no breaking change to existing semantics).
+
+**Consequences.**
+
+- ✅ Future under-declared DTO bugs are caught at write time: the author cannot list fields without first stating *which type the fields come from*, so the compiler does the enumeration.
+- ✅ Source-type growth (e.g., adding a slot to a LinkML class that backs `SceneProperties`) produces a compile error at every boundary that uses `Pick<...>` of that source — surfacing pick/omit decisions for review rather than dropping the field on the wire.
+- ✅ Builds on Article II.1 ("Single source of truth — LinkML schemas") and Article IV.4 (persistence-host abstraction): the schema is canonical, boundary types must reference it.
+- ⚠️ No machine enforcement yet — the rule is a written discipline + AI-session-level check until the ESLint rule lands. Mitigated by `CLAUDE.md` integration (every session applies it) and the worked example in this ADR.
+- ⚠️ Some boundary types legitimately cannot derive from a single source (e.g., a message that joins data from two unrelated types). For those, the exhaustiveness guard against each source type is the substitute. Ergonomics worth revisiting if many such cases emerge.
+
+**Alternatives considered.**
+
+- **Strengthen Article XV (Strict Type Safety) with the rule.** Rejected — Article XV is about *whether* types are present and concrete. Article IV is about *contracts between components*. The rule belongs with the boundary articles, where it sits next to IV.4 (persistence-host abstraction) which has the same structural-fidelity flavour.
+- **Document only in `CLAUDE.md` (not the constitution).** Rejected — the bug recurs in human-authored code as well as AI-authored. Constitutional placement makes it a project-wide standard, not a Claude-specific heuristic.
+- **Block on the ESLint rule.** Rejected — the rule's scope is uncertain enough that designing it first slows ship velocity. The written discipline plus Claude integration captures most of the value immediately.
+
+**Worked example (from PR #623):**
+
+```ts
+// ❌ Hand-rewritten subset — silent drop when SceneProperties grows
+export interface SceneRectangleSnapshot {
+  readonly sceneId: string;
+  readonly viewport: Viewport;
+  readonly timestamp: string;
+  readonly polygon: readonly (readonly (readonly [number, number])[])[];
+}
+
+// ✅ Structurally derived — Pick forces an explicit pick/omit choice
+//    when SceneProperties gains a new field
+type ScenePropertyPicks = Pick<
+  SceneProperties,
+  'id' | 'viewport' | 'timestamp' | '_polygon_source'
+>;
+export interface SceneRectangleSnapshot extends ScenePropertyPicks {
+  readonly polygon: readonly (readonly (readonly [number, number])[])[];
+}
+```
+
+**Originating issue:** PR #623 (`claude/fix-scene-rectangle-bounds-ZiCot`). Bug fix commit `f719d8f`. Related to Spec #258 (`specs/258-scene-playback-fidelity/`) which introduced the `_polygon_source` slot the DTO dropped.
+
+**Evidence:**
+- `CONSTITUTION.md` Article IV clause 5 (the rule).
+- `CLAUDE.md` "Governing Principles" → "Boundary types are derived, not rewritten" bullet (AI-session integration).
+- PR #623 (worked example + fix).

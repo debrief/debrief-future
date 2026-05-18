@@ -172,6 +172,129 @@ describe('MapPanel.setSceneRectangles', () => {
       currentSceneId: null,
     });
   });
+
+  it('threads `_polygon_source` provenance through the snapshot (Spec #258 / FR-006)', () => {
+    const { panel, postMessage } = makePanel(makePlot(), []);
+    const scene = makeScene('scene-bounds', [
+      [-5, 50],
+      [-4, 50],
+      [-4, 51],
+      [-5, 51],
+      [-5, 50],
+    ]);
+    (scene.properties as { _polygon_source?: string })._polygon_source = 'bounds';
+
+    panel.setSceneRectangles([scene], 'sb-1', 'scene-bounds');
+
+    const msg = postMessage.mock.calls[0]![0] as {
+      scenes: Array<{ sceneId: string; polygonSource?: string }>;
+    };
+    expect(msg.scenes[0]!.polygonSource).toBe('bounds');
+  });
+
+  it('omits `polygonSource` when the Scene has no provenance (legacy)', () => {
+    const { panel, postMessage } = makePanel(makePlot(), []);
+    const scene = makeScene('scene-legacy', [
+      [-5, 50],
+      [-4, 50],
+      [-4, 51],
+      [-5, 51],
+      [-5, 50],
+    ]);
+    // `_polygon_source` intentionally absent — mirrors pre-#258 scenes.
+
+    panel.setSceneRectangles([scene], 'sb-1', 'scene-legacy');
+
+    const msg = postMessage.mock.calls[0]![0] as {
+      scenes: Array<{ sceneId: string; polygonSource?: string }>;
+    };
+    expect(msg.scenes[0]).not.toHaveProperty('polygonSource');
+  });
+});
+
+describe('MapPanel viewport echo suppression (PR #625)', () => {
+  /**
+   * After the user pans, the host receives `viewportChanged`, debounces
+   * 100ms, then writes the new corners to session-state. The spatial
+   * subscription would *then* post `setViewport(avg-centre, zoom)` back to
+   * the webview — and Leaflet's `setView(avg-centre)` shifts the map off
+   * the user's original pixel-centre because `avg(corners.lat) ≠
+   * map.getCenter().lat` in Mercator. To break that round-trip,
+   * `handleViewportChanged` primes `lastSentViewportKey` to the new
+   * viewport's key *before* it writes to session-state, so the subscription
+   * sees a match and skips the echo.
+   */
+  it('primes `lastSentViewportKey` to the new viewport before writing to session-state', () => {
+    vi.useFakeTimers();
+    try {
+      const { panel, internals } = makePanel(makePlot(), []);
+      const setViewportSpy = vi.fn();
+      const sessionState = {
+        viewport: null,
+        setViewport: setViewportSpy,
+      } as unknown as { viewport: unknown; setViewport: typeof setViewportSpy };
+      (internals as unknown as { activeSession: unknown }).activeSession = {
+        getState: () => sessionState,
+      };
+
+      const corners: [
+        [number, number],
+        [number, number],
+        [number, number],
+        [number, number],
+      ] = [
+        [-3, 51],
+        [-1, 51],
+        [-1, 49],
+        [-3, 49],
+      ];
+      const handler = (panel as unknown as {
+        handleViewportChanged: (vp: {
+          center: [number, number];
+          zoom: number;
+          bounds?: [
+            [number, number],
+            [number, number],
+            [number, number],
+            [number, number],
+          ];
+        }) => void;
+      }).handleViewportChanged.bind(panel);
+
+      handler({ center: [50, -2], zoom: 10, bounds: corners });
+      vi.advanceTimersByTime(101); // VIEWPORT_DEBOUNCE_MS = 100
+
+      expect(setViewportSpy).toHaveBeenCalledTimes(1);
+      // Key encodes avg(corners.lat) = 50, avg(corners.lng) = -2, zoom = 10.
+      const key = (panel as unknown as { lastSentViewportKey: string }).lastSentViewportKey;
+      expect(key).toBe('50.000000,-2.000000,10');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('viewportPolygonKey is identical to the spatial-subscription centre math', () => {
+    const { panel } = makePanel(makePlot(), []);
+    // High-latitude case where Mercator distortion matters most. Both sites
+    // use the same lat-/lng-average so the key always matches and the
+    // suppression is deterministic — verify the formula here so a future
+    // change to one site forces the other to follow.
+    const key = (panel as unknown as {
+      viewportPolygonKey: (
+        coords: ReadonlyArray<{ longitude: number; latitude: number }>,
+        zoom: number,
+      ) => string;
+    }).viewportPolygonKey(
+      [
+        { longitude: -10, latitude: 60 },
+        { longitude: 10, latitude: 60 },
+        { longitude: 10, latitude: 40 },
+        { longitude: -10, latitude: 40 },
+      ],
+      8,
+    );
+    expect(key).toBe('50.000000,0.000000,8');
+  });
 });
 
 describe('MapPanel event emitters', () => {

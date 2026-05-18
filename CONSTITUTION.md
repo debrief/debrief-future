@@ -47,6 +47,7 @@ This constitution establishes the immutable principles governing all development
 2. **Frontends never persist** — frontends orchestrate calls to services. All data writes go through services.
 3. **Services have zero MCP dependency** — domain logic lives in pure Python libraries. MCP wrappers are thin, replaceable layers.
 4. **Persistence-host abstraction.** Frontends may persist data only via the unified writer abstraction. Browser-native stores (IndexedDB, OPFS, File System Access API) qualify as a persistence backend **only** when accessed through this abstraction — frontends never own a divergent write code path. The writer abstraction is the persistence boundary; both Node-side hosts and browser-side hosts route their writes through it. Each host implements the abstraction once, against its native backend; the rest of the system depends only on the interface. Machine-enforced via ESLint (`no-direct-persistence-in-frontend`).
+5. **Boundary types are derived, not rewritten.** Any type defined at a cross-boundary surface (host↔webview message, service↔frontend payload, persistence DTO, MCP envelope, snapshot, request/response) that represents a *subset* of an existing typed source MUST be expressed structurally — `Pick<T, …>`, `Omit<T, …>`, `Partial<T>`, a generated-schema export, or a schema-derived runtime validator (Zod, Pydantic) — never by re-listing the source's fields verbatim. When the source type grows a field, the boundary type's authors must make an explicit pick/omit decision; structural derivation makes that decision a compile error rather than a silent drop on the wire. Hand-rewritten subset types at boundaries are forbidden. Where structural derivation is genuinely impossible, the boundary type must carry a compile-time exhaustiveness guard against the source (`type _Exhaustive = Exclude<keyof Source, keyof Dto | 'intentionally_omitted'> extends never ? true : never`) so source-type growth still surfaces at the boundary. Machine-enforced where practical via lint rules.
 
 ---
 
@@ -203,4 +204,4 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 
 ---
 
-*Document version: 1.4 — March 2026*
+*Document version: 1.5 — May 2026*

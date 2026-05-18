@@ -34,17 +34,55 @@ import type { SessionStoreApi } from '@debrief/session-state';
 
 // ─── Test doubles ────────────────────────────────────────────────────
 
+interface FlyToCall {
+  readonly viewport: {
+    center: [number, number];
+    zoom: number;
+    bearing: number;
+  };
+  readonly durationMs: number;
+}
+
 interface StubMapPanel {
   features: DebriefFeature[];
   thumbnail: { largePngBase64: string | null; smallPngBase64: string | null };
+  liveViewport: {
+    center: [number, number];
+    zoom: number;
+    bounds: [
+      [number, number],
+      [number, number],
+      [number, number],
+      [number, number],
+    ];
+  } | null;
   setFeaturesCalls: DebriefFeature[][];
   requestThumbnailCaptureCalls: number;
+  requestCurrentViewportCalls: number;
+  flyToCalls: FlyToCall[];
+  flyToTokenCounter: number;
+  flushPendingViewportUpdateCalls: number;
   getCurrentFeatures(): DebriefFeature[];
   setFeatures(features: DebriefFeature[]): void;
   requestThumbnailCapture(timeoutMs: number): Promise<{
     largePngBase64: string | null;
     smallPngBase64: string | null;
   }>;
+  requestCurrentViewport(timeoutMs: number): Promise<{
+    center: [number, number];
+    zoom: number;
+    bounds: [
+      [number, number],
+      [number, number],
+      [number, number],
+      [number, number],
+    ];
+  } | null>;
+  flyToViewport(
+    viewport: { center: [number, number]; zoom: number; bearing: number },
+    durationMs: number,
+  ): number;
+  flushPendingViewportUpdate(): void;
 }
 
 function makeMapPanel(
@@ -60,8 +98,13 @@ function makeMapPanel(
   const panel: StubMapPanel = {
     features: initialFeatures.slice(),
     thumbnail,
+    liveViewport: null,
     setFeaturesCalls: [],
     requestThumbnailCaptureCalls: 0,
+    requestCurrentViewportCalls: 0,
+    flyToCalls: [],
+    flyToTokenCounter: 0,
+    flushPendingViewportUpdateCalls: 0,
     getCurrentFeatures() {
       return this.features.slice();
     },
@@ -72,6 +115,17 @@ function makeMapPanel(
     async requestThumbnailCapture(_ms: number) {
       this.requestThumbnailCaptureCalls += 1;
       return this.thumbnail;
+    },
+    async requestCurrentViewport(_ms: number) {
+      this.requestCurrentViewportCalls += 1;
+      return this.liveViewport;
+    },
+    flyToViewport(viewport, durationMs) {
+      this.flyToCalls.push({ viewport, durationMs });
+      return ++this.flyToTokenCounter;
+    },
+    flushPendingViewportUpdate() {
+      this.flushPendingViewportUpdateCalls += 1;
     },
   };
   return panel;
@@ -364,6 +418,142 @@ describe('captureScene — happy paths', () => {
         (f.properties as { kind?: string }).kind === 'STORYBOARD_SCENE',
     );
     expect(scenes).toHaveLength(2);
+  });
+
+  it('prefers the live Leaflet viewport over state.viewport when present (PR #627)', async () => {
+    // First-capture race: `state.viewport` lags the live Leaflet view
+    // because the moveend → debounce → setViewport chain hasn't propagated
+    // the analyst's composition yet. The live RPC must take precedence so
+    // the captured scene matches what the analyst is actually looking at.
+    const mapPanel = makeMapPanel([trackFeature('t1')]);
+    // Live Leaflet says: viewport centred on (-1, 50), zoom 12.
+    mapPanel.liveViewport = {
+      center: [-1, 50],
+      zoom: 12,
+      bounds: [
+        [-2, 51],
+        [0, 51],
+        [0, 49],
+        [-2, 49],
+      ],
+    };
+    // session-state's viewport is the wide initial-fit value (different).
+    const session = makeSession({
+      viewport: {
+        coordinates: [
+          { longitude: -20, latitude: 60 },
+          { longitude: 20, latitude: 60 },
+          { longitude: 20, latitude: 40 },
+          { longitude: -20, latitude: 40 },
+        ],
+        zoom: 5,
+      },
+      currentTime: 1713623700000,
+      timeRange: null,
+      hiddenFeatureIds: [],
+      markDirty: () => undefined,
+    });
+    const result = await captureScene(
+      mkContext({ mapPanel, session: session.session, panelView: makePanelSurface() }),
+      null,
+      depsFor(),
+    );
+
+    expect(result.status).toBe('captured');
+    expect(mapPanel.requestCurrentViewportCalls).toBe(1);
+    expect(mapPanel.flyToCalls).toHaveLength(1);
+    const fly = mapPanel.flyToCalls[0]!;
+    // The live viewport's centre + zoom — NOT the stale state values.
+    expect(fly.viewport.center[0]).toBeCloseTo(-1, 6);
+    expect(fly.viewport.center[1]).toBeCloseTo(50, 6);
+    expect(fly.viewport.zoom).toBe(12);
+  });
+
+  it('falls back to state.viewport when the live-viewport RPC returns null', async () => {
+    // Webview not ready / RPC timed out — capture must still succeed.
+    const mapPanel = makeMapPanel([trackFeature('t1')]);
+    mapPanel.liveViewport = null;
+    const session = makeSession({
+      viewport: defaultViewport(),
+      currentTime: 1713623700000,
+      timeRange: null,
+      hiddenFeatureIds: [],
+      markDirty: () => undefined,
+    });
+    const result = await captureScene(
+      mkContext({ mapPanel, session: session.session, panelView: makePanelSurface() }),
+      null,
+      depsFor(),
+    );
+
+    expect(result.status).toBe('captured');
+    expect(mapPanel.requestCurrentViewportCalls).toBe(1);
+  });
+
+  it('flushes the viewport debounce before reading state.viewport (PR #625)', async () => {
+    // The host debounces webview→host viewportChanged messages by 100 ms.
+    // If the analyst pans and clicks Capture within that window, the
+    // debounced write to session-state hasn't fired yet and `captureScene`
+    // would otherwise read the stale viewport (typically the initial-fit
+    // value from plot load). The flush call at the top of `captureSceneInner`
+    // forces the pending write to apply synchronously, so the capture sees
+    // the analyst's actual composition.
+    const mapPanel = makeMapPanel([trackFeature('t1')]);
+    const session = makeSession({
+      viewport: defaultViewport(),
+      currentTime: 1713623700000,
+      timeRange: null,
+      hiddenFeatureIds: [],
+      markDirty: () => undefined,
+    });
+    const result = await captureScene(
+      mkContext({ mapPanel, session: session.session, panelView: makePanelSurface() }),
+      null,
+      depsFor(),
+    );
+
+    expect(result.status).toBe('captured');
+    expect(mapPanel.flushPendingViewportUpdateCalls).toBe(1);
+  });
+
+  it('restores the captured viewport on the live map after success (PR #624)', async () => {
+    // The captured scene's stored viewport is correct, but the live map can
+    // drift if anything (host-side fit-to-features behaviour, panel reveal
+    // resize, etc.) recomputes bounds while the new STORYBOARD_SCENE polygon
+    // is being added. captureScene issues a no-animation flyTo to (center,
+    // zoom) at the end of the success path so the analyst is left looking at
+    // the composition they captured.
+    const mapPanel = makeMapPanel([trackFeature('t1')]);
+    const session = makeSession({
+      viewport: {
+        coordinates: [
+          { longitude: -3, latitude: 51 },
+          { longitude: -1, latitude: 51 },
+          { longitude: -1, latitude: 49 },
+          { longitude: -3, latitude: 49 },
+        ],
+        zoom: 12,
+      },
+      currentTime: 1713623700000,
+      timeRange: null,
+      hiddenFeatureIds: [],
+      markDirty: () => undefined,
+    });
+    const result = await captureScene(
+      mkContext({ mapPanel, session: session.session, panelView: makePanelSurface() }),
+      null,
+      depsFor(),
+    );
+
+    expect(result.status).toBe('captured');
+    expect(mapPanel.flyToCalls).toHaveLength(1);
+    const fly = mapPanel.flyToCalls[0]!;
+    expect(fly.durationMs).toBe(0);
+    // captured viewport: center is the average of the 4 corners, zoom = 12.
+    expect(fly.viewport.center[0]).toBeCloseTo(-2, 6);
+    expect(fly.viewport.center[1]).toBeCloseTo(50, 6);
+    expect(fly.viewport.zoom).toBe(12);
+    expect(fly.viewport.bearing).toBe(0);
   });
 
   it('scene title defaults to the DTG of the current timestamp', async () => {

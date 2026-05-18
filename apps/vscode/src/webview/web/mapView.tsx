@@ -11,6 +11,7 @@
 
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
+import type { Map as LeafletMap } from 'leaflet';
 import { MapView, createDrawnFeature, getPaletteStyleOverrides, captureMapAsDataUrl, downscaleDataUrl } from '@debrief/components';
 import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProvenance, FlyToTarget, SceneRectangleLayerProps } from '@debrief/components';
 import type {
@@ -225,6 +226,57 @@ function MapViewApp(): React.ReactElement {
             }
           })();
           break;
+        case 'requestCurrentViewport': {
+          // PR #627 — answer the host's RPC for the live Leaflet viewport.
+          // Read directly from `map.getCenter()`/`getZoom()`/`getBounds()`
+          // so the response reflects the user's actual view RIGHT NOW,
+          // bypassing the moveend → postMessage → debounce → state.viewport
+          // chain that can be stale at first-capture time.
+          const map = leafletMapRef.current;
+          if (!map) {
+            vscode.postMessage({
+              type: 'currentViewportResponse',
+              requestId: msg.requestId,
+              success: false,
+              center: [0, 0],
+              zoom: 0,
+              bounds: [[0, 0], [0, 0], [0, 0], [0, 0]],
+              error: 'leaflet map not ready',
+            });
+            break;
+          }
+          const centre = map.getCenter();
+          const zoom = map.getZoom();
+          const mapBounds = map.getBounds();
+          const west = mapBounds.getWest();
+          const east = mapBounds.getEast();
+          const south = mapBounds.getSouth();
+          const north = mapBounds.getNorth();
+          // 4 corners in NW, NE, SE, SW order, each [lng, lat] — same
+          // shape `viewportChanged` already uses.
+          const bounds: [
+            [number, number],
+            [number, number],
+            [number, number],
+            [number, number],
+          ] = [
+            [west, north],
+            [east, north],
+            [east, south],
+            [west, south],
+          ];
+          vscode.postMessage({
+            type: 'currentViewportResponse',
+            requestId: msg.requestId,
+            success: true,
+            // `Viewport.center` is [longitude, latitude]; convert from
+            // Leaflet's LatLng order before reporting.
+            center: [centre.lng, centre.lat],
+            zoom,
+            bounds,
+          });
+          break;
+        }
       }
     };
     window.addEventListener('message', handler);
@@ -252,6 +304,16 @@ function MapViewApp(): React.ReactElement {
   // Track current zoom so bounds-change emissions carry a real zoom
   // rather than the prior hard-coded `10`. handleZoomChange updates this.
   const currentZoomRef = useRef<number>(10);
+
+  // PR #627 — Leaflet map instance reference, populated by the MapView's
+  // `onMapReady` callback once Leaflet has mounted. Used to answer the
+  // `requestCurrentViewport` RPC at capture time without going through the
+  // moveend → debounce → session-state chain (which can be stale for the
+  // very first capture if the analyst hasn't panned since composing).
+  const leafletMapRef = useRef<LeafletMap | null>(null);
+  const handleMapReady = useCallback((map: LeafletMap) => {
+    leafletMapRef.current = map;
+  }, []);
 
   // Viewport change callback. #230 FR-050: emit a full `viewportChanged`
   // including the polygon bounds so `mapPanel.handleViewportChanged` can
@@ -352,6 +414,12 @@ function MapViewApp(): React.ReactElement {
         thumbnail_asset_ref: '',
         transition_duration_ms: 500,
         schema_version: 1,
+        // Spec #258 / FR-006 — restore provenance so `pickPolygonForRender`
+        // trusts the stored polygon for `'bounds'` captures and only
+        // recomputes for legacy / placeholder scenes.
+        ...(snap.polygonSource !== undefined && {
+          _polygon_source: snap.polygonSource,
+        }),
       },
     }));
     // Cast once at the boundary — the synthetic object is structurally
@@ -473,6 +541,7 @@ function MapViewApp(): React.ReactElement {
       onShapeCreated={handleShapeCreated}
       flyToTarget={flyToTarget}
       onFlyToComplete={handleFlyToComplete}
+      onMapReady={handleMapReady}
       sceneRectangles={sceneRectangleProps}
       height="100vh"
     />
