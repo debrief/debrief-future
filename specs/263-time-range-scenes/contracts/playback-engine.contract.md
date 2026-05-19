@@ -1,8 +1,8 @@
 # Contract: Playback Engine — `executeTransition` Flavour Branch
 
-**Surface**: `apps/vscode/src/services/storyboardPlayback.ts` — internal `executeTransition` private method and the new private `TimeRangeTween` primitive it dispatches to.
+**Surface (revised at review 1B — 2026-05-19)**: `shared/components/src/storyboardPlayback/` — the engine module relocated from `apps/vscode/src/services/storyboardPlayback.ts`. The internal `executeTransition` method and the new `TimeRangeTween` primitive live here. Host-specific dependencies (`MapPanel`, session, panel view, time-range view, modal prompts, visibility) are accepted as injected ports the host implements once; the engine itself is host-agnostic.
 
-**Stable consumers**: VS Code transport UI (forward/back/play/pause) and the web-shell transport once #263 lands there; future briefing renderer (#264) re-implements the same contract against its own ports.
+**Stable consumers**: VS Code transport UI wires the engine with its existing `MapPanel` / `vscode.Event` adapters. The web-shell transport wires the engine with new lightweight adapters against `react-leaflet` + the existing `webPanelHost`. Future briefing renderer (#264) implements the same port interfaces against its own DOM/canvas surface.
 
 ## Inputs (unchanged from #217 except for flavour awareness)
 
@@ -77,7 +77,7 @@ The engine MUST:
 
 ## Tests
 
-Located at `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`:
+Located at `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts` (relocated alongside the engine):
 
 - `forward — frames advance both axes linearly over duration`
 - `forward — endpoint exact on completion`
@@ -86,4 +86,8 @@ Located at `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test
 - `mixed sequence — time-range Scene before an instant Scene plays correctly`
 - `abort — slider grab mid-scrub leaves last coherent frame, dispatches user grab`
 - `abort — scene-select mid-scrub leaves last coherent frame, dispatches new transition`
+- `abort — fake subscriber sees no torn (currentTime, viewport) pair after abort` (review 3C)
+- `perf — 60-frame tween with realistic subscribers stays under 8 ms mean per-frame` (review 4A)
 - `safety timer — fires only when RAF stalls; does not corrupt state under normal flow`
+
+Inter-host port contract tests (new at review 1B): `shared/components/src/storyboardPlayback/__tests__/portContract.test.ts` exercises a stub MapPanel / session / panel-view port with a recorded call log; both VS Code's adapter and the web-shell's adapter MUST satisfy the same recorded calls.

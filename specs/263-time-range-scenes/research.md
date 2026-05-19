@@ -47,7 +47,9 @@ Any other combination — `viewport_end` set with `time_range` absent, `time_ran
 
 ## R3. Lock-step interpolation primitive (`TimeRangeTween`)
 
-**Decision**: Introduce a single private RAF-driven primitive in `apps/vscode/src/services/storyboardPlayback.ts` (initial home; promoted to `@debrief/components` only if the briefing-renderer port in #264 forces it). The primitive owns one wall-clock loop and on each frame:
+**Decision (revised at review 1B — 2026-05-19)**: Introduce a single RAF-driven primitive inside a relocated `shared/components/src/storyboardPlayback/` module. The engine surface — `StoryboardPlaybackService`, `executeTransition`, `TimeRangeTween` — moves out of `apps/vscode/src/services/storyboardPlayback.ts` into the shared layer, with host-specific dependencies (MapPanel port, session port, panel-view port, time-range-view port, modal-prompt port, visibility port) injected via interfaces the host implements once. VS Code wires the engine with its existing adapters; the web-shell wires it with new lightweight adapters against `react-leaflet` + the existing `webPanelHost`. The original plan deferred this promotion to #264 (briefing renderer); the review found that the web-shell has **no** storyboard playback engine today and Phase 7's Playwright workflow drives forward + reverse playback in the web-shell, so the promotion has to happen now to give the web-shell a path. **Net diff size is unchanged** — the primitive lands once instead of twice and the web-shell gets a thin adapter rather than a parallel engine.
+
+The primitive owns one wall-clock loop and on each frame:
 
 1. Computes a normalised progress `p ∈ [0, 1]` (forward) or `p ∈ [1, 0]` (reverse) from `(now - startedAt) / transition_duration_ms`.
 2. Computes a linear blend of the viewport endpoints (`center`, `zoom`) — `bearing` stays at `0` (still v1-reserved; this feature does not lift that constraint).
@@ -66,7 +68,7 @@ The existing single-Scene `flyToViewport(viewport, durationMs)` path (which dele
 **Alternatives considered**:
 - *Drive Leaflet's `flyTo` for the viewport and a separate RAF for the slider*. Rejected — two animation clocks drift; lock-step is only guaranteed if a single `p` drives both.
 - *Quantise per-frame updates to ~16 ms and tolerate drift*. Rejected — invisible drift becomes visible when tracks move long distances and the slider lags by a frame; FR-PLAY-003 forbids it beyond redraw latency.
-- *Promote the primitive into `@debrief/components` now*. Deferred — premature; #264 (briefing renderer) is the second consumer and will know the right shape when it arrives. Promoting prematurely risks an API we then rework.
+- *Promote the primitive into `@debrief/components` now*. **Adopted** (review 1B). The original deferral was wrong: the web-shell has no playback engine today, so the second consumer's shape needs to be known **now**, not at #264. Promotion adds a port-extraction step but eliminates the alternative of duplicating the engine across two app directories.
 
 **Recorded as**: ADR-NEW-C.
 
@@ -147,22 +149,26 @@ Interrupt sources:
 
 **Recorded in**: Covered by ADR-NEW-C body.
 
-## R8. Ordering anchor (`t_start` as the sort key) and #259 interaction
+## R8. Ordering anchor and #259 interaction
 
-**Decision**: A Scene's anchor for Storyboard ordering remains `SceneProperties.timestamp`. For instant Scenes (today), `timestamp` is the captured instant. For time-range Scenes (new), `timestamp == t_start` (i.e. the capture flow writes the slider position at the *first* capture action into `timestamp` AND into `time_range.start`). The sort key `(timestamp, creation_order)` from #259 is unchanged; no extra code in `ordering.ts`.
+**Decision (revised at review 2A — 2026-05-19)**: `ordering.ts` reads `time_range?.start ?? timestamp` as the first sort-key component (second component remains `creation_order` per #259). Instant Scenes (`time_range` absent) sort byte-equivalently to #259. Time-range Scenes sort on `time_range.start` directly, without requiring `timestamp == time_range.start`.
 
-**Rationale**:
-- Reusing `timestamp` keeps the sort path single-key-tuple and avoids a special "if time-range then use time_range.start else timestamp" branch in `ordering.ts`.
-- Writing the same value to both slots is a small CRUD invariant (asserted in `createScene`) and keeps `timestamp` semantically meaningful for time-range Scenes too ("when does this Scene start").
-- The duplicate-storage cost is one ISO-8601 string per time-range Scene — negligible.
+**Rationale (revised)**:
+- One-line change in `ordering.ts`. No new cross-field rule, no new error code, no new invalid fixture, no parallel hand-written Pydantic + TS validators.
+- LinkML's expression grammar cannot express `timestamp == time_range.start` across slots, so the originally-drafted invariant would have landed as parallel hand-written validators — a soft Article II.1 violation for zero correctness benefit.
+- CRUD may still write the same value to both slots at capture time as a convention; the sort path no longer depends on it.
 
-**Validation invariant** (added to `validate.ts`): for time-range Scenes, `timestamp == time_range.start` MUST hold. Any drift is a writer bug and is rejected with a named error.
+**Originally drafted (now retracted)**:
+- A LinkML rule `scene-timestamp-equals-time-range-start-rule` enforcing `timestamp == time_range.start`.
+- A matching invalid fixture `scene-time-range-timestamp-mismatch.json`.
+- An error code `SceneTimestampDoesNotEqualTimeRangeStartError`.
 
-**Alternatives considered**:
-- *Make `timestamp` mean "anchor" abstractly and let `ordering.ts` branch on flavour to read either `timestamp` or `time_range.start`*. Rejected — branches in the sort path are bug-prone and split the meaning of a slot across flavours.
-- *Drop `timestamp` for time-range Scenes and use `time_range.start` for ordering only*. Rejected — would require `ordering.ts` to know about flavour, and would force the schema to permit a Scene with no `timestamp`, which is a larger change.
+These three artefacts are explicitly not added. See data-model.md §3 and §5 for the resolution text.
 
-**Recorded in**: Data model § Sort invariants.
+**Alternatives considered (still relevant)**:
+- *Drop `timestamp` for time-range Scenes and use `time_range.start` for ordering only*. Rejected — would force the schema to permit a Scene with no `timestamp`, which is a larger change than the one-line sort-key fallback.
+
+**Recorded in**: Data model § Sort invariants (revised).
 
 ## R9. Retired and added golden fixtures (Article II)
 
@@ -182,9 +188,10 @@ Interrupt sources:
 - `invalid/scene-time-range-missing-viewport-end.json` — `time_range` set, `viewport_end` absent → flavour XOR violation.
 - `invalid/scene-instant-with-viewport-end.json` — `time_range = null`, `viewport_end` set → flavour XOR violation.
 - `invalid/scene-time-range-end-not-after-start.json` — `time_range.end <= time_range.start` → range validity violation.
-- `invalid/scene-time-range-timestamp-mismatch.json` — `timestamp != time_range.start` → sort-anchor invariant violation (R8).
 
-All four invalid fixtures MUST be rejected with a single named error per spec FR-CAP-006 / FR-SCH-002.
+> **Retracted at review 2A (2026-05-19)**: `invalid/scene-time-range-timestamp-mismatch.json` is **not** added. The R8 invariant it enforced was dropped in favour of a one-line sort-key fallback in `ordering.ts`.
+
+All three invalid fixtures MUST be rejected with a single named error per spec FR-CAP-006 / FR-SCH-002.
 
 **Rationale**: Article II requires golden fixtures to gate every schema change. The new XOR rule needs both directions covered (instant-with-end, range-without-end), the range validity needs its own fixture, and the sort-anchor invariant needs one. The retired fixtures encoded constraints that are no longer the rule.
 
@@ -192,11 +199,12 @@ All four invalid fixtures MUST be rejected with a single named error per spec FR
 
 ## R10. ADR list
 
-Three ADR appends to `docs/project_notes/decisions.md`, written as part of the implementation:
+Four ADR appends to `docs/project_notes/decisions.md` (one added at review), written as part of the implementation:
 
 - **ADR-NEW-A — Additive schema evolution without version bump for time-range Scenes**. Records R1 (no `schema_version` bump; both new slots optional; legacy plots unchanged).
 - **ADR-NEW-B — Flavour XOR as a cross-field LinkML rule with a TypeScript narrowing predicate at the boundary**. Records R2 (LinkML `rules` block is the source of truth; `isTimeRangeScene` predicate is the only narrowing site).
-- **ADR-NEW-C — Lock-step viewport+slider RAF primitive (`TimeRangeTween`) initially private to the VS Code playback engine**. Records R3, R4, R6, R7 (one ADR, one primitive; promotion to `@debrief/components` deferred to #264).
+- **ADR-NEW-C — Lock-step viewport+slider RAF primitive (`TimeRangeTween`) in the shared playback engine**. Records R3 (revised), R4, R6, R7. The engine lands in `shared/components/src/storyboardPlayback/` with host-injected ports — earlier than the original "deferred to #264" timing — because the web-shell needs playback parity for #263's Phase 7 Playwright workflow.
+- **ADR-NEW-D (review 2A — 2026-05-19) — Sort-key fallback `time_range?.start ?? timestamp` instead of a `timestamp == time_range.start` invariant**. Records R8 (revised). LinkML's expression grammar cannot express the equality across slots, so the originally-drafted invariant would have landed as parallel hand-written Pydantic + TS validators. A one-line `ordering.ts` change replaces three artefacts (rule, fixture, error code) and removes the source-of-truth split.
 
 Exact ADR numbers are assigned at write time by scanning `decisions.md` for the highest existing ADR-NNN and incrementing — the script `update-agent-context.sh` does not touch this file, so the numbering is done by hand in the implementation commit.
 
