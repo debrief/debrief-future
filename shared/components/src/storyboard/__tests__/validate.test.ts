@@ -33,13 +33,46 @@ describe("validatePlot", () => {
     expect(() => validatePlot(plot)).not.toThrow();
   });
 
-  it("rejects the duplicate-timestamp invalid fixture with DuplicateTimestamp", () => {
+  it("AT-001 (FR-001) accepts the tied-timestamp fixture (three Scenes sharing a timestamp)", () => {
+    const plot = loadFixture("valid", "storyboard-tied-timestamps.json");
+    expect(() => validatePlot(plot)).not.toThrow();
+  });
+
+  it("AT-013 (FC-I4) rejects the duplicate-creation_order fixture", () => {
     const plot = loadFixture(
       "invalid",
-      "storyboard-scene-duplicate-timestamp.json",
+      "storyboard-scene-duplicate-creation-order.json",
     );
     expect(() => validatePlot(plot)).toThrowError(
-      expect.objectContaining({ code: "DuplicateTimestamp" }),
+      expect.objectContaining({ code: "DuplicateCreationOrder" }),
+    );
+  });
+
+  it("AT-015 (FC-V1) rejects a pre-#259 plot with UnsupportedSchemaVersion before FC-I5 fires", () => {
+    const plot = loadFixture(
+      "invalid",
+      "storyboard-scene-missing-creation-order.json",
+    );
+    expect(() => validatePlot(plot)).toThrowError(
+      expect.objectContaining({ code: "UnsupportedSchemaVersion" }),
+    );
+  });
+
+  it("AT-010 (FC-I5) rejects a hand-edited plot whose Scenes lack creation_order even when schema_version is current", () => {
+    // Force-bump schema_version so FC-V1 passes, exposing the FC-I5 gate.
+    const plot = loadFixture(
+      "invalid",
+      "storyboard-scene-missing-creation-order.json",
+    );
+    for (const f of plot.features) {
+      if (
+        (f as { properties?: { kind?: string } }).properties?.kind === "STORYBOARD"
+      ) {
+        (f as { properties: { schema_version: number } }).properties.schema_version = 2;
+      }
+    }
+    expect(() => validatePlot(plot)).toThrowError(
+      expect.objectContaining({ code: "MissingCreationOrder" }),
     );
   });
 
@@ -53,7 +86,9 @@ describe("validatePlot", () => {
   it("rejects a bearing-nonzero Scene with ReservedSlotViolation", () => {
     const bad = loadFixture("invalid", "storyboard-scene-bearing-nonzero.json");
     // Single-Feature fixture — wrap in a one-Scene + one-matching-Storyboard
-    // FeatureCollection so validatePlot can scan it.
+    // FeatureCollection so validatePlot can scan it. Storyboard's
+    // schema_version is bumped to 2 so FC-V1 passes and FC-I3 / I5 / I4 /
+    // ReservedSlot can run.
     const asCollection: Plot = {
       type: "FeatureCollection",
       features: [
@@ -65,7 +100,7 @@ describe("validatePlot", () => {
             kind: "STORYBOARD",
             id: (bad.properties as { storyboard_id: string }).storyboard_id,
             name: "Wrapper",
-            schema_version: 1,
+            schema_version: 2,
           },
         },
         bad as unknown as Plot["features"][number],
@@ -92,7 +127,7 @@ describe("validatePlot", () => {
             kind: "STORYBOARD",
             id: (bad.properties as { storyboard_id: string }).storyboard_id,
             name: "Wrapper",
-            schema_version: 1,
+            schema_version: 2,
           },
         },
         bad as unknown as Plot["features"][number],

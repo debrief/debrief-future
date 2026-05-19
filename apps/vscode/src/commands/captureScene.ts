@@ -16,9 +16,7 @@ import { ulid } from 'ulid';
 import {
   createStoryboard,
   createScene,
-  deleteScene,
   getActiveStoryboardDefault,
-  DuplicateTimestampError,
   DuplicateStoryboardNameError,
   type StoryboardPlot,
   type SceneFeature,
@@ -440,15 +438,8 @@ async function captureSceneInner(
     void deps.executeCommand('debrief.storyboardPanel.focus');
     return { status: 'captured', scene: result.scene };
   } catch (err) {
-    if (err instanceof DuplicateTimestampError) {
-      return handleDuplicateTimestamp(
-        context,
-        deps,
-        sceneInput,
-        0,
-        sceneInput.timestamp,
-      );
-    }
+    // #259 — createScene no longer throws DuplicateTimestampError; any
+    // failure here is an unexpected error.
     deps.logError(
       `[captureScene] createScene failed: ${stringifyError(err)}`,
     );
@@ -486,201 +477,10 @@ async function persistFeatureCollection(
   }
 }
 
-async function handleDuplicateTimestamp(
-  context: CaptureCommandContext,
-  deps: ResolvedDeps,
-  inputs: CreateSceneInput,
-  retries: number,
-  /** #235 — original timestamp the analyst started at; preserved across
-   *  Offset round-trips so the banner can show how far they have shifted. */
-  originalTimestamp: string,
-): Promise<CaptureResult> {
-  const { mapPanel, sessionStore } = context;
-  if (retries >= 5) {
-    void deps.showErrorMessage(
-      'Too many consecutive offset retries — pick a different moment in time.',
-    );
-    return { status: 'rejected', reason: 'duplicate-offset-limit-exceeded' };
-  }
-  const conflict = findExistingConflict(mapPanel, inputs);
-  // #235: the duplicate prompt is the inline panel banner, NOT a
-  // host-level modal that would occlude the map (FR-VIS-022/023, SC-009).
-  // The host owns the offset count + offsetWouldExceedTimeRange computation.
-  const conflictTitle = findExistingTitle(mapPanel, inputs) ?? 'Existing scene';
-  const offsetWouldExceedTimeRange = wouldOffsetExceedTimeRange(
-    sessionStore,
-    inputs.timestamp,
-  );
-  const reply = await context.panelView.promptCollisionResolution({
-    visible: true,
-    conflictingSceneId: conflict ?? '',
-    conflictingSceneTitle: conflictTitle,
-    originalTimestamp,
-    proposedTimestamp: inputs.timestamp,
-    offsetCount: retries,
-    offsetWouldExceedTimeRange,
-    cause: 'capture',
-  });
-  if (reply.kind === 'cancel') {
-    return { status: 'cancelled', reason: 'duplicate-prompt' };
-  }
-  if (reply.kind === 'replace') {
-    return performReplace(context, deps, inputs, conflict, originalTimestamp);
-  }
-  // reply.kind === 'offset'
-  if (offsetWouldExceedTimeRange) {
-    // The panel hides the Offset button when this is true (FR-CAP-017a),
-    // so we should never reach this branch under normal flow. Treat as
-    // a defensive cancel — the host's own state is authoritative.
-    return { status: 'cancelled', reason: 'duplicate-prompt' };
-  }
-  const offsetIso = new Date(
-    new Date(inputs.timestamp).getTime() + 1000,
-  ).toISOString();
-  return retryCreateScene(
-    context,
-    deps,
-    { ...inputs, timestamp: offsetIso },
-    retries + 1,
-    originalTimestamp,
-  );
-}
-
-function findExistingTitle(
-  mapPanel: MapPanel,
-  inputs: CreateSceneInput,
-): string | null {
-  const plot = packagePlot(mapPanel.getCurrentFeatures());
-  for (const f of plot.features) {
-    const props = f.properties as {
-      kind?: string;
-      storyboard_id?: string;
-      timestamp?: string;
-      title?: string;
-    } | null;
-    if (
-      props !== null &&
-      props.kind === 'STORYBOARD_SCENE' &&
-      props.storyboard_id === inputs.storyboardId &&
-      props.timestamp === inputs.timestamp
-    ) {
-      return typeof props.title === 'string' ? props.title : null;
-    }
-  }
-  return null;
-}
-
-function wouldOffsetExceedTimeRange(
-  sessionStore: SessionStoreApi,
-  proposedTimestamp: string,
-): boolean {
-  const state = sessionStore.getState();
-  const range = state.timeRange;
-  if (range === null) {return false;}
-  const proposedMs = new Date(proposedTimestamp).getTime();
-  // Offsetting by 1 s — would the next attempt push past the upper bound?
-  return proposedMs + 1000 > range.end;
-}
-
-function findExistingConflict(
-  mapPanel: MapPanel,
-  inputs: CreateSceneInput,
-): string | null {
-  const plot = packagePlot(mapPanel.getCurrentFeatures());
-  for (const f of plot.features) {
-    const props = f.properties as {
-      kind?: string;
-      storyboard_id?: string;
-      timestamp?: string;
-      id?: string;
-    } | null;
-    if (
-      props !== null &&
-      props.kind === 'STORYBOARD_SCENE' &&
-      props.storyboard_id === inputs.storyboardId &&
-      props.timestamp === inputs.timestamp
-    ) {
-      return typeof props.id === 'string' ? props.id : null;
-    }
-  }
-  return null;
-}
-
-async function performReplace(
-  context: CaptureCommandContext,
-  deps: ResolvedDeps,
-  inputs: CreateSceneInput,
-  conflictSceneId: string | null,
-  originalTimestamp: string,
-): Promise<CaptureResult> {
-  if (conflictSceneId === null) {
-    deps.logError('[captureScene] Replace requested but conflict scene not located; retrying createScene');
-    return retryCreateScene(context, deps, inputs, 0, originalTimestamp);
-  }
-  try {
-    const fcLatest = packagePlot(context.mapPanel.getCurrentFeatures());
-    const afterDelete = await deleteScene(fcLatest, {
-      sceneId: conflictSceneId,
-      actor: context.actor,
-      now: deps.now(),
-    });
-    context.mapPanel.setFeatures(
-      // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
-      afterDelete.plot.features as unknown as DebriefFeature[],
-    );
-  } catch (err) {
-    deps.logError(
-      `[captureScene] deleteScene (replace branch) failed: ${stringifyError(err)}`,
-    );
-    void deps.showErrorMessage(
-      'Capture failed — could not replace the conflicting scene.',
-    );
-    return { status: 'rejected', reason: 'unexpected', error: err };
-  }
-  return retryCreateScene(context, deps, inputs, 0, originalTimestamp);
-}
-
-async function retryCreateScene(
-  context: CaptureCommandContext,
-  deps: ResolvedDeps,
-  inputs: CreateSceneInput,
-  retries: number,
-  originalTimestamp: string,
-): Promise<CaptureResult> {
-  try {
-    const fcLatest = packagePlot(context.mapPanel.getCurrentFeatures());
-    const result = await createScene(fcLatest, inputs);
-    context.mapPanel.setFeatures(
-      // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
-      result.plot.features as unknown as DebriefFeature[],
-    );
-    await persistFeatureCollection(context, deps, context.mapPanel.getCurrentFeatures());
-    const withUndo = context.sessionStore.getState();
-    withUndo.markDirty();
-    // PR #624 — mirror the viewport-restore on the offset/replace retry path
-    // so duplicate-timestamp resolutions also preserve the analyst's view.
-    context.mapPanel.flyToViewport(inputs.viewport, 0);
-    void deps.executeCommand('debrief.storyboardPanel.focus');
-    return { status: 'captured', scene: result.scene };
-  } catch (err) {
-    if (err instanceof DuplicateTimestampError) {
-      return handleDuplicateTimestamp(
-        context,
-        deps,
-        inputs,
-        retries,
-        originalTimestamp,
-      );
-    }
-    deps.logError(
-      `[captureScene] createScene (retry) failed: ${stringifyError(err)}`,
-    );
-    void deps.showErrorMessage(
-      'Capture failed — unexpected error. See Debrief output channel for details.',
-    );
-    return { status: 'rejected', reason: 'unexpected', error: err };
-  }
-}
+// #259 — handleDuplicateTimestamp / performReplace / retryCreateScene /
+// findExistingConflict / findExistingTitle / wouldOffsetExceedTimeRange
+// were the duplicate-timestamp banner flow. They are obsolete now that
+// createScene unconditionally appends to a tied-timestamp group.
 
 /**
  * Collect existing Storyboard names on the plot for inline collision

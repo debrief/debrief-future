@@ -41,15 +41,15 @@
 
 **Independent test**: `pnpm -r typecheck && uv run pyright` is green; generated `SceneProperties` in both Python and TypeScript exposes `creation_order: int / number` as a required field.
 
-- [ ] T001 Drop the "MUST be unique within a Storyboard" wording from `SceneProperties.timestamp` description `shared/schemas/src/linkml/storyboard.yaml`
-- [ ] T002 Add new `creation_order` slot to `SceneProperties` (range `integer`, required, `minimum_value: 0`, description explains it as the secondary sort key, per-Storyboard scope, monotonic at capture) `shared/schemas/src/linkml/storyboard.yaml`
-- [ ] T003 Bump `StoryboardProperties.schema_version` `minimum_value` from `1` to `2`; update the slot description to record the v1 → v2 transition (no backfill; pre-v2 plots are rejected) `shared/schemas/src/linkml/storyboard.yaml`
-- [ ] T004 Update the comment block at the top of the schema file referencing #259 and the change of invariants (FC-I3 removed; FC-I4, FC-I5, FC-V1 added per `data-model.md`) `shared/schemas/src/linkml/storyboard.yaml`
-- [ ] T005 Regenerate Pydantic models from LinkML `shared/schemas/src/generated/python/debrief_schemas/storyboard.py`
-- [ ] T006 [P] Regenerate TypeScript types from LinkML `shared/schemas/src/generated/typescript/types.ts`
-- [ ] T007 [P] Regenerate JSON Schema from LinkML `shared/schemas/src/generated/json-schema/storyboard.schema.json`
-- [ ] T008 [test] Re-run schema adherence tests; confirm `creation_order` round-trips Python ↔ JSON ↔ TypeScript ↔ JSON ↔ Python identity-preserved `shared/schemas/tests/test_storyboard_roundtrip.py`
-- [ ] T009 [P] Capture round-trip evidence (paste passing pytest output + a hand-walked example) `specs/259-relax-scene-time/evidence/round-trip-evidence.md`
+- [x] T001 Drop the "MUST be unique within a Storyboard" wording from `SceneProperties.timestamp` description `shared/schemas/src/linkml/storyboard.yaml`
+- [x] T002 Add new `creation_order` slot to `SceneProperties` (range `integer`, required, `minimum_value: 0`, description explains it as the secondary sort key, per-Storyboard scope, monotonic at capture) `shared/schemas/src/linkml/storyboard.yaml`
+- [x] T003 Bump `StoryboardProperties.schema_version` `minimum_value` from `1` to `2`; update the slot description to record the v1 → v2 transition (no backfill; pre-v2 plots are rejected) `shared/schemas/src/linkml/storyboard.yaml`
+- [x] T004 Update the comment block at the top of the schema file referencing #259 and the change of invariants (FC-I3 removed; FC-I4, FC-I5, FC-V1 added per `data-model.md`) `shared/schemas/src/linkml/storyboard.yaml`
+- [x] T005 Regenerate Pydantic models from LinkML `shared/schemas/src/generated/python/debrief_schemas/storyboard.py`
+- [x] T006 [P] Regenerate TypeScript types from LinkML `shared/schemas/src/generated/typescript/types.ts`
+- [x] T007 [P] Regenerate JSON Schema from LinkML `shared/schemas/src/generated/json-schema/storyboard.schema.json`
+- [x] T008 [test] Re-run schema adherence tests; confirm `creation_order` round-trips Python ↔ JSON ↔ TypeScript ↔ JSON ↔ Python identity-preserved `shared/schemas/tests/test_storyboard_roundtrip.py`
+- [x] T009 [P] Capture round-trip evidence (paste passing pytest output + a hand-walked example) `specs/259-relax-scene-time/evidence/round-trip-evidence.md`
 
 ## Phase 2: Fixtures
 
@@ -57,13 +57,13 @@
 
 **Independent test**: All valid fixtures pass `pytest shared/schemas/tests/test_fixtures.py::test_valid_fixtures`; all invalid fixtures correctly fail schema validation with the expected error code.
 
-- [ ] T010 [P] Delete the now-obsolete invalid fixture `shared/schemas/src/fixtures/invalid/storyboard-scene-duplicate-timestamp.json`
-- [ ] T011 [P] Add valid fixture: three Scenes in one Storyboard sharing a timestamp; `creation_order = 0, 1, 2`; `schema_version = 2` `shared/schemas/src/fixtures/valid/storyboard-tied-timestamps.json`
-- [ ] T012 [P] Add valid fixture: five Scenes across two timestamps (A@T0, B@T0, C@T1, D@T1, E@T2) in capture order; `creation_order = 0..4`; `schema_version = 2` `shared/schemas/src/fixtures/valid/storyboard-mixed-tied.json`
-- [ ] T013 [P] Add invalid fixture: two Scenes share `creation_order = 0` in the same Storyboard (triggers FC-I4 / `DuplicateCreationOrderError`) `shared/schemas/src/fixtures/invalid/storyboard-scene-duplicate-creation-order.json`
-- [ ] T014 [P] Add invalid fixture: pre-#259 shape — Scenes lack `creation_order`; `schema_version = 1` (triggers FC-V1 first, then FC-I5 / `MissingCreationOrderError`) `shared/schemas/src/fixtures/invalid/storyboard-scene-missing-creation-order.json`
-- [ ] T015 [test] Update the fixture-adherence test inventory to reference the new file names (delete the duplicate-timestamp entry; add three new entries) `shared/schemas/tests/test_fixtures.py`
-- [ ] T016 [P] Update the #215 usage example that deliberately inserts Scenes out-of-timestamp-order — keep the demonstration, add `creation_order` to each Scene so the example still validates `specs/215-storyboarding-schema/evidence/usage-example.ts`
+- [x] T010 [P] Delete the now-obsolete invalid fixture `shared/schemas/src/fixtures/invalid/storyboard-scene-duplicate-timestamp.json`
+- [x] T011 [P] Add valid fixture: three Scenes in one Storyboard sharing a timestamp; `creation_order = 0, 1, 2`; `schema_version = 2` `shared/schemas/src/fixtures/valid/storyboard-tied-timestamps.json`
+- [x] T012 [P] Add valid fixture: five Scenes across two timestamps (A@T0, B@T0, C@T1, D@T1, E@T2) in capture order; `creation_order = 0..4`; `schema_version = 2` `shared/schemas/src/fixtures/valid/storyboard-mixed-tied.json`
+- [x] T013 [P] Add invalid fixture: two Scenes share `creation_order = 0` in the same Storyboard (triggers FC-I4 / `DuplicateCreationOrderError`) `shared/schemas/src/fixtures/invalid/storyboard-scene-duplicate-creation-order.json`
+- [x] T014 [P] Add invalid fixture: pre-#259 shape — Scenes lack `creation_order`; `schema_version = 1` (triggers FC-V1 first, then FC-I5 / `MissingCreationOrderError`) `shared/schemas/src/fixtures/invalid/storyboard-scene-missing-creation-order.json`
+- [x] T015 [test] Update the fixture-adherence test inventory to reference the new file names (delete the duplicate-timestamp entry; add three new entries) `shared/schemas/tests/test_fixtures.py`
+- [x] T016 [P] Update the #215 usage example that deliberately inserts Scenes out-of-timestamp-order — keep the demonstration, add `creation_order` to each Scene so the example still validates `specs/215-storyboarding-schema/evidence/usage-example.ts`
 
 ## Phase 3: Errors module + index exports
 
@@ -71,13 +71,13 @@
 
 **Independent test**: `import { DuplicateCreationOrderError, CreationOrderOutOfRangeError, MissingCreationOrderError, UnsupportedSchemaVersionError } from '@debrief/components'` resolves and the classes are constructible with their documented `details` payload; `DuplicateTimestampError` is no longer importable.
 
-- [ ] T017 Delete `DuplicateTimestampError` class and its code constant `shared/components/src/storyboard/errors.ts`
-- [ ] T018 Add `DuplicateCreationOrderError` (code `STORYBOARD_DUPLICATE_CREATION_ORDER`; details: `{ storyboardId, creationOrder, conflictingSceneIds: [string, string] }`) `shared/components/src/storyboard/errors.ts`
-- [ ] T019 Add `CreationOrderOutOfRangeError` (code `STORYBOARD_CREATION_ORDER_OUT_OF_RANGE`; details: `{ storyboardId, sceneId, providedIndex, tiedGroupSize }`) `shared/components/src/storyboard/errors.ts`
-- [ ] T020 Add `MissingCreationOrderError` (code `STORYBOARD_MISSING_CREATION_ORDER`; details: `{ storyboardId, sceneId }`) `shared/components/src/storyboard/errors.ts`
-- [ ] T021 Add `UnsupportedSchemaVersionError` (code `STORYBOARD_UNSUPPORTED_SCHEMA_VERSION`; details: `{ storyboardId, foundVersion: number, requiredMinimum: 2 }`) `shared/components/src/storyboard/errors.ts`
-- [ ] T022 Update the public-exports list: drop `DuplicateTimestampError`; add the four new classes `shared/components/src/storyboard/index.ts`
-- [ ] T023 [P][test] Add unit tests covering each new error's `code`, `message`, and `details` shape `shared/components/src/storyboard/__tests__/errors.test.ts`
+- [x] T017 Delete `DuplicateTimestampError` class and its code constant `shared/components/src/storyboard/errors.ts`
+- [x] T018 Add `DuplicateCreationOrderError` (code `STORYBOARD_DUPLICATE_CREATION_ORDER`; details: `{ storyboardId, creationOrder, conflictingSceneIds: [string, string] }`) `shared/components/src/storyboard/errors.ts`
+- [x] T019 Add `CreationOrderOutOfRangeError` (code `STORYBOARD_CREATION_ORDER_OUT_OF_RANGE`; details: `{ storyboardId, sceneId, providedIndex, tiedGroupSize }`) `shared/components/src/storyboard/errors.ts`
+- [x] T020 Add `MissingCreationOrderError` (code `STORYBOARD_MISSING_CREATION_ORDER`; details: `{ storyboardId, sceneId }`) `shared/components/src/storyboard/errors.ts`
+- [x] T021 Add `UnsupportedSchemaVersionError` (code `STORYBOARD_UNSUPPORTED_SCHEMA_VERSION`; details: `{ storyboardId, foundVersion: number, requiredMinimum: 2 }`) `shared/components/src/storyboard/errors.ts`
+- [x] T022 Update the public-exports list: drop `DuplicateTimestampError`; add the four new classes `shared/components/src/storyboard/index.ts`
+- [x] T023 [P][test] Add unit tests covering each new error's `code`, `message`, and `details` shape `shared/components/src/storyboard/__tests__/errors.test.ts`
 
 ## Phase 4: User Story 1 — Capture multiple viewports at the same instant (P1)
 
@@ -87,20 +87,20 @@
 
 ### Tests (write first — Article VII)
 
-- [ ] T024 [P][test] **AT-001** (FR-001): `createScene` succeeds when a Scene already exists at the same timestamp; returned Storyboard contains both Scenes; new Scene last in the tied group `shared/components/src/storyboard/__tests__/crud.test.ts`
-- [ ] T025 [P][test] **AT-004** (FR-004, FR-011): three sequential `createScene` calls at the same timestamp produce strictly-monotonic `creation_order` values; new Scene always appended to tied group `shared/components/src/storyboard/__tests__/crud.test.ts`
-- [ ] T026 [P][test] **AT-005** (FR-005): after `createScene`, returned Scene's `creation_order` is present, an integer, ≥ 0, on `properties.creation_order` (not a sidecar) `shared/components/src/storyboard/__tests__/crud.test.ts`
-- [ ] T027 [P][test] **AT-002** (FR-002): preserved-behaviour test — `createScene` at an *earlier* timestamp than the latest still behaves as today (whatever today does) `shared/components/src/storyboard/__tests__/crud.test.ts`
+- [x] T024 [P][test] **AT-001** (FR-001): `createScene` succeeds when a Scene already exists at the same timestamp; returned Storyboard contains both Scenes; new Scene last in the tied group `shared/components/src/storyboard/__tests__/crud.test.ts`
+- [x] T025 [P][test] **AT-004** (FR-004, FR-011): three sequential `createScene` calls at the same timestamp produce strictly-monotonic `creation_order` values; new Scene always appended to tied group `shared/components/src/storyboard/__tests__/crud.test.ts`
+- [x] T026 [P][test] **AT-005** (FR-005): after `createScene`, returned Scene's `creation_order` is present, an integer, ≥ 0, on `properties.creation_order` (not a sidecar) `shared/components/src/storyboard/__tests__/crud.test.ts`
+- [x] T027 [P][test] **AT-002** (FR-002): preserved-behaviour test — `createScene` at an *earlier* timestamp than the latest still behaves as today (whatever today does) `shared/components/src/storyboard/__tests__/crud.test.ts`
 
 ### Implementation
 
-- [ ] T028 Add private helper `nextCreationOrder(plot, storyboardId)` near the top of the CRUD module (max over existing Scenes' `creation_order` + 1; returns 0 for empty Storyboards) `shared/components/src/storyboard/crud.ts`
-- [ ] T029 Delete `findConflictingSceneTimestamp` and all five call-sites; remove the `DuplicateTimestampError` throws in: `createScene`, `updateScene`, `duplicateScene`, `copySceneToOtherStoryboard`, `restoreScene` `shared/components/src/storyboard/crud.ts`
-- [ ] T030 In `createScene`: assign `creation_order = nextCreationOrder(plot, storyboardId)` on the new SceneProperties before write `shared/components/src/storyboard/crud.ts`
-- [ ] T031 In `updateScene`: preserve the existing Scene's `creation_order` on update (do not touch unless an explicit reorder is requested — that lives in Phase 6) `shared/components/src/storyboard/crud.ts`
-- [ ] T032 In `duplicateScene`: assign a *new* `creation_order` to the duplicate via `nextCreationOrder` (do not copy the source's value — would violate FC-I4 within the same Storyboard) `shared/components/src/storyboard/crud.ts`
-- [ ] T033 In `copySceneToOtherStoryboard`: assign `creation_order = nextCreationOrder(plot, destinationStoryboardId)` (target Storyboard scope, not source) `shared/components/src/storyboard/crud.ts`
-- [ ] T034 In `restoreScene`: assign `creation_order = nextCreationOrder(plot, storyboardId)` (restored Scene is treated as a new append; original creation_order is not honoured to avoid mid-sequence collision with Scenes captured after the original deletion) `shared/components/src/storyboard/crud.ts`
+- [x] T028 Add private helper `nextCreationOrder(plot, storyboardId)` near the top of the CRUD module (max over existing Scenes' `creation_order` + 1; returns 0 for empty Storyboards) `shared/components/src/storyboard/crud.ts`
+- [x] T029 Delete `findConflictingSceneTimestamp` and all five call-sites; remove the `DuplicateTimestampError` throws in: `createScene`, `updateScene`, `duplicateScene`, `copySceneToOtherStoryboard`, `restoreScene` `shared/components/src/storyboard/crud.ts`
+- [x] T030 In `createScene`: assign `creation_order = nextCreationOrder(plot, storyboardId)` on the new SceneProperties before write `shared/components/src/storyboard/crud.ts`
+- [x] T031 In `updateScene`: preserve the existing Scene's `creation_order` on update (do not touch unless an explicit reorder is requested — that lives in Phase 6) `shared/components/src/storyboard/crud.ts`
+- [x] T032 In `duplicateScene`: assign a *new* `creation_order` to the duplicate via `nextCreationOrder` (do not copy the source's value — would violate FC-I4 within the same Storyboard) `shared/components/src/storyboard/crud.ts`
+- [x] T033 In `copySceneToOtherStoryboard`: assign `creation_order = nextCreationOrder(plot, destinationStoryboardId)` (target Storyboard scope, not source) `shared/components/src/storyboard/crud.ts`
+- [x] T034 In `restoreScene`: assign `creation_order = nextCreationOrder(plot, storyboardId)` (restored Scene is treated as a new append; original creation_order is not honoured to avoid mid-sequence collision with Scenes captured after the original deletion) `shared/components/src/storyboard/crud.ts`
 
 ## Phase 5: User Story 2 — Mixed timestamps remain time-ordered + legacy hard-fail (P1)
 
@@ -110,22 +110,22 @@
 
 ### Tests (write first)
 
-- [ ] T035 [P][test] **AT-003** (FR-003): `listScenesOrdered` returns Scenes ordered by `(timestamp, creation_order)` — two Scenes at same timestamp with `creation_order` 5 then 6 come back in that order `shared/components/src/storyboard/__tests__/ordering.test.ts`
-- [ ] T036 [P][test] **AT-006** (FR-006): `listScenesOrdered` produces identical output for two arbitrary permutations of the same Scene set (sort is deterministic) `shared/components/src/storyboard/__tests__/ordering.test.ts`
-- [ ] T037 [P][test] Mixed-tied scenario (Story 2 acceptance scenario 2): Scenes A@T0, B@T0, C@T1, D@T1, E@T2 in capture order; assert `listScenesOrdered` returns exactly A, B, C, D, E `shared/components/src/storyboard/__tests__/ordering.test.ts`
-- [ ] T038 [P][test] **AT-010** (FR-010): loading `storyboard-scene-missing-creation-order.json` fixture throws `MissingCreationOrderError`; error payload names the offending Storyboard ID and Scene ID `shared/components/src/storyboard/__tests__/validate.test.ts`
-- [ ] T039 [P][test] **AT-013** (FC-I4): loading `storyboard-scene-duplicate-creation-order.json` throws `DuplicateCreationOrderError` `shared/components/src/storyboard/__tests__/validate.test.ts`
-- [ ] T040 [P][test] **AT-015** (R-007 / FC-V1): a plot with `schema_version = 1` throws `UnsupportedSchemaVersionError` *before* the FC-I5 check has a chance to fire (ordering of validator passes) `shared/components/src/storyboard/__tests__/validate.test.ts`
+- [x] T035 [P][test] **AT-003** (FR-003): `listScenesOrdered` returns Scenes ordered by `(timestamp, creation_order)` — two Scenes at same timestamp with `creation_order` 5 then 6 come back in that order `shared/components/src/storyboard/__tests__/ordering.test.ts`
+- [x] T036 [P][test] **AT-006** (FR-006): `listScenesOrdered` produces identical output for two arbitrary permutations of the same Scene set (sort is deterministic) `shared/components/src/storyboard/__tests__/ordering.test.ts`
+- [x] T037 [P][test] Mixed-tied scenario (Story 2 acceptance scenario 2): Scenes A@T0, B@T0, C@T1, D@T1, E@T2 in capture order; assert `listScenesOrdered` returns exactly A, B, C, D, E `shared/components/src/storyboard/__tests__/ordering.test.ts`
+- [x] T038 [P][test] **AT-010** (FR-010): loading `storyboard-scene-missing-creation-order.json` fixture throws `MissingCreationOrderError`; error payload names the offending Storyboard ID and Scene ID `shared/components/src/storyboard/__tests__/validate.test.ts`
+- [x] T039 [P][test] **AT-013** (FC-I4): loading `storyboard-scene-duplicate-creation-order.json` throws `DuplicateCreationOrderError` `shared/components/src/storyboard/__tests__/validate.test.ts`
+- [x] T040 [P][test] **AT-015** (R-007 / FC-V1): a plot with `schema_version = 1` throws `UnsupportedSchemaVersionError` *before* the FC-I5 check has a chance to fire (ordering of validator passes) `shared/components/src/storyboard/__tests__/validate.test.ts`
 
 ### Implementation
 
-- [ ] T041 Extend the sort comparator from `(a.timestamp).localeCompare(b.timestamp)` to a tuple compare with `creation_order` as the secondary key; update the SC-I1 comment block at the top of the file to match the revised wording in `data-model.md` `shared/components/src/storyboard/ordering.ts`
-- [ ] T042 Drop the FC-I3 (duplicate-timestamp) check from the plot validator `shared/components/src/storyboard/validate.ts`
-- [ ] T043 Add FC-V1 entry check: for each Storyboard, assert `properties.schema_version >= 2`; throw `UnsupportedSchemaVersionError` on failure. Place this gate *first* so it fires before FC-I5 on pre-#259 plots `shared/components/src/storyboard/validate.ts`
-- [ ] T044 Add FC-I5 check: for every Scene, assert `typeof properties.creation_order === 'number'`; throw `MissingCreationOrderError(storyboardId, sceneId)` on the first offender `shared/components/src/storyboard/validate.ts`
-- [ ] T045 Add FC-I4 check: Map-based uniqueness on the key `${storyboard_id}|${creation_order}`; throw `DuplicateCreationOrderError` with both conflicting Scene IDs `shared/components/src/storyboard/validate.ts`
-- [ ] T046 Replace the inline `.sort((a, b) => a.timestamp.localeCompare(b.timestamp))` (~line 465) with a call to `listScenesOrdered(plot, storyboardId)` `apps/vscode/src/views/storyboardPanelView.ts`
-- [ ] T047 Replace the inline `.sort((a, b) => ...)` (~line 798) with a call to `listScenesOrdered(plot, storyboardId)` `apps/vscode/src/services/storyboardPlayback.ts`
+- [x] T041 Extend the sort comparator from `(a.timestamp).localeCompare(b.timestamp)` to a tuple compare with `creation_order` as the secondary key; update the SC-I1 comment block at the top of the file to match the revised wording in `data-model.md` `shared/components/src/storyboard/ordering.ts`
+- [x] T042 Drop the FC-I3 (duplicate-timestamp) check from the plot validator `shared/components/src/storyboard/validate.ts`
+- [x] T043 Add FC-V1 entry check: for each Storyboard, assert `properties.schema_version >= 2`; throw `UnsupportedSchemaVersionError` on failure. Place this gate *first* so it fires before FC-I5 on pre-#259 plots `shared/components/src/storyboard/validate.ts`
+- [x] T044 Add FC-I5 check: for every Scene, assert `typeof properties.creation_order === 'number'`; throw `MissingCreationOrderError(storyboardId, sceneId)` on the first offender `shared/components/src/storyboard/validate.ts`
+- [x] T045 Add FC-I4 check: Map-based uniqueness on the key `${storyboard_id}|${creation_order}`; throw `DuplicateCreationOrderError` with both conflicting Scene IDs `shared/components/src/storyboard/validate.ts`
+- [x] T046 Replace the inline `.sort((a, b) => a.timestamp.localeCompare(b.timestamp))` (~line 465) with a call to `listScenesOrdered(plot, storyboardId)` `apps/vscode/src/views/storyboardPanelView.ts`
+- [x] T047 Replace the inline `.sort((a, b) => ...)` (~line 798) with a call to `listScenesOrdered(plot, storyboardId)` `apps/vscode/src/services/storyboardPlayback.ts`
 
 ## Phase 6: User Story 3 — Reorder, delete, edit within a tied group (P2)
 
@@ -135,18 +135,18 @@
 
 ### Tests (write first)
 
-- [ ] T048 [P][test] **AT-007** (FR-007): `reorderSceneInTiedGroup(B, newPositionInGroup=2)` on tied group `[A (co=5), B (co=6), C (co=7)]` yields ordering `[A, C, B]` with re-sequenced `creation_order` `5, 6, 7` `shared/components/src/storyboard/__tests__/reorder.test.ts`
-- [ ] T049 [P][test] Reorder variant — move last to first: `reorderSceneInTiedGroup(C, newPositionInGroup=0)` on `[A, B, C]` yields `[C, A, B]` `shared/components/src/storyboard/__tests__/reorder.test.ts`
-- [ ] T050 [P][test] Reorder preserves Scenes outside the tied group: a tied group of three sits between two non-tied Scenes; reordering inside the group leaves the non-tied Scenes' `creation_order` untouched `shared/components/src/storyboard/__tests__/reorder.test.ts`
-- [ ] T051 [P][test] **AT-008** (FR-008): `deleteScene(B)` on tied group `[A (co=5), B (co=6), C (co=7)]` yields `[A, C]` with `creation_order` `5, 7` (gap allowed, no renumber) `shared/components/src/storyboard/__tests__/reorder.test.ts`
-- [ ] T052 [P][test] **AT-009** (FR-009): `updateScene(B, { viewport: newViewport })` leaves B's `creation_order` and position unchanged `shared/components/src/storyboard/__tests__/reorder.test.ts`
-- [ ] T053 [P][test] **AT-014** (defensive): `reorderSceneInTiedGroup(A, newPositionInGroup=99)` on a 3-Scene tied group throws `CreationOrderOutOfRangeError` with `providedIndex: 99` and `tiedGroupSize: 3` in the error details `shared/components/src/storyboard/__tests__/reorder.test.ts`
-- [ ] T054 [P][test] Reorder of a Scene whose timestamp is unique (tied group size 1): `newPositionInGroup=0` is a no-op; any other index throws `CreationOrderOutOfRangeError` `shared/components/src/storyboard/__tests__/reorder.test.ts`
+- [x] T048 [P][test] **AT-007** (FR-007): `reorderSceneInTiedGroup(B, newPositionInGroup=2)` on tied group `[A (co=5), B (co=6), C (co=7)]` yields ordering `[A, C, B]` with re-sequenced `creation_order` `5, 6, 7` `shared/components/src/storyboard/__tests__/reorder.test.ts`
+- [x] T049 [P][test] Reorder variant — move last to first: `reorderSceneInTiedGroup(C, newPositionInGroup=0)` on `[A, B, C]` yields `[C, A, B]` `shared/components/src/storyboard/__tests__/reorder.test.ts`
+- [x] T050 [P][test] Reorder preserves Scenes outside the tied group: a tied group of three sits between two non-tied Scenes; reordering inside the group leaves the non-tied Scenes' `creation_order` untouched `shared/components/src/storyboard/__tests__/reorder.test.ts`
+- [x] T051 [P][test] **AT-008** (FR-008): `deleteScene(B)` on tied group `[A (co=5), B (co=6), C (co=7)]` yields `[A, C]` with `creation_order` `5, 7` (gap allowed, no renumber) `shared/components/src/storyboard/__tests__/reorder.test.ts`
+- [x] T052 [P][test] **AT-009** (FR-009): `updateScene(B, { viewport: newViewport })` leaves B's `creation_order` and position unchanged `shared/components/src/storyboard/__tests__/reorder.test.ts`
+- [x] T053 [P][test] **AT-014** (defensive): `reorderSceneInTiedGroup(A, newPositionInGroup=99)` on a 3-Scene tied group throws `CreationOrderOutOfRangeError` with `providedIndex: 99` and `tiedGroupSize: 3` in the error details `shared/components/src/storyboard/__tests__/reorder.test.ts`
+- [x] T054 [P][test] Reorder of a Scene whose timestamp is unique (tied group size 1): `newPositionInGroup=0` is a no-op; any other index throws `CreationOrderOutOfRangeError` `shared/components/src/storyboard/__tests__/reorder.test.ts`
 
 ### Implementation
 
-- [ ] T055 Add new exported function `reorderSceneInTiedGroup(plot, { sceneId, newPositionInGroup }): { plot }` per the contract in `contracts/storyboard-crud.md` (locate target → compute tied group → bounds-check → re-sequence using `group_min_creation_order + i`) `shared/components/src/storyboard/crud.ts`
-- [ ] T056 Export `reorderSceneInTiedGroup` from the module index `shared/components/src/storyboard/index.ts`
+- [x] T055 Add new exported function `reorderSceneInTiedGroup(plot, { sceneId, newPositionInGroup }): { plot }` per the contract in `contracts/storyboard-crud.md` (locate target → compute tied group → bounds-check → re-sequence using `group_min_creation_order + i`) `shared/components/src/storyboard/crud.ts`
+- [x] T056 Export `reorderSceneInTiedGroup` from the module index `shared/components/src/storyboard/index.ts`
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
@@ -156,23 +156,23 @@
 
 ### E2E workflow (web-shell)
 
-- [ ] T057 [test] New Playwright workflow: open sample plot → freeze time controller → capture Scene → pan viewport → capture Scene → pan again → capture Scene → assert three rows present in the StoryboardPanel in capture order → write screenshot directly into `specs/259-relax-scene-time/evidence/screenshots/tied-timestamps.png` `apps/web-shell/playwright/tests/storyboard-tied-timestamps.spec.ts`
-- [ ] T058 [P] Add `StoryboardPanelPage` helper (or extend the existing analysis page object) with a `getSceneRows()` enumeration method `apps/web-shell/playwright/pages/storyboardPanelPage.ts`
-- [ ] T059 [test] Second Playwright workflow: attempt to load a fixture plot with `schema_version: 1` → assert the explicit load error dialogue surfaces with the `MissingCreationOrderError` / `UnsupportedSchemaVersionError` text → screenshot into `specs/259-relax-scene-time/evidence/screenshots/missing-creation-order-error.png` `apps/web-shell/playwright/tests/storyboard-legacy-rejection.spec.ts`
+- [x] T057 [test] New Playwright workflow: open sample plot → freeze time controller → capture Scene → pan viewport → capture Scene → pan again → capture Scene → assert three rows present in the StoryboardPanel in capture order → write screenshot directly into `specs/259-relax-scene-time/evidence/screenshots/tied-timestamps.png` `apps/web-shell/playwright/tests/storyboard-tied-timestamps.spec.ts`
+- [x] T058 [P] Add `StoryboardPanelPage` helper (or extend the existing analysis page object) with a `getSceneRows()` enumeration method `apps/web-shell/playwright/pages/storyboardPanelPage.ts`
+- [x] T059 [test] Second Playwright workflow: attempt to load a fixture plot with `schema_version: 1` → assert the explicit load error dialogue surfaces with the `MissingCreationOrderError` / `UnsupportedSchemaVersionError` text → screenshot into `specs/259-relax-scene-time/evidence/screenshots/missing-creation-order-error.png` `apps/web-shell/playwright/tests/storyboard-legacy-rejection.spec.ts`
 
 ### Full verification gate
 
-- [ ] T060 Run `task verify` from the repo root; confirm lint + typecheck + unit + Playwright all pass; resolve anything red before evidence capture
+- [x] T060 Run `task verify` from the repo root; confirm lint + typecheck + unit + Playwright all pass; resolve anything red before evidence capture
 
 ### Evidence Collection
 
-- [ ] T061 Capture test results using the template at `.specify/templates/evidence/test-summary-template.md` (YAML front matter with `feature: 259-relax-scene-time`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body summarises scenarios verified) `specs/259-relax-scene-time/evidence/test-summary.md`
-- [ ] T062 Write usage demonstration: short TypeScript walk-through showing `createScene` × 3 at one timestamp, `listScenesOrdered`, `reorderSceneInTiedGroup`, `deleteScene` with expected before/after states inline `specs/259-relax-scene-time/evidence/usage-example.md`
-- [ ] T063 [P] Confirm round-trip evidence file from Phase 1 (T009) is still accurate post-implementation; touch if needed `specs/259-relax-scene-time/evidence/round-trip-evidence.md`
+- [x] T061 Capture test results using the template at `.specify/templates/evidence/test-summary-template.md` (YAML front matter with `feature: 259-relax-scene-time`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body summarises scenarios verified) `specs/259-relax-scene-time/evidence/test-summary.md`
+- [x] T062 Write usage demonstration: short TypeScript walk-through showing `createScene` × 3 at one timestamp, `listScenesOrdered`, `reorderSceneInTiedGroup`, `deleteScene` with expected before/after states inline `specs/259-relax-scene-time/evidence/usage-example.md`
+- [x] T063 [P] Confirm round-trip evidence file from Phase 1 (T009) is still accurate post-implementation; touch if needed `specs/259-relax-scene-time/evidence/round-trip-evidence.md`
 
 ### Media Content
 
-- [ ] T064 Spawn the Content Specialist (`.claude/agents/media/content.md`) to write the Feature Post: title prefixed with `Building `, first three sections copied verbatim from `evidence/opening-context.md` (already cached), remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from the evidence collected in T061–T063 and the Playwright screenshots from T057, T059 `specs/259-relax-scene-time/media/shipped-post.md`
+- [x] T064 Spawn the Content Specialist (`.claude/agents/media/content.md`) to write the Feature Post: title prefixed with `Building `, first three sections copied verbatim from `evidence/opening-context.md` (already cached), remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from the evidence collected in T061–T063 and the Playwright screenshots from T057, T059 `specs/259-relax-scene-time/media/shipped-post.md`
 
 ### PR Creation
 

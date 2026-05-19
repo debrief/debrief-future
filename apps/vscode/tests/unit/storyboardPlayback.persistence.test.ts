@@ -46,7 +46,7 @@ function sb(
       kind: 'STORYBOARD',
       id,
       name,
-      schema_version: 1,
+      schema_version: 2,
       provenance: [
         {
           activity_id: `prov-${id}`,

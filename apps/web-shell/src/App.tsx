@@ -38,6 +38,8 @@ import {
   useIsMobile,
   MobileTabLayout,
   PropertiesForm,
+  validatePlot,
+  StoryboardError,
 } from '@debrief/components';
 import type {
   PropertiesFormField,
@@ -150,6 +152,11 @@ declare global {
     __openPlot?: (itemPath: string) => void;
     /** Exposed for Playwright backfill script (#174) */
     __backToCatalog?: () => void;
+    /** #259 — Playwright hook: forces a plot-load validation against an
+     *  arbitrary FeatureCollection so legacy-rejection screenshots can be
+     *  captured without smuggling a pre-#259 fixture through the bundled
+     *  catalog's pre-loaded cache. */
+    __triggerPlotValidation?: (fc: FeatureCollection) => void;
   }
 }
 window.__sessionStore = getSessionStore();
@@ -217,6 +224,13 @@ export default function App() {
   // View state (local — not part of session-state)
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
+  // #259 — plot-load validation error banner. Populated by handlePlotSelect
+  // when validatePlot throws (e.g. pre-#259 plot lacking creation_order or
+  // carrying schema_version < 2).
+  const [plotLoadError, setPlotLoadError] = useState<{
+    readonly code: string;
+    readonly message: string;
+  } | null>(null);
   // Stable ref for the writer-init effect's hydration retry path
   // (avoids re-running the init effect every time currentPlot changes).
   const currentPlotRef = useRef<PlotState | null>(null);
@@ -393,6 +407,27 @@ export default function App() {
     window.__currentPlotFeatures = plotFeatures as Feature[];
   }, [plotFeatures]);
 
+  // #259 — Playwright hook: run validatePlot against an arbitrary FC and
+  // drive the same banner state handlePlotSelect would on a real failure.
+  useEffect(() => {
+    window.__triggerPlotValidation = (fc) => {
+      try {
+        validatePlot({
+          type: 'FeatureCollection',
+          features: fc.features as Parameters<typeof validatePlot>[0]['features'],
+        });
+        setPlotLoadError(null);
+      } catch (err) {
+        if (err instanceof StoryboardError) {
+          setPlotLoadError({ code: err.code, message: err.message });
+        } else {
+          throw err;
+        }
+      }
+    };
+    return () => { delete window.__triggerPlotValidation; };
+  }, []);
+
   // Calculate time extent from features
   const timeExtent = useMemo<[number, number] | null>(() => {
     if (plotFeatures.length === 0) return null;
@@ -464,6 +499,23 @@ export default function App() {
     try {
       const plotData = await stacService.getPlotData(itemPath);
       const item = stacService.getItem(itemPath);
+
+      // #259 — validate the plot's Storyboards / Scenes before swapping
+      // in any state. Pre-#259 plots (schema_version < 2 or Scenes lacking
+      // creation_order) are rejected here per FR-010 — no silent coercion.
+      try {
+        validatePlot({
+          type: 'FeatureCollection',
+          features: plotData.features as Parameters<typeof validatePlot>[0]['features'],
+        });
+        setPlotLoadError(null);
+      } catch (err) {
+        if (err instanceof StoryboardError) {
+          setPlotLoadError({ code: err.code, message: err.message });
+          return;
+        }
+        throw err;
+      }
 
       // Reset session store for new plot
       resetSessionStore();
@@ -1671,6 +1723,25 @@ export default function App() {
 
     return (
       <div className="web-shell web-shell--welcome">
+        {plotLoadError !== null && (
+          <div
+            role="alert"
+            data-testid="plot-load-error-banner"
+            data-error-code={plotLoadError.code}
+            style={{
+              background: '#7f1d1d',
+              color: '#fee2e2',
+              padding: '12px 20px',
+              borderBottom: '2px solid #fca5a5',
+              fontFamily: 'system-ui, sans-serif',
+              fontSize: '14px',
+              lineHeight: '1.5',
+            }}
+          >
+            <strong>Plot could not be loaded</strong> ({plotLoadError.code}):{' '}
+            {plotLoadError.message}
+          </div>
+        )}
         <header className="web-shell__header">
           <h1 className="web-shell__title">Debrief Web Shell</h1>
           <p className="web-shell__subtitle">STAC Catalog Browser</p>

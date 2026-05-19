@@ -25,9 +25,7 @@ import { ulid } from 'ulid';
 import {
   createStoryboard,
   createScene,
-  deleteScene,
   getActiveStoryboardDefault,
-  DuplicateTimestampError,
   DuplicateStoryboardNameError,
   type StoryboardPlot,
   type SceneFeature,
@@ -44,7 +42,6 @@ import {
 } from '../services/webSceneThumbnailAdapter';
 import type {
   CapturePanelSurface,
-  CollisionBannerResolution,
   NamingRowResolution,
 } from '../services/webPanelHost';
 
@@ -234,62 +231,8 @@ function defaultStoryboardName(): string {
   return 'Storyboard';
 }
 
-function findExistingConflict(
-  fc: FeatureCollection,
-  inputs: CreateSceneInput,
-): string | null {
-  for (const f of fc.features) {
-    const props = f.properties as {
-      kind?: string;
-      storyboard_id?: string;
-      timestamp?: string;
-      id?: string;
-    } | null;
-    if (
-      props !== null &&
-      props.kind === 'STORYBOARD_SCENE' &&
-      props.storyboard_id === inputs.storyboardId &&
-      props.timestamp === inputs.timestamp
-    ) {
-      return typeof props.id === 'string' ? props.id : null;
-    }
-  }
-  return null;
-}
-
-function findExistingTitle(
-  fc: FeatureCollection,
-  inputs: CreateSceneInput,
-): string | null {
-  for (const f of fc.features) {
-    const props = f.properties as {
-      kind?: string;
-      storyboard_id?: string;
-      timestamp?: string;
-      title?: string;
-    } | null;
-    if (
-      props !== null &&
-      props.kind === 'STORYBOARD_SCENE' &&
-      props.storyboard_id === inputs.storyboardId &&
-      props.timestamp === inputs.timestamp
-    ) {
-      return typeof props.title === 'string' ? props.title : null;
-    }
-  }
-  return null;
-}
-
-function wouldOffsetExceedTimeRange(
-  sessionStore: SessionStoreApi,
-  proposedTimestamp: string,
-): boolean {
-  const state = sessionStore.getState();
-  const range = state.timeRange;
-  if (range === null) {return false;}
-  const proposedMs = new Date(proposedTimestamp).getTime();
-  return proposedMs + 1000 > range.end;
-}
+// #259 — findExistingConflict / findExistingTitle / wouldOffsetExceedTimeRange
+// were used by the now-deleted duplicate-timestamp banner flow.
 
 function stringifyError(err: unknown): string {
   if (err instanceof Error) {
@@ -487,144 +430,19 @@ async function captureSceneWebInner(
     now: deps.now(),
     idOverride: sceneId,
   };
-  const result = await tryCreateScene(
-    context,
-    deps,
-    plot,
-    sceneInput,
-    timestampIso,
-    0,
-  );
-  if (result.status === 'captured') {
-    sessionStore.getState().markDirty();
-  }
-  return result;
-}
-
-async function tryCreateScene(
-  context: CaptureSceneWebContext,
-  deps: ResolvedDeps,
-  plot: StoryboardPlot,
-  inputs: CreateSceneInput,
-  originalTimestamp: string,
-  retries: number,
-): Promise<CaptureResult> {
-  if (retries >= 5) {
-    deps.showError(
-      'Too many consecutive offset retries — pick a different moment in time.',
-    );
-    return { status: 'rejected', reason: 'duplicate-offset-limit-exceeded' };
-  }
+  // #259 — captures always succeed at the timestamp level; no banner flow.
   try {
-    const result = await createScene(plot, inputs);
+    const result = await createScene(plot, sceneInput);
     context.setFeatureCollection(plotToFeatureCollection(result.plot));
+    sessionStore.getState().markDirty();
     return { status: 'captured', scene: result.scene };
   } catch (err) {
-    if (err instanceof DuplicateTimestampError) {
-      return handleDuplicateTimestamp(
-        context,
-        deps,
-        plot,
-        inputs,
-        retries,
-        originalTimestamp,
-      );
-    }
     deps.logError(
       `[captureSceneWeb] createScene failed: ${stringifyError(err)}`,
     );
     deps.showError('Capture failed — unexpected error.');
     return { status: 'rejected', reason: 'unexpected', error: err };
   }
-}
-
-async function handleDuplicateTimestamp(
-  context: CaptureSceneWebContext,
-  deps: ResolvedDeps,
-  plot: StoryboardPlot,
-  inputs: CreateSceneInput,
-  retries: number,
-  originalTimestamp: string,
-): Promise<CaptureResult> {
-  const fc = plotToFeatureCollection(plot);
-  const conflict = findExistingConflict(fc, inputs);
-  const conflictTitle = findExistingTitle(fc, inputs) ?? 'Existing scene';
-  const offsetWouldExceedTimeRange = wouldOffsetExceedTimeRange(
-    context.sessionStore,
-    inputs.timestamp,
-  );
-  const reply: CollisionBannerResolution =
-    await context.panelView.promptCollisionResolution({
-      visible: true,
-      conflictingSceneId: conflict ?? '',
-      conflictingSceneTitle: conflictTitle,
-      originalTimestamp,
-      proposedTimestamp: inputs.timestamp,
-      offsetCount: retries,
-      offsetWouldExceedTimeRange,
-      cause: 'capture',
-    });
-  if (reply.kind === 'cancel') {
-    return { status: 'cancelled', reason: 'duplicate-prompt' };
-  }
-  if (reply.kind === 'replace') {
-    return performReplace(
-      context,
-      deps,
-      plot,
-      inputs,
-      conflict,
-      originalTimestamp,
-    );
-  }
-  // reply.kind === 'offset'
-  if (offsetWouldExceedTimeRange) {
-    return { status: 'cancelled', reason: 'duplicate-prompt' };
-  }
-  const offsetIso = new Date(
-    new Date(inputs.timestamp).getTime() + 1000,
-  ).toISOString();
-  return tryCreateScene(
-    context,
-    deps,
-    plot,
-    { ...inputs, timestamp: offsetIso },
-    originalTimestamp,
-    retries + 1,
-  );
-}
-
-async function performReplace(
-  context: CaptureSceneWebContext,
-  deps: ResolvedDeps,
-  plot: StoryboardPlot,
-  inputs: CreateSceneInput,
-  conflictSceneId: string | null,
-  originalTimestamp: string,
-): Promise<CaptureResult> {
-  if (conflictSceneId === null) {
-    deps.logError(
-      '[captureSceneWeb] Replace requested but conflict scene not located; retrying createScene',
-    );
-    return tryCreateScene(context, deps, plot, inputs, originalTimestamp, 0);
-  }
-  let nextPlot = plot;
-  try {
-    const afterDelete = await deleteScene(plot, {
-      sceneId: conflictSceneId,
-      actor: context.actor,
-      now: deps.now(),
-    });
-    nextPlot = afterDelete.plot;
-    context.setFeatureCollection(plotToFeatureCollection(nextPlot));
-  } catch (err) {
-    deps.logError(
-      `[captureSceneWeb] deleteScene (replace branch) failed: ${stringifyError(err)}`,
-    );
-    deps.showError('Capture failed — could not replace the conflicting scene.');
-    return { status: 'rejected', reason: 'unexpected', error: err };
-  }
-  return tryCreateScene(context, deps, nextPlot, inputs, originalTimestamp, 0);
 }
 
 // `DebriefFeature` is imported only to keep the boundary cast type-safe;

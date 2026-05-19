@@ -260,22 +260,8 @@ export const updateToCurrentHandler = (deps: HandlerDeps): CommandFn =>
         void vscode.window.showErrorMessage(
           messages.updateToCurrentThumbnailFailed(),
         );
-      } else if (result.kind === 'duplicate-timestamp-collision') {
-        const pick = await vscode.window.showInformationMessage(
-          messages.duplicateTimestampConflict(view.timestamp),
-          { modal: true },
-          'Offset (+1 s)',
-          'Cancel',
-        );
-        if (pick === 'Offset (+1 s)') {
-          await deps.service.updateSceneToCurrent({
-            documentUri: ctx.documentUri,
-            sceneId: ctx.sceneId,
-            currentView: { ...view, timestamp: result.suggestedOffsetTimestamp },
-            actor: ACTOR,
-          });
-        }
       }
+      // #259 — duplicate-timestamp-collision result is no longer produced.
     } catch (err) {
       void vscode.window.showErrorMessage(messages.unexpectedError(err));
     }
@@ -299,15 +285,13 @@ export const duplicateSceneHandler = (deps: HandlerDeps): CommandFn =>
       return;
     }
     try {
-      const result = await deps.service.duplicateScene({
+      await deps.service.duplicateScene({
         documentUri: ctx.documentUri,
         sceneId: ctx.sceneId,
         newTimestamp: input,
         actor: ACTOR,
       });
-      if (result.kind === 'duplicate-timestamp-collision') {
-        await handleTimestampCollision(deps, ctx, input, result.suggestedOffsetTimestamp);
-      }
+      // #259 — duplicate-timestamp-collision result is no longer produced.
     } catch (err) {
       void vscode.window.showErrorMessage(messages.unexpectedError(err));
     }
@@ -376,23 +360,8 @@ export const copyToOtherHandler = (deps: HandlerDeps): CommandFn =>
       });
       if (result.kind === 'deep-copy-failed') {
         void vscode.window.showErrorMessage(messages.deepCopyFailed());
-      } else if (result.kind === 'duplicate-timestamp-collision') {
-        const choice = await vscode.window.showInformationMessage(
-          messages.duplicateTimestampConflict(tsInput),
-          { modal: true },
-          'Offset (+1 s)',
-          'Cancel',
-        );
-        if (choice === 'Offset (+1 s)') {
-          await deps.service.copySceneToOtherStoryboard({
-            documentUri: ctx.documentUri,
-            sceneId: ctx.sceneId,
-            destinationStoryboardId: pick.id,
-            newTimestamp: result.suggestedOffsetTimestamp,
-            actor: ACTOR,
-          });
-        }
       }
+      // #259 — duplicate-timestamp-collision result is no longer produced.
     } catch (err) {
       void vscode.window.showErrorMessage(messages.unexpectedError(err));
     }
@@ -524,27 +493,8 @@ function isoValidator(value: string): string | null {
     : null;
 }
 
-async function handleTimestampCollision(
-  deps: HandlerDeps,
-  ctx: { documentUri: string; sceneId: string },
-  attempted: string,
-  suggestedOffsetTimestamp: string,
-): Promise<void> {
-  const pick = await vscode.window.showInformationMessage(
-    messages.duplicateTimestampConflict(attempted),
-    { modal: true },
-    'Offset (+1 s)',
-    'Cancel',
-  );
-  if (pick === 'Offset (+1 s)') {
-    await deps.service.duplicateScene({
-      documentUri: ctx.documentUri,
-      sceneId: ctx.sceneId,
-      newTimestamp: suggestedOffsetTimestamp,
-      actor: ACTOR,
-    });
-  }
-}
+// #259 — handleTimestampCollision was used by the duplicate-timestamp
+// conflict dialog; deleted along with the rest of that flow.
 
 // ── Registration ────────────────────────────────────────────────────
 

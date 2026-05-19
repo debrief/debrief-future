@@ -949,7 +949,7 @@ describe('flattenFeatures — storyboard grouping (#258)', () => {
         kind: 'STORYBOARD',
         id,
         name,
-        schema_version: 1,
+        schema_version: 2,
       },
     };
   }

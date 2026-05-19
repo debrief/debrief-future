@@ -190,50 +190,10 @@ test.describe('Storyboard rail — visual evidence (#235)', () => {
       });
     });
 
-    test(`collision-banner screenshot — ${theme}`, async ({ page }) => {
-      await loadAnalysisView(page);
-      await applyTheme(page, theme);
-      // First capture — creates a Storyboard + Scene at the current playhead.
-      await page.locator('[data-testid="capture-scene-button"]').click();
-      await expect(
-        page.locator('[data-testid="storyboard-naming-row"]'),
-      ).toBeVisible({ timeout: 5000 });
-      await page
-        .locator('[data-testid="storyboard-naming-row-input"]')
-        .fill('Exercise Alpha');
-      await page
-        .locator('[data-testid="storyboard-naming-row-confirm"]')
-        .click();
-      await expect(
-        page.locator('[data-testid="storyboard-naming-row"]'),
-      ).not.toBeVisible({ timeout: 5000 });
-      await page.waitForFunction(
-        () => {
-          const fc = window.__currentPlotFeatures ?? [];
-          return fc.some(
-            (f) =>
-              (f.properties as { kind?: string })?.kind === 'STORYBOARD_SCENE',
-          );
-        },
-        { timeout: 10000 },
-      );
-      // Second capture at the same playhead → collision banner.
-      await page.locator('[data-testid="capture-button"]').click();
-      await expect(
-        page.locator('[data-testid="storyboard-collision-banner"]'),
-      ).toBeVisible({ timeout: 5000 });
-      // Map + time controller still visible alongside the banner.
-      await expect(page.locator('.leaflet-container')).toBeVisible();
-      await expect(
-        page.locator('[data-testid="time-controller"]'),
-      ).toBeVisible();
-      await page.screenshot({
-        path: resolve(
-          EVIDENCE_DIR,
-          `web-shell-collision-banner-${theme}.png`,
-        ),
-        fullPage: false,
-      });
-    });
+    // #259 — the collision-banner screenshots (Replace / Offset / Cancel)
+    // were retired here when the underlying constraint was relaxed. Multiple
+    // Scenes may share a timestamp now; no banner ever surfaces. The post-
+    // #259 visual equivalent is the headline tied-timestamps screenshot
+    // captured by `storyboard-tied-timestamps.spec.ts`.
   }
 });

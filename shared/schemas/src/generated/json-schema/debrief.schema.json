@@ -2684,6 +2684,11 @@
           "$ref": "#/$defs/PolygonSourceEnum",
           "description": "Provenance of the scene's stored polygon geometry (Spec #258). 'bounds' = computed from real Leaflet map bounds at capture time; 'placeholder' = pre-#258 ~100m square; 'manual' = reserved for future user-drawn rectangles. Render-side consumers recompute the polygon from (viewport, map dimensions) when this value is anything other than 'bounds' (including absent, for legacy scenes). The stored geometry is NEVER rewritten on read (Article III.2 source preservation)."
         },
+        "creation_order": {
+          "description": "Per-Storyboard monotonic sequence value assigned by the platform at capture time. Acts as the secondary sort key for Scenes \u2014 when two Scenes share a `timestamp` the one with the lower `creation_order` comes first. Unique within a Storyboard; gaps are permitted (left by deletion). The platform \u2014 not the client \u2014 is the source of truth. Introduced by #259; absent on pre-#259 plots which are rejected at load (no migration shim \u2014 Article XIV pre-release freedom).",
+          "minimum": 0,
+          "type": "integer"
+        },
         "description": {
           "description": "Markdown per-scene narrative",
           "type": [
@@ -2747,7 +2752,7 @@
           ]
         },
         "timestamp": {
-          "description": "ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard). MUST be unique within a Storyboard.",
+          "description": "ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard) as the primary sort key. Multiple Scenes MAY share the same timestamp; ties are broken by `creation_order` ascending (see #259).",
           "format": "date-time",
           "type": "string"
         },
@@ -2779,6 +2784,7 @@
         "title",
         "viewport",
         "timestamp",
+        "creation_order",
         "visible_feature_ids",
         "feature_set_hash",
         "thumbnail_asset_ref",
@@ -3491,8 +3497,8 @@
           ]
         },
         "schema_version": {
-          "description": "Schema version. Starts at 1. Monotonically non-decreasing across edits; bumped only by migrations.",
-          "minimum": 1,
+          "description": "Schema version. Bumped to 2 by #259 (relax timestamp uniqueness + add `SceneProperties.creation_order`). Pre-#259 plots carrying `schema_version: 1` are rejected at load with `UnsupportedSchemaVersionError` \u2014 no in-place migration is provided (Article XIV pre-release freedom; FR-010 in #259 spec). Monotonically non-decreasing across edits; bumped only by migrations or breaking schema changes.",
+          "minimum": 2,
           "type": "integer"
         },
         "tags": {

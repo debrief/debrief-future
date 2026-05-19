@@ -45,7 +45,7 @@ function sb(
       kind: 'STORYBOARD',
       id,
       name,
-      schema_version: 1,
+      schema_version: 2,
       provenance: [
         {
           activity_id: `prov-${id}`,
@@ -60,6 +60,7 @@ function sb(
   } as unknown as StoryboardFeature;
 }
 
+let sceneCreationOrderCounter = 0;
 function scene(
   id: string,
   storyboardId: string,
@@ -85,7 +86,9 @@ function scene(
       feature_set_hash: 'deadbeef'.repeat(8),
       thumbnail_asset_ref: `scene-${id}.png`,
       transition_duration_ms: 500,
-      schema_version: 1,
+      // #259 — required creation_order; monotonic per test invocation is fine
+      // for these fixtures since each test builds isolated plots.
+      creation_order: sceneCreationOrderCounter++,
     },
   } as unknown as SceneFeature;
 }

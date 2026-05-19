@@ -28,6 +28,7 @@
     "feature_set_hash": "0000000000000000000000000000000000000000000000000000000000000000",
     "thumbnail_asset_ref": "scene-thumbnail-01HZ8K8K8K8K8K8K8K8K8K8K8K",
     "transition_duration_ms": 500,
+    "creation_order": 0,
     "display_mode": "trail",
     "_polygon_source": "bounds"
   }

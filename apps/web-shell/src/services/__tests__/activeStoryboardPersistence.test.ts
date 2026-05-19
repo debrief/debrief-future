@@ -50,7 +50,7 @@ function makeStoryboard(id: string, name: string): Feature {
       kind: 'STORYBOARD',
       id,
       name,
-      schema_version: 1,
+      schema_version: 2,
       tags: [],
       provenance: [
         {
