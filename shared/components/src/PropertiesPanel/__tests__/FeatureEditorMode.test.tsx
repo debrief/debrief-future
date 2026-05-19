@@ -266,4 +266,151 @@ describe('FeatureEditorMode (Spec 192, T026)', () => {
       screen.getByTestId('properties-mode-feature').getAttribute('aria-disabled'),
     ).toBe('true');
   });
+
+  // ─── Revert affordance (Spec 192, Phase 8, T061) ───────────────────
+  describe('revert affordance next to override slots (T061)', () => {
+    it('renders a revert button next to an override slot when an explicit value is set', () => {
+      // NELSON is in the inline platform-registry mirror (vessel_role = "frigate");
+      // overriding vessel_role to "destroyer" gives an auto-derived value (frigate)
+      // that differs — the button must render enabled with the registry tooltip.
+      const feature = buildTrack('track-1', {
+        platform_id: 'NELSON',
+        vessel_role: 'destroyer',
+      });
+      renderWithRealStaging(feature);
+      const btn = screen.getByTestId('revert-vessel_role') as HTMLButtonElement;
+      expect(btn).toBeDefined();
+      expect(btn.disabled).toBe(false);
+      expect(btn.getAttribute('title')).toMatch(/frigate/);
+    });
+
+    it('does NOT render a revert button for an override slot with no explicit value', () => {
+      const feature = buildTrack('track-1', {
+        platform_id: 'NELSON',
+        vessel_role: undefined,
+      });
+      renderWithRealStaging(feature);
+      expect(screen.queryByTestId('revert-vessel_role')).toBeNull();
+    });
+
+    it('renders a disabled revert button when the platform_id is unknown to the registry (FR-024)', () => {
+      // platform_id "UNKNOWN-XYZ" is absent from the inline mirror →
+      // resolvePlatform returns null → autoDerivedValue is null → row 3
+      // of the contract's state matrix: disabled + "no auto-derived value"
+      // tooltip.
+      const feature = buildTrack('track-1', {
+        platform_id: 'UNKNOWN-XYZ',
+        vessel_role: 'destroyer',
+      });
+      renderWithRealStaging(feature);
+      const btn = screen.getByTestId('revert-vessel_role') as HTMLButtonElement;
+      expect(btn.disabled).toBe(true);
+      expect(btn.getAttribute('title')).toMatch(/no auto-derived value/i);
+    });
+
+    it('clicking revert dispatches to useStagedEdits.revertField and flips the chip to auto-derived', () => {
+      const feature = buildTrack('track-1', {
+        platform_id: 'NELSON',
+        vessel_role: 'destroyer',
+      });
+      const hook = renderHook(() => useStagedEdits());
+
+      function Harness({ f }: { f: DebriefFeature }): React.ReactElement {
+        return (
+          <FeatureEditorMode
+            feature={f}
+            readOnly={false}
+            setFeatureField={hook.result.current.setFeatureField}
+            revertField={hook.result.current.revertField}
+            unrevertField={hook.result.current.unrevertField}
+          />
+        );
+      }
+      render(<Harness f={feature} />);
+
+      // Pre-click: the slot renders as override (chip visible)
+      const overrideRow = screen.getByTestId('properties-field-vessel_role');
+      expect(
+        overrideRow.querySelector('[data-testid="properties-chip-override"]'),
+      ).not.toBeNull();
+
+      fireEvent.click(screen.getByTestId('revert-vessel_role'));
+
+      // Post-click: the staging buffer carries the revert
+      expect(
+        hook.result.current.state.revertedFields['track-1']?.has('vessel_role'),
+      ).toBe(true);
+      // The chip flips off (derivation back to non-override per FR-024)
+      expect(
+        screen
+          .getByTestId('properties-field-vessel_role')
+          .querySelector('[data-testid="properties-chip-override"]'),
+      ).toBeNull();
+      // The button label becomes "Undo revert"
+      expect(screen.getByTestId('revert-vessel_role').textContent).toMatch(
+        /undo/i,
+      );
+    });
+
+    it('clicking undo revert re-stages the override (unrevertField)', () => {
+      const feature = buildTrack('track-1', {
+        platform_id: 'NELSON',
+        vessel_role: 'destroyer',
+      });
+      const hook = renderHook(() => useStagedEdits());
+
+      function Harness({ f }: { f: DebriefFeature }): React.ReactElement {
+        return (
+          <FeatureEditorMode
+            feature={f}
+            readOnly={false}
+            setFeatureField={hook.result.current.setFeatureField}
+            revertField={hook.result.current.revertField}
+            unrevertField={hook.result.current.unrevertField}
+          />
+        );
+      }
+      render(<Harness f={feature} />);
+
+      fireEvent.click(screen.getByTestId('revert-vessel_role'));
+      expect(
+        hook.result.current.state.revertedFields['track-1']?.has('vessel_role'),
+      ).toBe(true);
+
+      fireEvent.click(screen.getByTestId('revert-vessel_role'));
+      // After undo the slot is no longer in revertedFields
+      expect(
+        hook.result.current.state.revertedFields['track-1']?.has(
+          'vessel_role',
+        ) ?? false,
+      ).toBe(false);
+      // And the override chip is visible again
+      expect(
+        screen
+          .getByTestId('properties-field-vessel_role')
+          .querySelector('[data-testid="properties-chip-override"]'),
+      ).not.toBeNull();
+    });
+
+    it('respects a host-supplied resolveAutoDerivedValue override', () => {
+      const feature = buildTrack('track-1', {
+        platform_id: 'ANYTHING',
+        vessel_role: 'destroyer',
+      });
+      const customResolver = vi.fn().mockReturnValue('custom-role');
+      render(
+        <FeatureEditorMode
+          feature={feature}
+          readOnly={false}
+          setFeatureField={vi.fn()}
+          revertField={vi.fn()}
+          unrevertField={vi.fn()}
+          resolveAutoDerivedValue={customResolver}
+        />,
+      );
+      const btn = screen.getByTestId('revert-vessel_role');
+      expect(btn.getAttribute('title')).toMatch(/custom-role/);
+      expect(customResolver).toHaveBeenCalled();
+    });
+  });
 });

@@ -12,6 +12,8 @@ export { ArrayWidget } from './ArrayWidget';
 export { BboxWidget } from './BboxWidget';
 export { DateTimeWidget } from './DateTimeWidget';
 export { PlatformArrayWidget } from './PlatformArrayWidget';
+export { RevertControl } from './revertControl';
+export type { RevertControlProps, RevertControlSlot } from './revertControl';
 
 // Spec 192 — Phase 2: dispatcher + shells + banner + save-path glue.
 export { PropertiesPanelDispatch } from './PropertiesPanelDispatch';
