@@ -97,7 +97,7 @@
 ### ADR + en-GB messages
 
 - [ ] T025 [P] Append ADR: additive optional schema evolution under Article XIV + RAF lock-step interpolation primitive `docs/project_notes/decisions.md`
-- [ ] T026 [P] Add new en-GB strings for the range affordance, in-progress banner, cancel label, and `t_end <= t_start` error `apps/vscode/src/views/storyboardPanel/messages.ts`
+- [ ] T026 [P] Add new en-GB strings for the range affordance, in-progress banner, cancel label, and `t_end <= t_start` error `apps/vscode/src/types/storyboardPanelMessages.ts`
 
 **Parallel example for Phase 2**: T010 must complete before T011/T012/T013 (Pydantic generates first by convention); T014–T019 are independent file writes and run in parallel; T020/T021/T022 are independent test files and run in parallel after their fixtures and regenerated code land.
 
@@ -112,29 +112,29 @@
 - [ ] T027 [test] Capture command: arming the range toggle flips transport state and updates the capture button label `apps/vscode/src/commands/__tests__/captureScene.range.test.ts`
 - [ ] T028 [test] Capture command: step-1 records `t_start` + `viewport`, leaves Storyboard list unchanged, surfaces "range in progress" `apps/vscode/src/commands/__tests__/captureScene.range.test.ts`
 - [ ] T029 [test] Capture command: step-2 writes a single Scene with `time_range` and `viewport_end` set, list updates once, transport state resets `apps/vscode/src/commands/__tests__/captureScene.range.test.ts`
-- [ ] T030 [test] Capture command: cancel path between step-1 and step-2 writes nothing and clears in-progress state `apps/vscode/src/commands/__tests__/captureScene.range.test.ts`
+- [ ] T030 [test] Capture command: cancel path between step-1 and step-2 writes nothing and clears in-progress state; AND document-close (or active-Storyboard switch) mid-flow also resets transport.rangeInProgress to false `apps/vscode/src/commands/__tests__/captureScene.range.test.ts`
 - [ ] T031 [test] Capture command: `t_end <= t_start` is rejected at confirm time with a named error string from the en-GB messages module `apps/vscode/src/commands/__tests__/captureScene.range.test.ts`
 - [ ] T032 [test] CRUD createScene: accepts the `{ time_range, viewport_end }` pair, enforces XOR (FR-SCH-002), applies the existing `assertViewportBearingZero` to `viewport_end` too `shared/components/src/storyboard/__tests__/crud.flavour.test.ts`
 - [ ] T033 [test] CRUD updateScene: partial flavour edits are rejected (capture-and-replace pattern preserved per FR-SCO-002) `shared/components/src/storyboard/__tests__/crud.flavour.test.ts`
 - [ ] T034 [test] validate.ts: `flavourCheck()` accepts both valid flavours, rejects mixed flavour and reversed range `shared/components/src/storyboard/__tests__/validate.flavour.test.ts`
-- [ ] T035 [test] ordering.ts assertion: anchor key remains `timestamp` (= `t_start` by convention) for both flavours `shared/components/src/storyboard/__tests__/ordering.flavour.test.ts`
+- [ ] T035 [test] ordering.ts assertion: sort key is `(time_range?.start ?? timestamp, creation_order)`; instant-only Storyboards sort byte-equivalently to #259; mixed-flavour Storyboard sorts by `t_start` for time-range Scenes `shared/components/src/storyboard/__tests__/ordering.flavour.test.ts`
 
 ### Implementation
 
 - [ ] T036 Extend CRUD `createScene` signature to accept optional `{ time_range, viewport_end }`; enforce XOR; pass `viewport_end` through bearing-zero assertion `shared/components/src/storyboard/crud.ts`
 - [ ] T037 Extend `updateScene` to reject partial flavour edits (returns named error) `shared/components/src/storyboard/crud.ts`
 - [ ] T038 Add `flavourCheck()` in validate, called from `createScene` and `updateScene` paths `shared/components/src/storyboard/validate.ts`
-- [ ] T039 [P] Confirm `ordering.ts` keys off `timestamp` and document the `timestamp == t_start` convention with a single-line invariant comment `shared/components/src/storyboard/ordering.ts`
+- [ ] T039 [P] Change `ordering.ts` sort key from `(timestamp, creation_order)` to `(time_range?.start ?? timestamp, creation_order)` (review 2A — drops the R8 sort-anchor invariant; instant Scenes sort byte-equivalently to #259) `shared/components/src/storyboard/ordering.ts`
 - [ ] T040 Add `transport.rangeArmed` + `transport.rangeInProgress` state (transport-only, NOT in schema) `apps/vscode/src/services/transportState.ts`
 - [ ] T041 Wire the two-step state machine into `captureScene`: arm → step-1 (record `t_start`, `viewport`) → step-2 (record `t_end`, `viewport_end`, emit `createScene`) → cancel `apps/vscode/src/commands/captureScene.ts`
 - [ ] T042 Surface the `t_end <= t_start` rejection via the en-GB messages module and the panel banner `apps/vscode/src/commands/captureScene.ts`
 
-### UI affordance (StoryboardPanel)
+### UI affordance (StoryboardPanel — real path under `shared/components/src/panels/`)
 
-- [ ] T043 [P] Add the range toggle (`data-testid="storyboard-range-toggle"`, `aria-pressed`) `shared/components/src/StoryboardPanel/StoryboardPanel.tsx`
-- [ ] T044 [P] Add the "range in progress" banner (`data-testid="storyboard-range-banner"`, `aria-live="polite"`) with a Cancel control `shared/components/src/StoryboardPanel/StoryboardPanel.tsx`
-- [ ] T045 [P] Add the per-row range badge for time-range Scenes (`data-testid="storyboard-scene-row-{id}"`) `shared/components/src/StoryboardPanel/StoryboardPanel.tsx`
-- [ ] T046 [P] Extend Storybook stories with `rangeArmedAndInProgress` and `mixedFlavourPlayback` `shared/components/src/StoryboardPanel/__stories__/StoryboardPanel.stories.tsx`
+- [ ] T043 [P] Add the range toggle (`data-testid="storyboard-range-toggle"`, `aria-pressed`) `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
+- [ ] T044 [P] Add the "range in progress" banner (`data-testid="storyboard-range-banner"`, `aria-live="polite"`) with a Cancel control `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
+- [ ] T045 [P] Add the per-row range badge for time-range Scenes (`data-testid="storyboard-scene-row-{id}"`) `shared/components/src/panels/StoryboardPanel/SceneRow.tsx`
+- [ ] T046 [P] Extend Storybook stories with `rangeArmedAndInProgress` and `mixedFlavourPlayback` `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
 
 **Checkpoint**: At the end of Phase 3 a user can capture a time-range Scene and see it in the Storyboard list with the range badge. Playback still uses the v1 path (Phase 4 lights up the new playback engine).
 
@@ -146,25 +146,37 @@
 
 **Independent Test**: Open a Storyboard containing at least one time-range Scene whose `time_range` covers a window where tracks visibly move. Press Play. The map pans/zooms and the slider crawls in lock-step; at the end the slider rests at `t_end` and the viewport at `viewport_end`. Mixed flavours (some instant, some time-range) play correctly with no instant-Scene regression.
 
+### Engine relocation to shared layer (review 1B)
+
+- [ ] T047a Extract port interfaces (MapPanel, session, panelView, timeRangeView, modalPrompt, visibility) from the existing VS Code service into a host-agnostic shape `shared/components/src/storyboardPlayback/ports.ts`
+- [ ] T047b Relocate `StoryboardPlaybackService` from `apps/vscode/src/services/storyboardPlayback.ts` into the shared module; replace concrete deps with the port interfaces `shared/components/src/storyboardPlayback/storyboardPlaybackService.ts`
+- [ ] T047c Add the VS Code host adapter wiring `MapPanel` + `vscode.Event` + `sessionManager` into the shared engine `apps/vscode/src/services/storyboardPlaybackHost.ts`
+- [ ] T047d Add the web-shell host adapter wiring `react-leaflet` map + `webPanelHost` + web-shell sessionStore into the shared engine `apps/web-shell/src/services/storyboardPlaybackWebHost.ts`
+- [ ] T047e [test] Port-contract test: a stub VS Code adapter and a stub web-shell adapter both satisfy the same recorded port call log under a representative transition `shared/components/src/storyboardPlayback/__tests__/portContract.test.ts`
+
 ### Tests first (FR-PLAY-001..005)
 
-- [ ] T047 [test] `executeTransition` branches on flavour: instant path is unchanged (calls `flyToViewport` + snaps `currentTime`) `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
-- [ ] T048 [test] `executeTransition` time-range forward: at wall-clock fraction `f` the slider is at `t_start + f·(t_end−t_start)` and the viewport is at the linear blend `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
-- [ ] T049 [test] `executeTransition` time-range forward: at completion slider rests at `t_end` and viewport rests at `viewport_end` (no drift, no overshoot) `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
-- [ ] T050 [test] Mixed-flavour Storyboard plays end-to-end without flavour cross-contamination `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
-- [ ] T051 [test] Degenerate range (`t_end == t_start`): viewport tweens, slider stays put, no divide-by-zero `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
+- [ ] T047 [test] `executeTransition` branches on flavour: instant path is unchanged (calls `flyToViewport` + snaps `currentTime`) `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [ ] T048 [test] `executeTransition` time-range forward: at wall-clock fraction `f` the slider is at `t_start + f·(t_end−t_start)` and the viewport is at the linear blend `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [ ] T049 [test] `executeTransition` time-range forward: at completion slider rests at `t_end` and viewport rests at `viewport_end` (no drift, no overshoot) `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [ ] T050 [test] Mixed-flavour Storyboard plays end-to-end without flavour cross-contamination `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [ ] T051 [test] Degenerate range (`t_end == t_start`): viewport tweens, slider stays put, no divide-by-zero `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
 
 ### Implementation
 
-- [ ] T052 Introduce `TimeRangeTween` primitive: single RAF loop that on each frame computes `f = clamp01((now − t0) / duration)` and applies both `session.setCurrentTime(...)` and `MapPanel.setViewport(linearBlend(...))` `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T053 Branch `executeTransition` on `isTimeRangeScene(scene)`: time-range path uses `TimeRangeTween`, instant path stays on existing `flyToViewport` + snap `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T054 Linear-blend helper for `Viewport` (geographic bounds; no rotation/bearing per Article XV invariants), pure function with unit-test coverage `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T055 Wire `MapPanel.setViewport` (or equivalent) so that the same per-frame primitive used by `flyToViewport` is reusable for `TimeRangeTween` without breaking the existing tween `apps/vscode/src/views/mapPanel/MapPanel.tsx`
-- [ ] T056 Ensure the lock-step write order is `setCurrentTime` then `setViewport` on each RAF tick (so feature-visibility windows resolve before redraw) `apps/vscode/src/services/storyboardPlayback.ts`
+- [ ] T052 Introduce `TimeRangeTween` primitive in the shared engine: single RAF loop that on each frame computes `f = clamp01((now − t0) / duration)` and applies both `session.setCurrentTime(...)` and `mapPanel.flyToViewport(linearBlend(...), 0)` via the ports `shared/components/src/storyboardPlayback/timeRangeTween.ts`
+- [ ] T053 Branch `executeTransition` on `isTimeRangeScene(scene)`: time-range path uses `TimeRangeTween`, instant path stays on existing `flyToViewport` + snap `shared/components/src/storyboardPlayback/storyboardPlaybackService.ts`
+- [ ] T054 Linear-blend helper for `Viewport` (geographic bounds; no rotation/bearing per Article XV invariants), pure function with unit-test coverage `shared/components/src/storyboardPlayback/timeRangeTween.ts`
+- [ ] T055 Confirm the MapPanel port's `flyToViewport(viewport, 0)` is the documented snap path used per-frame; no concrete `MapPanel` edit needed if both adapters already honour `durationMs == 0` as snap (verify in T047e contract test) `shared/components/src/storyboardPlayback/ports.ts`
+- [ ] T056 Ensure the lock-step write order is `setCurrentTime` then `flyToViewport` on each RAF tick (so feature-visibility windows resolve before redraw) `shared/components/src/storyboardPlayback/timeRangeTween.ts`
+
+### Performance gate (review 4A)
+
+- [ ] T056a [test] Perf smoke: 60-frame tween with a realistic feature-visibility consumer + chart-cursor stub subscribed to session-state; assert mean per-frame work under 8 ms (half of 16 ms budget). Fails build if exceeded. `shared/components/src/storyboardPlayback/__tests__/timeRange.perf.test.ts`
 
 ### Visual sync verification (FR-PLAY-003)
 
-- [ ] T057 [test] On every RAF tick, all time-driven visuals (track positions, feature-visibility filter outputs, chart cursor positions) reflect the slider position with no greater lag than the existing instant-Scene path `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
+- [ ] T057 [test] On every RAF tick, all time-driven visuals (track positions, feature-visibility filter outputs, chart cursor positions) reflect the slider position with no greater lag than the existing instant-Scene path `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
 
 **Checkpoint**: At the end of Phase 4 captured time-range Scenes play back as synchronised scrubs. Reverse is still v1 behaviour (Phase 5 lights up reverse symmetry).
 
@@ -178,17 +190,21 @@
 
 ### Tests first (FR-PLAY-006, FR-PLAY-007)
 
-- [ ] T058 [test] Reverse `executeTransition` mid-scrub: at wall-clock fraction `f` slider is at `t_end − f·(t_end−t_start)`, viewport is the corresponding reverse blend `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
-- [ ] T059 [test] Reverse completion: slider rests exactly at `t_start`, viewport rests exactly at `viewport_start` `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
-- [ ] T060 [test] Forward+reverse symmetry: world state at forward `f` matches world state at reverse `1−f` (modulo direction) `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
-- [ ] T061 [test] Interruption coherence: grabbing the slider mid-scrub aborts the tween cleanly; slider, viewport, and time-driven visuals all settle on one coherent moment within `[t_start, t_end]` `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
-- [ ] T062 [test] Selecting a different Scene mid-scrub aborts the tween and routes the new transition without forcing completion `apps/vscode/src/services/__tests__/storyboardPlayback.timeRange.test.ts`
+- [ ] T058 [test] Reverse `executeTransition` mid-scrub: at wall-clock fraction `f` slider is at `t_end − f·(t_end−t_start)`, viewport is the corresponding reverse blend `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [ ] T059 [test] Reverse completion: slider rests exactly at `t_start`, viewport rests exactly at `viewport_start` `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [ ] T060 [test] Forward+reverse symmetry: world state at forward `f` matches world state at reverse `1−f` (modulo direction) `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [ ] T061 [test] Interruption coherence: grabbing the slider mid-scrub aborts the tween cleanly; slider, viewport, and time-driven visuals all settle on one coherent moment within `[t_start, t_end]` `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [ ] T062 [test] Selecting a different Scene mid-scrub aborts the tween and routes the new transition without forcing completion `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
 
 ### Implementation
 
-- [ ] T063 Extend `TimeRangeTween` to accept a direction flag (`forward | reverse`) and apply the symmetric blend formula `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T064 Wire the reverse-playback entry path (the transport's reverse button / API) through the same `executeTransition` branch so reverse uses `TimeRangeTween` with `direction = 'reverse'` `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T065 Abort-on-interrupt: expose a `cancel()` on the active tween, called by transport state changes (pause/stop/scene-change/manual-scrub) `apps/vscode/src/services/storyboardPlayback.ts`
+- [ ] T063 Extend `TimeRangeTween` to accept a direction flag (`forward | reverse`) and apply the symmetric blend formula `shared/components/src/storyboardPlayback/timeRangeTween.ts`
+- [ ] T064 Wire the reverse-playback entry path (the transport's reverse button / API) through the same `executeTransition` branch so reverse uses `TimeRangeTween` with `direction = 'reverse'` `shared/components/src/storyboardPlayback/storyboardPlaybackService.ts`
+- [ ] T065 Abort-on-interrupt: expose a `cancel()` on the active tween, called by transport state changes (pause/stop/scene-change/manual-scrub) `shared/components/src/storyboardPlayback/timeRangeTween.ts`
+
+### Interrupt-coherence subscriber test (review 3C)
+
+- [ ] T065a [test] Construct a fake session-state subscriber that records every `(currentTime, viewport)` pair it sees; run `TimeRangeTween` to mid-scrub, fire abort, assert the subscriber's last-seen pair matches the engine's last written frame exactly (no torn write, no out-of-order pair) `shared/components/src/storyboardPlayback/__tests__/interruptCoherence.test.ts`
 
 **Checkpoint**: At the end of Phase 5 forward and reverse playback both work through time-range Scenes; interruptions leave a coherent world state.
 
@@ -202,7 +218,7 @@
 
 - [ ] T066 [test] Loading a pre-#263 plot fixture with all instant Scenes parses cleanly under the new schema (no prompts, no transforms) `shared/components/src/storyboard/__tests__/backcompat.test.ts`
 - [ ] T067 [test] Round-trip an all-instant Storyboard through save → load → save and assert byte-equivalence `shared/components/src/storyboard/__tests__/backcompat.test.ts`
-- [ ] T068 [test] Playback of an all-instant Storyboard exercises ONLY the instant `executeTransition` branch (asserted via spy on `TimeRangeTween` — must never be constructed) `apps/vscode/src/services/__tests__/storyboardPlayback.backcompat.test.ts`
+- [ ] T068 [test] Playback of an all-instant Storyboard exercises ONLY the instant `executeTransition` branch (asserted via spy on `TimeRangeTween` — must never be constructed) `shared/components/src/storyboardPlayback/__tests__/backcompat.test.ts`
 - [ ] T069 [test] A v1 plot opened on a build with the new schema can have a new time-range Scene appended without corrupting any of the existing instant Scenes (FR-SCH-006 / SC-004 — mixed survivability) `shared/components/src/storyboard/__tests__/backcompat.test.ts`
 
 ### Implementation / verification
@@ -224,7 +240,8 @@
 
 ### Web-shell E2E (workflow test)
 
-- [ ] T075 [test] Web-shell Playwright workflow: open plot → arm range → capture start → scrub → reframe → confirm → play forward → play reverse; capture screenshots + interaction GIF directly into the evidence directory `apps/web-shell/playwright/tests/storyboard-range-scene.spec.ts`
+- [ ] T075 [test] Web-shell Playwright workflow: open plot → arm range → capture start → scrub → reframe → confirm → play forward → play reverse; capture screenshots + interaction GIF directly into the evidence directory. Web-shell exercises the same shared engine as VS Code via `storyboardPlaybackWebHost` (review 1B). `apps/web-shell/playwright/tests/storyboard-range-scene.spec.ts`
+- [ ] T075a [test] Interrupt visual-continuity (review 3C E2E half): inside the workflow spec, mid-scrub fire an interrupt (drag the slider); take a screenshot; manually scrub to that exact instant on a fresh load; assert pixel-level continuity between the two frames `apps/web-shell/playwright/tests/storyboard-range-scene.spec.ts`
 - [ ] T076 Run `cd apps/web-shell && node run-playwright.mjs storyboard-range-scene` and confirm screenshots + GIF land at `specs/263-time-range-scenes/evidence/screenshots/` `specs/263-time-range-scenes/evidence/screenshots/`
 
 ### Evidence Collection
@@ -271,21 +288,22 @@ Phase 2 (Schema Foundation — BLOCKS everything below)
 **Story-level dependencies**:
 
 - **US1 (Capture)** depends only on Phase 2. Delivers the new Scene shape end-to-end; playback still uses the v1 path until US2 ships.
-- **US2 (Forward Playback)** depends on Phase 2; US1 makes it demonstrable in the UI but US2's `executeTransition` branch can be tested against hand-crafted fixtures.
-- **US3 (Reverse Playback)** depends on Phase 4 (`TimeRangeTween` primitive exists).
-- **US4 (Back-compat)** depends on Phase 2 only and runs in parallel with US1 & US2 (it is a pure regression-protection phase).
+- **US2 (Forward Playback)** depends on Phase 2 + the Phase 4 engine relocation prelude (T047a–T047e, review 1B); only then can the new branch land in the shared engine and reach both hosts.
+- **US3 (Reverse Playback)** depends on Phase 4 (`TimeRangeTween` primitive exists in the shared engine).
+- **US4 (Back-compat)** depends on Phase 2 + engine relocation (so the back-compat spy tests reference the shared module path) and runs in parallel with US2 & US3 after the relocation lands.
 - **Phase 7 (Polish + PR)** depends on every prior phase completing — evidence collection requires the feature working end-to-end.
 
 **Task-level critical path** within phases is documented inside each phase's "Parallel example" line.
 
 ## Implementation Strategy
 
-**Atomic commits** (per plan.md):
+**Atomic commits** (per plan.md, revised at review 1B):
 
-1. **Schema + regen + adherence tests** — Phase 2 (T006–T026). One commit; CI gates that the regenerated artefacts match LinkML before any code consumes them.
+1. **Schema + regen + adherence tests** — Phase 2 (T006–T026). One commit; CI gates that the regenerated artefacts match LinkML before any code consumes them. Note: `ordering.ts` sort key changes here (T039 — review 2A) and the R8 invariant + fixture + error code are NOT added.
 2. **CRUD / validate / ordering + StoryboardPanel UI affordance** — Phase 3 (T027–T046). One commit; capture flow lands in isolation behind the new toggle.
-3. **Playback engine (forward + reverse + abort)** — Phases 4 + 5 (T047–T065). One commit; the `TimeRangeTween` primitive is born complete with both directions and interruption coherence so it never half-ships.
-4. **Capture command wiring + Playwright workflow + evidence + media + PR** — Phases 3 (T040–T042 if not already committed with step 2), 6, and 7. One commit; ship.
+3. **Engine relocation to `@debrief/components` + port adapters + contract test** — Phase 4 prelude (T047a–T047e). One commit; this is the pure mechanical refactor that unblocks step 4. The VS Code adapter and web-shell adapter both compile and pass the port-contract test against the unchanged v1 playback path before any flavour-branching lands.
+4. **Playback engine (forward + reverse + abort + perf gate + interrupt coherence)** — Phases 4 (T047–T056a) + 5 (T058–T065a). One commit; the `TimeRangeTween` primitive is born complete with both directions, interruption coherence, and the perf smoke gate so it never half-ships.
+5. **Capture command wiring + Playwright workflow + evidence + media + PR** — Phases 3 (T040–T042 if not already committed with step 2), 6, and 7. One commit; ship.
 
 **Independent demonstrability**:
 
@@ -297,4 +315,4 @@ Phase 2 (Schema Foundation — BLOCKS everything below)
 
 **Why this order**: the schema is the contract every other layer reads; landing it first means downstream tests can use generated types from the first task they're written against. Capture before playback means the playback engine has real data to feed it; back-compat last (but in parallel) means the regression net catches anything the new path inadvertently broke.
 
-**Format validation**: Every task above follows the strict checklist format — `- [ ] T### [optional-labels] Description \`path\``. IDs are 3-digit (T001..T083). Test tasks are tagged `[test]`; parallel-safe tasks tagged `[P]`. All file paths are project-relative.
+**Format validation**: Every task above follows the strict checklist format — `- [ ] T### [optional-labels] Description \`path\``. IDs are 3-digit (T001..T083) with `Txxxa..e` suffixes used for tasks inserted at review time (1B engine relocation, 3C interrupt coherence, 4A perf gate) so the original numbering survives. Test tasks are tagged `[test]`; parallel-safe tasks tagged `[P]`. All file paths are project-relative.

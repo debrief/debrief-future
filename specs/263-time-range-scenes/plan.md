@@ -95,19 +95,32 @@ shared/components/src/storyboard/
     ├── validate.flavour.test.ts     # NEW
     └── types.flavour.test.ts        # NEW — predicate narrowing
 
-apps/vscode/src/services/
-├── storyboardPlayback.ts            # Branch executeTransition on flavour; introduce TimeRangeTween primitive (RAF loop driving currentTime + flyToViewport in lock-step); symmetric reverse; abort-on-interrupt
+shared/components/src/storyboardPlayback/   # NEW (review 1B) — engine relocated from apps/vscode/src/services/
+├── index.ts                         # NEW — public surface (StoryboardPlaybackService factory + port interfaces)
+├── ports.ts                         # NEW — MapPanel, session, panelView, timeRangeView, modalPrompt, visibility port interfaces (Article XV — explicit shapes, no `any`)
+├── storyboardPlaybackService.ts     # MOVED — formerly apps/vscode/src/services/storyboardPlayback.ts; now host-agnostic, takes ports
+├── timeRangeTween.ts                # NEW — RAF loop primitive (lock-step currentTime + flyToViewport(.., 0); forward/reverse via p-reversal; abort flag)
 └── __tests__/
-    └── storyboardPlayback.timeRange.test.ts   # NEW — covers forward, reverse, abort, interruption coherence
+    ├── timeRange.test.ts            # NEW — forward, reverse, abort, interruption coherence
+    ├── interruptCoherence.test.ts   # NEW (review 3C) — fake subscriber sees no torn (currentTime, viewport) pair after abort
+    ├── timeRange.perf.test.ts       # NEW (review 4A) — 60-frame tween with realistic subscribers under 8 ms mean per-frame
+    └── portContract.test.ts         # NEW (review 1B) — VS Code adapter + web-shell adapter both satisfy the recorded port call log
+
+apps/vscode/src/services/storyboardPlaybackHost.ts   # NEW — thin wrapper wiring the shared engine into VS Code's MapPanel + vscode.Event adapters
+apps/web-shell/src/services/storyboardPlaybackWebHost.ts   # NEW (review 1B) — wires the shared engine into the web-shell react-leaflet + webPanelHost adapters
 
 apps/vscode/src/commands/
 ├── captureScene.ts                  # Branch on transport.rangeArmed; two-step state machine; cancel path; emit createScene input with time_range + viewport_end on confirm
 └── __tests__/
-    └── captureScene.range.test.ts   # NEW — armed-toggle, step-1, step-2 confirm, cancel, reject t_end<=t_start
+    └── captureScene.range.test.ts   # NEW — armed-toggle, step-1, step-2 confirm, cancel, reject t_end<=t_start, document-close mid-flow resets state
 
-apps/vscode/src/views/storyboardPanel/   # Or current location of the Storyboard panel React tree (confirm at Phase 1)
+shared/components/src/panels/StoryboardPanel/   # Real location (corrected from earlier draft); StoryboardPanel + TransportRow + 1041-LOC test already live here
 ├── StoryboardPanel.tsx              # Add range toggle + in-progress banner + range badge on Scene list rows
-└── messages.ts                      # New en-GB strings for the affordance
+├── StoryboardPanel.stories.tsx      # Extend with rangeArmed + rangeInProgress + mixed-flavour stories
+└── __tests__/
+    └── StoryboardPanel.test.tsx     # Extend with range affordance + banner + badge assertions
+
+apps/vscode/src/types/storyboardPanelMessages.ts   # Real path (corrected) — extend the host↔webview discriminated union with range-start / range-confirm / range-cancel messages + en-GB strings for the affordance, banner, cancel label, and t_end<=t_start error
 
 apps/web-shell/playwright/tests/
 └── storyboard-range-scene.spec.ts   # NEW — full workflow: arm range → capture start → scrub → reframe → confirm → play forward → play reverse; screenshots into specs/263-time-range-scenes/evidence/screenshots/
@@ -121,7 +134,14 @@ shared/components/src/StoryboardPanel/__stories__/
 docs/project_notes/decisions.md      # Append ADR — additive schema evolution + RAF lock-step interpolation primitive
 ```
 
-**Structure Decision**: Schema-first additive evolution. The single LinkML cluster `storyboard.yaml` gains a `TimeRange` class and a `viewport_end` slot; everything else is downstream regen + branching. Code-side work concentrates in three places (CRUD validation, playback engine, capture command) with a single shared discriminated-union predicate exported from `shared/components/src/storyboard/types.ts`. No new module, no new service, no new app.
+**Structure Decision**: Schema-first additive evolution. The single LinkML cluster `storyboard.yaml` gains a `TimeRange` class and a `viewport_end` slot; everything else is downstream regen + branching. Code-side work concentrates in three places (CRUD validation, playback engine, capture command) with a single shared discriminated-union predicate exported from `shared/components/src/storyboard/types.ts`.
+
+**One new module** (review 1B, 2026-05-19): `shared/components/src/storyboardPlayback/` houses the relocated engine + `TimeRangeTween` + port interfaces. VS Code and the web-shell each gain a small host adapter (`storyboardPlaybackHost.ts` / `storyboardPlaybackWebHost.ts`) wiring the shared engine into their respective surfaces. This relocation was deferred to #264 in the original draft; review found the web-shell has no playback engine today, so it has to land in #263 to give the Phase 7 Playwright workflow somewhere to run.
+
+**Three path discrepancies vs the earlier draft, corrected at review (2026-05-19)**:
+- `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx` is the real location (the earlier draft pointed at `apps/vscode/src/views/storyboardPanel/`).
+- `apps/vscode/src/types/storyboardPanelMessages.ts` is the real messages path (the earlier draft pointed at `apps/vscode/src/views/storyboardPanel/messages.ts`).
+- `executeTransition`'s `direction` is computed inside the engine from `state.currentSceneIndex` vs `targetIndex` (the earlier draft implied a new parameter).
 
 ## Media Components
 
