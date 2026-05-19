@@ -1,1 +1,16 @@
-{}
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "//": "Block PR creation when the active feature spec has committed to screenshots that aren't on disk. See docs/project_notes/bugs.md → 'feature posts shipped without screenshots'. Override: SPECIFY_SKIP_SCREENSHOT_AUDIT=1.",
+        "matcher": "mcp__github__create_pull_request|mcp__github__update_pull_request",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".specify/scripts/bash/audit-evidence-screenshots.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
