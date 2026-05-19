@@ -83,6 +83,19 @@ export type ActivityPanelMessage =
   | { type: 'layer:toggleVisibility'; payload: { featureIds: string[] } }
   | { type: 'layer:delete'; payload: { featureIds: string[] } }
   | { type: 'layer:select'; payload: { featureIds: string[] } }
+  | {
+      /**
+       * Structured click-event payload (mirrors `SelectionClickEvent`),
+       * emitted alongside `layer:select` whenever a user clicks a row
+       * in the Layers panel via plain/modifier click (#192 Phase 5).
+       * Hosts that need to recompute `selection.primary` deterministic-
+       * ally — e.g. via `applyClickToSelection` — listen for this
+       * variant; hosts that only care about the resulting feature-id
+       * set can continue to use `layer:select`.
+       */
+      type: 'layer:selectEvent';
+      payload: { target: string; modifier: boolean; shift: boolean };
+    }
   | { type: 'layer:format'; payload: { featureIds: string[]; property: string; value: string | number | boolean; isPointOverride?: boolean; positionIndex?: number; childType?: string } }
   | { type: 'file:action'; payload: { file: AssociatedFile; action: 'open' | 'openWith' | 'reveal' | 'delete' } }
   | PropertiesCommitMessage;

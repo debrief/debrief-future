@@ -40,10 +40,12 @@ import {
   PropertiesForm,
   validatePlot,
   StoryboardError,
+  applyClickToSelection,
 } from '@debrief/components';
 import type {
   PropertiesFormField,
   PropertiesFormProps,
+  SelectionClickEvent,
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance, AssociatedFile } from '@debrief/components';
 import type {
@@ -938,20 +940,21 @@ export default function App() {
     []
   );
 
-  // Handle map feature selection (goes through session-state)
-  const handleMapSelect = useCallback((featureId: string, event: React.MouseEvent) => {
+  // Handle map feature selection (goes through session-state).
+  //
+  // #192 Phase 5: routes the new `SelectionClickEvent` through the shared
+  // `applyClickToSelection` helper so the map and the Layers panel
+  // produce identical selection sets for identical sequences.
+  const handleMapSelect = useCallback((event: SelectionClickEvent) => {
     const s = store.getState();
-    if (event.ctrlKey || event.metaKey) {
-      // Toggle: add or remove
-      const current = s.selection.featureIds;
-      if (current.includes(featureId)) {
-        s.removeFromSelection([featureId]);
-      } else {
-        s.addToSelection([featureId]);
-      }
-    } else {
-      s.setSelection([featureId], featureId);
-    }
+    const next = applyClickToSelection({
+      current: {
+        featureIds: s.selection.featureIds,
+        primary: s.selection.primary ?? null,
+      },
+      event,
+    });
+    s.setSelection(next.featureIds, next.primary ?? undefined);
   }, [store]);
 
   // Handle background click (clear selection via session-state)
@@ -1292,6 +1295,23 @@ export default function App() {
       case 'layer:select':
         store.getState().setSelection(message.payload.featureIds);
         break;
+      case 'layer:selectEvent': {
+        // #192 Phase 5: emitted right after `layer:select` by FeatureList
+        // for plain/modifier clicks. Re-route through the shared
+        // `applyClickToSelection` helper so `selection.primary` follows
+        // the modifier-aware "most recent action" rule, matching the
+        // map-click path.
+        const s = store.getState();
+        const next = applyClickToSelection({
+          current: {
+            featureIds: s.selection.featureIds,
+            primary: s.selection.primary ?? null,
+          },
+          event: message.payload,
+        });
+        s.setSelection(next.featureIds, next.primary ?? undefined);
+        break;
+      }
       case 'layer:toggleVisibility': {
         const targetIds = new Set(message.payload.featureIds);
 

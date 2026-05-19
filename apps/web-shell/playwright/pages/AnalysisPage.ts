@@ -265,6 +265,125 @@ export class AnalysisPage {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Multi-feature selection helpers (#192 Phase 5)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Detect the platform modifier key from `navigator.platform` inside the
+   * page. macOS → `Meta`, everything else → `Control`. Tests that mock
+   * `navigator.platform` via `addInitScript` will see the mocked value.
+   *
+   * Returns the Playwright `KeyboardModifier` string accepted by `click`.
+   */
+  async getPlatformModifierName(): Promise<'Meta' | 'Control'> {
+    const isMac = await this.page.evaluate(() => {
+      const platform = navigator.platform ?? '';
+      return /Mac|iP(hone|od|ad)/.test(platform);
+    });
+    return isMac ? 'Meta' : 'Control';
+  }
+
+  /**
+   * Click a single feature, either on the map or in the Layers panel.
+   *
+   * - `source: 'layers'` clicks the FeatureList row whose
+   *   `data-testid="feature-row-<id>"` matches.
+   * - `source: 'map'` clicks the Leaflet SVG path/marker overlay. Leaflet
+   *   does NOT expose feature ids on the rendered DOM, so the page-object
+   *   looks the feature up by index via `__sessionStore.featureCollection`
+   *   and clicks the matching `.leaflet-interactive` element by index.
+   *
+   * Both routes converge on the shared `applyClickToSelection` glue
+   * (#192 Phase 5); the resulting `selection.featureIds` transition is
+   * identical between sources.
+   *
+   * @param id  Feature ID
+   * @param options.modifier  If true, hold the platform modifier (Cmd on
+   *                          Mac / Ctrl elsewhere) during the click.
+   * @param options.source    `'map'` or `'layers'` — defaults to `'map'`.
+   */
+  async selectFeature(
+    id: string,
+    options: { modifier?: boolean; source?: 'map' | 'layers' } = {},
+  ): Promise<void> {
+    const source = options.source ?? 'map';
+    const modifiers = options.modifier
+      ? ([await this.getPlatformModifierName()] as Array<'Meta' | 'Control'>)
+      : ([] as Array<'Meta' | 'Control'>);
+    const clickOpts = modifiers.length > 0 ? { modifiers } : {};
+
+    if (source === 'map') {
+      const featureIndex = await this.page.evaluate((target) => {
+        // window.__currentPlotFeatures is exposed by the web-shell for
+        // test introspection; the Leaflet GeoJSON overlay renders
+        // `.leaflet-interactive` in the same array order.
+        const features =
+          (
+            window as unknown as {
+              __currentPlotFeatures?: Array<{ id?: string | number }>;
+            }
+          ).__currentPlotFeatures ?? [];
+        return features.findIndex((f) => String(f.id) === target);
+      }, id);
+      if (featureIndex < 0) {
+        throw new Error(`selectFeature: feature id "${id}" not in __currentPlotFeatures`);
+      }
+      // `force` is sometimes needed when an overlay sits on top of an SVG path.
+      await this.mapFeatures.nth(featureIndex).click({ ...clickOpts, force: true });
+      return;
+    }
+
+    // Layers-panel row
+    const row = this.page.getByTestId(`feature-row-${id}`);
+    await row.locator('.debrief-feature-row__content').click(clickOpts);
+  }
+
+  /**
+   * Select multiple features in click order. The first click is plain;
+   * every subsequent click holds the platform modifier (so the resulting
+   * `selection.featureIds` is `[id0, id1, ..., idN]`).
+   *
+   * @param ids       Feature IDs in click order.
+   * @param options.source  `'map'` or `'layers'`.
+   */
+  async selectFeatures(
+    ids: ReadonlyArray<string>,
+    options: { source?: 'map' | 'layers' } = {},
+  ): Promise<void> {
+    const source = options.source ?? 'map';
+    for (let i = 0; i < ids.length; i++) {
+      // eslint-disable-next-line no-await-in-loop -- clicks must be sequential
+      await this.selectFeature(ids[i]!, { modifier: i > 0, source });
+    }
+  }
+
+  /**
+   * Read `selection.featureIds` from the session-state store. Used by
+   * Playwright specs to assert the post-click selection-set shape.
+   */
+  async getSelectedFeatureIds(): Promise<string[]> {
+    return await this.page.evaluate(() => {
+      // window.__sessionStore is exposed for test introspection.
+      return window.__sessionStore.getState().selection.featureIds;
+    });
+  }
+
+  /**
+   * Read `selection.primary` from the session-state store.
+   */
+  async getSelectedPrimary(): Promise<string | null> {
+    return await this.page.evaluate(() => {
+      return window.__sessionStore.getState().selection.primary ?? null;
+    });
+  }
+
+  // TODO: Phase 4 (US-2) will add `selectVertex(featureId, path)` here.
+  // That helper drives a Leaflet position-marker click via the temporal
+  // layer's per-position circle marker. Leaving this slot unfilled —
+  // Phase 4 owns the implementation; the modifier-aware emitter from
+  // this phase is the only prerequisite.
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Panel Tabs (GoldenLayout)
   // ─────────────────────────────────────────────────────────────────────────────
 

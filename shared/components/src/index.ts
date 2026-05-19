@@ -44,6 +44,18 @@ export type {
 export { MapView } from './MapView';
 export type { MapViewProps, FlyToTarget } from './MapView';
 export {
+  applyClickToSelection,
+  getPlatformModifierKey,
+  isMacPlatform,
+  isPlatformModifier,
+} from './utils/applyClickToSelection';
+export type {
+  SelectionClickEvent,
+  SelectionState,
+  NextSelection,
+  PlatformModifierKey,
+} from './utils/applyClickToSelection';
+export {
   SceneRectangleLayer,
   geoJsonPolygonToLeafletCoords,
   computeOverlapRanks,

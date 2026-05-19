@@ -16,6 +16,7 @@ import { SceneRectangleLayer } from './SceneRectangleLayer';
 import type { SceneRectangleLayerProps } from './SceneRectangleLayer';
 import { DrawingGuidanceOverlay } from './DrawingGuidanceOverlay/DrawingGuidanceOverlay';
 import { ViewportLockBanner } from './ViewportLockBanner/ViewportLockBanner';
+import { isPlatformModifier, type SelectionClickEvent } from '../utils/applyClickToSelection';
 import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
@@ -43,8 +44,15 @@ export interface MapViewProps {
   /** Set of selected feature IDs */
   selectedIds?: Set<string>;
 
-  /** Callback when a feature is clicked */
-  onSelect?: (featureId: string, event: React.MouseEvent) => void;
+  /**
+   * Callback when a feature is clicked.
+   *
+   * **Breaking change (#192 Phase 5)**: the payload is now a
+   * `SelectionClickEvent` (`{ target, modifier, shift }`) rather than
+   * `(featureId, event)`. Pair with `applyClickToSelection` from
+   * `@debrief/components` to derive the next selection set.
+   */
+  onSelect?: (event: SelectionClickEvent) => void;
 
   /** Callback when clicking empty space (for clearing selection) */
   onBackgroundClick?: () => void;
@@ -655,11 +663,21 @@ export function MapView({
 
       // Click handler — works for all features including decomposed
       // MultiPolygon child polygons (which now have IDs like "parent/polygons/0")
+      //
+      // Emits the new `SelectionClickEvent` shape (#192 Phase 5). Modifier
+      // detection routes through `isPlatformModifier` so Mac analysts get
+      // `Cmd` and everyone else gets `Ctrl` without per-host wiring.
       layer.on('click', (e) => {
-        e.originalEvent.stopPropagation();
-        // eslint-disable-next-line no-restricted-syntax
-        onSelect?.(featureId, e.originalEvent as unknown as React.MouseEvent);
-      // eslint-disable-next-line no-restricted-syntax
+        const original = e.originalEvent;
+        original.stopPropagation();
+        onSelect?.({
+          target: String(featureId),
+          modifier: isPlatformModifier({
+            ctrlKey: original.ctrlKey,
+            metaKey: original.metaKey,
+          }),
+          shift: original.shiftKey === true,
+        });
       });
 
       // Apply per-ring styles for ZONE MultiPolygon features

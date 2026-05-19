@@ -386,6 +386,19 @@ export function ActivityPanel({
     [onMessage]
   );
 
+  // #192 Phase 5: structured click event from FeatureList. Conveys the
+  // `target + modifier` bits so the host can recompute `primary` via
+  // `applyClickToSelection` — producing identical map/Layers parity.
+  const handleSelectionEvent = useCallback(
+    (event: { target: string; modifier: boolean; shift: boolean }) => {
+      onMessage?.({
+        type: 'layer:selectEvent',
+        payload: { target: event.target, modifier: event.modifier, shift: event.shift },
+      });
+    },
+    [onMessage]
+  );
+
   // Format menu state (Feature 097)
   const [formatMenuState, setFormatMenuState] = useState<{
     featureIds: string[];
@@ -625,6 +638,7 @@ export function ActivityPanel({
             selectedIds={new Set(selectedFeatureIds)}
             hiddenIds={hiddenIds}
             onSelectionChange={handleSelectionChange}
+            onSelectionEvent={handleSelectionEvent}
             showFormatIcon
             onFormatClick={handleFormatClick}
             onChildFormatClick={handleChildFormatClick}
