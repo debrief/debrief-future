@@ -50,23 +50,24 @@ An analyst opens a colleague's plot and lands on the same temporal viewport (the
 **Acceptance Scenarios**:
 
 1. **Given** a plot saved with temporal viewport [2024-01-01T00:00Z, 2024-01-07T00:00Z], **When** the plot file (without sidecar) is opened in either host, **Then** the time scope renders that window.
-2. **Given** the analyst then changes time scope locally (e.g. zooms in on a 1-hour incident), **When** the plot is closed without saving, **Then** the in-plot SystemState value is unchanged — local exploration does not mutate the shared temporal viewport.
-3. **Given** the analyst saves after changing the time scope, **Then** the in-plot SystemState value is updated to reflect the new window.
+2. **Given** the analyst then changes time scope locally (e.g. zooms in on a 1-hour incident) OR scrubs the playhead to a different time, **When** the plot is closed without saving, **Then** the in-plot `SystemState`/`temporal` value is unchanged — local exploration (zoom, scrub, play, pause) does not mutate the shared temporal state.
+3. **Given** the analyst saves after changing the time scope OR after scrubbing the playhead to a particular moment, **Then** the in-plot `SystemState`/`temporal` value is updated to reflect the new `start_time`, `end_time`, **and** `current_time` (the new schema field added by this work — see FR-016).
 
 ---
 
-### User Story 3 — Cross-machine selection restoration (Priority: P3)
+### User Story 3 — Cross-machine selection restoration (Priority: P2)
 
 An analyst opens a colleague's plot and finds the same set of features pre-selected.
 
-**Why this priority**: Most semantically contested. Per #251, selection is the strongest candidate to remain per-user — analyst A pre-selecting "the four hostile contacts" while analyst B is investigating "the friendly convoy" is normal collaborative-but-divergent work. P3 because it carries the most risk of being the wrong default. **Deferral is acceptable** per approval constraint #2 — this story may be scoped out entirely if the team confirms per-user semantics is the answer.
+**Why this priority**: P2 because it shares Story 1's machinery and is now confirmed in scope (Q1 resolved to Option B — ship as plot-shared). Per #251, selection remains the strongest *future* candidate for a per-user override layer, but the current resolution is to migrate now and let #251 build the per-user override on top later if the team confirms that need.
 
 **Independent Test**: As Story 1, but verifying that `selected_ids` survive the round-trip via the plot file.
 
 **Acceptance Scenarios**:
 
 1. **Given** an analyst saves with feature IDs `[feat-a, feat-b]` selected, **When** the plot is opened on a different machine, **Then** those two features are pre-selected.
-2. **Given** the team has decided selection should be per-user (Resolution of [NEEDS CLARIFICATION 1] below), **Then** this story is removed and the `selection` variant remains documented-but-unused in the schema, with selection continuing to live in the sidecar.
+2. **Given** the analyst then changes selection locally (e.g. selects a different feature), **When** the plot is closed without saving, **Then** the in-plot `SystemState`/`selection` value is unchanged — local exploration does not mutate the shared selection.
+3. **Given** the analyst saves after changing selection, **Then** the in-plot `SystemState`/`selection` value is updated to reflect the new selected set.
 
 ---
 
@@ -140,9 +141,14 @@ After this work, the `.debrief-session` sidecar file is **smaller** — it no lo
 - **FR-011**: VS Code MUST gain a `SystemState` read/write surface mirroring the web-shell `activeStoryboardPersistence.ts` pattern, structured so all four variants (the three migrated by this work plus `active_storyboard`) are served by a single shared helper, not duplicated per host.
 - **FR-012**: The shared helper MUST live in a location consumable by both hosts (e.g. `services/session-state/` or a sibling module) — no host-private SystemState writer. (Implementation detail deferred to planning, but the *constraint* — single producer of the SystemState write code path — is binding here.)
 
-#### Migration scope (the open question)
+#### Migration scope
 
-- **FR-013**: The exact set of fields migrated per variant MUST be enumerated explicitly. See "Per-slice migration scope" section below for the decision matrix and the [NEEDS CLARIFICATION] resolution.
+- **FR-013**: The exact set of fields migrated per variant MUST follow the matrix in the "Per-slice migration scope" section below. The matrix is authoritative; any deviation requires a spec amendment.
+
+#### Schema growth (Q2 resolution)
+
+- **FR-016**: The LinkML schema's `SystemStateProperties` `temporal` variant MUST gain a new field `current_time` (ISO-8601 timestamp, optional). Generated TypeScript and Python bindings MUST be regenerated. The schema bump MUST be additive — no removal of existing fields, no breaking changes to existing fixtures or runtime consumers.
+- **FR-017**: Local playhead movement (scrubbing, playing, pausing, seeking) MUST NOT mark the plot as dirty. `current_time` is persisted into the plot file ONLY when an explicit save action runs. This preserves the existing save-vs-modified UX contract — the user controls when changes commit, not the playback machinery.
 
 #### Backwards compatibility
 
@@ -173,39 +179,27 @@ The `active_storyboard` variant has already shipped runtime in web-shell. This w
 
 ### Per-variant scope decisions
 
-| Variant | Schema fields | Sidecar fields today | Migration verdict | Reason |
+| Variant | Schema fields (post-this-work) | Sidecar fields today | Migration verdict | Reason |
 |---|---|---|---|---|
 | **`spatial`** | `bbox`, `zoom`, `center` | `viewport` (≈ bbox + zoom + center), `rotation`, `drawingMode`, `drawingPaletteIndex`, `viewportLocked` | **Migrate** `bbox`, `zoom`, `center`. **Keep in sidecar** `rotation`, `drawingMode`, `drawingPaletteIndex`, `viewportLocked`. | Plot-shared semantics uncontroversial for the viewport itself (this is the slice the approval flagged as "likely uncontroversial"). The other fields are editor / UI state with no schema home — keep per-user. |
-| **`temporal`** | `start_time`, `end_time` | `currentTime`, `timeRange`, `timeFilter`, `stepSize`, `playbackRate`, `playbackState`, `displayMode` | **Migrate** `timeRange` → `{start_time, end_time}`. **Keep in sidecar** the playback-state fields (`currentTime`, `playbackState`, `playbackRate`, `stepSize`, `displayMode`, `timeFilter`). | The *analytical window* (`start_time`/`end_time`) is plot-shared — it answers "what time range is this plot about?". Playback-control fields are per-user (where am I scrubbed to right now, am I playing, at what speed) — they have no schema home and shouldn't acquire one. |
-| **`selection`** | `selected_ids` | `selection` (selected feature IDs), plus sidecar carries `hiddenFeatureIds`, `styleVersion`, `featureCollectionUri` on the same `features` slice | **[NEEDS CLARIFICATION 1]** — see below. Default: scope OUT pending #251. | Per #251, selection is the strongest candidate for per-user persistence. Reasonable arguments both ways (see [NEEDS CLARIFICATION 1]). |
+| **`temporal`** | `start_time`, `end_time`, **`current_time` (new — added by this work)** | `currentTime`, `timeRange`, `timeFilter`, `stepSize`, `playbackRate`, `playbackState`, `displayMode` | **Migrate** `timeRange` → `{start_time, end_time}` **AND** `currentTime` → `current_time`. **Keep in sidecar** the playback-control fields (`playbackState`, `playbackRate`, `stepSize`, `displayMode`, `timeFilter`). | Per Q2 resolution (Option B — plot-shared): the analytical window AND the playhead position both ride with the plot, so a colleague opening the plot lands at the same moment the saver was viewing. Playback machinery (am I playing, at what speed, what's my step size) stays per-user — it has no analytical meaning. The schema's `temporal` variant grows one new field, `current_time` (see FR-016). |
+| **`selection`** | `selected_ids` | `selection` (selected feature IDs), plus sidecar carries `hiddenFeatureIds`, `styleVersion`, `featureCollectionUri` on the same `features` slice | **Migrate** `selected_ids`. **Keep in sidecar** `hiddenFeatureIds`, `styleVersion`, `featureCollectionUri`. | Per Q1 resolution (Option B — ship as plot-shared): selection is migrated now as plot-shared semantics. Future #251 work, if/when commissioned, will layer a per-user override on top (e.g. via a new per-user-scoped variant or a per-user store) — it will NOT revert this migration. The non-migrated `features`-slice fields are technical bookkeeping (URI binding, style version, hidden-set visibility) with no schema home. |
 
-### [NEEDS CLARIFICATION 1] — Selection slice migration
+### Resolved scope decisions (from clarification answers)
 
-**Context**: Approval constraint #2 explicitly says "It is acceptable to migrate only the slice(s) where shared semantics is uncontroversial (likely `spatial` bbox) and defer the others." #251 (Per-user-within-shared-plot active-Storyboard view memory) flags that selection state may want to be per-user.
+#### Q1 — Selection slice migration: **Option B (ship as plot-shared)**
 
-**Question**: Should the `selection` variant ship in *this* feature, or be deferred until the per-user-identity model (#221) lands and a per-user-selection model (#251 generalisation) is designed?
+The `selection` variant migrates now with plot-shared semantics. `selected_ids` rides with the plot. Future #251 work will layer a per-user override on top if/when the team commissions that work; #251 will NOT revert this migration. Story 3 is in scope.
 
-| Option | Resolution | Implications |
-|---|---|---|
-| A | **Defer**. Story 3 is removed. `selection` schema variant remains modelled but unproduced. Sidecar continues to carry `selection`. | Lowest risk. Matches the explicit approval guidance. Closes the spec scope tightly. Future #251 work is unconstrained. |
-| B | **Ship as plot-shared**. Story 3 is in scope. `selected_ids` is migrated to a `SystemState`/`selection` feature. | Maximises the "single source of truth" payoff. But locks in plot-shared semantics for selection — future #251 work then has to either revert this or layer per-user-selection on top. |
-| C | **Ship as plot-shared with a documented "intent to override per-user later"**. Migrate now, but document in the spec that #251 will introduce a per-user layer (probably via a new variant or per-user property on the existing variant). | Compromise. Gives the architectural payoff today but signals expected churn. |
+**Rationale captured for downstream readers**: Maximises the "single source of truth" payoff today. The team has accepted that #251 (if it lands) will design a per-user override layer rather than a per-user replacement — i.e. plot-shared remains the default, with per-user as opt-in additive behaviour.
 
-**Default if not resolved**: Option A (defer), matching approval constraint #2's explicit acceptance.
+#### Q2 — Temporal `currentTime`: **Option B (plot-shared, schema grows)**
 
-### [NEEDS CLARIFICATION 2] — Temporal viewport: `timeRange` only, or `currentTime` too?
+The schema's `temporal` variant grows a new field, `current_time` (ISO-8601 timestamp). `currentTime` from the sidecar migrates to this new schema field. The playhead position rides with the plot — colleagues open and land where the saver was scrubbed.
 
-**Context**: The schema's `temporal` variant has exactly two fields: `start_time` and `end_time`. The sidecar `temporal` slice has both a `timeRange` (the analytical window — clearly maps to start/end) AND a `currentTime` (where the time-cursor is right now). One is naturally plot-shared, one is naturally per-user — but a user could plausibly argue both ways for `currentTime`.
+**Dirty-on-scrub UX**: This work adopts the conservative default — **scrubbing or playing does NOT mark the plot as modified**. The new `current_time` value is captured in memory as the user explores, but it is only persisted into the plot file when the user takes an explicit save action (the same save actions that today persist any other plot state). This avoids "every drag of the slider marks the file dirty" pathology. See FR-017.
 
-**Question**: Does `currentTime` (the playhead position) ride with the plot, or stay per-user?
-
-| Option | Resolution | Implications |
-|---|---|---|
-| A | **Per-user**. `currentTime` stays in sidecar. Plot-shared temporal variant carries `start_time`/`end_time` only. | Matches the natural intuition that "where I'm scrubbed to" is local exploration. Matches the schema as written. Story 2 acceptance scenarios stand as drafted (changing playhead locally doesn't dirty the plot). |
-| B | **Plot-shared**. Schema must grow a `current_time` field on the `temporal` variant. `currentTime` migrates to plot. | Allows colleagues to "land where the saver was scrubbed". Requires schema breaking-or-additive change (LinkML edit + regen). Forces a "dirty on scrub" UX decision (does scrubbing mark the plot as modified?). |
-| C | **Plot-shared but optional**. Schema grows an optional `current_time`. Hosts write it on save IF user explicitly requests it (e.g. via a "Save view" command). | Most flexible. Adds UX complexity (a new user-facing command). |
-
-**Default if not resolved**: Option A. Matches the schema as it stands, matches the natural "per-user playhead" intuition, doesn't require schema changes.
+**Schema growth posture**: The `current_time` field is added as **optional**. Pre-migration plots have no `SystemState`/`temporal` feature at all; new plots have one with all three fields populated. The optional-ness lets older readers (and the `active_storyboard`-only fixtures) continue to be valid against the bumped schema without retrofitting. A future migration may tighten it to required after a deprecation cycle.
 
 ### Out of scope
 
@@ -233,7 +227,7 @@ This recommendation is non-binding on #250 — that spec retains its own scoping
 ## Assumptions
 
 1. **#237's pattern is correct and stable**. We are extending it, not revisiting it. (#237 spec is currently `Draft` but its runtime is shipped — its actual contract is whatever `activeStoryboardPersistence.ts` does today, not whatever the eventual #237 spec text says. If #237's spec lands with revisions, those revisions must be reconciled before this work merges.)
-2. **The LinkML schema is authoritative**. The variant field lists (`bbox`/`zoom`/`center` for spatial, `start_time`/`end_time` for temporal, `selected_ids` for selection) are the migration target shape. If a migrated field has no schema home, it stays in the sidecar — we do NOT extend the schema in this work unless [NEEDS CLARIFICATION 2] Option B/C is selected.
+2. **The LinkML schema is authoritative — and this work extends it minimally**. The variant field lists (`bbox`/`zoom`/`center` for spatial, `start_time`/`end_time` for temporal, `selected_ids` for selection) are the migration target shape. Per Q2 resolution, the `temporal` variant grows one new field, `current_time` (FR-016) — this is the only schema extension this work makes. Any sidecar field that still has no schema home post-extension stays in the sidecar.
 3. **Existing tests cover the non-migration path**. Loading a pre-migration plot (no `SystemState` features for the new variants) must continue to work; this is verified by re-running the existing `services/session-state/` test suite without modification.
 4. **Schema fixture work is in scope**. Golden fixtures for the three migrated variants are part of this delivery (FR-002). Additionally, the missing `active_storyboard` fixture is added (it was missed by #237's delivery).
 5. **No browser-storage adapter work is needed**. For web-shell, the migration moves state from "would-be-sidecar (which doesn't exist)" to "in the plot" — no localStorage/IndexedDB write surface is introduced. (Per-user fields remain unpersisted in web-shell today — that's #250's problem.)
@@ -252,7 +246,8 @@ This recommendation is non-binding on #250 — that spec retains its own scoping
 ### Measurable Outcomes
 
 - **SC-001** (Story 1 — primary): Spatial viewport is preserved across a "save plot on host A → transfer ONLY `.plot.geojson` (no sidecar) → open on host B" round trip, in both directions (VS Code → web-shell, web-shell → VS Code). Bbox/zoom/centre match within numerical tolerance of float-round-trip (≤ 1e-9 relative error on numeric fields).
-- **SC-002** (Story 2): Temporal viewport (`start_time`, `end_time`) is preserved across the same round-trip in both directions. Timestamps match to ISO-8601 second precision.
+- **SC-002** (Story 2): Temporal state (`start_time`, `end_time`, **and** `current_time`) is preserved across the same round-trip in both directions. Timestamps match to ISO-8601 second precision. The playhead position (`current_time`) on the second host matches what the first host had scrubbed to at save time.
+- **SC-002a** (Story 3): Selection set (`selected_ids`) is preserved across the same round-trip in both directions. The set of selected feature IDs on the second host matches what was selected on the first host at save time.
 - **SC-003** (Story 4 — host parity): VS Code can read AND write all four `SystemState` variants (including `active_storyboard`, fixing the asymmetry where web-shell-only writes `active_storyboard` today). Verified by a host-cross-product test matrix: every variant written by every host is read correctly by every host (4 variants × 2 producers × 2 readers = 16 test cases, including the diagonal).
 - **SC-004** (sidecar shrinkage — Story 5): Post-migration sidecar files for newly-saved plots are missing **all** of the keys enumerated in the migration-scope matrix. Verified by a golden-fixture comparison: pre-migration sidecar JSON vs. post-migration sidecar JSON shows exactly the documented field set has moved.
 - **SC-005** (backward compatibility — FR-014): 100% of existing pre-migration plot+sidecar fixtures continue to load and produce the same in-memory session-state as before. Re-running the existing `services/session-state/` test suite passes unchanged.
@@ -263,7 +258,8 @@ This recommendation is non-binding on #250 — that spec retains its own scoping
 ### Non-goals (explicit)
 
 - **NG-001**: This work does NOT retire the `.debrief-session` sidecar.
-- **NG-002**: This work does NOT introduce a per-user persistence layer for any variant. All migrated fields are plot-shared.
-- **NG-003**: This work does NOT extend the LinkML `SystemStateProperties` variants with new fields, **unless** [NEEDS CLARIFICATION 2] is resolved to Option B or C.
+- **NG-002**: This work does NOT introduce a per-user persistence layer for any variant. All migrated fields are plot-shared. (Future #251 may add per-user override semantics on top of `selection` — that is #251's work, not this.)
+- **NG-003**: This work extends the LinkML `SystemStateProperties` ONLY by adding `current_time` to the `temporal` variant (FR-016, Q2 resolution). No other variant gains fields. No fields are renamed, retyped, or removed.
 - **NG-004**: This work does NOT change the on-the-wire shape of the existing `active_storyboard` SystemState feature — only its writer location (host-private → shared helper) and the addition of a fixture.
 - **NG-005**: This work does NOT design or build web-shell's per-user persistence — that remains #250's scope, narrowed by this work.
+- **NG-006**: This work does NOT change the existing save-vs-dirty UX contract. Scrubbing the playhead does NOT mark the plot dirty (FR-017). Persistence remains driven by explicit save actions.
