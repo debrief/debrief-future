@@ -62,6 +62,10 @@ def test_time_range_scene_round_trip() -> None:
     feature = SceneFeature.model_validate(raw)
     serialised = feature.model_dump_json(by_alias=True)
     reparsed = SceneFeature.model_validate_json(serialised)
+    # Narrow both Optional slots on both feature and reparsed before access,
+    # so pyright accepts the chained .start / .end / .center / .zoom reads.
+    assert feature.properties.time_range is not None
+    assert feature.properties.viewport_end is not None
     assert reparsed.properties.time_range is not None
     assert reparsed.properties.viewport_end is not None
     assert reparsed.properties.time_range.start == feature.properties.time_range.start
