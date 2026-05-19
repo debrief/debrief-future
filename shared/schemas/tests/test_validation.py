@@ -539,24 +539,21 @@ class TestStoryboardingNegativeFixtures:
         return json.loads((INVALID_FIXTURES_DIR / name).read_text())
 
     def test_rejects_non_null_time_range(self) -> None:
-        """FR-SCHEMA-004: time_range MUST be null in schema v1."""
-        # Load fixture and corrupt it by asserting non-null time_range flows
-        # through to the SceneFeature model where the v1 reserved-slot check
-        # (pattern/field-validator) rejects it.
+        """Pre-#263 invariant: legacy fixture with stringified time_range.
+
+        Under #215/#259 `time_range` was a `string` reserved slot that MUST
+        be null. Under #263 it is a `TimeRange` sub-record. The legacy
+        fixture's stringified JSON-as-`time_range` is now invalid for a
+        structural reason (string ≠ TimeRange object), so Pydantic rejects
+        it at the type layer. The spirit of the invariant survives: an
+        ill-formed `time_range` is still rejected.
+        """
         fixture = self._load("storyboard-scene-non-null-time-range.json")
-        # The fixture encodes the reserved-slot violation directly; confirm the
-        # Pydantic model rejects it with a clear error naming the time_range
-        # slot (via the module-level check) OR accepts the string form (since
-        # LinkML encodes it as a string). Either way, the spirit of the
-        # invariant is tested at the module boundary in Phase 4.
-        # At the schema level, the non-null string is structurally valid but
-        # will be rejected by the module via ReservedSlotViolation — so we
-        # assert the fixture still parses but carries the forbidden non-null
-        # value that the module will reject in T068.
-        scene = SceneFeature(**fixture)
-        assert scene.properties.time_range is not None, (
-            "Fixture encodes a non-null time_range for downstream module rejection"
-        )
+        with pytest.raises(ValidationError) as exc_info:
+            SceneFeature(**fixture)
+        # Error must name the time_range field
+        error_text = str(exc_info.value).lower()
+        assert "time_range" in error_text
 
     def test_rejects_bearing_nonzero(self) -> None:
         """FR-SCHEMA-005: viewport.bearing MUST be 0 in schema v1."""

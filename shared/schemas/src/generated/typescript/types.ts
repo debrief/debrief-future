@@ -1829,13 +1829,13 @@ export interface TimeInstant {
 
 
 /**
- * A temporal interval with inclusive start and end
+ * Time interval for a time-range Scene (#263). The interval is closed on both ends. `end` MUST be strictly greater than `start`. Introduced by Spec #263 to make `SceneProperties.time_range` a first-class slot.
  */
 export interface TimeRange {
-    /** Start of interval */
-    start: TimeInstant,
-    /** End of interval */
-    end: TimeInstant,
+    /** ISO-8601 instant; the slider position at the first capture action. By convention CRUD writes the owning Scene's `timestamp` into this slot, but the system does not depend on the two being equal — ordering reads `time_range?.start ?? timestamp`. */
+    start: string,
+    /** ISO-8601 instant; the slider position at the second (confirm) capture action. MUST be strictly greater than `start`. */
+    end: string,
 }
 
 
@@ -2197,8 +2197,10 @@ export interface SceneProperties extends BaseFeatureProperties {
     timestamp: string,
     /** Per-Storyboard monotonic sequence value assigned by the platform at capture time. Acts as the secondary sort key for Scenes — when two Scenes share a `timestamp` the one with the lower `creation_order` comes first. Unique within a Storyboard; gaps are permitted (left by deletion). The platform — not the client — is the source of truth. Introduced by #259; absent on pre-#259 plots which are rejected at load (no migration shim — Article XIV pre-release freedom). */
     creation_order: number,
-    /** Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1. */
-    time_range?: string,
+    /** For instant Scenes (#215 default): MUST be absent. For time-range Scenes (#263): a TimeRange sub-record. When present, the Scene is the time-range flavour and `viewport_end` MUST also be present. See cross-field rule `scene-flavour-xor-rule`. */
+    time_range?: TimeRange,
+    /** Map viewport camera state at the end of a time-range Scene (#263). MUST be present if and only if `time_range` is present. Reuses the Viewport sub-record (`bearing` MUST be 0). For instant Scenes this slot MUST be absent. */
+    viewport_end?: Viewport,
     /** Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective. */
     visible_feature_ids: string[],
     /** SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids. */

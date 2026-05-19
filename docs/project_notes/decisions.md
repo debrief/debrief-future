@@ -1361,3 +1361,80 @@ export interface SceneRectangleSnapshot extends ScenePropertyPicks {
 - `CONSTITUTION.md` Article IV clause 5 (the rule).
 - `CLAUDE.md` "Governing Principles" → "Boundary types are derived, not rewritten" bullet (AI-session integration).
 - PR #623 (worked example + fix).
+
+---
+
+## ADR-NEW (2026-05-19): Time-range Scene schema is additive, no version bump (Spec #263)
+
+**Context.** Spec #263 introduces a second Scene flavour ("time-range") to
+the Storyboarding cluster. The new shape adds one sub-record (`TimeRange`)
+and one optional slot (`viewport_end`) to `SceneProperties`. The existing
+`time_range` slot — a string-typed reserved-null placeholder from #215 —
+becomes a real `Optional[TimeRange]`.
+
+**Decision.** The schema evolution lands **additive** under Article XIV
+(pre-4.0 freedom): no `schema_version` bump, no migration shim, no reader
+gymnastics. Both new slots are optional at the schema layer. Legacy plots
+(instant Scenes with `time_range = null` and no `viewport_end`) parse
+unchanged. Mixed-presence Scenes are rejected by a layered enforcement
+strategy: LinkML rules → JSON Schema `if/then` constraints on the
+boundary, plus a `flavourCheck()` function in `validate.ts` at the
+application layer.
+
+**Why no version bump.**
+
+- The two new slots are optional. A v1 reader (pre-#263) reading a v3
+  schema's instant Scene sees no new keys.
+- The XOR cross-field rule means a v1 reader receiving a time-range
+  Scene from a newer writer would see an unfamiliar `time_range`
+  object — but the schema-version field already exists (`schema_version
+  >= 2` since #259), and any v1 reader would be running pre-#259 code,
+  which the existing `UnsupportedSchemaVersionError` already rejects.
+- Article XIV explicitly authorises additive evolution without ceremony
+  pre-4.0.
+
+**Alternative considered.** Two distinct classes (`InstantScene` +
+`TimeRangeScene`) with a discriminator field, rather than a single
+`SceneProperties` class with the cross-field XOR. Rejected because the
+renaming cost across every consumer (CRUD, validate, ordering, playback,
+panel, briefing-renderer-to-be) was disproportionate to a two-line XOR
+rule. Tracked as a future v3 schema cycle item (#269 in BACKLOG.md) for
+when a third Scene flavour arrives.
+
+**Layered cross-field enforcement (related decision).** LinkML 1.7's
+`rules:` block lowers cleanly to JSON Schema `if/then` constraints, but
+does **not** generate Pydantic `model_validator` functions. The XOR and
+range-validity rules therefore live in:
+
+1. The LinkML source (one place — declarative).
+2. The generated JSON Schema (mechanical, enforced on serialisation
+   boundaries).
+3. A hand-written `flavourCheck()` in `shared/components/src/storyboard/
+   validate.ts` (enforced at the application boundary; called from
+   `validatePlot` and from `createScene`).
+
+Pydantic adherence tests pin this division explicitly: the Pydantic layer
+is structural-only for these slots; the application layer carries the
+cross-field semantics. A future LinkML upgrade that DOES generate
+validators would surface as a test diff.
+
+**RAF lock-step interpolation primitive.** As part of the same feature we
+also adopt a "single RAF loop drives both axes" rule for time-range
+playback. The `TimeRangeTween` primitive in
+`shared/components/src/storyboardPlayback/` computes a single normalised
+progress `p ∈ [0, 1]` from elapsed wall-clock time, then on every frame
+applies `setCurrentTime(lerp(t_start, t_end, p))` **before**
+`flyToViewport(blendedViewport, 0)`. The per-frame `flyToViewport` is
+called with `durationMs = 0` (the documented snap path) so Leaflet's own
+pan/zoom tween — which has its own clock — does not run alongside ours
+and drift the two axes apart. Reverse playback reuses the same primitive
+with the schedule reversed; abort sets a cancelled flag the next tick
+honours; the `done` Promise resolves with the last-written `(epoch,
+viewport)` pair so the engine can emit a coherent snapshot whether the
+tween completed naturally or was cancelled.
+
+**Provenance.** Spec `specs/263-time-range-scenes/` (data-model.md §3 and
+§5 — review note 2A; research.md R8). Evidence:
+`specs/263-time-range-scenes/evidence/round-trip-evidence.md` and the
+`TimeRangeTween` test suite at
+`shared/components/src/storyboardPlayback/__tests__/timeRangeTween.test.ts`.
