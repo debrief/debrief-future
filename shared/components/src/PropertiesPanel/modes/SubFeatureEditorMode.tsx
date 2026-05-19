@@ -1,9 +1,24 @@
 /**
- * SubFeatureEditorMode — body for editing a single vertex / sub-feature
- * (Spec 192, Phase 4, T033 — track-point paths only).
+ * SubFeatureEditorMode — body for editing a single vertex / sub-feature.
  *
- * Responsibilities (track-point — `positions/N`):
- *   1. Parse the supplied path via `parsePath` to extract the vertex index.
+ * Phase 4 (T033) shipped track-point support (`positions/N`).
+ * Phase 9 (T067-T070, US-7) generalises this component to the four
+ * annotation-geometry path shapes:
+ *
+ *   - Polygon    `rings/R/vertices/V`
+ *   - LineString `vertices/V`
+ *   - MultiPoint `vertices/V`
+ *   - Point      `vertex/0`
+ *
+ * Per spec FR-026 the form body is identical across geometries — only
+ * the header label format changes (the geometry-aware label formatter
+ * lives in `formatVertexHeader`). The structured `path` string is always
+ * present on the mode container via `data-path` so downstream provenance
+ * never needs to reparse the header to discover the saved vertex address.
+ *
+ * Responsibilities:
+ *   1. Parse the supplied path via `parsePath` to extract the vertex
+ *      address (geometry kind + index).
  *   2. Resolve the matching `VertexMetadata` entry on the parent feature
  *      via a memoised `Map<path, VertexMetadata>` built once per feature
  *      change (data-model.md § 2.3 invariant 5 — O(1) lookup on read).
@@ -22,11 +37,6 @@
  *   `properties-mode-subfeature-out-of-range` notice and disables all
  *   inputs so the buffer can't be polluted with a non-resolvable
  *   `(featureId, path)` key.
- *
- * Phase 9 (T067-T070) will extend this component to handle the three
- * annotation-geometry path shapes (Polygon `rings/R/vertices/V`,
- * LineString / MultiPoint `vertices/V`, Point `vertex/0`). The structure
- * here is laid out to make that extension a small additive change.
  *
  * Article IV.5 (boundary types are derived, not rewritten): props re-use
  * the schema-generated `DebriefFeature`, `VertexMetadata`, and the
@@ -64,6 +74,8 @@ interface ParsedVertexAddress {
   /** The leaf vertex index (e.g. the `N` in `positions/N`). For
    *  `rings/R/vertices/V` this is `V`; for `vertex/0` this is `0`. */
   vertexIndex: number | null;
+  /** The ring index for `rings/R/vertices/V`. `null` for other shapes. */
+  ringIndex: number | null;
 }
 
 function parseVertexAddress(path: string): ParsedVertexAddress {
@@ -73,34 +85,100 @@ function parseVertexAddress(path: string): ParsedVertexAddress {
     // level/address pair. The real root is the feature.id supplied
     // elsewhere; this parser only cares about the level breakdown.
     const head = parsed.levels[0];
-    if (!head) return { kind: 'unknown', vertexIndex: null };
+    if (!head) return { kind: 'unknown', vertexIndex: null, ringIndex: null };
     if (head.levelName === 'positions') {
       const n = Number.parseInt(head.address, 10);
-      return { kind: 'positions', vertexIndex: Number.isInteger(n) && n >= 0 ? n : null };
+      return {
+        kind: 'positions',
+        vertexIndex: Number.isInteger(n) && n >= 0 ? n : null,
+        ringIndex: null,
+      };
     }
     if (head.levelName === 'rings') {
+      const r = Number.parseInt(head.address, 10);
       const next = parsed.levels[1];
       if (!next || next.levelName !== 'vertices') {
-        return { kind: 'rings', vertexIndex: null };
+        return {
+          kind: 'rings',
+          vertexIndex: null,
+          ringIndex: Number.isInteger(r) && r >= 0 ? r : null,
+        };
       }
       const n = Number.parseInt(next.address, 10);
-      return { kind: 'rings', vertexIndex: Number.isInteger(n) && n >= 0 ? n : null };
+      return {
+        kind: 'rings',
+        vertexIndex: Number.isInteger(n) && n >= 0 ? n : null,
+        ringIndex: Number.isInteger(r) && r >= 0 ? r : null,
+      };
     }
     if (head.levelName === 'vertices') {
       const n = Number.parseInt(head.address, 10);
-      return { kind: 'vertices', vertexIndex: Number.isInteger(n) && n >= 0 ? n : null };
+      return {
+        kind: 'vertices',
+        vertexIndex: Number.isInteger(n) && n >= 0 ? n : null,
+        ringIndex: null,
+      };
     }
     if (head.levelName === 'vertex') {
       const n = Number.parseInt(head.address, 10);
-      return { kind: 'vertex', vertexIndex: Number.isInteger(n) && n >= 0 ? n : null };
+      return {
+        kind: 'vertex',
+        vertexIndex: Number.isInteger(n) && n >= 0 ? n : null,
+        ringIndex: null,
+      };
     }
-    return { kind: 'unknown', vertexIndex: null };
+    return { kind: 'unknown', vertexIndex: null, ringIndex: null };
   } catch {
-    return { kind: 'unknown', vertexIndex: null };
+    return { kind: 'unknown', vertexIndex: null, ringIndex: null };
   }
 }
 
-// ─── In-range check (track-point only for Phase 4) ────────────────────
+// ─── Geometry-aware header label formatter (US-7) ─────────────────────
+
+/**
+ * Build the human-readable vertex identifier rendered in the sub-feature
+ * mode header per the spec UI Flow "Sub-feature State":
+ *
+ *   - Track       (`positions/N`)             → "positions/N"     ← Phase 4 backwards-compat
+ *   - Polygon     (`rings/R/vertices/V`)      → "Ring R, Vertex V"
+ *   - LineString  (`vertices/V`)              → "Vertex V"
+ *   - MultiPoint  (`vertices/V`)              → "Vertex V"
+ *   - Point       (`vertex/0`)                → "Vertex"          (single-vertex; no index)
+ *
+ * Track keeps the raw `positions/N` literal so the Phase 4 contract
+ * (and the existing Vitest assertions on that header) is undisturbed.
+ * The structured path itself is always present on the mode container's
+ * `data-path` attribute regardless of the rendered label.
+ */
+function formatVertexHeader(parsed: ParsedVertexAddress, rawPath: string): string {
+  switch (parsed.kind) {
+    case 'positions':
+      // Phase 4 backwards-compat: keep the literal path form. The spec
+      // UI Flow allows "Point N" too; the Vitest-asserted format is the
+      // literal, and changing it would break the existing track tests.
+      return rawPath;
+    case 'rings':
+      if (parsed.ringIndex !== null && parsed.vertexIndex !== null) {
+        return `Ring ${parsed.ringIndex}, Vertex ${parsed.vertexIndex}`;
+      }
+      return rawPath;
+    case 'vertices':
+      if (parsed.vertexIndex !== null) {
+        return `Vertex ${parsed.vertexIndex}`;
+      }
+      return rawPath;
+    case 'vertex':
+      // Single-vertex geometry (Point). Per FR-028, the editor's behaviour
+      // is consistent with multi-vertex features but the header omits the
+      // index since there's only ever one vertex to address.
+      return 'Vertex';
+    case 'unknown':
+    default:
+      return rawPath;
+  }
+}
+
+// ─── In-range check (per-geometry; Phase 9 generalisation) ────────────
 
 function trackPositionCount(feature: DebriefFeature): number | null {
   // eslint-disable-next-line no-restricted-syntax
@@ -113,6 +191,34 @@ function trackPositionCount(feature: DebriefFeature): number | null {
   return positions.length;
 }
 
+interface MinimalGeometry {
+  type?: unknown;
+  coordinates?: unknown;
+}
+
+function getGeometry(feature: DebriefFeature): MinimalGeometry | null {
+  // eslint-disable-next-line no-restricted-syntax
+  const geom = (feature as { geometry?: unknown }).geometry;
+  if (geom === undefined || geom === null) return null;
+  if (typeof geom !== 'object') return null;
+  return geom as MinimalGeometry;
+}
+
+/**
+ * Geometry-aware bounds check.
+ *
+ *   - Track:     `properties.positions[index]` must exist
+ *   - Polygon:   `geometry.coordinates[ringIndex][vertexIndex]` must exist
+ *   - LineString / MultiPoint: `geometry.coordinates[vertexIndex]` must exist
+ *   - Point:     `geometry.coordinates` must be a non-empty tuple AND
+ *                vertexIndex must be 0
+ *
+ * Mirrors the resolver's `checkVertexPathInRange` (`selectionMode.ts`).
+ * The resolver vets paths before the dispatcher routes them here, so in
+ * production this defensive check rarely fires — it exists for Vitest
+ * (which renders the component directly with synthetic paths) and for
+ * any future surface that bypasses the resolver.
+ */
 function isInRange(
   feature: DebriefFeature,
   parsed: ParsedVertexAddress,
@@ -123,12 +229,34 @@ function isInRange(
     if (count === null) return false;
     return parsed.vertexIndex < count;
   }
-  // Phase 9 will extend bounds checks for rings / vertices / vertex.
-  // For Phase 4 we accept the path as in-range when it isn't a
-  // `positions/*` path — the dispatcher's resolver has already vetted
-  // these in production; the form's bounds check exists solely to
-  // catch the track-point out-of-range edge.
-  return true;
+  if (parsed.kind === 'vertices') {
+    const geom = getGeometry(feature);
+    if (geom === null) return false;
+    const coords = geom.coordinates;
+    if (!Array.isArray(coords)) return false;
+    return parsed.vertexIndex < coords.length;
+  }
+  if (parsed.kind === 'vertex') {
+    // Point: only `vertex/0` is valid, and the geometry must be a Point
+    // with a non-empty coordinates tuple.
+    if (parsed.vertexIndex !== 0) return false;
+    const geom = getGeometry(feature);
+    if (geom === null) return false;
+    const coords = geom.coordinates;
+    return Array.isArray(coords) && coords.length > 0;
+  }
+  if (parsed.kind === 'rings') {
+    if (parsed.ringIndex === null) return false;
+    const geom = getGeometry(feature);
+    if (geom === null) return false;
+    const rings = geom.coordinates;
+    if (!Array.isArray(rings)) return false;
+    if (parsed.ringIndex >= rings.length) return false;
+    const ring = rings[parsed.ringIndex];
+    if (!Array.isArray(ring)) return false;
+    return parsed.vertexIndex < ring.length;
+  }
+  return false;
 }
 
 // ─── vertex_metadata Map<path, entry> — memoised per feature ──────────
@@ -178,11 +306,12 @@ export function SubFeatureEditorMode(
   const byPath = useVertexMetadataLookup(feature);
   const existing = byPath.get(path);
 
-  // Bounds check — Phase 4 only handles track-point paths; anything
-  // else falls through to the "treat as in-range" branch (Phase 9 will
-  // extend).
+  // Bounds check — geometry-aware (Phase 9 generalisation). Track points,
+  // polygon ring vertices, linestring/multipoint vertices, and a Point's
+  // single vertex all funnel through `isInRange`.
   const parsed = useMemo(() => parseVertexAddress(path), [path]);
   const inRange = useMemo(() => isInRange(feature, parsed), [feature, parsed]);
+  const headerLabel = useMemo(() => formatVertexHeader(parsed, path), [parsed, path]);
 
   // ── Out-of-range defensive branch ──────────────────────────────────
   if (!inRange) {
@@ -203,7 +332,7 @@ export function SubFeatureEditorMode(
             borderBottom: '1px solid var(--vscode-panel-border, transparent)',
           }}
         >
-          {parentName} — {path}
+          {parentName} — {headerLabel}
         </header>
         <div
           data-testid="properties-mode-subfeature-out-of-range"
@@ -247,6 +376,7 @@ export function SubFeatureEditorMode(
       featureId={featureId}
       parentName={parentName}
       path={path}
+      headerLabel={headerLabel}
       readOnly={readOnly}
       setVertexField={setVertexField}
       existing={existing}
@@ -259,13 +389,14 @@ interface BodyProps {
   featureId: string;
   parentName: string;
   path: string;
+  headerLabel: string;
   readOnly: boolean;
   setVertexField: UseStagedEditsApi['setVertexField'];
   existing: VertexMetadata | undefined;
 }
 
 function SubFeatureEditorBody(p: BodyProps): React.ReactElement {
-  const { featureId, parentName, path, readOnly, setVertexField, existing } = p;
+  const { featureId, parentName, path, headerLabel, readOnly, setVertexField, existing } = p;
 
   // Local edit-state — drives the input visuals between commits. The
   // staging hook owns the *committed* value; the form's local state
@@ -320,7 +451,7 @@ function SubFeatureEditorBody(p: BodyProps): React.ReactElement {
           borderBottom: '1px solid var(--vscode-panel-border, transparent)',
         }}
       >
-        {parentName} — {path}
+        {parentName} — {headerLabel}
       </header>
 
       <label

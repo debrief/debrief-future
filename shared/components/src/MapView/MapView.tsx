@@ -197,6 +197,126 @@ export interface FlyToTarget {
   readonly durationMs: number;
 }
 
+// ─── Vertex hit-testing for annotation geometries (#192 Phase 9 / US-7) ───
+//
+// Polygon / LineString / MultiPoint / Point layers don't expose per-vertex
+// DOM handles, so we hit-test the click location against each rendered
+// vertex and — if the click falls within `VERTEX_HIT_RADIUS_PX` of one —
+// emit the geometry-specific structured selection path. Falls through to
+// feature-level emission otherwise (clicking the body of a polygon, for
+// example, still selects the whole feature).
+//
+// The path shapes mirror data-model.md § 1.3:
+//   - Polygon    → `rings/R/vertices/V`
+//   - LineString → `vertices/V`
+//   - MultiPoint → `vertices/V`
+//   - Point      → `vertex/0`
+//
+// Tracks keep their existing per-point selection path (`positions/N`) via
+// `PositionSymbolsLayer` — that route is unchanged.
+
+const VERTEX_HIT_RADIUS_PX = 12;
+
+/**
+ * Result of hit-testing a click against a feature's vertices.
+ * `null` → no vertex within radius; caller falls back to feature-level select.
+ */
+type VertexHit = string | null;
+
+/**
+ * Hit-test the click container-point against each vertex of the feature's
+ * geometry — within `VERTEX_HIT_RADIUS_PX` counts as a hit. Returns the
+ * closest matching vertex's structured sub-path (relative to the feature
+ * root) or `null` if no vertex is within radius.
+ *
+ * Pixel-distance hit testing matches how the analyst perceives "clicking
+ * a vertex": a click that's 8 px from a vertex on a Polygon edge resolves
+ * to that vertex even if the click latlng isn't exactly on the vertex
+ * latlng. The Leaflet click event's `containerPoint` is already in pixel
+ * coordinates — we project each vertex into the same space via
+ * `map.latLngToContainerPoint`.
+ */
+function hitTestVertex(
+  map: L.Map,
+  clickPt: L.Point,
+  geometry: GeoJSON.Geometry | null | undefined,
+): VertexHit {
+  if (!geometry) return null;
+
+  const distPx = (lonLat: GeoJSON.Position): number => {
+    const lon = lonLat[0];
+    const lat = lonLat[1];
+    if (typeof lon !== 'number' || typeof lat !== 'number') return Number.POSITIVE_INFINITY;
+    // eslint-disable-next-line no-restricted-syntax
+    const pt = map.latLngToContainerPoint(L.latLng(lat, lon));
+    const dx = pt.x - clickPt.x;
+    const dy = pt.y - clickPt.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  let bestHit: VertexHit = null;
+  let bestDist = VERTEX_HIT_RADIUS_PX;
+
+  if (geometry.type === 'Polygon') {
+    const rings = geometry.coordinates;
+    for (let r = 0; r < rings.length; r += 1) {
+      const ring = rings[r];
+      if (!ring) continue;
+      for (let v = 0; v < ring.length; v += 1) {
+        const pt = ring[v];
+        if (!pt) continue;
+        const d = distPx(pt);
+        if (d <= bestDist) {
+          bestDist = d;
+          bestHit = `rings/${r}/vertices/${v}`;
+        }
+      }
+    }
+    return bestHit;
+  }
+
+  if (geometry.type === 'LineString') {
+    const coords = geometry.coordinates;
+    for (let v = 0; v < coords.length; v += 1) {
+      const pt = coords[v];
+      if (!pt) continue;
+      const d = distPx(pt);
+      if (d <= bestDist) {
+        bestDist = d;
+        bestHit = `vertices/${v}`;
+      }
+    }
+    return bestHit;
+  }
+
+  if (geometry.type === 'MultiPoint') {
+    const coords = geometry.coordinates;
+    for (let v = 0; v < coords.length; v += 1) {
+      const pt = coords[v];
+      if (!pt) continue;
+      const d = distPx(pt);
+      if (d <= bestDist) {
+        bestDist = d;
+        bestHit = `vertices/${v}`;
+      }
+    }
+    return bestHit;
+  }
+
+  if (geometry.type === 'Point') {
+    const pt = geometry.coordinates;
+    const d = distPx(pt);
+    if (d <= bestDist) {
+      // FR-028: a Point's single implicit vertex is always reachable when
+      // the click is anywhere near it.
+      bestHit = 'vertex/0';
+    }
+    return bestHit;
+  }
+
+  return null;
+}
+
 /**
  * The six Leaflet gesture handlers disabled while the viewport is locked
  * (spec 260 / FR-003). Drag, wheel, double-click, pinch/touch, drag-rectangle
@@ -662,16 +782,41 @@ export function MapView({
       layer.bindPopup(popupLines.join('<br/>'), { maxWidth: 400 });
 
       // Click handler — works for all features including decomposed
-      // MultiPolygon child polygons (which now have IDs like "parent/polygons/0")
+      // MultiPolygon child polygons (which now have IDs like "parent/polygons/0").
       //
       // Emits the new `SelectionClickEvent` shape (#192 Phase 5). Modifier
       // detection routes through `isPlatformModifier` so Mac analysts get
       // `Cmd` and everyone else gets `Ctrl` without per-host wiring.
+      //
+      // #192 Phase 9 (US-7 / T070): for Polygon / LineString / MultiPoint /
+      // Point geometries, hit-test the click against rendered vertices
+      // first. A click within `VERTEX_HIT_RADIUS_PX` of a vertex emits the
+      // structured sub-path (e.g. `featureId/rings/0/vertices/3`) so the
+      // sub-feature editor opens for that vertex. Clicks on the body of
+      // the geometry (away from any vertex) keep the feature-level emit.
+      // Track-point selection continues to flow through
+      // `PositionSymbolsLayer` (unchanged by this phase).
       layer.on('click', (e) => {
         const original = e.originalEvent;
         original.stopPropagation();
+        // eslint-disable-next-line no-restricted-syntax
+        const leafletMap = (e as unknown as { target?: { _map?: L.Map } }).target?._map
+          // eslint-disable-next-line no-restricted-syntax
+          ?? (layer as unknown as { _map?: L.Map })._map
+          ?? null;
+        // eslint-disable-next-line no-restricted-syntax
+        const containerPoint = (e as unknown as { containerPoint?: L.Point }).containerPoint;
+        let target = String(featureId);
+        if (leafletMap !== null && containerPoint !== undefined) {
+          // eslint-disable-next-line no-restricted-syntax
+          const geom = feature.geometry;
+          const vertexPath = hitTestVertex(leafletMap, containerPoint, geom);
+          if (vertexPath !== null) {
+            target = `${String(featureId)}/${vertexPath}`;
+          }
+        }
         onSelect?.({
-          target: String(featureId),
+          target,
           modifier: isPlatformModifier({
             ctrlKey: original.ctrlKey,
             metaKey: original.metaKey,
