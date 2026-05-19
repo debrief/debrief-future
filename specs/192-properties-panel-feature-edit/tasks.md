@@ -86,8 +86,8 @@ read-only signal on the plot slice, (e) the mode dispatcher in
 
 ### Staged-edits buffer hook (staged-edits-store.md, R-002a, R-011)
 
-- [ ] T013 [test] Author Vitest for `useStagedEdits` covering every state transition (setters, prune-on-equality, `revertField`/`unrevertField`, selection-independence, `applyEditsToFeatures` for feature/vertex/reverted/sparse-prune, `clearAll`) `shared/components/src/ActivityPanel/__tests__/useStagedEdits.test.ts`
-- [ ] T014 Implement `useStagedEdits` as a `useReducer`-backed hook colocated with `ActivityPanel`; export the surface listed in `contracts/staged-edits-store.md` `shared/components/src/ActivityPanel/useStagedEdits.ts`
+- [x] T013 [test] Author Vitest for `useStagedEdits` covering every state transition (setters, prune-on-equality, `revertField`/`unrevertField`, selection-independence, `applyEditsToFeatures` for feature/vertex/reverted/sparse-prune, `clearAll`) `shared/components/src/ActivityPanel/__tests__/useStagedEdits.test.ts`
+- [x] T014 Implement `useStagedEdits` as a `useReducer`-backed hook colocated with `ActivityPanel`; export the surface listed in `contracts/staged-edits-store.md` `shared/components/src/ActivityPanel/useStagedEdits.ts`
 
 ### Read-only signal on plot slice (read-only-signal.md, R-003)
 
