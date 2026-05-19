@@ -17,8 +17,8 @@ Alias: tool
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [MCPRequest](../classes/MCPRequest.md) | MCP tool invocation envelope |  no  |
 | [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) | Single entry in item |  no  |
+| [MCPRequest](../classes/MCPRequest.md) | MCP tool invocation envelope |  no  |
 | [WasGeneratedBy](../classes/WasGeneratedBy.md) | Identifies the tool and its parameters for a specific invocation |  no  |
 
 
