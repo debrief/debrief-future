@@ -48,11 +48,11 @@
 
 **Goal**: Confirm the active feature, branch, and toolchain are ready before any schema or code work begins.
 
-- [ ] T001 Confirm `.specify/.active-feature` resolves to this feature `.specify/.active-feature`
-- [ ] T002 Verify the feature branch matches the active feature `apps/.gitignore`
-- [ ] T003 [P] Verify Python toolchain (`uv sync`) and that `linkml`, `pydantic>=2`, `gen-pydantic`, `gen-typescript`, `gen-json-schema` are available `pyproject.toml`
-- [ ] T004 [P] Verify Node toolchain (`pnpm install`) and that `@debrief/schemas`, `@debrief/components`, `@debrief/session-state`, `@debrief/stac-writer` workspaces resolve `pnpm-workspace.yaml`
-- [ ] T005 Sanity-run `task verify` (or the four-step fallback) on the current `main` to capture the pre-change baseline `Taskfile.yml`
+- [x] T001 Confirm `.specify/.active-feature` resolves to this feature `.specify/.active-feature`
+- [x] T002 Verify the feature branch matches the active feature `apps/.gitignore`
+- [x] T003 [P] Verify Python toolchain (`uv sync`) and that `linkml`, `pydantic>=2`, `gen-pydantic`, `gen-typescript`, `gen-json-schema` are available `pyproject.toml`
+- [x] T004 [P] Verify Node toolchain (`pnpm install`) and that `@debrief/schemas`, `@debrief/components`, `@debrief/session-state`, `@debrief/stac-writer` workspaces resolve `pnpm-workspace.yaml`
+- [x] T005 Sanity-run `task verify` (or the four-step fallback) on the current `main` to capture the pre-change baseline `Taskfile.yml`
 
 ## Phase 2: Foundation — Schema Evolution (Article II)
 
@@ -62,37 +62,37 @@
 
 ### Schema source of truth
 
-- [ ] T006 Add `TimeRange` class (`start: datetime`, `end: datetime`) to the storyboard LinkML cluster `shared/schemas/src/linkml/storyboard.yaml`
-- [ ] T007 Convert `SceneProperties.time_range` from reserved (must-be-null) to a `TimeRange` optional slot `shared/schemas/src/linkml/storyboard.yaml`
-- [ ] T008 Add `SceneProperties.viewport_end: Viewport` optional slot `shared/schemas/src/linkml/storyboard.yaml`
-- [ ] T009 Add the XOR cross-field adherence rule: `time_range` set ⇔ `viewport_end` set; and `time_range.end > time_range.start` `shared/schemas/src/linkml/storyboard.yaml`
+- [x] T006 Add `TimeRange` class (`start: datetime`, `end: datetime`) to the storyboard LinkML cluster `shared/schemas/src/linkml/storyboard.yaml`
+- [x] T007 Convert `SceneProperties.time_range` from reserved (must-be-null) to a `TimeRange` optional slot `shared/schemas/src/linkml/storyboard.yaml`
+- [x] T008 Add `SceneProperties.viewport_end: Viewport` optional slot `shared/schemas/src/linkml/storyboard.yaml`
+- [x] T009 Add the XOR cross-field adherence rule: `time_range` set ⇔ `viewport_end` set; and `time_range.end > time_range.start` `shared/schemas/src/linkml/storyboard.yaml`
 
 ### Regenerate derived artefacts (Article II.1)
 
-- [ ] T010 Regenerate Pydantic models from LinkML `shared/schemas/src/debrief_schemas/storyboard.py`
-- [ ] T011 [P] Regenerate TypeScript types from LinkML `shared/schemas/src/ts/storyboard.ts`
-- [ ] T012 [P] Regenerate JSON Schema from LinkML `shared/schemas/src/json-schema/storyboard.schema.json`
-- [ ] T013 [P] Regenerate the `@debrief/schemas` package index export of the new `TimeRange` and updated `SceneProperties` `shared/schemas/src/index.ts`
+- [x] T010 Regenerate Pydantic models from LinkML `shared/schemas/src/debrief_schemas/storyboard.py`
+- [x] T011 [P] Regenerate TypeScript types from LinkML `shared/schemas/src/ts/storyboard.ts`
+- [x] T012 [P] Regenerate JSON Schema from LinkML `shared/schemas/src/json-schema/storyboard.schema.json`
+- [x] T013 [P] Regenerate the `@debrief/schemas` package index export of the new `TimeRange` and updated `SceneProperties` `shared/schemas/src/index.ts`
 
 ### Golden fixtures (Article II.2)
 
-- [ ] T014 [P] Add canonical valid time-range Scene fixture `shared/schemas/src/fixtures/valid/scene-time-range.json`
-- [ ] T015 [P] Keep (regression anchor) canonical valid instant Scene fixture `shared/schemas/src/fixtures/valid/scene-instant.json`
-- [ ] T016 [P] Add invalid fixture: time-range missing `viewport_end` `shared/schemas/src/fixtures/invalid/scene-time-range-missing-viewport-end.json`
-- [ ] T017 [P] Add invalid fixture: instant Scene with `viewport_end` set `shared/schemas/src/fixtures/invalid/scene-instant-with-viewport-end.json`
-- [ ] T018 [P] Add invalid fixture: time-range with `t_end <= t_start` `shared/schemas/src/fixtures/invalid/scene-time-range-end-not-after-start.json`
+- [x] T014 [P] Add canonical valid time-range Scene fixture `shared/schemas/src/fixtures/valid/scene-time-range.json`
+- [x] T015 [P] Keep (regression anchor) canonical valid instant Scene fixture `shared/schemas/src/fixtures/valid/scene-instant.json`
+- [x] T016 [P] Add invalid fixture: time-range missing `viewport_end` `shared/schemas/src/fixtures/invalid/scene-time-range-missing-viewport-end.json`
+- [x] T017 [P] Add invalid fixture: instant Scene with `viewport_end` set `shared/schemas/src/fixtures/invalid/scene-instant-with-viewport-end.json`
+- [x] T018 [P] Add invalid fixture: time-range with `t_end <= t_start` `shared/schemas/src/fixtures/invalid/scene-time-range-end-not-after-start.json`
 - [ ] T019 [P] Retire the v1 reserved-slot fixtures (`scene-time-range-non-null.json` and `scene-viewport-end-set.json`) introduced by #215 `shared/schemas/src/fixtures/invalid/`
 
 ### Adherence tests (Article II + Article VI)
 
-- [ ] T020 [test] Add Python adherence tests: round-trip both flavours, reject all three invalid fixtures with flavour-mismatch error `shared/schemas/tests/test_storyboard_scene_flavour.py`
-- [ ] T021 [P][test] Add TypeScript adherence tests mirroring T020 using generated TS types `shared/schemas/tests/storyboard_scene_flavour.test.ts`
-- [ ] T022 [P][test] Add JSON-Schema validation tests for the same five fixtures `shared/schemas/tests/storyboard_scene_flavour.schema.test.ts`
+- [x] T020 [test] Add Python adherence tests: round-trip both flavours, reject all three invalid fixtures with flavour-mismatch error `shared/schemas/tests/test_storyboard_scene_flavour.py`
+- [x] T021 [P][test] Add TypeScript adherence tests mirroring T020 using generated TS types `shared/schemas/tests/storyboard_scene_flavour.test.ts`
+- [x] T022 [P][test] Add JSON-Schema validation tests for the same five fixtures `shared/schemas/tests/storyboard_scene_flavour.schema.test.ts`
 
 ### Shared discriminated union (Article XV)
 
-- [ ] T023 Add `TimeRange`, `InstantSceneFeature`, `TimeRangeSceneFeature`, `SceneFeature` union, and `isTimeRangeScene` predicate (typed boundary narrowing, no `any`) `shared/components/src/storyboard/types.ts`
-- [ ] T024 [test] Predicate narrowing test (positive + negative cases) `shared/components/src/storyboard/__tests__/types.flavour.test.ts`
+- [x] T023 Add `TimeRange`, `InstantSceneFeature`, `TimeRangeSceneFeature`, `SceneFeature` union, and `isTimeRangeScene` predicate (typed boundary narrowing, no `any`) `shared/components/src/storyboard/types.ts`
+- [x] T024 [test] Predicate narrowing test (positive + negative cases) `shared/components/src/storyboard/__tests__/types.flavour.test.ts`
 
 ### ADR + en-GB messages
 
@@ -114,17 +114,17 @@
 - [ ] T029 [test] Capture command: step-2 writes a single Scene with `time_range` and `viewport_end` set, list updates once, transport state resets `apps/vscode/src/commands/__tests__/captureScene.range.test.ts`
 - [ ] T030 [test] Capture command: cancel path between step-1 and step-2 writes nothing and clears in-progress state; AND document-close (or active-Storyboard switch) mid-flow also resets transport.rangeInProgress to false `apps/vscode/src/commands/__tests__/captureScene.range.test.ts`
 - [ ] T031 [test] Capture command: `t_end <= t_start` is rejected at confirm time with a named error string from the en-GB messages module `apps/vscode/src/commands/__tests__/captureScene.range.test.ts`
-- [ ] T032 [test] CRUD createScene: accepts the `{ time_range, viewport_end }` pair, enforces XOR (FR-SCH-002), applies the existing `assertViewportBearingZero` to `viewport_end` too `shared/components/src/storyboard/__tests__/crud.flavour.test.ts`
-- [ ] T033 [test] CRUD updateScene: partial flavour edits are rejected (capture-and-replace pattern preserved per FR-SCO-002) `shared/components/src/storyboard/__tests__/crud.flavour.test.ts`
-- [ ] T034 [test] validate.ts: `flavourCheck()` accepts both valid flavours, rejects mixed flavour and reversed range `shared/components/src/storyboard/__tests__/validate.flavour.test.ts`
-- [ ] T035 [test] ordering.ts assertion: sort key is `(time_range?.start ?? timestamp, creation_order)`; instant-only Storyboards sort byte-equivalently to #259; mixed-flavour Storyboard sorts by `t_start` for time-range Scenes `shared/components/src/storyboard/__tests__/ordering.flavour.test.ts`
+- [x] T032 [test] CRUD createScene: accepts the `{ time_range, viewport_end }` pair, enforces XOR (FR-SCH-002), applies the existing `assertViewportBearingZero` to `viewport_end` too `shared/components/src/storyboard/__tests__/crud.flavour.test.ts`
+- [x] T033 [test] CRUD updateScene: partial flavour edits are rejected (capture-and-replace pattern preserved per FR-SCO-002) `shared/components/src/storyboard/__tests__/crud.flavour.test.ts`
+- [x] T034 [test] validate.ts: `flavourCheck()` accepts both valid flavours, rejects mixed flavour and reversed range `shared/components/src/storyboard/__tests__/validate.flavour.test.ts`
+- [x] T035 [test] ordering.ts assertion: sort key is `(time_range?.start ?? timestamp, creation_order)`; instant-only Storyboards sort byte-equivalently to #259; mixed-flavour Storyboard sorts by `t_start` for time-range Scenes `shared/components/src/storyboard/__tests__/ordering.flavour.test.ts`
 
 ### Implementation
 
-- [ ] T036 Extend CRUD `createScene` signature to accept optional `{ time_range, viewport_end }`; enforce XOR; pass `viewport_end` through bearing-zero assertion `shared/components/src/storyboard/crud.ts`
+- [x] T036 Extend CRUD `createScene` signature to accept optional `{ time_range, viewport_end }`; enforce XOR; pass `viewport_end` through bearing-zero assertion `shared/components/src/storyboard/crud.ts`
 - [ ] T037 Extend `updateScene` to reject partial flavour edits (returns named error) `shared/components/src/storyboard/crud.ts`
-- [ ] T038 Add `flavourCheck()` in validate, called from `createScene` and `updateScene` paths `shared/components/src/storyboard/validate.ts`
-- [ ] T039 [P] Change `ordering.ts` sort key from `(timestamp, creation_order)` to `(time_range?.start ?? timestamp, creation_order)` (review 2A — drops the R8 sort-anchor invariant; instant Scenes sort byte-equivalently to #259) `shared/components/src/storyboard/ordering.ts`
+- [x] T038 Add `flavourCheck()` in validate, called from `createScene` and `updateScene` paths `shared/components/src/storyboard/validate.ts`
+- [x] T039 [P] Change `ordering.ts` sort key from `(timestamp, creation_order)` to `(time_range?.start ?? timestamp, creation_order)` (review 2A — drops the R8 sort-anchor invariant; instant Scenes sort byte-equivalently to #259) `shared/components/src/storyboard/ordering.ts`
 - [ ] T040 Add `transport.rangeArmed` + `transport.rangeInProgress` state (transport-only, NOT in schema) `apps/vscode/src/services/transportState.ts`
 - [ ] T041 Wire the two-step state machine into `captureScene`: arm → step-1 (record `t_start`, `viewport`) → step-2 (record `t_end`, `viewport_end`, emit `createScene`) → cancel `apps/vscode/src/commands/captureScene.ts`
 - [ ] T042 Surface the `t_end <= t_start` rejection via the en-GB messages module and the panel banner `apps/vscode/src/commands/captureScene.ts`
@@ -156,19 +156,19 @@
 
 ### Tests first (FR-PLAY-001..005)
 
-- [ ] T047 [test] `executeTransition` branches on flavour: instant path is unchanged (calls `flyToViewport` + snaps `currentTime`) `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
-- [ ] T048 [test] `executeTransition` time-range forward: at wall-clock fraction `f` the slider is at `t_start + f·(t_end−t_start)` and the viewport is at the linear blend `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
-- [ ] T049 [test] `executeTransition` time-range forward: at completion slider rests at `t_end` and viewport rests at `viewport_end` (no drift, no overshoot) `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
-- [ ] T050 [test] Mixed-flavour Storyboard plays end-to-end without flavour cross-contamination `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
-- [ ] T051 [test] Degenerate range (`t_end == t_start`): viewport tweens, slider stays put, no divide-by-zero `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [x] T047 [test] `executeTransition` branches on flavour: instant path is unchanged (calls `flyToViewport` + snaps `currentTime`) `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [x] T048 [test] `executeTransition` time-range forward: at wall-clock fraction `f` the slider is at `t_start + f·(t_end−t_start)` and the viewport is at the linear blend `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [x] T049 [test] `executeTransition` time-range forward: at completion slider rests at `t_end` and viewport rests at `viewport_end` (no drift, no overshoot) `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [x] T050 [test] Mixed-flavour Storyboard plays end-to-end without flavour cross-contamination `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [x] T051 [test] Degenerate range (`t_end == t_start`): viewport tweens, slider stays put, no divide-by-zero `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
 
 ### Implementation
 
-- [ ] T052 Introduce `TimeRangeTween` primitive in the shared engine: single RAF loop that on each frame computes `f = clamp01((now − t0) / duration)` and applies both `session.setCurrentTime(...)` and `mapPanel.flyToViewport(linearBlend(...), 0)` via the ports `shared/components/src/storyboardPlayback/timeRangeTween.ts`
-- [ ] T053 Branch `executeTransition` on `isTimeRangeScene(scene)`: time-range path uses `TimeRangeTween`, instant path stays on existing `flyToViewport` + snap `shared/components/src/storyboardPlayback/storyboardPlaybackService.ts`
-- [ ] T054 Linear-blend helper for `Viewport` (geographic bounds; no rotation/bearing per Article XV invariants), pure function with unit-test coverage `shared/components/src/storyboardPlayback/timeRangeTween.ts`
-- [ ] T055 Confirm the MapPanel port's `flyToViewport(viewport, 0)` is the documented snap path used per-frame; no concrete `MapPanel` edit needed if both adapters already honour `durationMs == 0` as snap (verify in T047e contract test) `shared/components/src/storyboardPlayback/ports.ts`
-- [ ] T056 Ensure the lock-step write order is `setCurrentTime` then `flyToViewport` on each RAF tick (so feature-visibility windows resolve before redraw) `shared/components/src/storyboardPlayback/timeRangeTween.ts`
+- [x] T052 Introduce `TimeRangeTween` primitive in the shared engine: single RAF loop that on each frame computes `f = clamp01((now − t0) / duration)` and applies both `session.setCurrentTime(...)` and `mapPanel.flyToViewport(linearBlend(...), 0)` via the ports `shared/components/src/storyboardPlayback/timeRangeTween.ts`
+- [x] T053 Branch `executeTransition` on `isTimeRangeScene(scene)`: time-range path uses `TimeRangeTween`, instant path stays on existing `flyToViewport` + snap `shared/components/src/storyboardPlayback/storyboardPlaybackService.ts`
+- [x] T054 Linear-blend helper for `Viewport` (geographic bounds; no rotation/bearing per Article XV invariants), pure function with unit-test coverage `shared/components/src/storyboardPlayback/timeRangeTween.ts`
+- [x] T055 Confirm the MapPanel port's `flyToViewport(viewport, 0)` is the documented snap path used per-frame; no concrete `MapPanel` edit needed if both adapters already honour `durationMs == 0` as snap (verify in T047e contract test) `shared/components/src/storyboardPlayback/ports.ts`
+- [x] T056 Ensure the lock-step write order is `setCurrentTime` then `flyToViewport` on each RAF tick (so feature-visibility windows resolve before redraw) `shared/components/src/storyboardPlayback/timeRangeTween.ts`
 
 ### Performance gate (review 4A)
 
@@ -190,17 +190,17 @@
 
 ### Tests first (FR-PLAY-006, FR-PLAY-007)
 
-- [ ] T058 [test] Reverse `executeTransition` mid-scrub: at wall-clock fraction `f` slider is at `t_end − f·(t_end−t_start)`, viewport is the corresponding reverse blend `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
-- [ ] T059 [test] Reverse completion: slider rests exactly at `t_start`, viewport rests exactly at `viewport_start` `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
-- [ ] T060 [test] Forward+reverse symmetry: world state at forward `f` matches world state at reverse `1−f` (modulo direction) `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [x] T058 [test] Reverse `executeTransition` mid-scrub: at wall-clock fraction `f` slider is at `t_end − f·(t_end−t_start)`, viewport is the corresponding reverse blend `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [x] T059 [test] Reverse completion: slider rests exactly at `t_start`, viewport rests exactly at `viewport_start` `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
+- [x] T060 [test] Forward+reverse symmetry: world state at forward `f` matches world state at reverse `1−f` (modulo direction) `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
 - [ ] T061 [test] Interruption coherence: grabbing the slider mid-scrub aborts the tween cleanly; slider, viewport, and time-driven visuals all settle on one coherent moment within `[t_start, t_end]` `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
 - [ ] T062 [test] Selecting a different Scene mid-scrub aborts the tween and routes the new transition without forcing completion `shared/components/src/storyboardPlayback/__tests__/timeRange.test.ts`
 
 ### Implementation
 
-- [ ] T063 Extend `TimeRangeTween` to accept a direction flag (`forward | reverse`) and apply the symmetric blend formula `shared/components/src/storyboardPlayback/timeRangeTween.ts`
+- [x] T063 Extend `TimeRangeTween` to accept a direction flag (`forward | reverse`) and apply the symmetric blend formula `shared/components/src/storyboardPlayback/timeRangeTween.ts`
 - [ ] T064 Wire the reverse-playback entry path (the transport's reverse button / API) through the same `executeTransition` branch so reverse uses `TimeRangeTween` with `direction = 'reverse'` `shared/components/src/storyboardPlayback/storyboardPlaybackService.ts`
-- [ ] T065 Abort-on-interrupt: expose a `cancel()` on the active tween, called by transport state changes (pause/stop/scene-change/manual-scrub) `shared/components/src/storyboardPlayback/timeRangeTween.ts`
+- [x] T065 Abort-on-interrupt: expose a `cancel()` on the active tween, called by transport state changes (pause/stop/scene-change/manual-scrub) `shared/components/src/storyboardPlayback/timeRangeTween.ts`
 
 ### Interrupt-coherence subscriber test (review 3C)
 
@@ -246,9 +246,9 @@
 
 ### Evidence Collection
 
-- [ ] T077 Capture test results using `.specify/templates/evidence/test-summary-template.md` (YAML front matter: `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) `specs/263-time-range-scenes/evidence/test-summary.md`
-- [ ] T078 Create usage demonstration (capture flow + playback narrative + screenshots) `specs/263-time-range-scenes/evidence/usage-example.md`
-- [ ] T079 [P] Capture schema round-trip evidence (LinkML → Pydantic → JSON → TS → JSON for both flavours; reject samples for all three invalid fixtures) `specs/263-time-range-scenes/evidence/round-trip-evidence.md`
+- [x] T077 Capture test results using `.specify/templates/evidence/test-summary-template.md` (YAML front matter: `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) `specs/263-time-range-scenes/evidence/test-summary.md`
+- [x] T078 Create usage demonstration (capture flow + playback narrative + screenshots) `specs/263-time-range-scenes/evidence/usage-example.md`
+- [x] T079 [P] Capture schema round-trip evidence (LinkML → Pydantic → JSON → TS → JSON for both flavours; reject samples for all three invalid fixtures) `specs/263-time-range-scenes/evidence/round-trip-evidence.md`
 - [ ] T080 [P] Write the web-shell E2E summary (Playwright run report, links to screenshots and GIF) `specs/263-time-range-scenes/evidence/webview-e2e-summary.md`
 
 ### Media Content
