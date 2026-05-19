@@ -47,18 +47,26 @@ export interface SystemStateWriteInput {
 }
 
 /**
- * Identity of the calling host — required for provenance.
+ * Identity of the calling host — encoded into the LogEntry's `was_generated_by.tool`
+ * field per review resolution 2A (no new LogEntry schema fields).
  */
-export type SystemStateHost = 'vscode' | 'web-shell';
+export type SystemStateTool =
+  | 'vscode-extension'
+  | 'web-shell-session-state';
 
 /**
- * Provenance enrichment supplied at write time. The helper fills `host`, `timestamp`,
- * `action`, and `version` itself; the caller supplies `agent` (from LogService).
+ * Provenance enrichment supplied at write time. Fields map onto the existing LinkML
+ * LogEntry shape (Article II.1 — single source of truth, no parallel schema):
+ *   - tool, toolVersion        → LogEntry.was_generated_by.{tool, tool_version}
+ *   - agent                    → LogEntry.agent
+ *   - activityType (computed)  → LogEntry.activity_type
+ *   - timestamp (computed)     → LogEntry.timestamp
+ * The helper fills timestamp and activityType itself; the caller supplies the rest.
  */
 export interface SystemStateWriteContext {
-  host: SystemStateHost;
-  agent: string;            // typically from LogService.getAgent()
-  packageVersion: string;   // typically @debrief/session-state package.json version
+  tool: SystemStateTool;     // typically derived from a host-constant
+  toolVersion: string;       // typically @debrief/session-state package.json version
+  agent: string;             // typically from LogService.getAgent()
 }
 
 /**
@@ -70,9 +78,10 @@ export class SystemStateLoadError extends Error {
     | 'multiple-features-with-same-state-type'
     | 'malformed-feature'
     | 'unknown-state-type'
-    | 'missing-discriminator';
+    | 'missing-discriminator'
+    | 'cross-field-invariant';        // NEW per review resolution 3A (e.g. current_time outside window)
   readonly featureIds: string[];   // IDs of offending Features
-  readonly details?: unknown;      // e.g. Zod error issues
+  readonly details?: unknown;      // e.g. Zod error issues, or the violated invariant text
   constructor(opts: {
     kind: SystemStateLoadError['kind'];
     featureIds: string[];
@@ -226,6 +235,17 @@ This is Article IV.5's exhaustiveness mechanism applied to the helper.
 
 ---
 
+## Cross-field validation (per review resolution 3A)
+
+The helper's `validate.ts` runs **cross-field** checks beyond per-field Zod validation, surfacing violations as `SystemStateLoadError` with `kind: 'cross-field-invariant'`:
+
+| Invariant | Variant | Behaviour on violation |
+|---|---|---|
+| `current_time ∈ [start_time, end_time]` (when `current_time` present) | `temporal` | Load fails with structured error. No silent clamping. See `research.md` § R-011 for rationale (Article XIV.4 — strict on import). |
+| `start_time ≤ end_time` | `temporal` | Load fails — degenerate window is meaningless. |
+
+This is the smallest cross-field rule set that closes the F2 failure mode flagged in the review. Hosts surface the error message; users see "this plot's saved time-cursor (Jun 2024) is outside its analytical window (Jan 2024) — re-open after deleting the SystemState/temporal feature, or fix the source data".
+
 ## What the helper does NOT do (out-of-scope clarifications)
 
 - **Does not perform I/O.** Reading the plot file and the sidecar, writing them back — those happen in `load.ts` / `save.ts`. The helper is a pure transformation layer.
@@ -233,6 +253,7 @@ This is Article IV.5's exhaustiveness mechanism applied to the helper.
 - **Does not validate non-SystemState features.** Tracks, points, etc. are passed through untouched. Their validation is upstream of this work.
 - **Does not delete SystemState features.** There is no `delete` API. Writes are upserts only. Out of scope; can be added later if "reset SystemState" becomes a user-visible command.
 - **Does not migrate sidecar versions.** The `SessionFile` version bump (R-004) is in `load.ts` / `save.ts`, not the helper.
+- **Does not enforce save atomicity across sidecar + FC writes.** That sequencing concern is owned by the host's save command (per review resolution 3A and research.md § R-012). The helper is a pure transformation — it doesn't see the writes.
 
 ---
 

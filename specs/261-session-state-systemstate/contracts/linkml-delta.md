@@ -1,10 +1,12 @@
-# Contract: LinkML schema delta for `current_time`
+# Contract: LinkML schema delta for SystemState migration
 
 **Feature**: `261-session-state-systemstate`
 **File modified**: `shared/schemas/src/linkml/geojson.yaml`
-**Type of change**: Additive minor (Article II.3, FR-016).
+**Type of change**: Article XIV.1 pre-release refactor (`bbox`/`center` removal) + additive `current_time` + per-variant required-rules formalisation.
 
 This contract is the binding agreement on the LinkML schema change. The implementation may differ in YAML formatting but MUST match this contract in structure, field names, and semantic constraints.
+
+This delta resolves a pre-existing Article II.1 violation in the schema itself: today `SpatialSlice.viewport` uses `ViewportPolygon` (coordinates + zoom) while `SystemStateProperties` with `state_type=spatial` uses parallel `bbox`/`zoom`/`center` fields. Both purport to model the same concept ("map viewport"). Since no runtime code reads the latter (the variant has zero producers/consumers today), this delta unifies them on `ViewportPolygon` — per review resolution 1B.
 
 ---
 
@@ -46,19 +48,26 @@ This contract is the binding agreement on the LinkML schema change. The implemen
 +        range: datetime
 +        required: false
        # ---- spatial variant ----
-       bbox:
-         range: float
-         multivalued: true
-         exact_cardinality: 4
-         required: false
-       zoom:
-         range: float
-         required: false
-       center:
-         range: float
-         multivalued: true
-         exact_cardinality: 2
-         required: false
+-      bbox:
+-        range: float
+-        multivalued: true
+-        exact_cardinality: 4
+-        required: false
+-      zoom:
+-        range: float
+-        required: false
+-      center:
+-        range: float
+-        multivalued: true
+-        exact_cardinality: 2
+-        required: false
++      viewport:
++        description: >-
++          For spatial SystemState features, the saved map viewport as a
++          ViewportPolygon. Mirrors the in-memory SpatialSlice.viewport shape
++          exactly — no transformation at the persistence boundary.
++        range: ViewportPolygon
++        required: false
        # ---- selection variant ----
        selected_ids:
          range: string
@@ -80,18 +89,14 @@ This contract is the binding agreement on the LinkML schema change. The implemen
 +              required: true
 +            end_time:
 +              required: true
-+      - description: spatial variant requires bbox, zoom, and center
++      - description: spatial variant requires viewport
 +        preconditions:
 +          slot_conditions:
 +            state_type:
 +              equals_string: spatial
 +        postconditions:
 +          slot_conditions:
-+            bbox:
-+              required: true
-+            zoom:
-+              required: true
-+            center:
++            viewport:
 +              required: true
 +      - description: selection variant requires selected_ids
 +        preconditions:
@@ -117,16 +122,15 @@ This contract is the binding agreement on the LinkML schema change. The implemen
 
 ## What this delta DOES
 
-- Adds **one new optional attribute**: `current_time: datetime`.
+- Adds **one new optional attribute**: `current_time: datetime` (for the `temporal` variant).
+- **Removes three attributes**: `bbox`, `zoom`, `center` on `SystemStateProperties`. Replaced by **one new optional attribute**: `viewport: ViewportPolygon` (for the `spatial` variant). Permitted under Article XIV.1 (pre-release breaking changes) — zero runtime blast radius (the removed fields have no producers or consumers).
 - Adds **four `rules:` blocks** that pin per-variant required fields conditionally on `state_type`. This formalises constraints that have been implicit since #215; #237 did not codify them at the schema level. This work captures them now because the runtime helper relies on them being machine-checked.
 
 ## What this delta does NOT do
 
-- Does not rename any field.
-- Does not change the type of any existing field.
-- Does not remove any field.
+- Does not change `LogEntry`. Per review resolution 2A, provenance uses existing LogEntry fields (`agent`, `was_generated_by{tool, tool_version}`, `activity_type`, `timestamp`) with `tool` distinguishing host (`"vscode-extension"` | `"web-shell-session-state"`) — no `host` field is added.
 - Does not introduce a new variant of `SystemStateTypeEnum`.
-- Does not change `LogEntry` (a separate, scoped delta described in `data-model.md` § "Open issues" may add `host` to LogEntry — that's a downstream task, not part of this contract).
+- Does not change `ViewportPolygon` itself — uses the existing class definition.
 
 ## What this delta REQUIRES from downstream
 
@@ -144,7 +148,7 @@ A `SystemStateProperties` value written **before** this delta (i.e. an `active_s
 
 1. The new field `current_time` is optional.
 2. The new `rules:` block for `active_storyboard` requires `active_storyboard_id`, which #237's writer always populates.
-3. No existing field's required-ness changed (the `start_time` / `end_time` / `bbox` / etc. attributes remain class-level optional; per-variant required-ness is enforced by the new `rules:`).
+3. No existing field affecting the `active_storyboard` variant changed in required-ness. (The `bbox`/`zoom`/`center` removals only affect the `spatial` variant, which has no runtime producers today — zero plots in the wild contain spatial SystemState features.)
 
 Conversely, no `SystemStateProperties` value written **after** this delta would fail under the **pre-delta** schema for the `active_storyboard` variant, since that variant gains nothing in this delta.
 

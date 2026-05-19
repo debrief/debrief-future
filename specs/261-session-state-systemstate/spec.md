@@ -147,8 +147,20 @@ After this work, the `.debrief-session` sidecar file is **smaller** — it no lo
 
 #### Schema growth (Q2 resolution)
 
-- **FR-016**: The LinkML schema's `SystemStateProperties` `temporal` variant MUST gain a new field `current_time` (ISO-8601 timestamp, optional). Generated TypeScript and Python bindings MUST be regenerated. The schema bump MUST be additive — no removal of existing fields, no breaking changes to existing fixtures or runtime consumers.
+- **FR-016**: The LinkML schema's `SystemStateProperties` `temporal` variant MUST gain a new field `current_time` (ISO-8601 timestamp, optional). Generated TypeScript and Python bindings MUST be regenerated. The schema bump for the temporal variant MUST be additive — no removal of temporal fields, no breaking changes to the active_storyboard variant's fixtures or runtime consumers.
 - **FR-017**: Local playhead movement (scrubbing, playing, pausing, seeking) MUST NOT mark the plot as dirty. `current_time` is persisted into the plot file ONLY when an explicit save action runs. This preserves the existing save-vs-modified UX contract — the user controls when changes commit, not the playback machinery.
+
+#### Schema shape unification (review resolution 1B — Article II.1)
+
+- **FR-016a**: The LinkML schema's `SystemStateProperties` `spatial` variant MUST adopt `viewport: ViewportPolygon` as its single field, **replacing** the parallel `bbox`/`zoom`/`center` fields. Article XIV.1 (pre-release breaking change permitted) applies — verified zero runtime blast radius because no host produces or consumes the removed fields today. This collapses two LinkML representations of "map viewport" into one (the existing `ViewportPolygon` already used by `SpatialSlice`). See `contracts/linkml-delta.md` and `research.md` § R-010 for rationale.
+
+#### Cross-field invariants (review resolution 3A — closes F2)
+
+- **FR-018**: The shared SystemState helper's load-time validator MUST reject any `temporal` SystemState feature where `current_time` is present but lies outside `[start_time, end_time]`. The rejection MUST surface a structured `SystemStateLoadError` (kind `cross-field-invariant`) carrying the offending feature ID, the field values, and the violated invariant. No silent clamping (Article I.3, Article XIV.4). The helper MUST also reject any `temporal` feature where `start_time > end_time` for the same reason.
+
+#### Save atomicity (review resolution 3A — closes F1)
+
+- **FR-019**: The VS Code host's save command (`apps/vscode/src/commands/saveSession.ts`) MUST sequence the FeatureCollection write strictly **before** the sidecar write, and MUST abort the save (without touching the sidecar) if the FC write fails. If the FC write succeeds but the sidecar write fails, the user MUST be shown a recovery hint (the FC is updated; re-save to refresh per-machine fields). This closes the silent-failure path where the sidecar's `migration_lineage` could claim "migrated" while the FC actually lacks the new SystemState features. Web-shell is unaffected (single IndexedDB blob write — atomic by construction). See `research.md` § R-012.
 
 #### Backwards compatibility
 
@@ -181,7 +193,7 @@ The `active_storyboard` variant has already shipped runtime in web-shell. This w
 
 | Variant | Schema fields (post-this-work) | Sidecar fields today | Migration verdict | Reason |
 |---|---|---|---|---|
-| **`spatial`** | `bbox`, `zoom`, `center` | `viewport` (≈ bbox + zoom + center), `rotation`, `drawingMode`, `drawingPaletteIndex`, `viewportLocked` | **Migrate** `bbox`, `zoom`, `center`. **Keep in sidecar** `rotation`, `drawingMode`, `drawingPaletteIndex`, `viewportLocked`. | Plot-shared semantics uncontroversial for the viewport itself (this is the slice the approval flagged as "likely uncontroversial"). The other fields are editor / UI state with no schema home — keep per-user. |
+| **`spatial`** | `viewport: ViewportPolygon` (post-1B — replaces the legacy `bbox`/`zoom`/`center` fields) | `viewport: ViewportPolygon`, `rotation`, `drawingMode`, `drawingPaletteIndex`, `viewportLocked` | **Migrate** `viewport` (identity). **Keep in sidecar** `rotation`, `drawingMode`, `drawingPaletteIndex`, `viewportLocked`. | Plot-shared semantics uncontroversial for the viewport itself (this is the slice the approval flagged as "likely uncontroversial"). Per review 1B, the LinkML schema's spatial variant is harmonised onto the existing `ViewportPolygon` shape — no transformation, no parallel representations. The other fields are editor / UI state with no schema home — keep per-user. |
 | **`temporal`** | `start_time`, `end_time`, **`current_time` (new — added by this work)** | `currentTime`, `timeRange`, `timeFilter`, `stepSize`, `playbackRate`, `playbackState`, `displayMode` | **Migrate** `timeRange` → `{start_time, end_time}` **AND** `currentTime` → `current_time`. **Keep in sidecar** the playback-control fields (`playbackState`, `playbackRate`, `stepSize`, `displayMode`, `timeFilter`). | Per Q2 resolution (Option B — plot-shared): the analytical window AND the playhead position both ride with the plot, so a colleague opening the plot lands at the same moment the saver was viewing. Playback machinery (am I playing, at what speed, what's my step size) stays per-user — it has no analytical meaning. The schema's `temporal` variant grows one new field, `current_time` (see FR-016). |
 | **`selection`** | `selected_ids` | `selection` (selected feature IDs), plus sidecar carries `hiddenFeatureIds`, `styleVersion`, `featureCollectionUri` on the same `features` slice | **Migrate** `selected_ids`. **Keep in sidecar** `hiddenFeatureIds`, `styleVersion`, `featureCollectionUri`. | Per Q1 resolution (Option B — ship as plot-shared): selection is migrated now as plot-shared semantics. Future #251 work, if/when commissioned, will layer a per-user override on top (e.g. via a new per-user-scoped variant or a per-user store) — it will NOT revert this migration. The non-migrated `features`-slice fields are technical bookkeeping (URI binding, style version, hidden-set visibility) with no schema home. |
 
@@ -259,7 +271,8 @@ This recommendation is non-binding on #250 — that spec retains its own scoping
 
 - **NG-001**: This work does NOT retire the `.debrief-session` sidecar.
 - **NG-002**: This work does NOT introduce a per-user persistence layer for any variant. All migrated fields are plot-shared. (Future #251 may add per-user override semantics on top of `selection` — that is #251's work, not this.)
-- **NG-003**: This work extends the LinkML `SystemStateProperties` ONLY by adding `current_time` to the `temporal` variant (FR-016, Q2 resolution). No other variant gains fields. No fields are renamed, retyped, or removed.
+- **NG-003**: This work modifies the LinkML `SystemStateProperties` in two places only — (a) adds `current_time` to the `temporal` variant (FR-016, Q2 resolution); (b) replaces `bbox`/`zoom`/`center` with `viewport: ViewportPolygon` on the `spatial` variant (FR-016a, review resolution 1B). No other variant gains, loses, or renames fields. No changes to `LogEntry` (per review resolution 2A — uses existing fields).
 - **NG-004**: This work does NOT change the on-the-wire shape of the existing `active_storyboard` SystemState feature — only its writer location (host-private → shared helper) and the addition of a fixture.
 - **NG-005**: This work does NOT design or build web-shell's per-user persistence — that remains #250's scope, narrowed by this work.
 - **NG-006**: This work does NOT change the existing save-vs-dirty UX contract. Scrubbing the playhead does NOT mark the plot dirty (FR-017). Persistence remains driven by explicit save actions.
+- **NG-007**: This work does NOT make the broader VS Code save flow truly transactional (cross-file all-or-nothing — e.g. thumbnails + STAC assets + sidecar + FC). FR-019 only mandates atomicity for the FC↔sidecar pair on the migrated-state path. Broader save-flow atomicity is a separate Tech Debt item (Q4 spin-off — "VS Code save atomicity (broader)").

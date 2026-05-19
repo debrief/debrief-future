@@ -2,7 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-05-19
-**Updated**: 2026-05-19 (clarifications resolved — both [NEEDS CLARIFICATION] markers cleared)
+**Updated**: 2026-05-19 (Q1/Q2 clarifications + /speckit.review resolutions 1B / 2A / 3A all applied)
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -43,3 +43,18 @@
   - `current_time` joins the temporal variant (was: per-user, no schema change)
 - Schema growth introduced (`current_time` on `temporal` variant). Spec records this is the ONLY schema extension this work makes.
 - Spec is ready for `/speckit.clarify` (if further questions remain) or `/speckit.plan`.
+
+## /speckit.review resolutions (2026-05-19)
+
+The compressed review surfaced three plan defects, all resolved via the highest-impact options:
+
+- **1B — Spatial shape unified**: LinkML `SystemStateProperties.spatial` swapped from `bbox`/`zoom`/`center` to `viewport: ViewportPolygon` (identity-mapped to the slice). Resolves a pre-existing Article II.1 violation in the schema. Article XIV.1 covers the breaking change (zero runtime blast radius — no producers today). New FR-016a added; NG-003 updated.
+- **2A — Provenance uses existing LinkML LogEntry fields**: R-008 rewritten to map onto `agent`, `was_generated_by.{tool, tool_version}`, `activity_type`, `timestamp` rather than inventing `host`/`action`/`version`. No `host` field added to LogEntry. SystemStateWriteContext shape in `contracts/system-state-helper.ts.md` updated.
+- **3A — Test gaps closed**: FR-018 (cross-field invariant for `current_time`/window) closes F2 silent failure; FR-019 (VS Code save FC-first/sidecar-second) closes F1 silent failure; new legacy-plot fixture corpus closes the SC-005 false-confidence gap. Three test rows added to plan.md's Web-Shell E2E Testing table.
+
+Three backlog items spun off from the review:
+- #263 — Spatial-shape cleanup follow-up (any stale references to removed bbox/zoom/center shape)
+- #264 — Out-of-window `current_time` policy revisit (if strict-on-import proves user-hostile)
+- #265 — VS Code save atomicity (broader — the full save-flow transactional model, beyond just FC↔sidecar)
+
+Spec is ready for `/speckit.tasks`.

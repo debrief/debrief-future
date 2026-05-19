@@ -18,13 +18,11 @@ This document enumerates the entities the feature touches, their shapes, the rel
 |---|---|---|---|
 | `kind` | string (literal `"SYSTEM"`) | yes | Distinguishes SystemState features from spatial features. |
 | `state_type` | `SystemStateTypeEnum` | yes | Discriminator: `temporal` / `spatial` / `selection` / `active_storyboard`. |
-| `provenance` | `LogEntry[]` | yes | Append-only audit trail (Article III.3). |
+| `provenance` | `LogEntry[]` | yes | Append-only audit trail (Article III.3). Per review 2A — uses existing LinkML LogEntry fields verbatim, no new fields added. |
 | `start_time` | datetime | conditional | Required when `state_type=temporal`. |
 | `end_time` | datetime | conditional | Required when `state_type=temporal`. |
-| `current_time` | datetime | **NEW — optional** | The playhead at save time. Only meaningful when `state_type=temporal`. Optional initially per FR-016 (may tighten to required after a deprecation cycle). |
-| `bbox` | float[4] | conditional | Required when `state_type=spatial`. `[minLon, minLat, maxLon, maxLat]`. |
-| `zoom` | float | conditional | Required when `state_type=spatial`. Tile-server zoom level. |
-| `center` | float[2] | conditional | Required when `state_type=spatial`. `[lon, lat]`. |
+| `current_time` | datetime | **NEW — optional** | The playhead at save time. Only meaningful when `state_type=temporal`. Optional initially per FR-016 (may tighten to required after a deprecation cycle). Cross-field invariant: when present, must lie in `[start_time, end_time]` (FR-018 — R-011). |
+| `viewport` | `ViewportPolygon` | conditional | Required when `state_type=spatial`. Per review 1B — replaces the parallel `bbox`/`zoom`/`center` fields. Identity-mapped to `SpatialSlice.viewport`. |
 | `selected_ids` | string[] | conditional | Required when `state_type=selection`. May be empty array (= "explicit no-selection"). |
 | `active_storyboard_id` | string \| null | conditional | Required when `state_type=active_storyboard`. `null` = "explicit no pin"; absence of the feature entirely = "no preference, use default" (different semantics). |
 
@@ -55,7 +53,7 @@ This work does NOT add new enum values. It activates the three values (`temporal
 
 **Definition**: A GeoJSON `Feature` whose `properties` conform to `SystemStateProperties`. The `geometry` field is **always `null`** (these features have no spatial extent — they're state-bearing, not geographic).
 
-**Example — temporal variant**:
+**Example — temporal variant** (provenance shape per review 2A — uses existing LinkML LogEntry fields):
 
 ```json
 {
@@ -70,13 +68,43 @@ This work does NOT add new enum values. It activates the three values (`temporal
     "current_time": "2024-01-03T14:30:00Z",
     "provenance": [
       {
-        "agent": "alice@machine-7",
-        "action": "created",
-        "host": "vscode",
+        "activity_id": "01HZ0PROV0EXAMPLE",
         "timestamp": "2026-05-19T10:14:22Z",
-        "version": "0.4.2"
+        "agent": "alice@machine-7",
+        "activity_type": "created",
+        "was_generated_by": {
+          "tool": "vscode-extension",
+          "tool_version": "0.4.2"
+        },
+        "used": [],
+        "generated": ["sys-temporal-01HZ0EXAMPLE"],
+        "execution_duration": "PT0S"
       }
     ]
+  }
+}
+```
+
+**Example — spatial variant** (post-1B — viewport carries ViewportPolygon identity, not bbox+center):
+
+```json
+{
+  "type": "Feature",
+  "id": "sys-spatial-01HZ1EXAMPLE",
+  "geometry": null,
+  "properties": {
+    "kind": "SYSTEM",
+    "state_type": "spatial",
+    "viewport": {
+      "coordinates": [
+        { "longitude": -3.5, "latitude": 51.5 },
+        { "longitude":  2.5, "latitude": 51.5 },
+        { "longitude":  2.5, "latitude": 50.0 },
+        { "longitude": -3.5, "latitude": 50.0 }
+      ],
+      "zoom": 8
+    },
+    "provenance": [ /* same shape as above */ ]
   }
 }
 ```
@@ -249,7 +277,9 @@ There is no `updated → absent` transition in this work — clearing a SystemSt
 | Provenance array non-empty | Helper `write.ts` enforces — never writes without appending a LogEntry. | III.1 |
 | Provenance is append-only | Helper `write.ts` only appends; type system enforces (no public mutators). | III.3 |
 | Per-variant required fields populated (e.g. temporal requires start_time + end_time) | LinkML `rules` block; Pydantic at adherence-test gate; Zod at runtime load. | XIV.4 |
-| `current_time` (when present) lies within `[start_time, end_time]` | **Not enforced in this work.** Out of scope — a future feature may add this rule once the temporal-window semantics are settled. (See "Out of scope" in spec.) | — |
+| `current_time` (when present) lies within `[start_time, end_time]` | Helper `validate.ts` cross-field check at runtime load. Throws `SystemStateLoadError(kind='cross-field-invariant')`. **Per review 3A / R-011.** | I.3, XIV.4 |
+| `start_time ≤ end_time` (degenerate-window check) | Helper `validate.ts` cross-field check. Throws `SystemStateLoadError(kind='cross-field-invariant')`. | I.3, XIV.4 |
+| VS Code save: FC write must succeed before sidecar write commits | Host save command (saveSession.ts) — FC-first, sidecar-second flow per R-012. **Per review 3A.** | I.3 |
 
 ---
 
@@ -263,7 +293,7 @@ There is no `updated → absent` transition in this work — clearing a SystemSt
 
 ### `spatial`
 
-- Migrated from sidecar: `spatial.viewport.bbox` → `bbox`; `spatial.viewport.zoom` → `zoom`; `spatial.viewport.center` → `center`.
+- Migrated from sidecar: `spatial.viewport` → `viewport` (identity — same `ViewportPolygon` shape on both sides, per review 1B / R-010).
 - Stays in sidecar (per-user): `spatial.rotation`, `spatial.drawingMode`, `spatial.drawingPaletteIndex`, `spatial.viewportLocked`.
 - Default when absent: derived from the plot's bbox extent (existing behaviour).
 

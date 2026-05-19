@@ -190,21 +190,33 @@ The migration is **one PR**, in three sequenced commits, so each commit is revie
 
 ---
 
-## R-008: Provenance shape per write (FR-010, Article III.1)
+## R-008: Provenance shape per write (FR-010, Article III.1) — REVISED per review 2A
 
-**Decision**: Every `SystemState` write appends a single `LogEntry` to the variant's `provenance` array. The `LogEntry` fields used:
+**Decision**: Every `SystemState` write appends a single `LogEntry` to the variant's `provenance` array, using **the existing LinkML `LogEntry` shape — no new fields added**.
 
-- `agent` — set to the value produced by the existing `LogService.getAgent()` infrastructure (per Assumption 3 in spec — agent identity may be enriched by #221 in future).
-- `action` — one of `"created"`, `"updated"`, `"replaced"` depending on whether a feature of this `state_type` previously existed in the FeatureCollection.
-- `host` — `"vscode"` | `"web-shell"` (a new fields on `LogEntry` if not already present — check during data-model phase).
-- `timestamp` — ISO-8601 UTC, generated at save time.
-- `version` — the session-state package version (`@debrief/session-state` package.json `version` field), so old provenance entries can be diagnosed.
+Field mapping (verified against `shared/schemas/src/linkml/log-entry.yaml`):
+
+| Concept | LogEntry field | Value at write time |
+|---|---|---|
+| Producing host | `was_generated_by.tool` | `"vscode-extension"` \| `"web-shell-session-state"` |
+| Producing host version | `was_generated_by.tool_version` | `@debrief/session-state` package.json `version` |
+| User-or-agent identity | `agent` | from existing `LogService.getAgent()` infrastructure (per Assumption 3 in spec; #221 will enrich this) |
+| Write action | `activity_type` | `"created"` \| `"updated"` \| `"replaced"` (LinkML `ActivityType` enum gains these if they don't already exist — single value-set extension at most, no new top-level fields) |
+| When | `timestamp` | ISO-8601 UTC at save time |
+| Activity ID | `activity_id` | fresh ULID per write |
+| Required structural fields (per LinkML LogEntry spec) | `used`, `generated`, `execution_duration` | populated with sensible defaults — `used=[]` (no source inputs for state captures), `generated=[<SystemState feature id>]`, `execution_duration="PT0S"` (instantaneous capture) |
 
 The provenance array is *append-only* per Article III.3. The helper never modifies existing entries — it only appends.
 
+**Why this revision**: The original draft of R-008 invented three fields (`host`, `action`, `version`) that don't exist on the LinkML `LogEntry` class. This would have been a silent second schema change, violating Article II.3 (no undocumented schema growth) and Article IV.5 (boundary types must be derived, not rewritten). The fix maps onto the existing typed surface — adding at most enum values to `ActivityType` if needed, but no new fields. See `contracts/system-state-helper.ts.md` `SystemStateWriteContext` for the helper-side shape.
+
+**Open task for `/speckit.tasks`**: confirm `ActivityType` enum already includes (or grows to include) `"created"`, `"updated"`, `"replaced"`. If the enum has different terminology today, adopt it rather than extending. Either way the change is to the value-set, not the structure.
+
 **Alternatives considered**:
-1. **One LogEntry per migrated field**. Rejected — overflows the provenance array on every save; field-level provenance can be reconstructed from the LogEntry timestamp + the value at that time.
-2. **Provenance only on first write**. Rejected — Article III.1 (provenance always) and III.3 (immutable audit trail) want a continuous lineage, not just genesis.
+1. **Add `host`/`action`/`version` to LogEntry as a parallel schema delta**. Rejected per review 2A — breadth of blast radius (LogEntry is used everywhere; new fields would force every existing fixture and writer to migrate).
+2. **One LogEntry per migrated field**. Rejected — overflows the provenance array on every save; field-level provenance can be reconstructed from the LogEntry timestamp + the value at that time.
+3. **Provenance only on first write**. Rejected — Article III.1 (provenance always) and III.3 (immutable audit trail) want a continuous lineage, not just genesis.
+4. **Skip provenance for SystemState writes**. Rejected — violates Article III.1.
 
 ---
 
@@ -222,6 +234,107 @@ The provenance array is *append-only* per Article III.3. The helper never modifi
 | Candidate with `properties.kind === "SYSTEM"` but no `state_type` at all | Load error: surfaces feature ID, missing discriminator. **Article XIV.4 — strict.** |
 
 No "skip and continue" tolerance. Each error halts load and is surfaced to the host with structured detail.
+
+---
+
+---
+
+## R-010: Spatial shape unification (review resolution 1B)
+
+**Problem surfaced by review**: the LinkML schema contains two parallel representations of "map viewport":
+
+- `ViewportPolygon` (`{ coordinates: Coordinate[]; zoom?: number }`) — consumed by `SpatialSlice.viewport` and the map components.
+- `SystemStateProperties` with `state_type=spatial` — the `bbox: float[4]` + `zoom: float` + `center: float[2]` fields modelled in #215 but never produced.
+
+These purport to model the same concept ("the saved viewport"). They have different field shapes and different field names. This is an Article II.1 (single source of truth) violation in the schema itself, pre-dating this work.
+
+**Decision**: Unify on `ViewportPolygon`. The LinkML delta (`contracts/linkml-delta.md`) **removes** `bbox`, `zoom`, `center` from `SystemStateProperties` and **adds** `viewport: ViewportPolygon`. The slice mapping becomes an identity rather than a transformation. Article XIV.1 (pre-release breaking changes permitted) covers the removal — zero runtime blast radius because no host produces or consumes the old fields today.
+
+**Rationale**:
+
+1. **Article II.1** — collapses two schema representations into one. The schema is now self-consistent.
+2. **Minimal-diff helper** — the helper has no spatial conversion code. `mapping.ts` doesn't carry `polygonToBboxCenter` / `bboxCenterToPolygon` functions, which would have been a maintenance hot-spot and a round-trip-drift risk.
+3. **Zero migration cost for existing plots** — no plot in the wild contains a `SystemState`/`spatial` feature, so no plot needs conversion.
+4. **ViewportPolygon is more expressive** — preserves the exact four corners. Bbox+center is a *projection* (loses orientation if a future iteration wants tilted viewports; even though `rotation` is per-machine today, the wire shape doesn't pre-emptively flatten).
+
+**Alternatives considered**:
+1. **Conversion pair (1A)** — `polygonToBboxCenter` / `bboxCenterToPolygon` round-trip in the helper, both shapes preserved. Rejected — keeps the Article II.1 violation in the schema; adds drift risk; doubles maintenance.
+2. **Defer spatial migration (1C)** — ship temporal + selection only. Rejected — spatial was the *uncontroversial* slice per approval; deferring it would leave the user-visible primary (Story 1) unfinished.
+3. **Unify on bbox+zoom+center (slice changes shape)** — refactor `SpatialSlice.viewport` to drop `ViewportPolygon`. Rejected — far larger blast radius (map components consume `ViewportPolygon`), and `ViewportPolygon` is the more expressive shape anyway.
+
+**Open task for `/speckit.tasks`**: confirm no other consumers of the old `SystemStateProperties.bbox`/`zoom`/`center` fields exist (search `bbox`, `center` against `SystemStateProperties` references). Expected to be zero. If non-zero, treat as additional cleanup — see "Spatial shape cleanup follow-up" backlog item (Q4).
+
+---
+
+## R-011: `current_time` bounds validation (review resolution 3A — closes F2)
+
+**Problem surfaced by review**: a colleague's plot could carry `start_time=2024-01-01`, `end_time=2024-01-31`, `current_time=2024-06-01`. The original plan deferred this as "out of scope to validate". Runtime behaviour was undefined — the playhead would render off-screen or wrap to an arbitrary position, silently. Article I.3 (no silent failures) violation.
+
+**Decision**: The helper's `validate.ts` enforces a cross-field invariant: **`current_time ∈ [start_time, end_time]`** when all three are present. Violation triggers `SystemStateLoadError` with `kind: 'cross-field-invariant'`. No silent clamping. Article XIV.4 (strict on import) applies.
+
+A second cross-field rule comes along: **`start_time ≤ end_time`** — a degenerate window is meaningless, and catching it explicitly improves error reporting.
+
+**Behaviour at the host**: The error is surfaced to the user with the offending feature ID, the offending field values, and the violated invariant. The host decides whether to bail the load entirely or offer "open with sidecar defaults" — but the helper does not silently fall back.
+
+**Rationale**:
+- Article I.3 — no silent failures on the new persistence path.
+- Article XIV.4 — strict on import. The data is wrong; we say so, we don't bend the runtime to accommodate it.
+- Article XIV.5 — fix the data, not the consumer. The user (or the producing host) is responsible for fixing the malformed plot.
+
+**Alternatives considered**:
+1. **Clamp `current_time` to `[start_time, end_time]` silently**. Rejected — Article I.3.
+2. **Surface a warning, proceed with `current_time = start_time`**. Rejected — warnings get ignored; the user wouldn't see them. Worse than a hard error for a load-time problem.
+3. **Stay deferred (original plan position)**. Rejected — review identified the silent-failure path as a critical gap.
+
+**Open task for `/speckit.tasks`**: define the exact error-message text the host surfaces to the user. The helper's responsibility ends at the structured error; user-facing copy is host-side.
+
+**Backlog spin-off**: if future UX research wants tolerant behaviour (e.g. "out-of-window playhead → snap to nearest edge with a toast"), the policy can be revisited via a separate backlog item — see Q4 spin-off "Out-of-window current_time policy". This work commits to the strict-on-import default.
+
+---
+
+## R-012: VS Code save atomicity (review resolution 3A — closes F1)
+
+**Problem surfaced by review**: `apps/vscode/src/commands/saveSession.ts:163–208` performs the sidecar write at line 163, the FC write at line 178, and **catches FC write failures as non-blocking at line 180**. Pre-this-feature this was tolerable (no SystemState in the FC). Post-this-feature, sidecar saying "I migrated my spatial state" while the FC lacks the spatial SystemState feature creates a silent inconsistency on the next load (the sidecar fallback for spatial is short-circuited because `migration_lineage` says "migrated", but the SystemStateMap is empty). Article I.3 violation.
+
+**Decision**: Reorder and tighten the save flow.
+
+```text
+NEW save flow (VS Code) — replaces saveSession.ts:163–208:
+  1. Compose the desired post-save Zustand store state in memory.
+  2. Call writeSystemStateIntoFeatureCollection(currentFC, input, ctx) → newFC.
+  3. Call prepareSidecarForSave(...) → newSidecar (with version 1.2.0).
+  4. Attempt FC write first:
+       try: await storeFeatureCollection(storePath, plotUri, newFC.features)
+       catch: PROPAGATE — do not write sidecar. User sees a save-failed error.
+                The plot is unchanged. The sidecar is unchanged.
+  5. Then attempt sidecar write:
+       try: await writeSidecar(sidecarPath, newSidecar)
+       catch: PROPAGATE with a recovery hint — "FC was written but sidecar was not;
+                next open may use defaults for per-machine fields. Re-save to recover."
+                The plot is updated (new SystemState features present); the sidecar is stale.
+                This is recoverable on next save and SAFE for the new migrated state
+                (plot-shared fields all live in the FC).
+```
+
+Atomicity model: **FC-first, sidecar-second.** If both succeed, perfect. If FC fails, neither is touched. If FC succeeds but sidecar fails, the plot is in a *forward-compatible* state (new fields persisted; old per-machine fields may use defaults next time) and the user is told.
+
+This deliberately treats the FC write as the primary commit. Rationale:
+1. The FC is where the user's *content* lives. Losing the FC write is the irrecoverable case.
+2. The sidecar is per-machine. Losing it is recoverable (defaults + re-save).
+3. The order matches the data flow direction — content first, metadata second.
+
+**Test coverage** (from review 3A):
+- Mock `storeFeatureCollection` to throw → assert sidecar NOT written, error propagates.
+- Mock sidecar write to throw after FC succeeds → assert FC contains new SystemState features, error propagates with recovery hint, user sees correct error.
+
+**Out of scope** (per review resolution; backlog candidate at Q4): making the broader save flow truly transactional (cross-file, all-or-nothing). The thumbnails step at saveSession.ts:184–203 already has its own non-atomic semantics; this work only addresses the FC↔sidecar pair on the migrated-state path.
+
+**Web-shell parity**: `apps/web-shell/src/services/stacWriterIdb.ts` writes the whole FC blob in a single IndexedDB transaction (verified — lines 487–500). No sidecar exists. Atomic by construction; no host-side work needed.
+
+**Alternatives considered**:
+1. **Sidecar-first, FC-second**. Rejected — sidecar saying "I migrated" before the FC actually carries the new features is the failure mode we're closing.
+2. **Two-phase commit with rollback**. Rejected — file-system rollback in Node.js is non-trivial and the FC-first order makes recovery natural without it.
+3. **Defer the fix**. Rejected per review 3A — ships a known Article I.3 violation.
 
 ---
 

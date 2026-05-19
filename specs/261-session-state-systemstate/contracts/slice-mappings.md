@@ -38,11 +38,11 @@ const TEMPORAL_MIGRATION_SCOPE = {
 
 ## `spatial` slice ↔ `spatial` SystemState variant
 
+Post-review (1B), the LinkML schema's `SystemStateProperties.spatial` variant carries a `viewport: ViewportPolygon` field whose shape is **identical** to `SpatialSlice.viewport`. The mapping is therefore an identity — no transformation, no derivation, no risk of round-trip drift.
+
 | Zustand store key (`SpatialSlice.X`) | SystemStateProperties field | Verdict | Notes |
 |---|---|---|---|
-| `viewport.bbox` (`[number, number, number, number]`) | `bbox` (`float[4]`) | **Migrate** | Plot-shared map view. |
-| `viewport.zoom` (number) | `zoom` (float) | **Migrate** | Plot-shared map view. |
-| `viewport.center` (`[number, number]`) | `center` (`float[2]`) | **Migrate** | Plot-shared map view. |
+| `viewport` (`ViewportPolygon \| null`) | `viewport` (`ViewportPolygon`) | **Migrate** (identity) | Plot-shared map view. Same shape on both sides — no conversion. `null` on the slice maps to "no SystemState/spatial feature written" (and vice versa on load). |
 | `rotation` (number) | — | Stay in sidecar | Per-machine map rotation; no schema home. |
 | `drawingMode` (enum) | — | Stay in sidecar | Per-machine editor state. |
 | `drawingPaletteIndex` (number) | — | Stay in sidecar | Per-machine editor state. |
@@ -52,15 +52,15 @@ const TEMPORAL_MIGRATION_SCOPE = {
 ```typescript
 const SPATIAL_MIGRATION_SCOPE = {
   storeToVariant: {
-    'viewport.bbox':   'bbox',
-    'viewport.zoom':   'zoom',
-    'viewport.center': 'center',
+    'viewport': 'viewport',   // identity — same ViewportPolygon shape on both sides
   },
   staysInSidecar: [
     'rotation', 'drawingMode', 'drawingPaletteIndex', 'viewportLocked',
   ],
 } as const;
 ```
+
+**Why identity, not bbox/zoom/center**: Resolves a pre-existing Article II.1 violation in the LinkML schema, where `ViewportPolygon` and the old `bbox`/`zoom`/`center` parallel fields modelled the same concept. The schema is now the single source of truth for "what a saved viewport is shaped like", and the helper does not need a spatial-shape conversion function. See `linkml-delta.md` and `research.md` § R-010 for rationale.
 
 ---
 
