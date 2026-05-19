@@ -22,10 +22,12 @@ from `file://` origin (or any HTTP origin — the SPA is origin-agnostic).
 │       </App>                                                    │
 │ 6. Instantiate StoryboardPlaybackService with browser adapters: │
 │       new StoryboardPlaybackService({                           │
-│         map: new BrowserMapAdapter(leafletMapRef),              │
-│         session: new LocalSessionStoreAdapter(zustand),         │
-│         panel: new BrowserPanelViewAdapter(zustand),            │
-│         timeRange: new BrowserTimeRangeViewAdapter(zustand),    │
+│         mapPanel:        new BrowserMapAdapter(leafletMapRef),  │
+│         sessionManager:  new LocalSessionStoreAdapter(zustand), │
+│         panelView:       new BrowserPanelViewAdapter(zustand),  │
+│         timeRangeView:   new BrowserTimeRangeViewAdapter(zustand),│
+│         // runTimeRangeTween + defaultScheduler imported from   │
+│         // @debrief/components/storyboardPlayback (shipped #263)│
 │       })                                                        │
 │ 7. Render first Scene (Scene 0) at rest. Wait for user input.   │
 └─────────────────────────────────────────────────────────────────┘
@@ -104,9 +106,21 @@ const handlePresentEntry = () => {
 
 ## Playback contract (inherited from #217 / #258 / #263)
 
-The SPA does **not** reimplement playback. It composes the existing
-`StoryboardPlaybackService` (hoisted to
-`shared/components/src/storyboard/playback/`) with browser adapters.
+The SPA does **not** reimplement playback. It composes:
+
+- `StoryboardPlaybackService` (hoisted by this feature from
+  `apps/vscode/src/services/storyboardPlayback.ts` to
+  `shared/components/src/storyboardPlayback/service.ts`) — the
+  orchestrator that branches on `isTimeRangeScene(scene)` and chooses
+  between the instant and time-range paths.
+- `runTimeRangeTween` + `defaultScheduler` from
+  `shared/components/src/storyboardPlayback/timeRangeTween.ts` — the
+  host-agnostic RAF-driven primitive already shipped by #263 that drives
+  per-frame `setCurrentTime()` + `flyToViewport(durationMs=0)` for
+  time-range Scenes.
+
+with four browser port adapters supplied by the SPA. The SPA never
+forks or shadows playback logic.
 
 Per-Scene behaviour follows the parent contract verbatim:
 

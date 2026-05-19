@@ -18,11 +18,13 @@ JSZip and writes it to a user-chosen path. The SPA composes the existing
 `shared/components/`) with browser-side port adapters so playback is
 indistinguishable from the authoring environment.
 
-**Implementation is blocked on #263 merging** — the briefing SPA must
-play back time-range Scenes correctly, and the shared engine that
-handles that case is #263's deliverable. Specification + plan can land
-in parallel with #263; the first implementation task does not start
-until #263 is on `main`.
+**#263 has shipped (commit 38bce0d on main, merged 2026-05-19).** All
+the deliverables this feature inherits — `time_range` / `viewport_end`
+optional slots, the `flavourCheck` XOR validator, the `isTimeRangeScene`
+predicate, the host-agnostic `runTimeRangeTween` primitive at
+`shared/components/src/storyboardPlayback/timeRangeTween.ts`, and the new
+`PlaybackTimeRangeView.setScrubbableRange(start, end)` port — are now in
+main and consumable by this feature's implementation.
 
 ## Technical Context
 
@@ -33,7 +35,14 @@ the export command (VS Code Node-side) and the SPA (browser).
 - `react-leaflet` 4.2 + `leaflet` 1.9.x (map + tile rendering — same
   stack used by the authoring `MapView`)
 - `zustand` ^5.0.0 (SPA-local playback store)
-- `@debrief/components` (`StoryboardPlaybackService` hoisted here; `MapView`)
+- `@debrief/components` —
+  - `StoryboardPlaybackService` (hoisted here from `apps/vscode/`),
+  - `runTimeRangeTween` + `defaultScheduler` (already shipped by #263 at
+    `shared/components/src/storyboardPlayback/timeRangeTween.ts` — used
+    verbatim by the SPA's playback adapter),
+  - `flavourCheck` + `isTimeRangeScene` (#263, `shared/components/src/storyboard/`)
+    — reused at the SPA boundary,
+  - `MapView`
 - `@debrief/schemas` (StoryboardFeature, SceneFeature, PlotFeatureCollection,
   StacItem — boundary types derived via `Pick`/alias per Article IV.5)
 - `jszip` ^3.10.x (**new** dep — see research.md R3 + Article IX
@@ -94,8 +103,9 @@ The SPA is a sibling to `apps/backlog-navigator/` and
 - One new VS Code command + helper service
   (`apps/vscode/src/services/briefingZipExport/`, ~600 LOC TS + tests).
 - One mechanical refactor: hoist `storyboardPlayback.ts` from
-  `apps/vscode/src/services/` to `shared/components/src/storyboard/playback/`
-  (no logic change; ~3 imports updated).
+  `apps/vscode/src/services/` to `shared/components/src/storyboardPlayback/service.ts`
+  (alongside `timeRangeTween.ts` that #263 already placed there). No
+  logic change; ~3 imports updated in the VS Code app.
 - One new dependency (`jszip`) in the VS Code extension.
 
 ## Constitution Check
@@ -252,11 +262,12 @@ apps/vscode/
 
 shared/components/
 └── src/
-    └── storyboard/
-        └── playback/                            # NEW — hoisted from apps/vscode/src/services/
-            ├── service.ts                       # StoryboardPlaybackService
-            ├── ports.ts                         # MapPanel, SessionStoreApi, PanelView, TimeRangeView
-            └── index.ts
+    └── storyboardPlayback/                      # Already present after #263:
+        ├── timeRangeTween.ts                    #   - shipped by #263 (runTimeRangeTween, defaultScheduler, FrameScheduler)
+        ├── service.ts                           # NEW — hoisted from apps/vscode/src/services/storyboardPlayback.ts
+        ├── ports.ts                             # NEW — extracted PlaybackMapPanel, PlaybackSessionManager,
+        │                                        #       PlaybackPanelView, PlaybackTimeRangeView interfaces
+        └── index.ts                             # NEW — barrel
 ```
 
 **Structure Decision**: standalone SPA at `apps/briefing-renderer/`
@@ -339,7 +350,7 @@ Summary of decisions:
 | R1 | `file://` loading strategy | Inlined `<script type="application/json">` for data; relative `<img>` / Leaflet `TileLayer` for binary assets. |
 | R2 | Basemap tile coverage | Per-Scene captured zoom + interpolation-path coverage for time-range Scenes; +1 tile padding; `tiles/{z}/{x}/{y}.png` layout. |
 | R3 | ZIP library | `jszip` ^3.10.x (new dep). |
-| R4 | Playback engine | Hoist `StoryboardPlaybackService` to `shared/components/`; SPA supplies four port adapters. |
+| R4 | Playback engine | Hoist `StoryboardPlaybackService` to `shared/components/src/storyboardPlayback/`; reuse the host-agnostic `runTimeRangeTween` already placed there by #263; SPA supplies four port adapters (`PlaybackMapPanel`, `PlaybackSessionManager`, `PlaybackPanelView`, `PlaybackTimeRangeView`). |
 | R5 | Storyboard scoping | Closure of `storyboard_id`-matched Scenes + `visible_feature_ids` union. |
 | R6 | Browser compat | Chrome, Firefox, Edge, Safari current; mobile best-effort. |
 | R7 | SPA build & distribution | Vite static build → committed-bundle resource in the VS Code extension → copied into each export's zip. |
@@ -402,7 +413,20 @@ After Phase 1 design completed, re-verify each gate:
 | IX.1 Minimal vetted dependencies | ✓ — one new dep (`jszip`), justified. |
 | XV Strict type safety | ✓ — boundary validation narrows untyped JSON to typed models. |
 
-**All gates remain green.** Implementation can proceed once #263 lands.
+**All gates remain green.** **#263 has landed — implementation can
+proceed immediately after `/speckit.tasks`.**
+
+### New ADR to reference
+
+#263 added an ADR — `docs/project_notes/decisions.md` § ADR-NEW
+(2026-05-19) "Time-range Scene schema is additive, no version bump
+(Spec #263)" — which records that the two new Scene slots
+(`time_range`, `viewport_end`) are Optional and gated by an XOR rule
+enforced in three layers (LinkML rules → JSON Schema `if/then` →
+`flavourCheck()` in `validate.ts`). The briefing renderer SPA inherits
+this contract verbatim: it reuses the same `flavourCheck()` at its load
+boundary and the `isTimeRangeScene()` predicate at the playback branch.
+No additional ADR is added by this feature.
 
 ## Open follow-ups for `/speckit.tasks`
 
@@ -410,13 +434,20 @@ These belong in `tasks.md` (generated by the next command) but are
 captured here for traceability:
 
 1. **T-HOIST**: hoist `apps/vscode/src/services/storyboardPlayback.ts` →
-   `shared/components/src/storyboard/playback/`. Update 3 imports.
+   `shared/components/src/storyboardPlayback/service.ts` (alongside the
+   `timeRangeTween.ts` #263 already placed there). Extract the four port
+   interfaces into `…/ports.ts`. Update ~3 imports in the VS Code app.
    Net-zero logic change. Verifiable by existing tests still passing.
 2. **T-SPA-SHELL**: scaffold `apps/briefing-renderer/` (package.json,
    vite.config.ts, tsconfig, run-playwright.mjs, index.html template,
    main.tsx, App.tsx, store.ts). Boots to "empty briefing" placeholder.
-3. **T-ADAPTERS**: implement the four browser port adapters
-   (BrowserMap, LocalSessionStore, BrowserPanelView, BrowserTimeRangeView).
+3. **T-ADAPTERS**: implement the four browser port adapters:
+   `BrowserMapAdapter` (implements `PlaybackMapPanel`),
+   `LocalSessionStoreAdapter` (implements `PlaybackSessionManager`),
+   `BrowserPanelViewAdapter` (implements `PlaybackPanelView`),
+   `BrowserTimeRangeViewAdapter` (implements
+   `PlaybackTimeRangeView.setScrubbableRange(start, end)` —
+   the port name #263 added).
 4. **T-LOADER**: implement `inlineDataLoader` with boundary validation.
 5. **T-CHROME**: implement Minimal + Present chrome (TransportBar,
    TimeSlider, ModeToggle, MinimalChrome, PresentChrome) + Storybook

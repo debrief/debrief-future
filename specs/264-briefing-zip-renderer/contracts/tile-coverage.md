@@ -38,29 +38,44 @@ export function computeTileCoverage(input: TileCoverageInput): TileCoverageOutpu
 
 ## Algorithm
 
+Flavour branch uses `isTimeRangeScene(scene)` from
+`@debrief/components/storyboard` — the same predicate the playback
+service uses. Post-narrowing, time-range Scenes are typed
+`TimeRangeSceneFeature`, which makes `viewport_end` non-optional and
+`time_range.start`/`.end` (ISO-8601 strings) non-optional on the
+narrowed value.
+
 ```text
 for each scene in input.scenes:
-    if scene.time_range == null:
+    if not isTimeRangeScene(scene):
         # instant Scene
-        addCoverage(scene.viewport, scene.viewport.zoom)
+        addCoverage(scene.properties.viewport, scene.properties.viewport.zoom)
     else:
-        # time-range Scene (#263)
-        addCoverage(scene.viewport,     scene.viewport.zoom)
-        addCoverage(scene.viewport_end, scene.viewport_end.zoom)
+        # time-range Scene (#263) — viewport_end and time_range are present
+        let v_start = scene.properties.viewport
+        let v_end   = scene.properties.viewport_end
+        addCoverage(v_start, v_start.zoom)
+        addCoverage(v_end,   v_end.zoom)
         # sample the interpolation path so mid-tween pans don't show holes
         for f in [0..1] step (1 / samples):
-            v = lerpViewport(scene.viewport, scene.viewport_end, f)
-            z = roundedLerp(scene.viewport.zoom, scene.viewport_end.zoom, f)
+            v = lerpViewport(v_start, v_end, f)
+            z = roundedLerp(v_start.zoom, v_end.zoom, f)
             addCoverage(v, z)
         # cover every integer zoom between start and end
-        for z in [min(z_start, z_end) .. max(z_start, z_end)]:
-            addCoverage(scene.viewport, z)
-            addCoverage(scene.viewport_end, z)
+        for z in [min(v_start.zoom, v_end.zoom) .. max(v_start.zoom, v_end.zoom)]:
+            addCoverage(v_start, z)
+            addCoverage(v_end, z)
 
 deduplicate tiles
 sort by (z, x, y)
 return { tiles, maxZoom = max(z over all tiles), approxBytes }
 ```
+
+The `time_range` field (`{ start: ISO8601, end: ISO8601 }`) is *not*
+consumed by tile coverage — only viewports and zooms matter for the
+spatial tile set. Sample count for the interpolation path is wall-clock
+based (default ~250 ms apart) and is derived from the Scene's
+`transition_duration_ms` rather than from the time range itself.
 
 ### `addCoverage(viewport, zoom)`
 

@@ -136,46 +136,77 @@ Add **`jszip` ^3.10.x** as a dependency of the VS Code extension.
 
 ### Decision
 
-**Hoist** `apps/vscode/src/services/storyboardPlayback.ts` to a new module
-`shared/components/src/storyboard/playback/` exposing the same
-`StoryboardPlaybackService` class and its port interfaces
-(`MapPanel`, `SessionStoreApi`, `PanelView`, `TimeRangeView`).
-The VS Code extension switches its import; the briefing renderer SPA
-imports the same module and supplies browser-side port adapters.
+**Hoist** `apps/vscode/src/services/storyboardPlayback.ts` to
+`shared/components/src/storyboardPlayback/service.ts` (the directory
+already exists post-#263 and contains the host-agnostic
+`runTimeRangeTween` primitive). Extract the four port interfaces
+(`PlaybackMapPanel`, `PlaybackSessionManager`, `PlaybackPanelView`,
+`PlaybackTimeRangeView`) into a sibling `ports.ts`. The VS Code
+extension switches its imports; the briefing renderer SPA imports the
+same module and supplies browser-side port adapters.
 
 ### Rationale
 
-- Codebase audit confirms `StoryboardPlaybackService` is already
-  host-agnostic — it depends only on the four port interfaces. The only
-  reason it lives under `apps/vscode/` today is historical placement,
-  not coupling.
+- Post-#263 codebase audit confirms:
+  - `StoryboardPlaybackService` (still at `apps/vscode/src/services/storyboardPlayback.ts`)
+    is host-agnostic — it depends only on the four injected port
+    interfaces, plus it imports `runTimeRangeTween` and
+    `isTimeRangeScene` from `@debrief/components`.
+  - **`runTimeRangeTween` already lives in `shared/components/`**
+    (`shared/components/src/storyboardPlayback/timeRangeTween.ts`) —
+    #263 placed it there from day one. It accepts injected
+    `TimeRangeTweenPorts` and a `FrameScheduler` (default
+    implementation uses `requestAnimationFrame` in browser, `setTimeout`
+    in Node). The briefing SPA consumes it verbatim with
+    `defaultScheduler()`.
+  - Per-frame loop calls `setCurrentTime()` then
+    `flyToViewport(durationMs=0)`, so both axes (slider + viewport)
+    advance in lock-step from a single RAF — see the new ADR
+    `docs/project_notes/decisions.md` § ADR-NEW (2026-05-19).
 - Constitution Article IV.1 ("services never touch UI") is honoured: the
   service returns data and issues port calls; the SPA's adapters do the
   rendering.
 - One service, two adapters. No fork, no duplicate engine — the briefing
   SPA's playback is, by construction, indistinguishable from authoring.
-- The hoist is mechanical: ~1 file moved, ~3 imports updated in the
-  VS Code app, ~0 logic changes. It pays for itself the first time the
-  engine changes (e.g. when #263's interpolation lands — both consumers
-  pick it up for free).
+- The hoist is mechanical: ~1 file moved, port interfaces extracted into
+  their own file, ~3 imports updated in the VS Code app, ~0 logic
+  changes. The directory it's moving into (`shared/components/src/storyboardPlayback/`)
+  already exists, so the move is straightforward.
 
 ### Alternatives considered
 
 - **Fork the engine into the briefing-renderer SPA**: rejected as a clear
   Article II.1 / IV.1 violation (single source of truth; thick services).
 - **Move to a new dedicated `@debrief/storyboard-playback` package**:
-  considered, rejected as premature. Living in `@debrief/components`
-  beside the rest of the storyboard CRUD module is consistent with the
-  existing organisation.
+  considered, rejected as premature. Living in `@debrief/components/storyboardPlayback`
+  beside `timeRangeTween.ts` (the home #263 already chose) is consistent.
+- **Leave the service in `apps/vscode/` and import it from there**:
+  rejected — creates a cross-app import (briefing-renderer → vscode app)
+  that violates the single-direction dependency rule and would break the
+  briefing-renderer's standalone-app character.
 
 ### Port adapters needed in the SPA
 
 | Port | Browser adapter (briefing-renderer) | Notes |
 |------|--------------------------------------|-------|
-| `MapPanel.flyToViewport(viewport, durationMs)` | Wraps a `react-leaflet` `MapContainer` and calls `map.flyTo([lat, lon], zoom, { duration: durationMs / 1000 })`. | Same Leaflet API used by the authoring `MapView`. |
-| `SessionStoreApi.setCurrentTime(epochMs)` / `getCurrentTime()` | Backed by a local Zustand store inside the SPA (no `@debrief/session-state` dependency on the host shell). | Simple slice: `{ currentTime: number; setCurrentTime: (t: number) => void }`. |
-| `PanelView.notifySceneChange(sceneId)` | Updates the SPA's "current scene" React state; drives the transport bar's highlighted Scene. | Pure React state. |
-| `TimeRangeView.setRange(start, end)` | Updates the SPA's slider bounds for the active time-range Scene. | Pure React state. |
+| `PlaybackMapPanel.flyToViewport(viewport, durationMs)` | Wraps a `react-leaflet` `MapContainer` and calls `map.flyTo([lat, lon], zoom, { duration: durationMs / 1000 })`. For per-frame time-range scrubbing the tween invokes this with `durationMs = 0`. | Same Leaflet API used by the authoring `MapView`. |
+| `PlaybackSessionManager.setCurrentTime(epochMs)` / `getCurrentTime()` | Backed by a local Zustand store inside the SPA (no `@debrief/session-state` dependency on the host shell). | Simple slice: `{ currentTime: number; setCurrentTime: (t: number) => void }`. |
+| `PlaybackPanelView.notifySceneChange(sceneId)` | Updates the SPA's "current scene" React state; drives the transport bar's highlighted Scene. | Pure React state. |
+| `PlaybackTimeRangeView.setScrubbableRange(start, end)` | Updates the SPA's slider bounds for the active time-range Scene; `null` for both args means "no scrubbable range" (instant Scene rest state). | Port name and signature are exactly the new surface #263 introduced. |
+
+### Inherited boundary primitives
+
+The SPA reuses, without modification, the following symbols that #263
+shipped to `@debrief/components`:
+
+| Symbol | Path | Used for |
+|--------|------|----------|
+| `runTimeRangeTween` | `shared/components/src/storyboardPlayback/timeRangeTween.ts` | Driving the single-RAF loop for time-range Scene playback. |
+| `defaultScheduler` | same file | RAF-based scheduler that the SPA uses out of the box. |
+| `FrameScheduler`, `RunTimeRangeTweenInput`, `TimeRangeTweenHandle` | same file | Types for the tween's contract. |
+| `isTimeRangeScene` | `shared/components/src/storyboard/types.ts` | Branching at playback (instant vs time-range path) and at the SPA load boundary. |
+| `flavourCheck` | `shared/components/src/storyboard/validate.ts` | Boundary validation when the SPA reads the inlined `features.geojson` — rejects mixed-presence Scenes (one slot set, the other not). |
+| `InstantSceneFeature`, `TimeRangeSceneFeature` | `shared/components/src/storyboard/types.ts` | TypeScript-side discriminated union the SPA narrows into after `flavourCheck`. |
 
 ---
 
@@ -321,8 +352,8 @@ export still completes; the SPA's empty-thumbnail fallback applies
 | # | Finding | Source |
 |---|---------|--------|
 | 1 | Existing SPAs (`apps/backlog-navigator`, `apps/spec-navigator`) are Vite + React 18, output `dist/index.html` + `dist/assets/*`. | Read of their `package.json` and `vite.config.ts`. |
-| 2 | `StoryboardPlaybackService` is at `apps/vscode/src/services/storyboardPlayback.ts`, depends only on injected ports (`MapPanel`, `SessionStoreApi`, `PanelView`, `TimeRangeView`). Headless CRUD lives in `shared/components/src/storyboard/`. | Direct read of the service. |
-| 3 | `SceneFeature` carries `properties.storyboard_id`, `viewport: {center, zoom, bearing}`, `timestamp`, `creation_order`, `time_range` (slot for #263), `visible_feature_ids: string[]`, `thumbnail_asset_ref: string`. | `shared/schemas/src/linkml/storyboard.yaml` + generated TS types. |
+| 2 | `StoryboardPlaybackService` is at `apps/vscode/src/services/storyboardPlayback.ts`, depends only on injected ports (`PlaybackMapPanel`, `PlaybackSessionManager`, `PlaybackPanelView`, `PlaybackTimeRangeView`). `runTimeRangeTween` + `defaultScheduler` (host-agnostic, RAF-based) live at `shared/components/src/storyboardPlayback/timeRangeTween.ts` (#263). Headless CRUD lives in `shared/components/src/storyboard/`. | Direct read of the service post-#263. |
+| 3 | `SceneFeature` carries `properties.storyboard_id`, `viewport: {center, zoom, bearing}`, `timestamp`, `creation_order`, optional `time_range` (TimeRange — ISO-8601 `start`/`end`), optional `viewport_end` (Viewport), `visible_feature_ids: string[]`, `thumbnail_asset_ref: string`. XOR rule: `time_range` and `viewport_end` are both present or both absent (enforced in LinkML rules + JSON Schema `if/then` + `flavourCheck` in `shared/components/src/storyboard/validate.ts`). `isTimeRangeScene(scene)` is the canonical runtime narrowing predicate. Discriminated-union types (`InstantSceneFeature`, `TimeRangeSceneFeature`) exist in TypeScript only — no `kind` discriminator field on the schema. | `shared/schemas/src/linkml/storyboard.yaml`, generated TS types, `shared/components/src/storyboard/types.ts` + `validate.ts`. |
 | 4 | VS Code Storyboard commands live in `apps/vscode/src/commands/storyboardManagement.ts` (`debrief.storyboard.create`, `.rename`, `.delete`) and `…/storyboardTransport.ts` (`.forward`, `.backward`, `.goToScene`). Registered in extension `package.json` `contributes.commands` + `contributes.menus`. | Direct read. |
 | 5 | No existing zip library — `jszip`, `adm-zip`, `archiver`, `node:zlib` all absent from the monorepo. | Repo-wide grep. |
 | 6 | `MapView` (`shared/components/src/MapView/MapView.tsx`) accepts `tileLayerUrl` and `tileLayerAttribution` props (defaults to OSM). | Direct read, lines 457–458. |

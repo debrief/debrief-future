@@ -292,16 +292,24 @@ against the schema before handing it to the playback service. This is
 the Article II.1 boundary check that prevents a corrupted zip from
 crashing the SPA mid-playback.
 
-| Check | Failure mode → user-visible state |
-|-------|-----------------------------------|
-| `BriefingFeatureCollection.type === "FeatureCollection"` | Error state: "Briefing data is unreadable." |
-| Exactly one `StoryboardFeature` | Error state: same as above. |
-| Every `SceneFeature.properties.storyboard_id` matches the Storyboard's `id` | Error state: same as above. |
-| Scenes form a non-empty list (US1 / US2) | Empty state: "This Storyboard has no Scenes to play" (FR-030). |
-| `BriefingItemJson.id` and `properties.title` present | Renders without title bar; logs a console warning (still plays). |
+| Check | Implementation | Failure mode → user-visible state |
+|-------|----------------|-----------------------------------|
+| `BriefingFeatureCollection.type === "FeatureCollection"` | Local guard in `inlineDataLoader` | Error state: "Briefing data is unreadable." |
+| Exactly one `StoryboardFeature` | Local guard (filter by `kind === 'STORYBOARD'`, expect length 1) | Error state: same as above. |
+| Every `SceneFeature.properties.storyboard_id` matches the Storyboard's `id` | Local guard (filter Scenes by `storyboard_id`, expect them to match the chosen Storyboard) | Error state: same as above. |
+| Scene flavour XOR (`time_range` and `viewport_end` both present or both absent) | **`flavourCheck(scene)` from `@debrief/components/storyboard/validate`** — the same primitive the authoring environment uses. Throws `SceneFlavourXorViolationError` or `SceneTimeRangeEndNotAfterStartError`. | Error state: identifies the offending Scene id and which slot is missing or whether the range is inverted. |
+| Scenes form a non-empty list (US1 / US2) | Local guard | Empty state: "This Storyboard has no Scenes to play" (FR-030). |
+| `BriefingItemJson.id` and `properties.title` present | Local guard | Renders without title bar; logs a console warning (still plays). |
 
-Schema validation uses the `@debrief/schemas` JSON Schema bundle —
-the same artifact used by the authoring environment.
+The SPA does **not** re-derive XOR validation logic — it imports
+`flavourCheck` and the `isTimeRangeScene` predicate directly, so any
+future schema evolution lands in both consumers at once. The
+discriminated-union types `InstantSceneFeature` / `TimeRangeSceneFeature`
+(also from `@debrief/components`) are the post-narrowing types the
+playback adapter consumes.
+
+Schema validation otherwise uses the `@debrief/schemas` JSON Schema
+bundle — the same artifact used by the authoring environment.
 
 ---
 
