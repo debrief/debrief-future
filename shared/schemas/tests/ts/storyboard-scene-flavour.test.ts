@@ -45,10 +45,10 @@ describe("Storyboard Scene flavour #263 — generated TS types", () => {
     const fixture =
       loadFixture<SceneFeature>("scene-263-time-range-valid.json");
     expectTypeOf(fixture.properties.time_range).toEqualTypeOf<
-      TimeRange | undefined | null
+      TimeRange | undefined
     >();
     expectTypeOf(fixture.properties.viewport_end).toEqualTypeOf<
-      Viewport | undefined | null
+      Viewport | undefined
     >();
   });
 

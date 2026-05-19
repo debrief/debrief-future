@@ -64,21 +64,10 @@ def test_time_range_scene_round_trip() -> None:
     reparsed = SceneFeature.model_validate_json(serialised)
     assert reparsed.properties.time_range is not None
     assert reparsed.properties.viewport_end is not None
-    assert (
-        reparsed.properties.time_range.start
-        == feature.properties.time_range.start
-    )
-    assert (
-        reparsed.properties.time_range.end == feature.properties.time_range.end
-    )
-    assert (
-        reparsed.properties.viewport_end.center
-        == feature.properties.viewport_end.center
-    )
-    assert (
-        reparsed.properties.viewport_end.zoom
-        == feature.properties.viewport_end.zoom
-    )
+    assert reparsed.properties.time_range.start == feature.properties.time_range.start
+    assert reparsed.properties.time_range.end == feature.properties.time_range.end
+    assert reparsed.properties.viewport_end.center == feature.properties.viewport_end.center
+    assert reparsed.properties.viewport_end.zoom == feature.properties.viewport_end.zoom
 
 
 def test_instant_scene_still_parses() -> None:
@@ -107,9 +96,7 @@ def test_instant_scene_omits_new_slots_on_serialise() -> None:
 def test_time_range_direct_construction() -> None:
     """The TimeRange Pydantic class is constructible with ISO-8601 strings
     and exposes datetime fields."""
-    tr = TimeRange.model_validate(
-        {"start": "2026-05-15T12:00:00Z", "end": "2026-05-15T12:01:30Z"}
-    )
+    tr = TimeRange.model_validate({"start": "2026-05-15T12:00:00Z", "end": "2026-05-15T12:01:30Z"})
     assert tr.start.isoformat().startswith("2026-05-15T12:00:00")
     assert tr.end.isoformat().startswith("2026-05-15T12:01:30")
 
