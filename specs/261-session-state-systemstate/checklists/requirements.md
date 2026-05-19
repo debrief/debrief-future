@@ -53,8 +53,8 @@ The compressed review surfaced three plan defects, all resolved via the highest-
 - **3A — Test gaps closed**: FR-018 (cross-field invariant for `current_time`/window) closes F2 silent failure; FR-019 (VS Code save FC-first/sidecar-second) closes F1 silent failure; new legacy-plot fixture corpus closes the SC-005 false-confidence gap. Three test rows added to plan.md's Web-Shell E2E Testing table.
 
 Three backlog items spun off from the review:
-- #263 — Spatial-shape cleanup follow-up (any stale references to removed bbox/zoom/center shape)
-- #264 — Out-of-window `current_time` policy revisit (if strict-on-import proves user-hostile)
-- #265 — VS Code save atomicity (broader — the full save-flow transactional model, beyond just FC↔sidecar)
+- #266 — Spatial-shape cleanup follow-up (any stale references to removed bbox/zoom/center shape) — *renumbered from 263 after merge: #263 was taken by an E13 storyboard item*
+- #267 — Out-of-window `current_time` policy revisit (if strict-on-import proves user-hostile) — *renumbered from 264*
+- #268 — VS Code save atomicity (broader — the full save-flow transactional model, beyond just FC↔sidecar) — *renumbered from 265*
 
 Spec is ready for `/speckit.tasks`.
