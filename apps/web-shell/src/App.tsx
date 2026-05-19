@@ -539,6 +539,11 @@ export default function App() {
       // Clear undo history — initialization isn't a user action
       freshStore.getState().clearHistory();
       freshStore.getState().markClean();
+      // Spec 260 / FR-012 — opening a different plot force-unlocks the
+      // viewport. The fresh store defaults to false; we set explicitly so
+      // the invariant survives a future refactor that, say, copies a slice
+      // across the boundary.
+      freshStore.getState().setViewportLocked(false);
 
       setCurrentPlot({
         itemPath,
@@ -571,6 +576,9 @@ export default function App() {
     setCurrentPlot(null);
     setActiveStacItemPath(null);
     store.getState().clearResultLayers();
+    // Spec 260 / FR-012 — leaving the plot view force-unlocks (no active
+    // map means there's nothing for the lock to constrain).
+    store.getState().setViewportLocked(false);
     setToolMessage(null);
     setLogEntries([]);
     setSavedResultFiles([]);
@@ -940,6 +948,13 @@ export default function App() {
   // Handle drawing mode change — write to session-state store (#108)
   const handleDrawingModeChange = useCallback((mode: DrawingMode) => {
     store.getState().setDrawingMode(mode);
+  }, [store]);
+
+  // Spec 260 — viewport lock toggle from MapView (banner click, padlock,
+  // L shortcut). The session-state slice is the source of truth. The
+  // Storyboard padlock has its own toggle helper inside StoryboardPanelMount.
+  const handleViewportLockChange = useCallback((locked: boolean) => {
+    store.getState().setViewportLocked(locked);
   }, [store]);
 
   // #235 — track the latest map bounds + zoom and write a 4-corner
@@ -1497,6 +1512,9 @@ export default function App() {
       drawingMode,
       onDrawingModeChange: handleDrawingModeChange,
       onShapeCreated: handleShapeCreated,
+      // Spec 260 — viewport lock wired through session-state.
+      viewportLocked: state.viewportLocked,
+      onViewportLockChange: handleViewportLockChange,
       height: '100%',
       className: 'web-shell__map',
     } : null,
@@ -1539,6 +1557,7 @@ export default function App() {
     selectedIds, handleMapSelect, handleBackgroundClick,
     handleMapZoomChange, handleMapBoundsChange, storyboardPanelEnabled,
     drawingMode, handleDrawingModeChange,
+    state.viewportLocked, handleViewportLockChange,
     handleShapeCreated, logEntries, featureNames,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,

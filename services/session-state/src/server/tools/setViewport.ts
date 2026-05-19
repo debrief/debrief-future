@@ -22,15 +22,38 @@ export interface SetViewportOutput {
   viewport?: ViewportPolygon;
   center?: Coordinate;
   error?: string;
+  /**
+   * Machine-detectable error tag (spec 260 / FR-009). Present iff
+   * `success === false` AND the cause is a known structural condition
+   * (currently only the viewport lock). Callers MUST branch on this
+   * field rather than parsing the free-text `error`.
+   */
+  errorCode?: 'VIEWPORT_LOCKED';
 }
 
 /**
  * Set the map viewport.
+ *
+ * Reject contract (spec 260 / FR-009): when `state.viewportLocked === true`
+ * the call short-circuits BEFORE input validation and returns
+ * `{ success: false, errorCode: 'VIEWPORT_LOCKED', error: ... }`. Locked is
+ * the dominant signal — a locked rejection is independent of input quality
+ * so coincidental validation diagnostics are suppressed. LLM/tool callers
+ * SHOULD treat `errorCode === 'VIEWPORT_LOCKED'` as a terminal stop-retrying
+ * condition and surface the reason to the user.
  */
 export function setViewport(
   store: SessionStoreApi,
   input: SetViewportInput,
 ): SetViewportOutput {
+  if (store.getState().viewportLocked === true) {
+    return {
+      success: false,
+      error: 'Viewport is locked — unlock to change view.',
+      errorCode: 'VIEWPORT_LOCKED',
+    };
+  }
+
   try {
     const viewport: ViewportPolygon = {
       coordinates: input.coordinates,

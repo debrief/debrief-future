@@ -200,6 +200,11 @@ function applySessionState(
   if (typeof spatial.rotation === 'number') {
     store.getState().setRotation(spatial.rotation);
   }
+  // Spec 260 FR-011 / FR-012: session load is the canonical force-unlock
+  // event. Reset already left this false, but emit an explicit setter call
+  // as defence-in-depth — a future payload that smuggled viewportLocked back
+  // in (e.g. via a pre-Omit save) still lands unlocked.
+  store.getState().setViewportLocked(false);
 
   // Apply features state
   if (features.featureCollectionUri) {
@@ -236,6 +241,7 @@ function applySessionState(
         rotation: state.rotation,
         drawingMode: state.drawingMode,
         drawingPaletteIndex: state.drawingPaletteIndex ?? 0,
+        viewportLocked: state.viewportLocked,
       },
       features: {
         featureCollectionUri: state.featureCollectionUri,

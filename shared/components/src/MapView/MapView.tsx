@@ -15,6 +15,7 @@ import type { DrawingMode } from './LeafletToolbar';
 import { SceneRectangleLayer } from './SceneRectangleLayer';
 import type { SceneRectangleLayerProps } from './SceneRectangleLayer';
 import { DrawingGuidanceOverlay } from './DrawingGuidanceOverlay/DrawingGuidanceOverlay';
+import { ViewportLockBanner } from './ViewportLockBanner/ViewportLockBanner';
 import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
@@ -154,6 +155,22 @@ export interface MapViewProps {
    * `SceneRectangleLayer`). See `map-view-flyto.md` §5 / FR-PLAY-015.
    */
   shouldRenderInBaseLayer?: (feature: GeoJSON.Feature) => boolean;
+
+  // ── Spec 260 — viewport lock ─────────────────────────────────────────
+  /**
+   * When `true`, every Leaflet gesture handler that can change the map's
+   * centre or zoom (drag, scroll-wheel, double-click, pinch/touch, box,
+   * keyboard) is disabled and the on-map `ViewportLockBanner` is shown.
+   * Restoring to `false` re-enables only the handlers that were enabled
+   * BEFORE the lock — a host-disabled handler stays disabled (spec FR-006).
+   */
+  viewportLocked?: boolean;
+
+  /**
+   * Toggle callback — fires from the on-map banner (click-to-unlock) and
+   * from the `L` keyboard shortcut. The host owns the lock state.
+   */
+  onViewportLockChange?: (locked: boolean) => void;
 }
 
 /**
@@ -172,6 +189,21 @@ export interface FlyToTarget {
   readonly durationMs: number;
 }
 
+/**
+ * The six Leaflet gesture handlers disabled while the viewport is locked
+ * (spec 260 / FR-003). Drag, wheel, double-click, pinch/touch, drag-rectangle
+ * box-zoom, keyboard panning.
+ */
+const VIEWPORT_LOCK_HANDLER_KEYS = [
+  'dragging',
+  'scrollWheelZoom',
+  'doubleClickZoom',
+  'touchZoom',
+  'boxZoom',
+  'keyboard',
+] as const;
+type ViewportLockHandlerKey = (typeof VIEWPORT_LOCK_HANDLER_KEYS)[number];
+
 // Component to handle map events, auto-fit, and programmatic viewport control
 function MapController({
   bounds,
@@ -184,6 +216,7 @@ function MapController({
   onBoundsChange,
   onBackgroundClick,
   onMapReady,
+  viewportLocked,
 }: {
   bounds: Bounds | null;
   autoFitBounds: boolean;
@@ -195,9 +228,49 @@ function MapController({
   onBoundsChange?: (bounds: Bounds) => void;
   onBackgroundClick?: () => void;
   onMapReady?: (map: LeafletMap) => void;
+  viewportLocked: boolean;
 }) {
   const map = useMap();
   const prevBoundsRef = useRef<Bounds | null>(null);
+
+  // Spec 260 — capture each handler's enabled state at lock-on, restore only
+  // those entries that were enabled before. A host that pre-disabled
+  // `keyboard` (e.g. for measurement-tool mode) keeps it disabled after
+  // unlock. The snapshot is per-lock-cycle; cleared at unlock.
+  const lockHandlerSnapshotRef = useRef<Record<ViewportLockHandlerKey, boolean> | null>(null);
+
+  useEffect(() => {
+    if (viewportLocked) {
+      if (lockHandlerSnapshotRef.current !== null) return; // idempotent — already locked
+      const snapshot: Record<ViewportLockHandlerKey, boolean> = {
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        touchZoom: false,
+        boxZoom: false,
+        keyboard: false,
+      };
+      for (const key of VIEWPORT_LOCK_HANDLER_KEYS) {
+        const handler = (map as unknown as Record<string, { enabled?: () => boolean; disable?: () => void } | undefined>)[key];
+        if (handler && typeof handler.enabled === 'function' && typeof handler.disable === 'function') {
+          snapshot[key] = handler.enabled();
+          handler.disable();
+        }
+      }
+      lockHandlerSnapshotRef.current = snapshot;
+    } else {
+      const snapshot = lockHandlerSnapshotRef.current;
+      if (snapshot === null) return; // idempotent — already unlocked
+      for (const key of VIEWPORT_LOCK_HANDLER_KEYS) {
+        if (!snapshot[key]) continue; // host had it disabled — preserve that
+        const handler = (map as unknown as Record<string, { enable?: () => void } | undefined>)[key];
+        if (handler && typeof handler.enable === 'function') {
+          handler.enable();
+        }
+      }
+      lockHandlerSnapshotRef.current = null;
+    }
+  }, [map, viewportLocked]);
 
   // PR #627 — hand the Leaflet map instance to the host as soon as it's
   // available so capture-time viewport queries can read it synchronously.
@@ -400,6 +473,8 @@ export function MapView({
   sceneRectangles,
   onSceneRectangleClick,
   shouldRenderInBaseLayer,
+  viewportLocked = false,
+  onViewportLockChange,
 }: MapViewProps) {
   // Base-layer filter — defaults to excluding Storyboard parent + Scene
   // features so they are never rendered in the main GeoJSON layer.
@@ -693,8 +768,31 @@ export function MapView({
     ...style,
   };
 
+  // Spec 260 (Story 3) — `L` shortcut toggles the viewport lock when the map
+  // root has focus. Bound on the container <div> (NOT at document level) so
+  // typing 'l' into a Scene description field is unaffected. The listener
+  // remains active even while the Leaflet `keyboard` handler is disabled by
+  // the lock — the user MUST be able to exit via this shortcut.
+  //
+  // First-of-its-kind single-letter map shortcut — backlog #261 captures the
+  // convention work for adding more (custom hook, key registry, etc.).
+  const handleRootKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (!onViewportLockChange) return;
+    if (event.key !== 'l' && event.key !== 'L') return;
+    if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('input, textarea, [contenteditable="true"]')) return;
+    event.preventDefault();
+    onViewportLockChange(!viewportLocked);
+  };
+
   return (
-    <div className={`debrief-mapview ${className ?? ''}`} style={containerStyle}>
+    <div
+      className={`debrief-mapview ${className ?? ''}`}
+      style={containerStyle}
+      tabIndex={0}
+      onKeyDown={handleRootKeyDown}
+    >
       <MapContainer
         center={initialCenter}
         zoom={initialZoom}
@@ -711,6 +809,7 @@ export function MapView({
             drawingMode={drawingMode}
             onDrawingModeChange={onDrawingModeChange}
             onShapeCreated={onShapeCreated}
+            viewportLocked={viewportLocked}
           />
         )}
 
@@ -725,6 +824,7 @@ export function MapView({
           onBoundsChange={onBoundsChange}
           onBackgroundClick={onBackgroundClick}
           onMapReady={onMapReady}
+          viewportLocked={viewportLocked}
         />
 
         {sceneRectangles && (
@@ -785,6 +885,10 @@ export function MapView({
           ))}
       </MapContainer>
       <DrawingGuidanceOverlay drawingMode={drawingMode ?? null} />
+      <ViewportLockBanner
+        locked={viewportLocked}
+        onUnlock={() => onViewportLockChange?.(false)}
+      />
     </div>
   );
 }

@@ -67,10 +67,24 @@ function MapViewApp(): React.ReactElement {
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
   const [paletteIndex, setPaletteIndex] = useState(0);
 
+  // Spec 260 — viewport lock state. Host-driven (mirrors `drawingMode`
+  // pattern above). Seeded by `webviewReady` flush + kept fresh by
+  // `setViewportLocked` messages from the host's spatial subscription.
+  // The webview never owns the lock state; toggle requests go via
+  // `viewportLockChanged` messages.
+  const [viewportLocked, setViewportLockedState] = useState<boolean>(false);
+
   // Notify extension when drawing mode changes (session-state bridge, #108)
   const handleDrawingModeChange = useCallback((mode: DrawingMode) => {
     setDrawingMode(mode); // update local state for immediate UI feedback
     vscode.postMessage({ type: 'drawingModeChanged', drawingMode: mode });
+  }, []);
+
+  // Spec 260 — viewport lock toggle handler. Optimistic local update +
+  // post-back to host so the round-trip is invisible to the user.
+  const handleViewportLockChange = useCallback((locked: boolean) => {
+    setViewportLockedState(locked);
+    vscode.postMessage({ type: 'viewportLockChanged', viewportLocked: locked });
   }, []);
 
   // Temporal state
@@ -177,6 +191,12 @@ function MapViewApp(): React.ReactElement {
           break;
         case 'setDrawingPaletteIndex':
           setPaletteIndex(msg.paletteIndex);
+          break;
+        case 'setViewportLocked':
+          // Spec 260 — host pushes the canonical lock state. May be
+          // identical to our local optimistic update (no-op) or different
+          // (plot switch force-unlocks while user had locked).
+          setViewportLockedState(msg.viewportLocked);
           break;
         case 'flyTo':
           setFlyToTarget({
@@ -544,6 +564,8 @@ function MapViewApp(): React.ReactElement {
       onFlyToComplete={handleFlyToComplete}
       onMapReady={handleMapReady}
       sceneRectangles={sceneRectangleProps}
+      viewportLocked={viewportLocked}
+      onViewportLockChange={handleViewportLockChange}
       height="100vh"
     />
   );
