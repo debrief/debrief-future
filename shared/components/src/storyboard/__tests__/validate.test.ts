@@ -111,11 +111,21 @@ describe("validatePlot", () => {
     );
   });
 
-  it("rejects a non-null time_range Scene with ReservedSlotViolation", () => {
+  it("rejects a time_range-without-viewport_end Scene with SceneFlavourXorViolation (#263)", () => {
+    // Post-#263 the `time_range` slot is first-class. The legacy invalid
+    // fixture (#215 era) has `time_range` set but no `viewport_end` — under
+    // the new schema this is a flavour-XOR violation, not a reserved-slot
+    // violation. The fixture's `time_range` is a stringified JSON; we hoist
+    // it to a TimeRange object here so the validator reaches the XOR check.
     const bad = loadFixture(
       "invalid",
       "storyboard-scene-non-null-time-range.json",
     );
+    const props = bad.properties as Record<string, unknown>;
+    props.time_range = {
+      start: "2026-04-20T10:00:00Z",
+      end: "2026-04-20T10:05:00Z",
+    };
     const asCollection: Plot = {
       type: "FeatureCollection",
       features: [
@@ -134,7 +144,7 @@ describe("validatePlot", () => {
       ],
     };
     expect(() => validatePlot(asCollection)).toThrowError(
-      expect.objectContaining({ code: "ReservedSlotViolation" }),
+      expect.objectContaining({ code: "SceneFlavourXorViolation" }),
     );
   });
 });
