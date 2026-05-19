@@ -93,34 +93,50 @@ export interface FrameScheduler {
   now(): number;
 }
 
+interface RafCapableGlobal {
+  requestAnimationFrame?: (cb: (t: number) => void) => number;
+  cancelAnimationFrame?: (h: number) => void;
+}
+
 /** Default scheduler — RAF + performance.now() in browser, setTimeout in node. */
 function defaultScheduler(): FrameScheduler {
-  const hasRaf =
-    typeof globalThis !== "undefined" &&
-    typeof (globalThis as { requestAnimationFrame?: unknown })
-      .requestAnimationFrame === "function";
+  const g = globalThis as RafCapableGlobal;
   const nowFn =
     typeof performance !== "undefined" && typeof performance.now === "function"
       ? () => performance.now()
       : () => Date.now();
-  if (hasRaf) {
-    const raf = (globalThis as unknown as {
-      requestAnimationFrame: (cb: (t: number) => void) => number;
-      cancelAnimationFrame: (h: number) => void;
-    }).requestAnimationFrame;
-    const caf = (globalThis as unknown as {
-      cancelAnimationFrame: (h: number) => void;
-    }).cancelAnimationFrame;
+  if (typeof g.requestAnimationFrame === "function" &&
+      typeof g.cancelAnimationFrame === "function") {
+    const raf = g.requestAnimationFrame;
+    const caf = g.cancelAnimationFrame;
     return {
       request: (cb) => raf(cb),
       cancel: (h) => caf(h),
       now: nowFn,
     };
   }
+  // setTimeout returns ReturnType<typeof setTimeout> in node and number in
+  // browsers; the scheduler interface uses `number` as an opaque handle and
+  // we round-trip through the runtime's own representation via the
+  // `Timeout`-typed map below.
+  const timers = new Map<number, ReturnType<typeof setTimeout>>();
+  let nextHandle = 1;
   return {
-    request: (cb) =>
-      setTimeout(() => cb(nowFn()), 16) as unknown as number,
-    cancel: (h) => clearTimeout(h as unknown as ReturnType<typeof setTimeout>),
+    request: (cb) => {
+      const h = nextHandle++;
+      timers.set(h, setTimeout(() => {
+        timers.delete(h);
+        cb(nowFn());
+      }, 16));
+      return h;
+    },
+    cancel: (h) => {
+      const timer = timers.get(h);
+      if (timer !== undefined) {
+        clearTimeout(timer);
+        timers.delete(h);
+      }
+    },
     now: nowFn,
   };
 }
