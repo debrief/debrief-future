@@ -80,9 +80,9 @@ read-only signal on the plot slice, (e) the mode dispatcher in
 
 ### Selection-mode resolver (selection-mode.md)
 
-- [ ] T011 [test] Author Vitest cases for `resolveEditingMode` per the contract (16 cases incl. all four vertex-path shapes + stale branches) `shared/components/src/PropertiesPanel/__tests__/selectionMode.test.ts`
-- [ ] T011a [test] **NEW (re-baseline)**: Extend the path-level registry in `selectionPath.ts` with `rings` (index), `vertices` (index), and `vertex` (index, valid only with the literal address `0`); update `validatePathSemantics` to accept the new levels; add Vitest cases for each `services/session-state/src/utils/selectionPath.ts` + `services/session-state/src/utils/__tests__/selectionPath.test.ts`. **Without this**, the resolver in T012 will fail semantic validation on every Polygon / LineString / MultiPoint / Point vertex path.
-- [ ] T012 Implement `resolveEditingMode` using `parsePath` from `services/session-state/src/utils/selectionPath.ts:96` (after the registry extension in T011a) `shared/components/src/PropertiesPanel/selectionMode.ts`
+- [x] T011 [test] Author Vitest cases for `resolveEditingMode` per the contract (16 cases incl. all four vertex-path shapes + stale branches) `shared/components/src/PropertiesPanel/__tests__/selectionMode.test.ts`
+- [x] T011a [test] **NEW (re-baseline)**: Extend the path-level registry in `selectionPath.ts` with `rings` (index), `vertices` (index), and `vertex` (index, valid only with the literal address `0`); update `validatePathSemantics` to accept the new levels; add Vitest cases for each `services/session-state/src/utils/selectionPath.ts` + `services/session-state/src/utils/__tests__/selectionPath.test.ts`. **Without this**, the resolver in T012 will fail semantic validation on every Polygon / LineString / MultiPoint / Point vertex path.
+- [x] T012 Implement `resolveEditingMode` using `parsePath` from `services/session-state/src/utils/selectionPath.ts:96` (after the registry extension in T011a) `shared/components/src/PropertiesPanel/selectionMode.ts`
 
 ### Staged-edits buffer hook (staged-edits-store.md, R-002a, R-011)
 
