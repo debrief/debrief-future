@@ -13,7 +13,9 @@
  *   - OrphanScene (FC-I1)
  *   - MissingCreationOrder (FC-I5) — pre-#259 Scenes without creation_order
  *   - DuplicateCreationOrder (FC-I4) — replaces #215's FC-I3
- *   - ReservedSlotViolation (SC-I4 time_range, SC-I5 viewport.bearing)
+ *   - flavourCheck (#263): SceneFlavourXorViolation + SceneTimeRangeEndNotAfterStart
+ *   - ReservedSlotViolation (SC-I5 viewport.bearing — time_range is no
+ *     longer a reserved slot post-#263)
  */
 
 import {
@@ -22,10 +24,47 @@ import {
   MissingCreationOrderError,
   OrphanSceneError,
   ReservedSlotViolationError,
+  SceneFlavourXorViolationError,
+  SceneTimeRangeEndNotAfterStartError,
   UnsupportedSchemaVersionError,
 } from "./errors";
-import type { Plot } from "./types";
+import type { Plot, SceneFeature } from "./types";
 import { isSceneFeature, isStoryboardFeature } from "./types";
+
+/**
+ * Enforce the #263 Scene flavour XOR: a Scene is either the instant flavour
+ * (both `time_range` and `viewport_end` absent) or the time-range flavour
+ * (both present, with `time_range.end > time_range.start`).
+ *
+ * Throws `SceneFlavourXorViolationError` for mixed-slot scenes and
+ * `SceneTimeRangeEndNotAfterStartError` for reversed/zero ranges.
+ *
+ * Pure; no side effects.
+ */
+export function flavourCheck(scene: SceneFeature): void {
+  const tr = scene.properties.time_range;
+  const ve = scene.properties.viewport_end;
+  const tPresent = tr !== null && tr !== undefined;
+  const vPresent = ve !== null && ve !== undefined;
+  if (tPresent !== vPresent) {
+    throw new SceneFlavourXorViolationError(
+      scene.properties.id,
+      tPresent,
+      vPresent,
+    );
+  }
+  if (tPresent && tr) {
+    // tr is structurally TimeRange — start/end are ISO-8601 strings; lexical
+    // comparison on ISO-8601 strings is timeline-correct.
+    if (!(tr.end > tr.start)) {
+      throw new SceneTimeRangeEndNotAfterStartError(
+        scene.properties.id,
+        tr.start,
+        tr.end,
+      );
+    }
+  }
+}
 
 const REQUIRED_SCHEMA_VERSION = 2;
 
@@ -72,10 +111,17 @@ export function validatePlot(plot: Plot): void {
         f.properties.viewport.bearing,
       );
     }
-    const tr = f.properties.time_range;
-    if (tr !== null && tr !== undefined) {
-      throw new ReservedSlotViolationError("time_range", tr);
+    // viewport_end.bearing is also reserved (v1 invariant carried forward
+    // by #263 — both viewports must satisfy bearing=0).
+    const ve = f.properties.viewport_end;
+    if (ve !== null && ve !== undefined && ve.bearing !== 0) {
+      throw new ReservedSlotViolationError(
+        "viewport_end.bearing",
+        ve.bearing,
+      );
     }
+    // #263 — Scene flavour XOR + range validity.
+    flavourCheck(f);
     if (!storyboardIds.has(f.properties.storyboard_id)) {
       throw new OrphanSceneError(
         f.properties.id,
