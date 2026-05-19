@@ -1526,6 +1526,15 @@ export default function App() {
       selectedFeatureIds: state.selection.featureIds,
       hiddenIds: hiddenFeatureIds,
       resultFiles: savedResultFiles,
+      // #192 Phase 6 (T048) — plumb the plot slice's read-only signal
+      // through to the Properties panel so every mode renders the banner
+      // + disabled inputs (FR-018 / FR-019 / FR-020). The signal itself
+      // is producer-rule-driven by `setReadOnly` calls from openPlot
+      // (capability probe) and `saveSession` (EACCES / EPERM / RO error).
+      // PlotSlice fields are flat on `SessionStoreWithUndo` (no `.plot`
+      // namespace — the Zustand store flattens every slice).
+      isPlotReadOnly: state.isReadOnly,
+      plotReadOnlyReason: state.readOnlyReason,
       onMessage: handleActivityMessage,
     } : null,
     mapViewProps: currentPlot ? {
@@ -1588,6 +1597,8 @@ export default function App() {
     playback.playbackState, playback.speed, state.displayMode,
     tools, toolMatches, allFeatures, visibleFeatures, state.selection.featureIds,
     hiddenFeatureIds, handleActivityMessage,
+    // #192 Phase 6 — read-only signal threading (flat slice fields)
+    state.isReadOnly, state.readOnlyReason,
     selectedIds, handleMapSelect, handleBackgroundClick,
     handleMapZoomChange, handleMapBoundsChange, storyboardPanelEnabled,
     drawingMode, handleDrawingModeChange,

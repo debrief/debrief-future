@@ -335,13 +335,29 @@ export function ActivityPanel({
     [resolverSelection, featuresById]
   );
 
-  // ── Integrated save path (Spec 192 T025) ────────────────────────────
+  // ── Integrated save path (Spec 192 T025 + T048) ─────────────────────
   //
   // Reads `applyEditsToFeatures(features)` → calls the host writer →
   // appends provenance per affected feature → clears the staging buffer.
-  // Read-only escalation is handled inside the writer (R-009).
+  // Read-only escalation post-write is handled inside the writer (R-009).
+  //
+  // T048 (Phase 6 / US-5) — read-only PRE-flight gate. When the plot
+  // slice has already flagged the plot as read-only (either because
+  // capability probe returned `persistent: false` at open time, or
+  // because a prior save failed with `ReadOnlyFilesystemError` / EACCES /
+  // EPERM), refuse to invoke the writer at all. Article I.3 — no silent
+  // failure: bail explicitly with `success: false` so the host can show
+  // an info banner if it subscribes to `onPropertiesPanelSaveResult`.
   const handlePropertiesPanelSave = useCallback(async () => {
     if (!onSavePropertiesPanel || !appendPropertiesPanelProvenance) return;
+    if (isPlotReadOnly) {
+      const result = {
+        success: false as const,
+        error: plotReadOnlyReason ?? 'Plot is read-only — edits are not saved.',
+      };
+      onPropertiesPanelSaveResult?.(result);
+      return;
+    }
     const result = await saveStagedEdits({
       features,
       staging,
@@ -357,6 +373,8 @@ export function ActivityPanel({
     appendPropertiesPanelProvenance,
     propertiesPanelPackageVersion,
     onPropertiesPanelSaveResult,
+    isPlotReadOnly,
+    plotReadOnlyReason,
   ]);
   // Surface the save handler to the React lint pass — wired through to
   // the mode shells in later phases. For Phase 2 we expose it via a

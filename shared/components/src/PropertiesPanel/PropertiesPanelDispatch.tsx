@@ -157,6 +157,7 @@ export function PropertiesPanelDispatch(
           <MultiSelectSummaryMode
             featureIds={editingMode.featureIds}
             featuresById={featuresById}
+            readOnly={isReadOnly}
           />
         </div>
       );

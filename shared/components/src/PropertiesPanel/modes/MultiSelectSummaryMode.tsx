@@ -21,6 +21,12 @@ export interface MultiSelectSummaryModeProps {
   /** Resolved feature map. The shell only reads `.size`; Phase 7 uses it
    *  for the shared-vs-differs derivation. */
   featuresById: ReadonlyMap<string, DebriefFeature>;
+  /** True when the plot's storage is read-only — disables any inputs
+   *  Phase 7 may surface. Defaults to false. The summary itself is
+   *  always non-interactive (`aria-disabled="true"` on the container)
+   *  but this prop is threaded uniformly across every mode so the
+   *  dispatcher can hand the read-only signal down without branching. */
+  readOnly?: boolean;
 }
 
 export function MultiSelectSummaryMode(
@@ -29,6 +35,10 @@ export function MultiSelectSummaryMode(
   const { featureIds } = props;
   // The map is consumed by the shared-vs-differs derivation in Phase 7.
   void props.featuresById;
+  // Read-only is propagated for symmetry; the summary surface is itself
+  // non-interactive so the prop has no immediate behavioural effect.
+  // Phase 7 reads it to disable any per-shared-slot tooltip controls.
+  void props.readOnly;
   const count = featureIds.length;
 
   return (

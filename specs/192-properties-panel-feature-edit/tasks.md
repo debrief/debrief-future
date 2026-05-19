@@ -186,13 +186,13 @@ Save action unavailable. Then: open a writable plot, stage an edit,
 chmod the file to 0444, attempt save, assert banner appears and staged
 edits remain in the buffer. SC-009.
 
-- [ ] T046 [test] Vitest for the `readOnlyBanner` component (renders reason text, has `data-testid="read-only-banner"`, `aria-live="polite"`) `shared/components/src/PropertiesPanel/__tests__/readOnlyBanner.test.tsx`
-- [ ] T047 Implement `readOnlyBanner` body (per the T023 shell) `shared/components/src/PropertiesPanel/readOnlyBanner.tsx`
-- [ ] T048 Plumb `selectIsReadOnly` + `selectReadOnlyReason` into `ActivityPanel`; pass `readOnly` and `readOnlyReason` props down to `PropertiesForm` so every mode renders the banner above its form region; disable the Save action when `readOnly === true` `shared/components/src/ActivityPanel/ActivityPanel.tsx`
-- [ ] T049 [P] In every mode component (`FeatureEditorMode`, `SubFeatureEditorMode`, `MultiSelectSummaryMode`, plot mode), apply `disabled` + `aria-disabled="true"` to every input when `readOnly` is true `shared/components/src/PropertiesPanel/modes/*` (touch each of the three sibling files + the plot-mode pathway in `PropertiesForm.tsx`)
-- [ ] T050 [P][test] Playwright web-shell — pre-flight path: open the chmod-0444 fixture plot, assert banner appears in plot/feature/sub-feature/multi-select modes, assert all inputs disabled, assert Save action absent `apps/web-shell/playwright/tests/properties-read-only.spec.ts`
-- [ ] T051 [P][test] Playwright web-shell — post-write path: open writable plot, stage an edit, chmod 0444 the file from the test, click Save, assert banner appears with the EACCES-derived reason, assert the staged edit is preserved (UI still shows the unsaved value), revert permissions, save again, assert success `apps/web-shell/playwright/tests/properties-read-only.spec.ts` (extend file from T050)
-- [ ] T052 [P] Ship a read-only fixture: a copy of the existing local-store plot with the file marked 0444 in the test setup hook (no committed fixture; permissions set per-test) `apps/web-shell/playwright/fixtures/read-only.ts`
+- [x] T046 [test] Vitest for the `readOnlyBanner` component (renders reason text, has `data-testid="read-only-banner"`, `aria-live="polite"`) `shared/components/src/PropertiesPanel/__tests__/readOnlyBanner.test.tsx`
+- [x] T047 Implement `readOnlyBanner` body (per the T023 shell) `shared/components/src/PropertiesPanel/readOnlyBanner.tsx`
+- [x] T048 Plumb `selectIsReadOnly` + `selectReadOnlyReason` into `ActivityPanel`; pass `readOnly` and `readOnlyReason` props down to `PropertiesForm` so every mode renders the banner above its form region; disable the Save action when `readOnly === true` `shared/components/src/ActivityPanel/ActivityPanel.tsx`
+- [x] T049 [P] In every mode component (`FeatureEditorMode`, `SubFeatureEditorMode`, `MultiSelectSummaryMode`, plot mode), apply `disabled` + `aria-disabled="true"` to every input when `readOnly` is true `shared/components/src/PropertiesPanel/modes/*` (touch each of the three sibling files + the plot-mode pathway in `PropertiesForm.tsx`)
+- [x] T050 [P][test] Playwright web-shell — pre-flight path: open the chmod-0444 fixture plot, assert banner appears in plot/feature/sub-feature/multi-select modes, assert all inputs disabled, assert Save action absent `apps/web-shell/playwright/tests/properties-read-only.spec.ts`
+- [x] T051 [P][test] Playwright web-shell — post-write path: open writable plot, stage an edit, chmod 0444 the file from the test, click Save, assert banner appears with the EACCES-derived reason, assert the staged edit is preserved (UI still shows the unsaved value), revert permissions, save again, assert success `apps/web-shell/playwright/tests/properties-read-only.spec.ts` (extend file from T050)
+- [x] T052 [P] Ship a read-only fixture: a copy of the existing local-store plot with the file marked 0444 in the test setup hook (no committed fixture; permissions set per-test) `apps/web-shell/playwright/fixtures/read-only.ts`
 
 ## Phase 7: US-3 — Selection-driven mode swap preserves staged edits (P2)
 
