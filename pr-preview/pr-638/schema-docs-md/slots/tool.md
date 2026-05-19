@@ -1,0 +1,67 @@
+
+
+# Slot: tool 
+
+
+
+URI: [debrief:slot/tool](https://debrief.info/schemas/slot/tool)
+Alias: tool
+
+<!-- no inheritance hierarchy -->
+
+
+
+
+
+## Applicable Classes
+
+| Name | Description | Modifies Slot |
+| --- | --- | --- |
+| [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) | Single entry in item |  no  |
+| [WasGeneratedBy](../classes/WasGeneratedBy.md) | Identifies the tool and its parameters for a specific invocation |  no  |
+| [MCPRequest](../classes/MCPRequest.md) | MCP tool invocation envelope |  no  |
+
+
+
+
+
+
+## Properties
+
+* Range: [String](../types/String.md)
+
+
+
+
+## Identifier and Mapping Information
+
+
+
+
+
+
+
+## Mappings
+
+| Mapping Type | Mapped Value |
+| ---  | ---  |
+| self | debrief:tool |
+| native | debrief:tool |
+
+
+
+
+## LinkML Source
+
+<details>
+```yaml
+name: tool
+alias: tool
+domain_of:
+- WasGeneratedBy
+- PropertiesProvenanceEntry
+- MCPRequest
+range: string
+
+```
+</details>
