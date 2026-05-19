@@ -248,6 +248,26 @@ export interface StoryboardPanelProps {
     /** Fires when the analyst clicks Cancel in the collision banner. */
     onCollisionCancel?(): void;
     /**
+     * Current viewport-lock state. When `true`, the padlock toggle in the
+     * panel header is rendered as pressed (`aria-pressed="true"`) with the
+     * closed-padlock glyph. Optional + defaulted so existing fixtures keep
+     * compiling unchanged.
+     */
+    readonly viewportLocked?: boolean;
+    /**
+     * Fires when the analyst clicks the padlock toggle. The panel does NOT
+     * track its own lock state — the host owns it and reflects the new value
+     * back via `viewportLocked`. Disabled when there is no active plot.
+     */
+    onViewportLockToggle?(): void;
+    /**
+     * Whether a plot is currently loaded. When false, the padlock toggle is
+     * rendered disabled (spec 260 / FR-013). Defaults to `true` when omitted
+     * so existing fixtures (which always pass scenes implying an active
+     * plot) behave as before.
+     */
+    readonly hasActivePlot?: boolean;
+    /**
      * Fires whenever a Scene becomes the "current" Scene — panel-row click,
      * map-rectangle click, transport advance, or playback step (Spec #258 /
      * FR-002). Hosts wire this to `session.setDisplayMode(scene.properties
