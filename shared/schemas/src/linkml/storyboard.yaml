@@ -13,8 +13,18 @@ description: >-
   - StoryboardFeature, SceneFeature (GeoJSON Feature wrappers)
 
   Reserved slots in schema v2:
-  - SceneProperties.time_range MUST be null (reserved for animated ranges)
   - Viewport.bearing MUST be 0 (reserved for rotated viewports)
+
+  v3 evolution (introduced by #263):
+  - SceneProperties.time_range is now a first-class TimeRange sub-record
+    (was reserved-null in v1/v2). When set, the Scene is the "time-range"
+    flavour and `viewport_end` MUST also be set.
+  - New SceneProperties.viewport_end slot: present iff time_range present.
+  - Cross-field rule scene-flavour-xor-rule enforces the XOR coupling.
+  - Cross-field rule scene-time-range-end-after-start-rule enforces
+    `time_range.end > time_range.start`.
+  - Schema evolution is additive (Article XIV); legacy instant Scenes with
+    `time_range = null`/absent and no `viewport_end` parse unchanged.
 
   v2 (introduced by #259):
   - SceneProperties.timestamp is NO LONGER required to be unique within a
@@ -85,6 +95,27 @@ enums:
           (current behaviour) until manual editing of scene geometry ships.
 
 classes:
+  TimeRange:
+    description: >-
+      Time interval for a time-range Scene (#263). The interval is closed on
+      both ends. `end` MUST be strictly greater than `start`. Introduced by
+      Spec #263 to make `SceneProperties.time_range` a first-class slot.
+    attributes:
+      start:
+        description: >-
+          ISO-8601 instant; the slider position at the first capture action.
+          By convention CRUD writes the owning Scene's `timestamp` into this
+          slot, but the system does not depend on the two being equal —
+          ordering reads `time_range?.start ?? timestamp`.
+        range: datetime
+        required: true
+      end:
+        description: >-
+          ISO-8601 instant; the slider position at the second (confirm)
+          capture action. MUST be strictly greater than `start`.
+        range: datetime
+        required: true
+
   Viewport:
     description: >-
       Camera state sub-record inside a Scene. Captures the map viewport at
@@ -204,9 +235,19 @@ classes:
         minimum_value: 0
       time_range:
         description: >-
-          Reserved slot for v2 animated time-range Scenes. MUST be absent
-          (null) in schema v1.
-        range: string
+          For instant Scenes (#215 default): MUST be absent. For time-range
+          Scenes (#263): a TimeRange sub-record. When present, the Scene is
+          the time-range flavour and `viewport_end` MUST also be present.
+          See cross-field rule `scene-flavour-xor-rule`.
+        range: TimeRange
+        required: false
+      viewport_end:
+        description: >-
+          Map viewport camera state at the end of a time-range Scene (#263).
+          MUST be present if and only if `time_range` is present. Reuses
+          the Viewport sub-record (`bearing` MUST be 0). For instant Scenes
+          this slot MUST be absent.
+        range: Viewport
         required: false
       visible_feature_ids:
         description: >-
@@ -258,6 +299,31 @@ classes:
           (Article III.2 source preservation).
         range: PolygonSourceEnum
         required: false
+    rules:
+      - description: >-
+          Scene flavour XOR (#263): a Scene is either the instant flavour
+          (both `time_range` and `viewport_end` absent) or the time-range
+          flavour (both present). Any other combination is rejected with
+          `SceneFlavourXorViolation`.
+        preconditions:
+          slot_conditions:
+            time_range:
+              value_presence: PRESENT
+        postconditions:
+          slot_conditions:
+            viewport_end:
+              value_presence: PRESENT
+      - description: >-
+          Scene flavour XOR (#263, reverse): if `viewport_end` is present
+          then `time_range` MUST also be present.
+        preconditions:
+          slot_conditions:
+            viewport_end:
+              value_presence: PRESENT
+        postconditions:
+          slot_conditions:
+            time_range:
+              value_presence: PRESENT
 
   StoryboardFeature:
     description: GeoJSON Feature representing a Storyboard parent entity
