@@ -7,10 +7,10 @@
  */
 export type { Plot as StoryboardPlot, SceneFeature, StoryboardFeature, Ulid, StoryboardId, SceneId, } from './types';
 export { isStoryboardFeature, isSceneFeature, asUlid, asStoryboardId, asSceneId, } from './types';
-export { StoryboardError, DuplicateTimestampError, OrphanSceneError, UnknownStoryboardError, UnknownSceneError, ReservedSlotViolationError, DuplicateStoryboardNameError, ThumbnailDeepCopyFailedError, SchemaMigrationFailedError, InvariantViolationError, } from './errors';
+export { StoryboardError, OrphanSceneError, UnknownStoryboardError, UnknownSceneError, ReservedSlotViolationError, DuplicateStoryboardNameError, ThumbnailDeepCopyFailedError, SchemaMigrationFailedError, InvariantViolationError, DuplicateCreationOrderError, CreationOrderOutOfRangeError, MissingCreationOrderError, UnsupportedSchemaVersionError, } from './errors';
 export type { StoryboardErrorCode } from './errors';
-export { createStoryboard, renameStoryboard, deleteStoryboard, createScene, updateScene, deleteScene, duplicateScene, copySceneToOtherStoryboard, describeStoryboard, restoreScene, checkSceneTimestamp, bboxToPolygon, } from './crud';
-export type { CreateStoryboardInput, RenameStoryboardInput, DeleteStoryboardInput, CreateSceneInput, UpdateScenePatch, UpdateSceneInput, DeleteSceneInput, DuplicateSceneInput, CopySceneToOtherStoryboardInput, DescribeStoryboardInput, RestoreSceneInput, SceneBounds, } from './crud';
+export { createStoryboard, renameStoryboard, deleteStoryboard, createScene, updateScene, deleteScene, duplicateScene, copySceneToOtherStoryboard, describeStoryboard, restoreScene, bboxToPolygon, reorderSceneInTiedGroup, } from './crud';
+export type { CreateStoryboardInput, RenameStoryboardInput, DeleteStoryboardInput, CreateSceneInput, UpdateScenePatch, UpdateSceneInput, DeleteSceneInput, DuplicateSceneInput, CopySceneToOtherStoryboardInput, DescribeStoryboardInput, RestoreSceneInput, SceneBounds, ReorderSceneInTiedGroupInput, } from './crud';
 export { listScenesOrdered } from './ordering';
 export { getStoryboard, getScene, getActiveStoryboardDefault, getMostRecentlyModifiedStoryboard, readSceneWithStaleness, } from './queries';
 export type { StaleReadResult } from './queries';

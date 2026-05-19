@@ -163,15 +163,6 @@ export declare function copySceneToOtherStoryboard(plot: Plot, input: CopySceneT
     scene: SceneFeature;
 }>;
 /**
- * Thin wrapper over the internal `findConflictingSceneTimestamp` helper so
- * `StoryboardEditService.updateSceneToCurrent` can pre-flight the
- * duplicate-timestamp check before invoking the thumbnail pipeline (review
- * 1A). Returns the conflicting Scene or `null`. Pass `excludingSceneId` to
- * skip self (required when checking an existing Scene's new timestamp);
- * pass `null` for new-Scene checks.
- */
-export declare function checkSceneTimestamp(plot: Plot, storyboardId: string, timestamp: string, excludingSceneId: string | null): SceneFeature | null;
-/**
  * Storyboard-level `describe` mutation — mirrors `renameStoryboard` in
  * shape and invariant. Added alongside #218's edit suite so
  * `StoryboardEditService.describeStoryboard` can delegate rather than
@@ -209,5 +200,35 @@ export declare function restoreScene(plot: Plot, input: RestoreSceneInput): Prom
     plot: Plot;
     scene: SceneFeature;
 }>;
+export interface ReorderSceneInTiedGroupInput {
+    sceneId: string;
+    /** 0-based position within the tied-timestamp group. */
+    newPositionInGroup: number;
+}
+/**
+ * Re-sequence the `creation_order` of Scenes in a tied-timestamp group so
+ * the target Scene lands at `newPositionInGroup` (FR-007). The tied group
+ * is "all Scenes in the same Storyboard sharing the target's timestamp"
+ * — the target is always one of them, so `tied_group_size >= 1`.
+ *
+ * Algorithm:
+ *   1. Locate the target Scene; collect the tied group sorted by current
+ *      `creation_order`.
+ *   2. Bounds-check `newPositionInGroup ∈ [0, tied_group_size)`.
+ *   3. Capture `groupMin = min(creation_order)` of the tied group.
+ *   4. Remove the target from the sorted list; re-insert at the new
+ *      position.
+ *   5. Re-assign `creation_order = groupMin + i` to the i-th member of
+ *      the new list. Non-group Scenes are untouched (their values may sit
+ *      below `groupMin` or above `groupMax` — the re-sequencing only
+ *      permutes existing values within the group).
+ *
+ * Sync, pure — no provenance entry is emitted (the operation is a pure
+ * ordering rearrangement; consumers that need an audit trail should log
+ * separately via `buildStoryboardCrudLogEntry`).
+ */
+export declare function reorderSceneInTiedGroup(plot: Plot, input: ReorderSceneInTiedGroupInput): {
+    plot: Plot;
+};
 export type { LogEntry, WasGeneratedBy };
 //# sourceMappingURL=crud.d.ts.map
