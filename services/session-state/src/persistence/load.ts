@@ -257,6 +257,12 @@ function applySessionState(
         resultLayers: state.resultLayers ?? [],
         lastToolExecution: state.lastToolExecution ?? null,
       },
+      // Feature 192 — plot slice carries the read-only signal. It's derived
+      // (not persisted) so always emit the in-memory snapshot.
+      plot: {
+        isReadOnly: state.isReadOnly,
+        readOnlyReason: state.readOnlyReason,
+      },
     },
   };
 }

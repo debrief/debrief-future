@@ -84,7 +84,11 @@ export function registerCommands(
         getMapPanel,
         setMapPanel,
         resultIdRegistry,
-        logPanelProvider
+        logPanelProvider,
+        // Spec #192 T017 — pass the same StacWriter factory used by
+        // saveSession so openPlot can probe writer.capability() and
+        // dispatch the read-only signal.
+        (storePath) => createStacWriterFs({ storePath, stacService }),
       )
     )
   );

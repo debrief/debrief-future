@@ -127,6 +127,7 @@ import { mockFsAdapter } from './mocks/fsAdapter';
 import { createStacWriterIdb } from './services/stacWriterIdb';
 import { probeIndexedDbCapability } from './services/stacWriterCapability';
 import {
+  getActiveCapability,
   setActiveStacItemPath,
   setActiveStacWriter,
 } from './services/stacWriterRegistry';
@@ -544,6 +545,19 @@ export default function App() {
       // the invariant survives a future refactor that, say, copies a slice
       // across the boundary.
       freshStore.getState().setViewportLocked(false);
+      // Spec #192 T017 (producer rule 1) — dispatch the read-only signal
+      // from the IDB writer's capability. `getActiveCapability()` is
+      // populated by the writer-init effect above; if it hasn't resolved
+      // yet (race), we default to writable and rely on the save-time
+      // escalation path to catch real write failures.
+      {
+        const capability = getActiveCapability();
+        const persistent = capability.persistent === true;
+        freshStore.getState().setReadOnly(
+          !persistent,
+          persistent ? null : 'Storage location is not writable',
+        );
+      }
 
       setCurrentPlot({
         itemPath,

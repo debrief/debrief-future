@@ -13,6 +13,7 @@ import {
   DEFAULT_DOCUMENT_SLICE,
   DEFAULT_RESULTS_SLICE,
   DEFAULT_BROWSER_FILTER_SLICE,
+  DEFAULT_PLOT_SLICE,
 } from '../types/index.js';
 import { createTemporalSlice } from './slices/temporal.js';
 import { createSpatialSlice } from './slices/spatial.js';
@@ -20,6 +21,7 @@ import { createFeaturesSlice } from './slices/features.js';
 import { createDocumentSlice } from './slices/document.js';
 import { createResultsSlice } from './slices/results.js';
 import { createBrowserFilterSlice } from './slices/browser-filter.js';
+import { createPlotSlice } from './slices/plot.js';
 import { MAX_UNDO_STEPS } from './middleware/undo.js';
 import { DIRTY_TRIGGER_FIELDS } from './middleware/dirty.js';
 
@@ -221,6 +223,9 @@ export function createSessionStore() {
         // Browser filter slice (uses regular set — ephemeral filter state, not undoable)
         ...createBrowserFilterSlice(set, get, api),
 
+        // Plot slice (uses regular set — derived host-capability signal, not undoable)
+        ...createPlotSlice(set, get, api),
+
         // Global reset action
         reset: () => {
           history.past = [];
@@ -232,6 +237,7 @@ export function createSessionStore() {
             ...DEFAULT_DOCUMENT_SLICE,
             ...DEFAULT_RESULTS_SLICE,
             ...DEFAULT_BROWSER_FILTER_SLICE,
+            ...DEFAULT_PLOT_SLICE,
           });
         },
 
@@ -329,3 +335,4 @@ export { createFeaturesSlice } from './slices/features.js';
 export { createDocumentSlice } from './slices/document.js';
 export { createResultsSlice } from './slices/results.js';
 export { createBrowserFilterSlice } from './slices/browser-filter.js';
+export { createPlotSlice, selectIsReadOnly, selectReadOnlyReason } from './slices/plot.js';
