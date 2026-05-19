@@ -377,11 +377,53 @@ export class AnalysisPage {
     });
   }
 
-  // TODO: Phase 4 (US-2) will add `selectVertex(featureId, path)` here.
-  // That helper drives a Leaflet position-marker click via the temporal
-  // layer's per-position circle marker. Leaving this slot unfilled —
-  // Phase 4 owns the implementation; the modifier-aware emitter from
-  // this phase is the only prerequisite.
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Phase 4 (US-2): sub-feature (vertex) selection helpers
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Select a single vertex on a feature by writing through the
+   * session-state store.
+   *
+   * Why store-driven and not a DOM click:
+   *   Leaflet `CircleMarker` / `Marker` elements rendered by
+   *   `PositionSymbolsLayer` are SVG `<circle>` / `<img>` nodes inside
+   *   the Leaflet pane. They do NOT carry the position index on a
+   *   queryable DOM attribute — the only stable per-position handle is
+   *   the selection-state path string (`<featureId>/positions/<N>`)
+   *   that `PositionSymbolsLayer` already uses for highlight rendering.
+   *   The `window.__sessionStore` test-introspection handle exposes
+   *   `setSelection(featureIds, primary)` directly, so the page object
+   *   sets `featureIds = [fullPath]` and `primary = fullPath`. This
+   *   matches the exact selection shape that a real per-position click
+   *   would produce once that interaction is wired (Phase 9), and
+   *   exercises the full resolver → dispatcher → SubFeatureEditorMode
+   *   path under test.
+   *
+   * @param featureId The parent feature's id.
+   * @param path      The vertex path relative to the feature (e.g.
+   *                  `positions/4`). Concatenated with the feature id
+   *                  to form the full selection-path primary key.
+   */
+  async selectVertex(featureId: string, path: string): Promise<void> {
+    const fullPath = `${featureId}/${path}`;
+    // We write both `featureIds` and `primary` as the full structured
+    // path. The web-shell host currently passes only `selectedFeatureIds`
+    // (not the full `selection` object) into `ActivityPanel`; the panel
+    // then synthesises `primary` from `selectedFeatureIds[0]` when no
+    // `selection` prop is present. By putting the structured path on
+    // featureIds[0], the resolver receives a primary that mirrors the
+    // structured path verbatim and the vertex-bearing branch fires.
+    // The resolver tolerates this — it parses each featureId, takes the
+    // root for feature-map lookups, and reduces multi-feature roots
+    // independently.
+    await this.page.evaluate(
+      ({ ids, primary }) => {
+        window.__sessionStore.getState().setSelection(ids, primary);
+      },
+      { ids: [fullPath], primary: fullPath },
+    );
+  }
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Phase 3 helpers (US-1) — feature-editor workflow (#192 T031)

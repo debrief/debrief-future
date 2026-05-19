@@ -144,13 +144,13 @@ JSON: `feature.properties.vertex_metadata` contains exactly one entry
 with the matching `path: "positions/N"`. SC-002 (≤ 45 s), SC-005
 (lossless round-trip), Article III.1 (provenance entry per save).
 
-- [ ] T032 [test] Vitest for `SubFeatureEditorMode` rendering on a track-point path: header reads "<track> — `positions/N`"; form shows label + tags + note inputs; staged edits route through `useStagedEdits.setVertexField`; O(1) read-time lookup via memoised `Map<path, VertexMetadata>` `shared/components/src/PropertiesPanel/__tests__/SubFeatureEditorMode.test.tsx`
-- [ ] T033 Implement `SubFeatureEditorMode` for the `positions/N` path: parse the path via `parsePath`, look up the parent track's existing `vertex_metadata` entry (if any) via the memoised Map, render the three inputs, stage edits keyed by `(featureId, path)` `shared/components/src/PropertiesPanel/modes/SubFeatureEditorMode.tsx`
-- [ ] T034 [P] Add `data-testid="properties-mode-subfeature"` + per-input testids (`vertex-label-input`, `vertex-tags-input`, `vertex-note-input`) `shared/components/src/PropertiesPanel/modes/SubFeatureEditorMode.tsx`
-- [ ] T035 [P] Storybook story: `PropertiesForm — Sub-feature mode (track)` showing a populated point with label + tag + note `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx`
-- [ ] T036 [P][test] Playwright web-shell: click point on track, fill, save, reload, re-click, assert restored; inspect saved JSON has one `VertexMetadata` entry with `path: positions/N` `apps/web-shell/playwright/tests/properties-subfeature-edit.spec.ts`
-- [ ] T037 [P] Extend `AnalysisPage` with `selectVertex(featureId, path)` helper (Leaflet position-marker click) `apps/web-shell/playwright/pages/AnalysisPage.ts`
-- [ ] T038 [P][test] Vertex out-of-range edge case: write a fixture where the selection points to `positions/9999` on a 50-position track; assert form renders "out-of-range" notice and Save is disabled `apps/web-shell/playwright/tests/properties-subfeature-edit.spec.ts` (extend file from T036)
+- [x] T032 [test] Vitest for `SubFeatureEditorMode` rendering on a track-point path: header reads "<track> — `positions/N`"; form shows label + tags + note inputs; staged edits route through `useStagedEdits.setVertexField`; O(1) read-time lookup via memoised `Map<path, VertexMetadata>` `shared/components/src/PropertiesPanel/__tests__/SubFeatureEditorMode.test.tsx`
+- [x] T033 Implement `SubFeatureEditorMode` for the `positions/N` path: parse the path via `parsePath`, look up the parent track's existing `vertex_metadata` entry (if any) via the memoised Map, render the three inputs, stage edits keyed by `(featureId, path)` `shared/components/src/PropertiesPanel/modes/SubFeatureEditorMode.tsx`
+- [x] T034 [P] Add `data-testid="properties-mode-subfeature"` + per-input testids (`vertex-label-input`, `vertex-tags-input`, `vertex-note-input`) `shared/components/src/PropertiesPanel/modes/SubFeatureEditorMode.tsx`
+- [x] T035 ~~deferred to Phase 10~~ Storybook story: `PropertiesForm — Sub-feature mode (track)` showing a populated point with label + tag + note `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx`
+- [x] T036 [P][test] Playwright web-shell: click point on track, fill, save, reload, re-click, assert restored; inspect saved JSON has one `VertexMetadata` entry with `path: positions/N` `apps/web-shell/playwright/tests/properties-subfeature-edit.spec.ts`
+- [x] T037 [P] Extend `AnalysisPage` with `selectVertex(featureId, path)` helper (Leaflet position-marker click) `apps/web-shell/playwright/pages/AnalysisPage.ts`
+- [x] T038 [P][test] Vertex out-of-range edge case: write a fixture where the selection points to `positions/9999` on a 50-position track; assert form renders "out-of-range" notice and Save is disabled `apps/web-shell/playwright/tests/properties-subfeature-edit.spec.ts` (extend file from T036)
 
 ## Phase 5: US-4 — Multi-feature selection emitter (P1)
 
