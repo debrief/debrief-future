@@ -124,12 +124,12 @@ restored value AND a `properties-panel@<version>` provenance entry
 listing the edited path. SC-001 (≤ 30 s end-to-end), SC-003 (form
 auto-derives from schema), SC-004 (provenance shape).
 
-- [ ] T026 [test] Vitest for `FeatureEditorMode` rendering: header shows feature display name, form renders inputs for every editable LinkML slot, override fields visually distinguished from auto-derived (FR-005), dirty indicator flips on any change `shared/components/src/PropertiesPanel/__tests__/FeatureEditorMode.test.tsx`
-- [ ] T027 Implement `FeatureEditorMode` body: derive editable `FieldSpec[]` from the LinkML JSON Schema for the feature's `kind`; render through the existing `PropertiesForm` widget dispatcher (no new widgets); thread edits to `useStagedEdits.setFeatureField` `shared/components/src/PropertiesPanel/modes/FeatureEditorMode.tsx`
-- [ ] T028 [P] Add `data-testid="properties-mode-feature"` on the mode container + per-field `data-testid` keyed off slot name (for Playwright + a11y) `shared/components/src/PropertiesPanel/modes/FeatureEditorMode.tsx`
-- [ ] T029 [P] Storybook story: `PropertiesForm — Feature mode` (with one tag input + one per-platform override visible) `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx`
-- [ ] T030 [P][test] Playwright web-shell: open plot, click feature, edit tag, save, reload, re-select; assert tag restored + provenance entry present `apps/web-shell/playwright/tests/properties-feature-edit.spec.ts`
-- [ ] T031 [P] Extend `AnalysisPage` page object with `selectFeature(id, { modifier? })` and `editTag(value)` helpers `apps/web-shell/playwright/pages/AnalysisPage.ts`
+- [x] T026 [test] Vitest for `FeatureEditorMode` rendering: header shows feature display name, form renders inputs for every editable LinkML slot, override fields visually distinguished from auto-derived (FR-005), dirty indicator flips on any change `shared/components/src/PropertiesPanel/__tests__/FeatureEditorMode.test.tsx`
+- [x] T027 Implement `FeatureEditorMode` body: derive editable `FieldSpec[]` from the LinkML JSON Schema for the feature's `kind`; render through the existing `PropertiesForm` widget dispatcher (no new widgets); thread edits to `useStagedEdits.setFeatureField` `shared/components/src/PropertiesPanel/modes/FeatureEditorMode.tsx`
+- [x] T028 [P] Add `data-testid="properties-mode-feature"` on the mode container + per-field `data-testid` keyed off slot name (for Playwright + a11y) `shared/components/src/PropertiesPanel/modes/FeatureEditorMode.tsx`
+- [x] T029 ~~deferred to Phase 10~~ — Storybook story for feature mode is captured later in the screenshots phase to avoid conflict with Phases 4 & 6. `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx`
+- [x] T030 [P][test] Playwright web-shell: open plot, click feature, edit tag, save, reload, re-select; assert tag restored + provenance entry present `apps/web-shell/playwright/tests/properties-feature-edit.spec.ts`
+- [x] T031 [P] Extend `AnalysisPage` page object with `selectFeature(id, { modifier? })` and `editTag(value)` helpers `apps/web-shell/playwright/pages/AnalysisPage.ts`
 
 ## Phase 4: US-2 — Annotate a single track point (P1)
 

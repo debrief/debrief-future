@@ -384,6 +384,29 @@ export class AnalysisPage {
   // this phase is the only prerequisite.
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Phase 3 helpers (US-1) — feature-editor workflow (#192 T031)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Type a tag value into the FeatureEditorMode's `tags` ArrayWidget input
+   * and press Enter to commit it. Commits go through
+   * `useStagedEdits.setFeatureField` per Phase 3 wiring.
+   *
+   * Requires the FeatureEditorMode to be visible — call after
+   * `selectFeature(id, { source: 'layers' })`.
+   *
+   * @param value  The tag string to add. Must be non-empty (the
+   *               ArrayWidget rejects empty / duplicate / non-enum values
+   *               at the widget level — those edge cases are not the
+   *               concern of this Phase 3 helper).
+   */
+  async editTag(value: string): Promise<void> {
+    const input = this.page.getByTestId('array-widget-input-tags');
+    await input.fill(value);
+    await input.press('Enter');
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Panel Tabs (GoldenLayout)
   // ─────────────────────────────────────────────────────────────────────────────
 
