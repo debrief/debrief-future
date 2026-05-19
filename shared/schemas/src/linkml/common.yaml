@@ -347,6 +347,60 @@ classes:
         range: LogEntry
         multivalued: true
         inlined_as_list: true
+      vertex_metadata:
+        description: >-
+          Sparse list of per-vertex metadata, keyed by `path`. Empty arrays
+          MUST be omitted from the serialised feature (FR-010). Duplicate
+          `path` values MUST be rejected by validators (contract
+          §Cross-cutting #3). Every concrete subclass of
+          `BaseFeatureProperties` gains this slot by inheritance — see spec
+          #192, contracts/vertex-metadata-slot.md.
+        range: VertexMetadata
+        required: false
+        multivalued: true
+        inlined: true
+        inlined_as_list: true
+
+  VertexMetadata:
+    description: >-
+      Optional, sparse per-vertex annotation attached to a feature. One
+      entry corresponds to one vertex of the parent feature's geometry,
+      identified by the structured `path` slot following the
+      `selectionPath` convention (research note R-008). Carrying any of
+      label/tags/note triggers persistence; an entry with all three
+      absent MUST be omitted on write (the writer's flush function prunes).
+      Path shape depends on parent geometry:
+        Track       -> "positions/<int>"
+        Polygon     -> "rings/<int>/vertices/<int>"
+        LineString  -> "vertices/<int>"
+        MultiPoint  -> "vertices/<int>"
+        Point       -> "vertex/0"
+    attributes:
+      path:
+        description: >-
+          Structured vertex address following the selectionPath convention.
+          The class-level regex accepts the union of all per-geometry path
+          shapes; the writer additionally checks that the path matches the
+          parent geometry's specific shape at flush time. Acts as the
+          identity for an entry within a feature's `vertex_metadata`
+          list — duplicates MUST be rejected by validators.
+        range: string
+        required: true
+        identifier: true
+        pattern: '^(positions/[0-9]+|rings/[0-9]+/vertices/[0-9]+|vertices/[0-9]+|vertex/0)$'
+      label:
+        description: Free-text short label.
+        range: string
+        required: false
+      tags:
+        description: Free-text tag list. Order is not significant.
+        range: string
+        required: false
+        multivalued: true
+      note:
+        description: Free-text long note.
+        range: string
+        required: false
 
   TimestampedPosition:
     description: >-

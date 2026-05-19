@@ -163,6 +163,54 @@ def generate_pydantic() -> bool:
             content,
         )
 
+        # Post-process: inject a Pydantic `model_validator` on
+        # `BaseFeatureProperties` that rejects duplicate `path` values in the
+        # inherited `vertex_metadata` slot (Spec #192,
+        # contracts/vertex-metadata-slot.md §Cross-cutting #3 — "Duplicate-
+        # path rejection MUST fail validation in all three implementations").
+        # The LinkML pydantic generator does not yet honour `identifier: true`
+        # on slots inlined as a list, so we add the constraint here. The
+        # validator is a no-op when `vertex_metadata` is None or empty, so it
+        # does not affect classes that never populate the slot.
+        _validator_marker = "class BaseFeatureProperties(ConfiguredBaseModel):"
+        if _validator_marker in content:
+            # The injection point is the end of the class body — just before
+            # the closing blank line followed by the next `class` definition.
+            idx = content.index(_validator_marker)
+            next_class = content.find("\nclass ", idx + len(_validator_marker))
+            assert next_class > 0, "Could not locate end of BaseFeatureProperties"
+            insertion = (
+                "\n"
+                "    @model_validator(mode='after')\n"
+                "    def _validate_vertex_metadata_unique_paths(self) -> 'BaseFeatureProperties':\n"
+                "        \"\"\"Reject duplicate `path` values within `vertex_metadata`.\n"
+                "\n"
+                "        Spec #192 contract requires duplicate-path rejection across all\n"
+                "        three schema implementations. Injected post-generation; see\n"
+                "        scripts/generate.py.\n"
+                "        \"\"\"\n"
+                "        vm = self.vertex_metadata\n"
+                "        if not vm:\n"
+                "            return self\n"
+                "        seen: set[str] = set()\n"
+                "        for entry in vm:\n"
+                "            if entry.path in seen:\n"
+                "                raise ValueError(\n"
+                "                    f\"duplicate vertex_metadata path {entry.path!r} \"\n"
+                "                    f\"— each path must appear at most once per feature\"\n"
+                "                )\n"
+                "            seen.add(entry.path)\n"
+                "        return self\n"
+            )
+            content = content[:next_class] + insertion + content[next_class:]
+            # Ensure `model_validator` is in the pydantic import group.
+            if "model_validator" not in content[: content.index(_validator_marker)]:
+                content = content.replace(
+                    "    field_validator,\n",
+                    "    field_validator,\n    model_validator,\n",
+                    1,
+                )
+
         # Prepend DO NOT EDIT header
         content = "# AUTO-GENERATED — DO NOT EDIT\n" + content
 

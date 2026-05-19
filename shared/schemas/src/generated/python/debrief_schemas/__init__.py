@@ -26,6 +26,7 @@ from pydantic import (
     SerializationInfo,
     SerializerFunctionWrapHandler,
     field_validator,
+    model_validator,
     model_serializer
 )
 
@@ -979,11 +980,79 @@ class BaseFeatureProperties(ConfiguredBaseModel):
                        'SceneProperties',
                        'MCPSelectionRequirement']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
+
+
+    @model_validator(mode='after')
+    def _validate_vertex_metadata_unique_paths(self) -> 'BaseFeatureProperties':
+        """Reject duplicate `path` values within `vertex_metadata`.
+
+        Spec #192 contract requires duplicate-path rejection across all
+        three schema implementations. Injected post-generation; see
+        scripts/generate.py.
+        """
+        vm = self.vertex_metadata
+        if not vm:
+            return self
+        seen: set[str] = set()
+        for entry in vm:
+            if entry.path in seen:
+                raise ValueError(
+                    f"duplicate vertex_metadata path {entry.path!r} "
+                    f"— each path must appear at most once per feature"
+                )
+            seen.add(entry.path)
+        return self
+
+class VertexMetadata(ConfiguredBaseModel):
+    """
+    Optional, sparse per-vertex annotation attached to a feature. One entry corresponds to one vertex of the parent feature's geometry, identified by the structured `path` slot following the `selectionPath` convention (research note R-008). Carrying any of label/tags/note triggers persistence; an entry with all three absent MUST be omitted on write (the writer's flush function prunes). Path shape depends on parent geometry:
+      Track       -> \"positions/<int>\"
+      Polygon     -> \"rings/<int>/vertices/<int>\"
+      LineString  -> \"vertices/<int>\"
+      MultiPoint  -> \"vertices/<int>\"
+      Point       -> \"vertex/0\"
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/common'})
+
+    path: str = Field(default=..., description="""Structured vertex address following the selectionPath convention. The class-level regex accepts the union of all per-geometry path shapes; the writer additionally checks that the path matches the parent geometry's specific shape at flush time. Acts as the identity for an entry within a feature's `vertex_metadata` list — duplicates MUST be rejected by validators.""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata', 'ResultTypePath']} })
+    label: Optional[str] = Field(default=None, description="""Free-text short label.""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
+                       'SensorContact',
+                       'TUASolution',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
+                       'ToolResultAnnotations',
+                       'DatasetAxisMetadata']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text tag list. Order is not significant.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
+    note: Optional[str] = Field(default=None, description="""Free-text long note.""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata']} })
+
+    @field_validator('path')
+    def pattern_path(cls, v):
+        pattern=re.compile(r"^(positions/[0-9]+|rings/[0-9]+/vertices/[0-9]+|vertices/[0-9]+|vertex/0)$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid path format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid path format: {v}"
+            raise ValueError(err_msg)
+        return v
 
 
 class TimestampedPosition(ConfiguredBaseModel):
@@ -1113,7 +1182,8 @@ class PositionStyleOverride(ConfiguredBaseModel):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     show_label: Optional[bool] = Field(default=None, description="""Override whether to show label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride', 'SensorContact']} })
-    label: Optional[str] = Field(default=None, description="""Custom label text (null = use timestamp)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: Optional[str] = Field(default=None, description="""Custom label text (null = use timestamp)""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -1544,7 +1614,8 @@ class SensorContact(ConfiguredBaseModel):
     range: Optional[float] = Field(default=None, description="""Range to contact in metres""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'TUASolution', 'VectorAnnotationProperties']} })
     frequency: Optional[float] = Field(default=None, description="""Measured frequency in Hz""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
     has_frequency: Optional[bool] = Field(default=None, description="""Controls frequency data display""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
-    label: Optional[str] = Field(default=None, description="""Display label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: Optional[str] = Field(default=None, description="""Display label""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -1615,7 +1686,8 @@ class TUASolution(ConfiguredBaseModel):
                        'SensorContact',
                        'TUASolution',
                        'NarrativeEntryProperties']} })
-    label: str = Field(default=..., description="""Solution label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: str = Field(default=..., description="""Solution label""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -1722,11 +1794,13 @@ class TrackProperties(BaseFeatureProperties):
     vessel_role: Optional[str] = Field(default=None, description="""Vessel role override (parent of leaf in classification path, e.g., frigate). When set, overrides the registry-derived role.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
     domain: Optional[VesselDomainEnum] = Field(default=None, description="""Vessel domain override. When set, overrides the registry-derived domain.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
     @field_validator('symbol_interval')
     def pattern_symbol_interval(cls, v):
@@ -2009,11 +2083,13 @@ class ReferenceLocationProperties(BaseFeatureProperties):
     valid_until: Optional[datetime ] = Field(default=None, description="""End of validity period""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     point_metadata: Optional[list[PointMetadataEntry]] = Field(default=[], description="""Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
 
 class ReferenceLocation(ConfiguredBaseModel):
@@ -2290,7 +2366,8 @@ class MultiPointFeatureProperties(BaseFeatureProperties):
                        'SceneProperties',
                        'MCPSelectionRequirement'],
          'equals_string': 'MULTI_POINT'} })
-    label: str = Field(default=..., description="""Human-readable result label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: str = Field(default=..., description="""Human-readable result label""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -2328,11 +2405,13 @@ class MultiPointFeatureProperties(BaseFeatureProperties):
                        'MCPToolDefinition',
                        'ToolDefinition']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
 
 class MultiPointFeature(ConfiguredBaseModel):
@@ -2462,7 +2541,8 @@ class MultiPolygonFeatureProperties(BaseFeatureProperties):
                        'SceneProperties',
                        'MCPSelectionRequirement'],
          'equals_string': 'MULTI_POLYGON'} })
-    label: str = Field(default=..., description="""Human-readable result label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: str = Field(default=..., description="""Human-readable result label""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -2500,11 +2580,13 @@ class MultiPolygonFeatureProperties(BaseFeatureProperties):
                        'MCPToolDefinition',
                        'ToolDefinition']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
 
 class MultiPolygonFeature(ConfiguredBaseModel):
@@ -2791,11 +2873,13 @@ class NarrativeEntryProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
 
 class NarrativeEntry(ConfiguredBaseModel):
@@ -2921,7 +3005,8 @@ class CircleAnnotationProperties(BaseFeatureProperties):
                        'CircleAnnotationProperties',
                        'Viewport']} })
     radius: float = Field(default=..., description="""Circle radius in meters for precise reconstruction""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'CircleAnnotationProperties']} })
-    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -2956,11 +3041,13 @@ class CircleAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
 
 class CircleAnnotation(ConfiguredBaseModel):
@@ -3082,7 +3169,8 @@ class RectangleAnnotationProperties(BaseFeatureProperties):
                        'SceneProperties',
                        'MCPSelectionRequirement'],
          'equals_string': 'RECTANGLE'} })
-    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -3117,11 +3205,13 @@ class RectangleAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
 
 class RectangleAnnotation(ConfiguredBaseModel):
@@ -3243,7 +3333,8 @@ class LineAnnotationProperties(BaseFeatureProperties):
                        'SceneProperties',
                        'MCPSelectionRequirement'],
          'equals_string': 'LINE'} })
-    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -3278,11 +3369,13 @@ class LineAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
 
 class LineAnnotation(ConfiguredBaseModel):
@@ -3430,11 +3523,13 @@ class TextAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
 
 class TextAnnotation(ConfiguredBaseModel):
@@ -3562,7 +3657,8 @@ class VectorAnnotationProperties(BaseFeatureProperties):
                        'TUASolution',
                        'VectorAnnotationProperties',
                        'Viewport']} })
-    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -3597,11 +3693,13 @@ class VectorAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
 
 class VectorAnnotation(ConfiguredBaseModel):
@@ -3724,7 +3822,8 @@ class PolyAnnotationProperties(BaseFeatureProperties):
                        'MCPSelectionRequirement'],
          'equals_string': 'POLY'} })
     vertex_count: int = Field(default=..., description="""Number of unique vertices (excluding ring closure point)""", ge=3, json_schema_extra = { "linkml_meta": {'domain_of': ['PolyAnnotationProperties']} })
-    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -3760,11 +3859,13 @@ class PolyAnnotationProperties(BaseFeatureProperties):
                        'PolyAnnotationProperties']} })
     line_number: Optional[int] = Field(default=None, description="""Source line number for debugging""", json_schema_extra = { "linkml_meta": {'domain_of': ['PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
 
 class PolyAnnotation(ConfiguredBaseModel):
@@ -4318,6 +4419,7 @@ class StacExtensionProperties(ConfiguredBaseModel):
          'slot_uri': 'debrief:platforms'} })
     tags: Optional[list[str]] = Field(default=[], description="""Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary'],
          'slot_uri': 'debrief:tags'} })
@@ -4443,6 +4545,7 @@ class StacItemSummary(ConfiguredBaseModel):
     platforms: Optional[list[PlatformRecord]] = Field(default=[], description="""Fully-resolved per-platform metadata array for filtering. Same structure as StacExtensionProperties.platforms.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
     tags: Optional[list[str]] = Field(default=[], description="""Plot-level tags from debrief:tags""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     feature_tags: Optional[list[str]] = Field(default=[], description="""Feature-level tags from debrief:feature_tags""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
@@ -4894,7 +4997,7 @@ class ResultTypePath(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.com/schemas/tool-result'})
 
-    path: str = Field(default=..., description="""Full hierarchical path""", json_schema_extra = { "linkml_meta": {'domain_of': ['ResultTypePath']} })
+    path: str = Field(default=..., description="""Full hierarchical path""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata', 'ResultTypePath']} })
 
     @field_validator('path')
     def pattern_path(cls, v):
@@ -4919,7 +5022,8 @@ class ToolResultAnnotations(ConfiguredBaseModel):
 
     resultType: str = Field(default=..., description="""Hierarchical result type (e.g., mutation/track/smoothed)""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultAnnotations'], 'slot_uri': 'debrief:resultType'} })
     sourceFeatures: list[str] = Field(default=..., description="""IDs of input features used to generate this result""", min_length=1, json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultAnnotations'], 'slot_uri': 'debrief:sourceFeatures'} })
-    label: str = Field(default=..., description="""Human-readable description of the result""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: str = Field(default=..., description="""Human-readable description of the result""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -4956,7 +5060,8 @@ class DatasetAxisMetadata(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.com/schemas/tool-result'})
 
-    label: str = Field(default=..., description="""Human-readable axis label (e.g., \"Time\", \"Range\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+    label: str = Field(default=..., description="""Human-readable axis label (e.g., \"Time\", \"Range\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
+                       'PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
                        'MultiPointFeatureProperties',
@@ -5190,11 +5295,13 @@ class StoryboardProperties(BaseFeatureProperties):
                        'ToolDefinition']} })
     schema_version: int = Field(default=..., description="""Schema version. Bumped to 2 by #259 (relax timestamp uniqueness + add `SceneProperties.creation_order`). Pre-#259 plots carrying `schema_version: 1` are rejected at load with `UnsupportedSchemaVersionError` — no in-place migration is provided (Article XIV pre-release freedom; FR-010 in #259 spec). Monotonically non-decreasing across edits; bumped only by migrations or breaking schema changes.""", ge=2, json_schema_extra = { "linkml_meta": {'domain_of': ['StoryboardProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
     @field_validator('id')
     def pattern_id(cls, v):
@@ -5290,11 +5397,13 @@ class SceneProperties(BaseFeatureProperties):
     display_mode: Optional[DisplayModeEnum] = Field(default=None, description="""Time-controller display mode at capture time (full = entire track history; trail = only the tail behind each platform). Reuses DisplayModeEnum from session-state.yaml. Optional for legacy compatibility (Spec #258): readers MUST leave the time controller untouched when this slot is absent (FR-003). Writers populate it from session.displayMode at the moment the scene is created.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     polygon_source: Optional[PolygonSourceEnum] = Field(default=None, alias="_polygon_source", description="""Provenance of the scene's stored polygon geometry (Spec #258). 'bounds' = computed from real Leaflet map bounds at capture time; 'placeholder' = pre-#258 ~100m square; 'manual' = reserved for future user-drawn rectangles. Render-side consumers recompute the polygon from (viewport, map dimensions) when this value is anything other than 'bounds' (including absent, for legacy scenes). The stored geometry is NEVER rewritten on read (Article III.2 source preservation).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
+    vertex_metadata: Optional[list[VertexMetadata]] = Field(default=[], description="""Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties']} })
 
     @field_validator('id')
     def pattern_id(cls, v):
@@ -5967,6 +6076,7 @@ class ToolsUpdateMessage(ConfiguredBaseModel):
 # Model rebuild
 # see https://pydantic-docs.helpmanual.io/usage/models/#rebuilding-a-model
 BaseFeatureProperties.model_rebuild()
+VertexMetadata.model_rebuild()
 TimestampedPosition.model_rebuild()
 PointProperties.model_rebuild()
 LineProperties.model_rebuild()
