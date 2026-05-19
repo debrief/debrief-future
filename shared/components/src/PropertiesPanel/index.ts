@@ -13,6 +13,30 @@ export { BboxWidget } from './BboxWidget';
 export { DateTimeWidget } from './DateTimeWidget';
 export { PlatformArrayWidget } from './PlatformArrayWidget';
 
+// Spec 192 — Phase 2: dispatcher + shells + banner + save-path glue.
+export { PropertiesPanelDispatch } from './PropertiesPanelDispatch';
+export type { PropertiesPanelDispatchProps } from './PropertiesPanelDispatch';
+export { ReadOnlyBanner } from './readOnlyBanner';
+export type { ReadOnlyBannerProps } from './readOnlyBanner';
+export { FeatureEditorMode } from './modes/FeatureEditorMode';
+export type { FeatureEditorModeProps } from './modes/FeatureEditorMode';
+export { SubFeatureEditorMode } from './modes/SubFeatureEditorMode';
+export type { SubFeatureEditorModeProps } from './modes/SubFeatureEditorMode';
+export { MultiSelectSummaryMode } from './modes/MultiSelectSummaryMode';
+export type { MultiSelectSummaryModeProps } from './modes/MultiSelectSummaryMode';
+export { resolveEditingMode } from './selectionMode';
+export type { EditingMode, Feature as EditingModeFeature } from './selectionMode';
+export {
+  saveStagedEdits,
+} from './saveStagedEdits';
+export type {
+  SaveStagedEditsInput,
+  SaveStagedEditsResult,
+  SaveWriter,
+  AppendProvenanceFn,
+  ProvenanceInputPath,
+} from './saveStagedEdits';
+
 export type {
   FieldKey,
   FieldValue,

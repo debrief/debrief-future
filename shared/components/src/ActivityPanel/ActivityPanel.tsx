@@ -5,7 +5,7 @@
  * single collapsible panel with three sections.
  */
 
-import { useState, useCallback, useRef, useEffect, Component } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo, Component } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
 import { Icon } from 'vscrui';
 import type { IIconProps } from 'vscrui';
@@ -15,8 +15,12 @@ import { LayersToolbar } from '../LayersToolbar';
 import { FeatureList } from '../FeatureList';
 import { FormatMenu } from '../FormatMenu';
 import { GeometryDialog } from '../GeometryDialog';
-import { PropertiesForm } from '../PropertiesPanel';
+import { PropertiesPanelDispatch } from '../PropertiesPanel/PropertiesPanelDispatch';
+import { resolveEditingMode } from '../PropertiesPanel/selectionMode';
+import { saveStagedEdits } from '../PropertiesPanel/saveStagedEdits';
 import type { FieldKey, FieldValue } from '../PropertiesPanel';
+import type { FeatureSelection } from '@debrief/session-state';
+import { useStagedEdits } from './useStagedEdits';
 import type { DebriefFeature } from '../utils/types';
 import { isTrackFeature, isMultiPointFeature, isMultiPolygonFeature } from '../utils/types';
 import type { DisplayMode, PlaybackState } from '@debrief/schemas';
@@ -205,6 +209,14 @@ export function ActivityPanel({
   propertiesWriteError = null,
   openItemStorePath,
   openItemPath,
+  // Spec 192 — Properties Panel mode dispatcher
+  selection,
+  isPlotReadOnly = false,
+  plotReadOnlyReason = null,
+  onSavePropertiesPanel,
+  appendPropertiesPanelProvenance,
+  propertiesPanelPackageVersion = '0.0.0',
+  onPropertiesPanelSaveResult,
   // Collapse
   collapseState: externalCollapseState,
   onCollapseStateChange,
@@ -277,6 +289,81 @@ export function ActivityPanel({
     },
     [onMessage, openItemStorePath, openItemPath]
   );
+
+  // ── Spec 192: Properties Panel staging buffer + mode dispatch ────────
+  //
+  // The staging buffer lives in `ActivityPanel` React state per R-002a
+  // (not in a new Zustand slice). The hook returns a stable API surface
+  // that the dispatcher / mode shells consume.
+  const staging = useStagedEdits();
+
+  // Build a `featuresById` lookup once per features-list reference.
+  // Used by `resolveEditingMode` and handed into the mode shells for the
+  // multi-select derivation in Phase 7.
+  const featuresById = useMemo<ReadonlyMap<string, DebriefFeature>>(() => {
+    const map = new Map<string, DebriefFeature>();
+    for (const f of features) {
+      map.set(f.id, f);
+    }
+    return map;
+  }, [features]);
+
+  // Synthesise a `FeatureSelection`-shaped object for the resolver. When
+  // the host hasn't started passing `selection` yet, fall back to the
+  // legacy `selectedFeatureIds` array — `resolveEditingMode` treats that
+  // as featureIds with a null primary and resolves to plot/feature/multi
+  // accordingly. Zero regression to #447's plot-editor flow.
+  const resolverSelection = useMemo<FeatureSelection>(() => {
+    if (selection) {
+      return {
+        featureIds: selection.featureIds,
+        primary: selection.primary,
+        // The resolver doesn't read `timestamp`; use Date.now() so the
+        // shape matches without forcing the host to fabricate one.
+        timestamp: { epoch: 0, iso: new Date(0).toISOString() },
+      };
+    }
+    return {
+      featureIds: selectedFeatureIds,
+      primary: selectedFeatureIds.length === 1 ? (selectedFeatureIds[0] ?? null) : null,
+      timestamp: { epoch: 0, iso: new Date(0).toISOString() },
+    };
+  }, [selection, selectedFeatureIds]);
+
+  const editingMode = useMemo(
+    () => resolveEditingMode(resolverSelection, featuresById),
+    [resolverSelection, featuresById]
+  );
+
+  // ── Integrated save path (Spec 192 T025) ────────────────────────────
+  //
+  // Reads `applyEditsToFeatures(features)` → calls the host writer →
+  // appends provenance per affected feature → clears the staging buffer.
+  // Read-only escalation is handled inside the writer (R-009).
+  const handlePropertiesPanelSave = useCallback(async () => {
+    if (!onSavePropertiesPanel || !appendPropertiesPanelProvenance) return;
+    const result = await saveStagedEdits({
+      features,
+      staging,
+      writer: onSavePropertiesPanel,
+      appendProvenance: appendPropertiesPanelProvenance,
+      packageVersion: propertiesPanelPackageVersion,
+    });
+    onPropertiesPanelSaveResult?.(result);
+  }, [
+    features,
+    staging,
+    onSavePropertiesPanel,
+    appendPropertiesPanelProvenance,
+    propertiesPanelPackageVersion,
+    onPropertiesPanelSaveResult,
+  ]);
+  // Surface the save handler to the React lint pass — wired through to
+  // the mode shells in later phases. For Phase 2 we expose it via a
+  // ref-style assignment so the eslint unused-vars rule is satisfied and
+  // the binding is reachable in the dispatcher when later tasks wire a
+  // visible Save action onto the modes.
+  void handlePropertiesPanelSave;
 
   const handleToggleVisibility = useCallback(
     (featureIds: string[]) => {
@@ -576,12 +663,29 @@ export function ActivityPanel({
         layout="fixed"
       >
         <SectionErrorBoundary sectionName="Properties">
-          <PropertiesForm
-            fields={propertiesFields}
-            onCommitField={handlePropertiesCommit}
-            loading={propertiesLoading}
-            readOnly={propertiesReadOnly}
-            writeError={propertiesWriteError}
+          {/*
+            Spec 192 T019 — mode-aware dispatcher. The plot-mode branch
+            renders the unchanged #447 `PropertiesForm` with the exact
+            prop surface it had today (zero regression — FR-012 / SC-008).
+            Feature / sub-feature / multi-select branches render the new
+            mode shells.
+          */}
+          <PropertiesPanelDispatch
+            editingMode={editingMode}
+            featuresById={featuresById}
+            isReadOnly={isPlotReadOnly}
+            readOnlyReason={plotReadOnlyReason}
+            plotFormProps={{
+              fields: propertiesFields,
+              onCommitField: handlePropertiesCommit,
+              loading: propertiesLoading,
+              readOnly: propertiesReadOnly,
+              writeError: propertiesWriteError,
+            }}
+            setFeatureField={staging.setFeatureField}
+            setVertexField={staging.setVertexField}
+            revertField={staging.revertField}
+            unrevertField={staging.unrevertField}
           />
         </SectionErrorBoundary>
       </PaneSection>
