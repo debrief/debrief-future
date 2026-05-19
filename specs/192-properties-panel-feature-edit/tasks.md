@@ -55,10 +55,10 @@
 
 Scope: no new package, no new build target. Setup is mostly verification.
 
-- [ ] T001 Confirm `.specify/.active-feature` pins to `192-properties-panel-feature-edit` and the working branch is `claude/start-speckit-192-SXMBK` (cloud cookie) — read `/home/user/debrief-future/.specify/.active-feature`
-- [ ] T002 Run baseline gate to confirm pre-feature state is green `task verify`
-- [ ] T003 [P] Confirm the LinkML generator pipeline runs cleanly on current schema (no schema change yet) `shared/schemas/Makefile`
-- [ ] T004 [P] Confirm Playwright web-shell harness works in this environment `apps/web-shell/run-playwright.mjs`
+- [x] T001 Confirm `.specify/.active-feature` pins to `192-properties-panel-feature-edit` and the working branch is `claude/implement-speckit-192-o9Oby` — read `/home/user/debrief-future/.specify/.active-feature`
+- [x] T002 Run baseline gate to confirm pre-feature state is green `task verify`
+- [x] T003 [P] Confirm the LinkML generator pipeline runs cleanly on current schema (no schema change yet) `shared/schemas/Makefile`
+- [x] T004 [P] Confirm Playwright web-shell harness works in this environment `apps/web-shell/run-playwright.mjs`
 
 ## Phase 2: Foundation (blocks all stories)
 
