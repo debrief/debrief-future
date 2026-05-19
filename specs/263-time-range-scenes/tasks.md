@@ -261,7 +261,7 @@
 
 ### PR Creation
 
-- [ ] T083 Create PR and publish blog: run /speckit.pr `specs/263-time-range-scenes/`
+- [x] T083 Create PR and publish blog: run /speckit.pr `specs/263-time-range-scenes/`
 
 **Task T083 must run last. It depends on every evidence, media, and verification task being complete.**
 
