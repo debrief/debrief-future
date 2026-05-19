@@ -15,7 +15,7 @@
  *   - `MissingCreationOrderError`          (FC-I5 — pre-#259 plot)
  *   - `UnsupportedSchemaVersionError`      (FC-V1 — pre-#259 plot)
  */
-export type StoryboardErrorCode = "OrphanScene" | "UnknownStoryboard" | "UnknownScene" | "ReservedSlotViolation" | "DuplicateStoryboardName" | "ThumbnailDeepCopyFailed" | "SchemaMigrationFailed" | "InvariantViolation" | "DuplicateCreationOrder" | "CreationOrderOutOfRange" | "MissingCreationOrder" | "UnsupportedSchemaVersion";
+export type StoryboardErrorCode = "OrphanScene" | "UnknownStoryboard" | "UnknownScene" | "ReservedSlotViolation" | "DuplicateStoryboardName" | "ThumbnailDeepCopyFailed" | "SchemaMigrationFailed" | "InvariantViolation" | "DuplicateCreationOrder" | "CreationOrderOutOfRange" | "MissingCreationOrder" | "UnsupportedSchemaVersion" | "SceneFlavourXorViolation" | "SceneTimeRangeEndNotAfterStart";
 export declare abstract class StoryboardError extends Error {
     abstract readonly code: StoryboardErrorCode;
 }
@@ -91,5 +91,19 @@ export declare class UnsupportedSchemaVersionError extends StoryboardError {
     readonly requiredMinimum: number;
     readonly code = "UnsupportedSchemaVersion";
     constructor(storyboardId: string, foundVersion: number, requiredMinimum?: number);
+}
+export declare class SceneFlavourXorViolationError extends StoryboardError {
+    readonly sceneId: string;
+    readonly timeRangePresent: boolean;
+    readonly viewportEndPresent: boolean;
+    readonly code = "SceneFlavourXorViolation";
+    constructor(sceneId: string, timeRangePresent: boolean, viewportEndPresent: boolean);
+}
+export declare class SceneTimeRangeEndNotAfterStartError extends StoryboardError {
+    readonly sceneId: string;
+    readonly start: string;
+    readonly end: string;
+    readonly code = "SceneTimeRangeEndNotAfterStart";
+    constructor(sceneId: string, start: string, end: string);
 }
 //# sourceMappingURL=errors.d.ts.map

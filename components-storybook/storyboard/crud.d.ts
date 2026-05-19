@@ -1,4 +1,4 @@
-import { GeoJSONPolygon, LogEntry, PolygonSource, SceneProperties, Viewport, WasGeneratedBy } from '../../../schemas/src/generated/typescript/index.ts';
+import { GeoJSONPolygon, LogEntry, PolygonSource, SceneProperties, TimeRange, Viewport, WasGeneratedBy } from '../../../schemas/src/generated/typescript/index.ts';
 import { Plot, SceneFeature, StoryboardFeature } from './types';
 
 /**
@@ -86,6 +86,24 @@ export interface CreateSceneInput {
     visibleFeatureIds: string[];
     thumbnailAssetRef: string;
     transitionDurationMs?: number;
+    /**
+     * Time-range flavour pair (#263). MUST be supplied together or both omitted:
+     *
+     * - **Instant flavour** (default): omit both `timeRange` and `viewportEnd`.
+     *   The captured Scene has `time_range = undefined` and
+     *   `viewport_end = undefined`. Behaviour identical to #215.
+     * - **Time-range flavour**: supply both `timeRange` (with
+     *   `timeRange.end > timeRange.start`) and `viewportEnd`. The captured
+     *   Scene records both slots and plays back as a synchronised viewport +
+     *   slider scrub (per #263 FR-PLAY-001..006).
+     *
+     * Mixed-presence inputs (`timeRange` without `viewportEnd` or vice versa)
+     * throw `SceneFlavourXorViolationError`. Reversed/zero ranges throw
+     * `SceneTimeRangeEndNotAfterStartError`. Both errors fire before any
+     * mutation, so the plot is left untouched on rejection.
+     */
+    timeRange?: TimeRange;
+    viewportEnd?: Viewport;
     actor: string;
     now?: string;
     idOverride?: string;

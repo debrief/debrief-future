@@ -5,9 +5,9 @@
  * core path. Consumers (downstream specs #216 / #217 / #218) import from
  * `@debrief/components` and treat the module as a pure data-layer helper.
  */
-export type { Plot as StoryboardPlot, SceneFeature, StoryboardFeature, Ulid, StoryboardId, SceneId, } from './types';
-export { isStoryboardFeature, isSceneFeature, asUlid, asStoryboardId, asSceneId, } from './types';
-export { StoryboardError, OrphanSceneError, UnknownStoryboardError, UnknownSceneError, ReservedSlotViolationError, DuplicateStoryboardNameError, ThumbnailDeepCopyFailedError, SchemaMigrationFailedError, InvariantViolationError, DuplicateCreationOrderError, CreationOrderOutOfRangeError, MissingCreationOrderError, UnsupportedSchemaVersionError, } from './errors';
+export type { Plot as StoryboardPlot, SceneFeature, StoryboardFeature, TimeRange, Viewport, Ulid, StoryboardId, SceneId, InstantSceneFeature, TimeRangeSceneFeature, InstantSceneProperties, TimeRangeSceneProperties, } from './types';
+export { isStoryboardFeature, isSceneFeature, isTimeRangeScene, asUlid, asStoryboardId, asSceneId, } from './types';
+export { StoryboardError, OrphanSceneError, UnknownStoryboardError, UnknownSceneError, ReservedSlotViolationError, DuplicateStoryboardNameError, ThumbnailDeepCopyFailedError, SchemaMigrationFailedError, InvariantViolationError, DuplicateCreationOrderError, CreationOrderOutOfRangeError, MissingCreationOrderError, UnsupportedSchemaVersionError, SceneFlavourXorViolationError, SceneTimeRangeEndNotAfterStartError, } from './errors';
 export type { StoryboardErrorCode } from './errors';
 export { createStoryboard, renameStoryboard, deleteStoryboard, createScene, updateScene, deleteScene, duplicateScene, copySceneToOtherStoryboard, describeStoryboard, restoreScene, bboxToPolygon, reorderSceneInTiedGroup, } from './crud';
 export type { CreateStoryboardInput, RenameStoryboardInput, DeleteStoryboardInput, CreateSceneInput, UpdateScenePatch, UpdateSceneInput, DeleteSceneInput, DuplicateSceneInput, CopySceneToOtherStoryboardInput, DescribeStoryboardInput, RestoreSceneInput, SceneBounds, ReorderSceneInTiedGroupInput, } from './crud';
@@ -17,7 +17,7 @@ export type { StaleReadResult } from './queries';
 export { detectMissingDataForScene } from './missing-data';
 export type { MissingDataClassification, PlotTimeRange as StoryboardPlotTimeRange, } from './missing-data';
 export { canonicaliseVisibleFeatureIds, computeFeatureSetHash, } from './hash';
-export { validatePlot } from './validate';
+export { validatePlot, flavourCheck } from './validate';
 export { isActiveStoryboardSelection, getActiveStoryboardSelection, setActiveStoryboardSelection, ACTIVE_STORYBOARD_FEATURE_ID, ACTIVE_STORYBOARD_STATE_TYPE, } from './activeStoryboardSelection';
 export { runPlotOpenMigrations, V1_MIGRATIONS } from './migration';
 export type { MigrationFn } from './migration';
