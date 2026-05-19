@@ -26,13 +26,16 @@ import {
   getScene,
   isSceneFeature,
   isStoryboardFeature,
+  isTimeRangeScene,
   listScenesOrdered,
+  runTimeRangeTween,
   setActiveStoryboardSelection,
   validatePlot,
   type MissingDataClassification,
   type StoryboardPlot,
   type SceneFeature,
   type StoryboardFeature,
+  type TimeRangeTweenHandle,
 } from '@debrief/components';
 import type {
   SceneRowViewModel,
@@ -114,6 +117,11 @@ interface TransportState {
   /** Non-null while a flyTo+RAF tween is in flight. */
   transitionId: number | null;
   transitionSafetyTimer: ReturnType<typeof setTimeout> | null;
+  /** Non-null while a time-range Scene scrub is in flight (#263). Distinct
+   *  from `transitionId` (which tracks the MapPanel's own flyTo). The tween
+   *  drives both the viewport and the slider on every frame; cancelling it
+   *  aborts both axes in lock-step. */
+  timeRangeTween: TimeRangeTweenHandle | null;
   /** Whether an active scrubbable-range override has been installed —
    *  drives dispose() behaviour. */
   scrubbableOverrideInstalled: boolean;
@@ -254,6 +262,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
       currentSceneIndex: 0,
       transitionId: null,
       transitionSafetyTimer: null,
+      timeRangeTween: null,
       scrubbableOverrideInstalled: false,
       disposables: [],
     };
@@ -615,7 +624,13 @@ export class StoryboardPlaybackService implements vscode.Disposable {
       }
     }
 
-    this.executeTransition(state, targetIndex, targetScene, plot);
+    // Time-range tween direction is computed from currentSceneIndex vs
+    // targetIndex (forward = play forward / step next; reverse = step
+    // backward). Note this is independent of the existing `direction:
+    // 'forward' | 'backward'` arg which controls hard-block-prompt copy.
+    const tweenDirection: 'forward' | 'reverse' =
+      direction === 'backward' ? 'reverse' : 'forward';
+    this.executeTransition(state, targetIndex, targetScene, plot, tweenDirection);
   }
 
   private executeTransition(
@@ -623,29 +638,25 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     targetIndex: number,
     targetScene: SceneFeature,
     plot: StoryboardPlot,
+    direction: 'forward' | 'reverse' = 'forward',
   ): void {
-    const viewport = targetScene.properties.viewport;
+    // Always abort any in-flight time-range tween before launching a new
+    // transition. This keeps the world coherent if the user clicks a
+    // different Scene mid-scrub (#263 FR-PLAY-007).
+    if (state.timeRangeTween !== null) {
+      state.timeRangeTween.cancel();
+      state.timeRangeTween = null;
+    }
+
     const durationMs = targetScene.properties.transition_duration_ms ?? 500;
-    const token = this.mapPanel.flyToViewport(viewport, durationMs);
-    state.transitionId = token;
-    this.flyToTokenToDocumentUri.set(token, state.documentUri);
+    const session = this.sessionManager.getSession(state.documentUri);
 
     // Update the current scene index + scrubbable range immediately so the
     // panel + time view show the destination scene without waiting for
-    // the flyTo to complete.
+    // the transition to complete.
     state.currentSceneIndex = targetIndex;
     this.applyScrubbableRange(state, plot);
     this.pushSceneRectangles(state, plot);
-
-    // RAF tween of `currentTime` — runs in the host process. For zero-
-    // duration jumps, snap immediately. For non-zero durations, snap to
-    // the target timestamp immediately in the service (the webview map
-    // panel drives the in-between frames visually).
-    const targetEpoch = new Date(targetScene.properties.timestamp).getTime();
-    const session = this.sessionManager.getSession(state.documentUri);
-    if (session && !Number.isNaN(targetEpoch)) {
-      session.getState().setCurrentTime(targetEpoch);
-    }
 
     // Spec #258 / FR-002: restore the captured display mode alongside the
     // viewport flyTo. Legacy scenes that pre-date #258 do not carry the
@@ -653,6 +664,56 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const capturedDisplayMode = targetScene.properties.display_mode;
     if (session && capturedDisplayMode !== undefined && capturedDisplayMode !== null) {
       session.getState().setDisplayMode(capturedDisplayMode);
+    }
+
+    // #263 — branch on Scene flavour. Time-range Scenes drive a
+    // synchronised viewport+slider scrub via `TimeRangeTween`; instant
+    // Scenes use the v1 path (viewport flyTo + immediate slider snap).
+    if (isTimeRangeScene(targetScene) && session) {
+      const tween = runTimeRangeTween({
+        targetScene,
+        direction,
+        durationMs,
+        ports: {
+          setCurrentTime: (epoch) => {
+            session.getState().setCurrentTime(epoch);
+          },
+          flyToViewport: (viewport) => {
+            // Per-frame snap (durationMs=0). The tween emits these many times
+            // per second, so we discard the flyTo token — the lock-step is
+            // governed by the tween, not the MapPanel's own completion event.
+            this.mapPanel.flyToViewport(viewport, 0);
+          },
+        },
+      });
+      state.timeRangeTween = tween;
+      void tween.done.then(() => {
+        // Resolved naturally OR cancelled — either way, clear the handle.
+        if (state.timeRangeTween === tween) {
+          state.timeRangeTween = null;
+        }
+        // No safety timer required: the tween's own scheduler guarantees
+        // a settle within durationMs + 1 frame. We still emit a fresh
+        // snapshot so the panel reflects the rest state.
+        this.emitSnapshot(state, plot);
+      });
+      this.emitSnapshot(state, plot);
+      return;
+    }
+
+    // Instant-Scene path (v1 — unchanged from #217).
+    const viewport = targetScene.properties.viewport;
+    const token = this.mapPanel.flyToViewport(viewport, durationMs);
+    state.transitionId = token;
+    this.flyToTokenToDocumentUri.set(token, state.documentUri);
+
+    // RAF tween of `currentTime` — runs in the host process. For zero-
+    // duration jumps, snap immediately. For non-zero durations, snap to
+    // the target timestamp immediately in the service (the webview map
+    // panel drives the in-between frames visually).
+    const targetEpoch = new Date(targetScene.properties.timestamp).getTime();
+    if (session && !Number.isNaN(targetEpoch)) {
+      session.getState().setCurrentTime(targetEpoch);
     }
 
     // Safety timer (R8).
@@ -676,6 +737,12 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     if (state.transitionSafetyTimer !== null) {
       clearTimeout(state.transitionSafetyTimer);
       state.transitionSafetyTimer = null;
+    }
+    // #263 — also cancel any in-flight time-range tween so the world
+    // settles on a coherent moment (FR-PLAY-007).
+    if (state.timeRangeTween !== null) {
+      state.timeRangeTween.cancel();
+      state.timeRangeTween = null;
     }
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
     this.emitSnapshot(state, plot);
