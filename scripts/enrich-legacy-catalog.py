@@ -27,12 +27,10 @@ _SCHEMAS_PY_DIR = Path(__file__).resolve().parent.parent / "shared" / "schemas" 
 if str(_SCHEMAS_PY_DIR) not in sys.path:
     sys.path.insert(0, str(_SCHEMAS_PY_DIR))
 
-from debrief_schemas import (  # noqa: E402
-    StacCollection,
-    StacItem,
-)
-from debrief_schemas.unions import StacCatalogOrCollection  # noqa: E402
 from pydantic import TypeAdapter  # noqa: E402
+
+from debrief_schemas import StacItem  # noqa: E402
+from debrief_schemas.unions import StacCatalogOrCollection  # noqa: E402
 
 _CATALOG_OR_COLLECTION_ADAPTER: TypeAdapter[StacCatalogOrCollection] = TypeAdapter(
     StacCatalogOrCollection

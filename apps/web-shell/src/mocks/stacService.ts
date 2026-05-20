@@ -487,9 +487,10 @@ async function loadStandaloneItemsViaWriter(
   for (const { itemPath, stored: rec } of stored) {
     if (rec.kind !== 'standalone') continue;
     if (itemMap.has(itemPath)) continue;
-    // Round-trip through JSON to project the writer's StacItem onto the
-    // local StacItem shape (no `as unknown` cast at the boundary).
-    const stacItem = JSON.parse(JSON.stringify(rec.record)) as StacItem;
+    // Both the writer's StacItem and the mock's StacItem now reference
+    // the same @debrief/schemas.StacItem (spec #223 Decision 1B), so no
+    // projection cast is required.
+    const stacItem = rec.record;
     itemMap.set(itemPath, stacItem);
     items.unshift(toOverviewItem(itemPath, stacItem));
     // Fetch the GeoJSON payload from IDB if available so getPlotData
