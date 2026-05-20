@@ -47,7 +47,7 @@
 
 import React, { useCallback, useMemo, useState } from 'react';
 import type { DebriefFeature, VertexMetadata } from '@debrief/schemas';
-import { parsePath } from '@debrief/session-state';
+import { parsePath } from '@debrief/session-state/browser';
 import type { UseStagedEditsApi } from '../../ActivityPanel/useStagedEdits';
 import { getFeatureLabel } from '../../utils/labels';
 import { ArrayWidget } from '../ArrayWidget';

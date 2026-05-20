@@ -19,7 +19,7 @@ import { PropertiesPanelDispatch } from '../PropertiesPanel/PropertiesPanelDispa
 import { resolveEditingMode } from '../PropertiesPanel/selectionMode';
 import { saveStagedEdits } from '../PropertiesPanel/saveStagedEdits';
 import type { FieldKey, FieldValue } from '../PropertiesPanel';
-import type { FeatureSelection } from '@debrief/session-state';
+import type { FeatureSelection } from '@debrief/session-state/browser';
 import { useStagedEdits } from './useStagedEdits';
 import type { DebriefFeature } from '../utils/types';
 import { isTrackFeature, isMultiPointFeature, isMultiPolygonFeature } from '../utils/types';

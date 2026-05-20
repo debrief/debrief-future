@@ -15,7 +15,7 @@ import type {
   PolyAnnotation,
   LineAnnotation,
 } from '@debrief/schemas';
-import type { FeatureSelection } from '@debrief/session-state';
+import type { FeatureSelection } from '@debrief/session-state/browser';
 import { resolveEditingMode } from '../selectionMode';
 
 // ─── Fixture builders ────────────────────────────────────────────────

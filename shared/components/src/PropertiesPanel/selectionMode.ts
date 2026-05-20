@@ -10,8 +10,8 @@
  */
 
 import type { DebriefFeature } from '@debrief/schemas';
-import type { FeatureSelection } from '@debrief/session-state';
-import { parsePath } from '@debrief/session-state';
+import type { FeatureSelection } from '@debrief/session-state/browser';
+import { parsePath } from '@debrief/session-state/browser';
 
 // ─── Public types ────────────────────────────────────────────────────
 
