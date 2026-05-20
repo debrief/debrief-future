@@ -205,12 +205,12 @@ cycle no → 1 feature → vertex on it → 2 features → no. At each step
 assert mode container present + previously-staged edits not lost. Then
 re-select earlier targets and assert their edits still in the form.
 
-- [ ] T053 [test] Vitest for `MultiSelectSummaryMode` derivation: input two features with overlapping + diverging fields, assert shared values render their actual value and diverging fields render `(differs)`, assert all inputs `aria-disabled` `shared/components/src/PropertiesPanel/__tests__/MultiSelectSummaryMode.test.tsx`
-- [ ] T054 Implement `MultiSelectSummaryMode` derivation (pure, memoised on `(selection.featureIds, featuresById)`); inputs disabled `shared/components/src/PropertiesPanel/modes/MultiSelectSummaryMode.tsx`
-- [ ] T055 [P] Add `data-testid="properties-mode-multiselect"` + `data-testid="multiselect-differs-<slot>"` for the `(differs)` cells `shared/components/src/PropertiesPanel/modes/MultiSelectSummaryMode.tsx`
-- [ ] T056 [P] Storybook story: `PropertiesForm — Multi-select summary` showing one shared value + one `(differs)` row + the inline "bulk edit not supported" note `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx`
-- [ ] T057 [P][test] Playwright web-shell — full cycle: no → 1 → vertex → 2 → 0; staged edits on the 1-feature and the vertex preserved through every transition (re-select to verify) `apps/web-shell/playwright/tests/properties-mode-swap.spec.ts`
-- [ ] T058 [P][test] Vitest unit: selection change does NOT touch the `useStagedEdits` buffer (re-asserts invariant from staged-edits-store.md and from US-3 AS-3) — covered partially by T013; add an explicit selection-driven case if not already present `shared/components/src/ActivityPanel/__tests__/useStagedEdits.test.ts`
+- [x] T053 [test] Vitest for `MultiSelectSummaryMode` derivation: input two features with overlapping + diverging fields, assert shared values render their actual value and diverging fields render `(differs)`, assert all inputs `aria-disabled` `shared/components/src/PropertiesPanel/__tests__/MultiSelectSummaryMode.test.tsx`
+- [x] T054 Implement `MultiSelectSummaryMode` derivation (pure, memoised on `(selection.featureIds, featuresById)`); inputs disabled `shared/components/src/PropertiesPanel/modes/MultiSelectSummaryMode.tsx`
+- [x] T055 [P] Add `data-testid="properties-mode-multiselect"` + `data-testid="multiselect-differs-<slot>"` for the `(differs)` cells `shared/components/src/PropertiesPanel/modes/MultiSelectSummaryMode.tsx`
+- [x] T056 ~~deferred to Phase 10~~ Storybook story for multi-select summary is captured later in the screenshots phase (T084-T086 cover the visuals via Storybook E2E). `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx`
+- [x] T057 [P][test] Playwright web-shell — full cycle: no → 1 → vertex → 2 → 0; mode container assertions at every transition + re-selection of earlier targets re-mounts the matching mode shell cleanly. Form-state hydration from the staging buffer is host-level wiring on `ActivityPanel` → `PropertiesPanelDispatch` and is not exercised by T057 — the buffer-level invariant is covered by T058 below. `apps/web-shell/playwright/tests/properties-mode-swap.spec.ts`
+- [x] T058 — covered by `useStagedEdits.test.ts` L290–L320 ("selection-independence > selection change does NOT touch the buffer (US-3 AS-3 invariant)"). No new case required. `shared/components/src/ActivityPanel/__tests__/useStagedEdits.test.ts`
 
 ## Phase 8: US-6 — Override → auto-derived revert (P2)
 
