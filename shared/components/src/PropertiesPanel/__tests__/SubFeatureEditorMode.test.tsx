@@ -349,6 +349,95 @@ describe('SubFeatureEditorMode (track-point path)', () => {
     }
   });
 
+  // ─── US-3 AS-3 hydration fix (Phase 10) ─────────────────────────────
+  it('hydrates the form from stagedVertexEdits when re-selecting a vertex with unsaved edits', () => {
+    // Saved entry exists with one value; the staging buffer carries a
+    // different uncommitted value. On re-mount the form must show the
+    // staged value, not the saved one.
+    const feature = buildTrack('track-1', 10, [
+      { path: 'positions/3', label: 'saved-label', note: 'saved-note' },
+    ]);
+    const { setVertexField } = makeStaging();
+    render(
+      <SubFeatureEditorMode
+        feature={feature}
+        path="positions/3"
+        readOnly={false}
+        setVertexField={setVertexField}
+        stagedVertexEdits={{
+          label: 'staged-label',
+          note: 'staged-note',
+          tags: ['staged-tag'],
+        }}
+      />,
+    );
+    const labelInput = screen.getByTestId('vertex-label-input') as HTMLInputElement;
+    expect(labelInput.value).toBe('staged-label');
+    const noteInput = screen.getByTestId('vertex-note-input') as HTMLTextAreaElement;
+    expect(noteInput.value).toBe('staged-note');
+    expect(screen.getByTestId('array-widget-chip-vertex-tags-staged-tag')).toBeDefined();
+  });
+
+  it('staged vertex value survives unmount + remount with the same (featureId, path)', () => {
+    // Reproduce the US-3 AS-3 lifecycle: edit → deselect → re-select.
+    const feature = buildTrack('track-1', 10, []);
+    const { setVertexField } = makeStaging();
+    const staged = { label: 'in-flight', note: '', tags: [] };
+    const view = render(
+      <SubFeatureEditorMode
+        feature={feature}
+        path="positions/2"
+        readOnly={false}
+        setVertexField={setVertexField}
+        stagedVertexEdits={staged}
+      />,
+    );
+    expect(
+      (screen.getByTestId('vertex-label-input') as HTMLInputElement).value,
+    ).toBe('in-flight');
+    view.unmount();
+
+    // Re-mount with the same featureId, path, and staged buffer entry.
+    render(
+      <SubFeatureEditorMode
+        feature={feature}
+        path="positions/2"
+        readOnly={false}
+        setVertexField={setVertexField}
+        stagedVertexEdits={staged}
+      />,
+    );
+    expect(
+      (screen.getByTestId('vertex-label-input') as HTMLInputElement).value,
+    ).toBe('in-flight');
+  });
+
+  it('partial stagedVertexEdits overlays only the touched slot — saved values remain for untouched slots', () => {
+    // The buffer is sparse: only the slot the analyst touched is
+    // present. Untouched slots must still hydrate from the saved entry.
+    const feature = buildTrack('track-1', 10, [
+      { path: 'positions/4', label: 'saved-label', note: 'saved-note', tags: ['saved-tag'] },
+    ]);
+    const { setVertexField } = makeStaging();
+    render(
+      <SubFeatureEditorMode
+        feature={feature}
+        path="positions/4"
+        readOnly={false}
+        setVertexField={setVertexField}
+        // Only `label` is staged — note + tags must come from saved entry.
+        stagedVertexEdits={{ label: 'staged-only-label' }}
+      />,
+    );
+    expect(
+      (screen.getByTestId('vertex-label-input') as HTMLInputElement).value,
+    ).toBe('staged-only-label');
+    expect(
+      (screen.getByTestId('vertex-note-input') as HTMLTextAreaElement).value,
+    ).toBe('saved-note');
+    expect(screen.getByTestId('array-widget-chip-vertex-tags-saved-tag')).toBeDefined();
+  });
+
   // Quietens the unused-var lint on `vi`.
   it('contract surface — setVertexField is a function', () => {
     const fn = vi.fn();

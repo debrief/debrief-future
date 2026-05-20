@@ -309,11 +309,66 @@ test.describe('Selection-driven mode swap (#192 Phase 7 / US-3)', () => {
       'data-path',
       vertexPath,
     );
-    // The label input is present and ready to receive a new edit. Its
-    // current `value` reflects the parent feature's `vertex_metadata`
-    // entry (which is untouched until save), NOT the staging buffer —
-    // see the file header for the form-hydration deferral note.
+    // US-3 AS-3 hydration: the vertex label input must show the staged
+    // value from step (3), not "" (the saved entry is absent). The
+    // dispatcher overlays `state.byVertex[id][path]` from useStagedEdits
+    // on the resolved entry → input must hydrate to `stagedLabel`.
     const labelAgain = page.getByTestId('vertex-label-input');
     await expect(labelAgain).toBeVisible();
+    await expect(labelAgain).toHaveValue(stagedLabel);
+  });
+
+  // ─── US-3 AS-3 — explicit feature-mode hydration test (Phase 10) ────
+  test('US-3 AS-3: staged tag re-displays in the form on re-selection', async ({
+    page,
+  }) => {
+    const ap = new AnalysisPage(page);
+    const { primaryId } = await pickPrimaryPlusPartner(page);
+    const stagedTag = 'as3-hydration-tag';
+    const dispatch = page.getByTestId('properties-panel-dispatch');
+
+    // Select the feature → enter feature mode.
+    await ap.selectFeature(primaryId, { source: 'layers' });
+    await expect(dispatch).toHaveAttribute('data-mode', 'feature', { timeout: 5_000 });
+
+    // Stage a tag.
+    const tagInput = page.getByTestId('array-widget-input-tags');
+    await expect(tagInput).toBeEnabled({ timeout: 5_000 });
+    await tagInput.fill(stagedTag);
+    await tagInput.press('Enter');
+    await expect(tagInput).toHaveValue('');
+    // The staged tag chip must be visible (the ArrayWidget surfaces it
+    // immediately after Enter).
+    await expect(
+      page.getByTestId(`array-widget-chip-tags-${stagedTag}`),
+    ).toBeVisible();
+
+    // Clear selection → plot mode.
+    await page.evaluate(() => {
+      window.__sessionStore.getState().setSelection([], null);
+    });
+    await expect(dispatch).toHaveAttribute('data-mode', /plot|stale/, {
+      timeout: 5_000,
+    });
+    // The feature-mode chip must be gone from the DOM (mode unmounted).
+    await expect(
+      page.getByTestId(`array-widget-chip-tags-${stagedTag}`),
+    ).toBeHidden();
+
+    // Re-select the same feature → the staged tag must re-display.
+    await page.evaluate(
+      ({ id }) => {
+        window.__sessionStore.getState().setSelection([id], id);
+      },
+      { id: primaryId },
+    );
+    await expect(dispatch).toHaveAttribute('data-mode', 'feature', { timeout: 5_000 });
+
+    // The crucial AS-3 assertion: the form re-mounted, and the staged
+    // tag is overlaid on top of the saved properties. The chip must be
+    // visible inside the new feature-mode container.
+    await expect(
+      page.getByTestId(`array-widget-chip-tags-${stagedTag}`),
+    ).toBeVisible({ timeout: 5_000 });
   });
 });

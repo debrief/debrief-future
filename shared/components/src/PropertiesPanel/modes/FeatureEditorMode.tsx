@@ -79,6 +79,22 @@ function isPerPlatformOverrideSlot(slot: string): slot is PerPlatformOverrideSlo
 }
 
 /**
+ * Narrow a generic FieldKey set down to only per-platform override slots —
+ * the set local state stores. Reverts on `tags` (the non-override slot)
+ * are not visible through the override chip and are ignored here.
+ */
+function filterToPerPlatform(
+  set: ReadonlySet<string> | undefined,
+): ReadonlySet<PerPlatformOverrideSlot> {
+  if (!set || set.size === 0) return new Set();
+  const out = new Set<PerPlatformOverrideSlot>();
+  for (const slot of set) {
+    if (isPerPlatformOverrideSlot(slot)) out.add(slot);
+  }
+  return out;
+}
+
+/**
  * The full editable slot set in form-render order. `tags` sits at the
  * bottom so the analyst-facing per-platform identity fields come first.
  */
@@ -274,6 +290,20 @@ export interface FeatureEditorModeProps {
   revertField: UseStagedEditsApi['revertField'];
   unrevertField: UseStagedEditsApi['unrevertField'];
   /**
+   * Staged (uncommitted) field edits for this feature, overlaid on top of
+   * `feature.properties` for display purposes (US-3 AS-3 hydration on
+   * re-selection). When the analyst re-selects a feature that has
+   * unsaved edits, the form must show the staged value — not the saved
+   * one — so the in-flight edit is visible. Keyed by slot.
+   */
+  stagedFeatureEdits?: Partial<FeatureEditableProperties>;
+  /**
+   * Slots the analyst has clicked Revert on but not yet saved. Reverted
+   * slots render as if the override were absent (auto-derived chip) even
+   * if `feature.properties[slot]` still carries the value — US-3 AS-3.
+   */
+  stagedRevertedFields?: ReadonlySet<FieldKey>;
+  /**
    * Optional override of the platform-registry resolver used to compute
    * each slot's `autoDerivedValue`. Defaults to the inline mirror walker
    * (`resolvePlatform`). Hosts that need to swap the registry source
@@ -292,7 +322,15 @@ export interface FeatureEditorModeProps {
 export function FeatureEditorMode(
   props: FeatureEditorModeProps,
 ): React.ReactElement {
-  const { feature, readOnly, setFeatureField, revertField, unrevertField } = props;
+  const {
+    feature,
+    readOnly,
+    setFeatureField,
+    revertField,
+    unrevertField,
+    stagedFeatureEdits,
+    stagedRevertedFields,
+  } = props;
   const resolveAutoDerived = props.resolveAutoDerivedValue ?? defaultResolveAutoDerivedValue;
 
   const displayName = getFeatureLabel(feature);
@@ -307,28 +345,44 @@ export function FeatureEditorMode(
 
   // ── Local revert UI state (Phase 8 / T061) ─────────────────────────
   //
-  // The authoritative `revertedFields` set lives on `useStagedEdits`; the
-  // dispatcher does not forward it down today, so we mirror the analyst's
-  // in-session intent locally. On component remount (selection change) the
-  // local state resets, but the staging buffer remains the persistence
-  // source of truth — `applyEditsToFeatures` flushes the slot regardless of
-  // whether the mode is still mounted (verified in the saveSession
-  // integration test, contract `staged-edits-store.md` invariant 3).
+  // The authoritative `revertedFields` set lives on `useStagedEdits`.
+  // Phase 10 (US-3 AS-3 hydration fix) — the dispatcher now forwards the
+  // authoritative set via `stagedRevertedFields`. We still hold a local
+  // mirror so the in-session click → chip flip is responsive even before
+  // the parent re-renders (the same call path that flushed it through
+  // useStagedEdits). When the host re-mounts the mode for the same
+  // featureId, the prop drives the initial set so revert state survives
+  // selection cycling.
   const [revertedSlots, setRevertedSlots] = React.useState<
     ReadonlySet<PerPlatformOverrideSlot>
-  >(() => new Set());
+  >(() => filterToPerPlatform(stagedRevertedFields));
 
-  // If the selected feature changes, drop any local revert intent — the
+  // If the selected feature changes, re-seed from the staged set — the
   // analyst is now editing a different feature and the per-feature buffer
   // entries belong to the previous id, not this one.
   React.useEffect(() => {
-    setRevertedSlots(new Set());
+    setRevertedSlots(filterToPerPlatform(stagedRevertedFields));
+    // Re-seed only when featureId changes; the host-supplied
+    // `stagedRevertedFields` reference also changes when the analyst
+    // toggles revert via this very component, so reading it once on
+    // remount avoids overwriting local optimistic state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [featureId]);
 
   const fields: PropertiesFormField[] = useMemo(() => {
     return EDITABLE_SLOTS.map((slot): PropertiesFormField => {
       const spec = resolveFieldSpec(SLOT_SCHEMA[slot], slot);
-      const value = featureProps[slot];
+      // US-3 AS-3 hydration: prefer the staged (uncommitted) value over
+      // the saved value, so re-selecting a feature with unsaved edits
+      // shows the in-flight value in the form. `stagedFeatureEdits` is
+      // sparse — only slots the analyst has touched are present.
+      const stagedValue =
+        stagedFeatureEdits !== undefined && slot in stagedFeatureEdits
+          ? (stagedFeatureEdits as Record<string, unknown>)[slot]
+          : undefined;
+      const hasStaged =
+        stagedFeatureEdits !== undefined && slot in stagedFeatureEdits;
+      const value = hasStaged ? stagedValue : featureProps[slot];
 
       // Derivation per FR-005 (override → revert flips back to auto-derived):
       //   - per-platform override slot WITH an explicit value AND NOT reverted → 'override'
@@ -357,7 +411,7 @@ export function FeatureEditorMode(
         error: null,
       };
     });
-  }, [featureProps, revertedSlots]);
+  }, [featureProps, revertedSlots, stagedFeatureEdits]);
 
   const handleCommit = useCallback(
     (key: FieldKey, next: FieldValue): void => {
@@ -403,9 +457,19 @@ export function FeatureEditorMode(
   // ── Revert affordances (Phase 8 / T061) ────────────────────────────
   // One control per override slot. Hidden when there's no override; the
   // widget enforces its own four-row state matrix internally.
+  //
+  // Staged edits overlay: prefer the staged value (US-3 AS-3) so that
+  // when the analyst types a new override and then re-selects the same
+  // feature, the revert button reflects the unsaved override they're
+  // still in the middle of editing.
   const revertControls = useMemo(() => {
     return PER_PLATFORM_OVERRIDE_SLOTS.map((slot) => {
-      const raw = featureProps[slot];
+      const hasStaged =
+        stagedFeatureEdits !== undefined && slot in stagedFeatureEdits;
+      const stagedRaw = hasStaged
+        ? (stagedFeatureEdits as Record<string, unknown>)[slot]
+        : undefined;
+      const raw = hasStaged ? stagedRaw : featureProps[slot];
       const effectiveValue =
         typeof raw === 'string' && raw.length > 0 ? raw : null;
       const hasOverride = effectiveValue !== null;
@@ -419,7 +483,7 @@ export function FeatureEditorMode(
         isReverted,
       };
     });
-  }, [feature, featureProps, resolveAutoDerived, revertedSlots]);
+  }, [feature, featureProps, resolveAutoDerived, revertedSlots, stagedFeatureEdits]);
 
   // Any override slot is currently overridden? If not we don't render the
   // section header at all (keeps the editor compact when the feature has

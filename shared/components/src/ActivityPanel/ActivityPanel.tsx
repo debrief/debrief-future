@@ -718,6 +718,7 @@ export function ActivityPanel({
             setVertexField={staging.setVertexField}
             revertField={staging.revertField}
             unrevertField={staging.unrevertField}
+            stagedEdits={staging.state}
           />
         </SectionErrorBoundary>
       </PaneSection>

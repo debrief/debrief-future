@@ -48,7 +48,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import type { DebriefFeature, VertexMetadata } from '@debrief/schemas';
 import { parsePath } from '@debrief/session-state/browser';
-import type { UseStagedEditsApi } from '../../ActivityPanel/useStagedEdits';
+import type {
+  UseStagedEditsApi,
+  VertexEditableProperties,
+} from '../../ActivityPanel/useStagedEdits';
 import { getFeatureLabel } from '../../utils/labels';
 import { ArrayWidget } from '../ArrayWidget';
 import type { FieldSpec } from '../types';
@@ -63,6 +66,13 @@ export interface SubFeatureEditorModeProps {
   readOnly: boolean;
   /** Staging buffer callback for vertex edits. */
   setVertexField: UseStagedEditsApi['setVertexField'];
+  /**
+   * Staged (uncommitted) vertex edits for this (featureId, path) cell,
+   * overlaid on top of the resolved `vertex_metadata` entry for display
+   * purposes (US-3 AS-3 hydration on re-selection). Sparse — only slots
+   * the analyst has touched are present.
+   */
+  stagedVertexEdits?: Partial<VertexEditableProperties>;
 }
 
 // ─── Path → vertex index parsing ──────────────────────────────────────
@@ -298,7 +308,7 @@ const TAGS_SPEC: Extract<FieldSpec, { kind: 'string-array' }> = {
 export function SubFeatureEditorMode(
   props: SubFeatureEditorModeProps,
 ): React.ReactElement {
-  const { feature, path, readOnly, setVertexField } = props;
+  const { feature, path, readOnly, setVertexField, stagedVertexEdits } = props;
   const parentName = getFeatureLabel(feature);
   const featureId = String(feature.id);
 
@@ -380,6 +390,7 @@ export function SubFeatureEditorMode(
       readOnly={readOnly}
       setVertexField={setVertexField}
       existing={existing}
+      stagedVertexEdits={stagedVertexEdits}
     />
   );
 }
@@ -393,18 +404,47 @@ interface BodyProps {
   readOnly: boolean;
   setVertexField: UseStagedEditsApi['setVertexField'];
   existing: VertexMetadata | undefined;
+  stagedVertexEdits: Partial<VertexEditableProperties> | undefined;
 }
 
 function SubFeatureEditorBody(p: BodyProps): React.ReactElement {
-  const { featureId, parentName, path, headerLabel, readOnly, setVertexField, existing } = p;
+  const {
+    featureId,
+    parentName,
+    path,
+    headerLabel,
+    readOnly,
+    setVertexField,
+    existing,
+    stagedVertexEdits,
+  } = p;
 
   // Local edit-state — drives the input visuals between commits. The
   // staging hook owns the *committed* value; the form's local state
   // gives the analyst a typing experience that doesn't ping-pong through
   // the dispatch on every keystroke.
-  const initialLabel = existing?.label ?? '';
-  const initialNote = existing?.note ?? '';
-  const initialTags = existing?.tags ?? [];
+  //
+  // US-3 AS-3 hydration: prefer the staged (uncommitted) value over the
+  // resolved `vertex_metadata` entry so that re-selecting the same
+  // (featureId, path) cell after typing — without saving — shows the
+  // in-flight value in the inputs. `stagedVertexEdits` is sparse: only
+  // touched slots are present.
+  const stagedLabel =
+    stagedVertexEdits && 'label' in stagedVertexEdits
+      ? (stagedVertexEdits.label as string | undefined)
+      : undefined;
+  const stagedNote =
+    stagedVertexEdits && 'note' in stagedVertexEdits
+      ? (stagedVertexEdits.note as string | undefined)
+      : undefined;
+  const stagedTags =
+    stagedVertexEdits && 'tags' in stagedVertexEdits
+      ? (stagedVertexEdits.tags as readonly string[] | undefined)
+      : undefined;
+
+  const initialLabel = stagedLabel ?? existing?.label ?? '';
+  const initialNote = stagedNote ?? existing?.note ?? '';
+  const initialTags = stagedTags ?? existing?.tags ?? [];
 
   const [localLabel, setLocalLabel] = useState<string>(initialLabel);
   const [localNote, setLocalNote] = useState<string>(initialNote);

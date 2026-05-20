@@ -392,6 +392,119 @@ describe('FeatureEditorMode (Spec 192, T026)', () => {
       ).not.toBeNull();
     });
 
+    // ─── US-3 AS-3 hydration fix (Phase 10) ─────────────────────────
+    it('hydrates the form from stagedFeatureEdits when re-selecting a feature with unsaved edits', () => {
+      // Simulates the US-3 AS-3 sequence: analyst edits tags, deselects
+      // the feature, then re-selects it. The staging buffer still holds
+      // the unsaved tags array; on re-mount, the form must show the
+      // staged value, not the saved one.
+      const feature = buildTrack('track-1', { tags: ['alpha'] });
+      const stagedFeatureEdits = { tags: ['alpha', 'beta', 'gamma'] };
+      render(
+        <FeatureEditorMode
+          feature={feature}
+          readOnly={false}
+          setFeatureField={vi.fn()}
+          revertField={vi.fn()}
+          unrevertField={vi.fn()}
+          stagedFeatureEdits={stagedFeatureEdits}
+        />,
+      );
+      // The three staged tags must render as chips, not the single
+      // saved tag 'alpha'.
+      expect(screen.getByTestId('array-widget-chip-tags-alpha')).toBeDefined();
+      expect(screen.getByTestId('array-widget-chip-tags-beta')).toBeDefined();
+      expect(screen.getByTestId('array-widget-chip-tags-gamma')).toBeDefined();
+    });
+
+    it('hydrates a per-platform override slot from stagedFeatureEdits on re-selection', () => {
+      // Saved vessel_role is undefined; analyst types "destroyer" then
+      // deselects → re-selects. The staged value must appear in the
+      // input AND the override chip must render.
+      const feature = buildTrack('track-1', {
+        platform_id: 'NELSON',
+        vessel_role: undefined,
+      });
+      render(
+        <FeatureEditorMode
+          feature={feature}
+          readOnly={false}
+          setFeatureField={vi.fn()}
+          revertField={vi.fn()}
+          unrevertField={vi.fn()}
+          stagedFeatureEdits={{ vessel_role: 'destroyer' }}
+        />,
+      );
+      const overrideRow = screen.getByTestId('properties-field-vessel_role');
+      // The override chip must render because the (staged) value is
+      // explicit, even though the saved feature has no value.
+      expect(
+        overrideRow.querySelector('[data-testid="properties-chip-override"]'),
+      ).not.toBeNull();
+    });
+
+    it('staged value survives unmount + remount with the same featureId', () => {
+      // Reproduce the exact AS-3 flow with a real render → unmount →
+      // re-render cycle. The staged value must persist across the
+      // component lifecycle because the staging buffer is held by the
+      // host (ActivityPanel), not the mode component itself.
+      const feature = buildTrack('track-1', { tags: ['alpha'] });
+      const stagedFeatureEdits = { tags: ['alpha', 'staged-tag'] };
+      const view = render(
+        <FeatureEditorMode
+          feature={feature}
+          readOnly={false}
+          setFeatureField={vi.fn()}
+          revertField={vi.fn()}
+          unrevertField={vi.fn()}
+          stagedFeatureEdits={stagedFeatureEdits}
+        />,
+      );
+      expect(screen.getByTestId('array-widget-chip-tags-staged-tag')).toBeDefined();
+
+      // Unmount and remount with the same featureId + staged edits.
+      view.unmount();
+      render(
+        <FeatureEditorMode
+          feature={feature}
+          readOnly={false}
+          setFeatureField={vi.fn()}
+          revertField={vi.fn()}
+          unrevertField={vi.fn()}
+          stagedFeatureEdits={stagedFeatureEdits}
+        />,
+      );
+      expect(screen.getByTestId('array-widget-chip-tags-staged-tag')).toBeDefined();
+    });
+
+    it('hydrates stagedRevertedFields so the revert button shows undo state on remount', () => {
+      // If the analyst clicks Revert and then re-selects the feature,
+      // the button must render as "Undo" because the staged set carries
+      // the revert intent.
+      const feature = buildTrack('track-1', {
+        platform_id: 'NELSON',
+        vessel_role: 'destroyer',
+      });
+      const revertedSet = new Set(['vessel_role'] as const);
+      render(
+        <FeatureEditorMode
+          feature={feature}
+          readOnly={false}
+          setFeatureField={vi.fn()}
+          revertField={vi.fn()}
+          unrevertField={vi.fn()}
+          stagedRevertedFields={revertedSet}
+        />,
+      );
+      // The button must already say "Undo" — the chip should be absent.
+      expect(screen.getByTestId('revert-vessel_role').textContent).toMatch(/undo/i);
+      expect(
+        screen
+          .getByTestId('properties-field-vessel_role')
+          .querySelector('[data-testid="properties-chip-override"]'),
+      ).toBeNull();
+    });
+
     it('respects a host-supplied resolveAutoDerivedValue override', () => {
       const feature = buildTrack('track-1', {
         platform_id: 'ANYTHING',

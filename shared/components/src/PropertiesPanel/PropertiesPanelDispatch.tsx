@@ -35,7 +35,7 @@ import { SubFeatureEditorMode } from './modes/SubFeatureEditorMode';
 import { MultiSelectSummaryMode } from './modes/MultiSelectSummaryMode';
 import { ReadOnlyBanner } from './readOnlyBanner';
 import type { EditingMode } from './selectionMode';
-import type { UseStagedEditsApi } from '../ActivityPanel/useStagedEdits';
+import type { UseStagedEditsApi, StagedEdits } from '../ActivityPanel/useStagedEdits';
 import type { PropertiesFormProps } from './types';
 
 export interface PropertiesPanelDispatchProps {
@@ -58,6 +58,15 @@ export interface PropertiesPanelDispatchProps {
   setVertexField: UseStagedEditsApi['setVertexField'];
   revertField: UseStagedEditsApi['revertField'];
   unrevertField: UseStagedEditsApi['unrevertField'];
+
+  /**
+   * Optional read of the staging-buffer state. When supplied, the feature
+   * and sub-feature mode shells overlay staged (uncommitted) edits on top
+   * of the saved `feature.properties` values — this is the US-3 AS-3
+   * hydration path: re-selecting a feature with unsaved edits shows the
+   * staged value in the inputs, not the saved one.
+   */
+  stagedEdits?: StagedEdits;
 }
 
 export function PropertiesPanelDispatch(
@@ -73,6 +82,7 @@ export function PropertiesPanelDispatch(
     setVertexField,
     revertField,
     unrevertField,
+    stagedEdits,
   } = props;
 
   // Banner is mode-agnostic; it renders above whichever shell is chosen.
@@ -112,6 +122,10 @@ export function PropertiesPanelDispatch(
           </div>
         );
       }
+      // US-3 AS-3 hydration: overlay the staged feature edits + reverted
+      // slots so the in-flight values survive selection cycling.
+      const stagedFeatureEdits = stagedEdits?.byFeature[editingMode.featureId];
+      const stagedRevertedFields = stagedEdits?.revertedFields[editingMode.featureId];
       return (
         <div data-testid="properties-panel-dispatch" data-mode="feature">
           {banner}
@@ -121,6 +135,8 @@ export function PropertiesPanelDispatch(
             setFeatureField={setFeatureField}
             revertField={revertField}
             unrevertField={unrevertField}
+            stagedFeatureEdits={stagedFeatureEdits}
+            stagedRevertedFields={stagedRevertedFields}
           />
         </div>
       );
@@ -138,6 +154,9 @@ export function PropertiesPanelDispatch(
           </div>
         );
       }
+      // US-3 AS-3 hydration for vertex edits.
+      const stagedVertexEdits =
+        stagedEdits?.byVertex[editingMode.featureId]?.[editingMode.path];
       return (
         <div data-testid="properties-panel-dispatch" data-mode="subfeature">
           {banner}
@@ -146,6 +165,7 @@ export function PropertiesPanelDispatch(
             path={editingMode.path}
             readOnly={isReadOnly}
             setVertexField={setVertexField}
+            stagedVertexEdits={stagedVertexEdits}
           />
         </div>
       );
