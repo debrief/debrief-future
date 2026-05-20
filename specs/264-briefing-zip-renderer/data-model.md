@@ -251,22 +251,34 @@ interface BriefingState {
 
 ## 6. Tile-cache layout
 
-`tiles/{z}/{x}/{y}.png` — standard XYZ tile layout. The SPA's Leaflet
-`TileLayer` is configured with:
+`tiles/{z}/{x}/{y}.png` — standard XYZ tile layout. The SPA mounts the
+shared `<MapView>` component (from `@debrief/components`), passing the
+`file://`-friendly tile-layer surface added by this feature
+(plan.md task T-MAPVIEW-EXT):
 
-```ts
-L.tileLayer('./tiles/{z}/{x}/{y}.png', {
-  attribution: config.tileLayerAttribution,
-  errorTileUrl: './tiles/placeholder.png',   // bundled at export
-  noWrap: true,
-  maxZoom: maxBundledZoom,                   // computed by export, written to config
-});
+```tsx
+<MapView
+  tileLayerUrl="./tiles/{z}/{x}/{y}.png"
+  tileLayerAttribution={config.tileLayerAttribution}
+  errorTileUrl="./tiles/placeholder.png"   // bundled at export
+  noWrap
+  maxZoom={config.maxBundledZoom}          // computed by export, written to config
+  tileLayerCrossOrigin={false}             // CORS attribute meaningless under file://
+  // … standard MapView props (center, zoom, …)
+/>
 ```
+
+The four props (`errorTileUrl`, `maxZoom`, `noWrap`,
+`tileLayerCrossOrigin`) are **new** optional props added to `MapView`
+by this feature; they default to today's behaviour so existing
+consumers are unaffected. Their presence keeps the briefing SPA on
+the shared component rather than reaching for raw Leaflet.
 
 `tiles/placeholder.png` is a small neutral tile shipped inside the zip;
 when a tile request misses (Scene viewport extends beyond captured
-coverage, FR-028), Leaflet renders the placeholder rather than triggering
-a network fallback. The placeholder is **never** an external URL.
+coverage, FR-028), `MapView`'s underlying `TileLayer` renders the
+placeholder rather than triggering a network fallback. The placeholder
+is **never** an external URL.
 
 ---
 
@@ -294,22 +306,27 @@ crashing the SPA mid-playback.
 
 | Check | Implementation | Failure mode → user-visible state |
 |-------|----------------|-----------------------------------|
-| `BriefingFeatureCollection.type === "FeatureCollection"` | Local guard in `inlineDataLoader` | Error state: "Briefing data is unreadable." |
-| Exactly one `StoryboardFeature` | Local guard (filter by `kind === 'STORYBOARD'`, expect length 1) | Error state: same as above. |
-| Every `SceneFeature.properties.storyboard_id` matches the Storyboard's `id` | Local guard (filter Scenes by `storyboard_id`, expect them to match the chosen Storyboard) | Error state: same as above. |
-| Scene flavour XOR (`time_range` and `viewport_end` both present or both absent) | **`flavourCheck(scene)` from `@debrief/components/storyboard/validate`** — the same primitive the authoring environment uses. Throws `SceneFlavourXorViolationError` or `SceneTimeRangeEndNotAfterStartError`. | Error state: identifies the offending Scene id and which slot is missing or whether the range is inverted. |
+| `features.geojson` payload conforms to the full `PlotFeatureCollection` JSON Schema (top-level `type`, every `features[].type` / `geometry` / `properties` slot) | **`@debrief/schemas` JSON Schema validator** at the briefing boundary — the same artefact the authoring environment uses. Runs **first**, before any local guard. | Error state: "Briefing data is unreadable." with the validator's path-pointed message logged to console. |
+| Exactly one `StoryboardFeature` is present (scoping check) | Local guard in `inlineDataLoader` (filter by `kind === 'STORYBOARD'`, expect length 1) | Error state: same as above. |
+| Every `SceneFeature.properties.storyboard_id` matches that one Storyboard's `id` (scoping check) | Local guard (filter Scenes by `storyboard_id`) | Error state: same as above. |
+| Scene flavour XOR (`time_range` and `viewport_end` both present or both absent) | **`flavourCheck(scene)` from `@debrief/components/storyboard/validate`** — the same primitive the authoring environment uses. Runs after the schema validator has passed. Throws `SceneFlavourXorViolationError` or `SceneTimeRangeEndNotAfterStartError`. | Error state: identifies the offending Scene id and which slot is missing or whether the range is inverted. |
 | Scenes form a non-empty list (US1 / US2) | Local guard | Empty state: "This Storyboard has no Scenes to play" (FR-030). |
 | `BriefingItemJson.id` and `properties.title` present | Local guard | Renders without title bar; logs a console warning (still plays). |
 
-The SPA does **not** re-derive XOR validation logic — it imports
-`flavourCheck` and the `isTimeRangeScene` predicate directly, so any
-future schema evolution lands in both consumers at once. The
-discriminated-union types `InstantSceneFeature` / `TimeRangeSceneFeature`
-(also from `@debrief/components`) are the post-narrowing types the
-playback adapter consumes.
+The schema validator handles all structural correctness (every required
+field, every type, every enum); local guards reduce to **scoping**
+checks (exactly one Storyboard, every Scene matches its `storyboard_id`)
+plus the cross-field XOR rule that lives in `flavourCheck`. The SPA
+does **not** re-derive XOR validation logic — it imports `flavourCheck`
+and the `isTimeRangeScene` predicate directly, so any future schema
+evolution lands in both consumers at once. The discriminated-union
+types `InstantSceneFeature` / `TimeRangeSceneFeature` (also from
+`@debrief/components`) are the post-narrowing types the playback
+adapter consumes.
 
-Schema validation otherwise uses the `@debrief/schemas` JSON Schema
-bundle — the same artifact used by the authoring environment.
+This validator-at-the-boundary contract was clarified during
+`/speckit.review` (decision 2A): the structural surface belongs to
+the schema, not to hand-written guards.
 
 ---
 

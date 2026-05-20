@@ -108,10 +108,14 @@ Tile fetches are stubbed in tests — no actual network goes out.
 Before approving:
 
 - [ ] Unzip `sample-briefing.zip` into a fresh directory.
-- [ ] Open `index.html` in Chrome, Firefox, Safari, and Edge.
+- [ ] Open `index.html` in current **Chrome** and current **Edge**
+  (the two supported browsers — see research.md R6).
 - [ ] In each browser, verify the SPA loads, shows Scene 0, and Play works.
 - [ ] In each browser, open devtools → Network → confirm **0 external
   requests** during load → play → mode toggle → replay.
+- [ ] (Optional sanity check) Open in Firefox or Safari and confirm the
+  browser-probe banner appears with the supported-browser message —
+  no silent half-loaded UI (Article I.3).
 - [ ] Confirm Present mode hides chrome; pressing `P` returns to Minimal
   with playback state preserved.
 - [ ] If the sample includes a time-range Scene, confirm the slider
@@ -123,8 +127,11 @@ Before approving:
 
 - **Tile coverage at export time uses the analyst's network.** This is
   the only network involvement; the recipient remains air-gapped.
-- **Mobile browsers** (iOS Safari, Chrome on Android) are best-effort;
-  no specific mobile UI tuning is in scope.
+- **Browser matrix is current Chrome and Edge only** — Firefox, Safari,
+  and mobile browsers are out of supported scope (narrowed during
+  `/speckit.review`, see research.md R6). The SPA surfaces a
+  boot-time banner for any other browser rather than silently
+  half-loading.
 - **Single Storyboard per zip.** Multi-Storyboard plots produce one
   zip per export invocation.
 

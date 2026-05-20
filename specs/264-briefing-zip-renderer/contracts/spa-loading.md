@@ -2,8 +2,12 @@
 
 **Surface**: standalone single-page application
 **Entry**: `apps/briefing-renderer/src/main.tsx` → `apps/briefing-renderer/dist/index.html`
-**Runtime**: any modern desktop browser opening the bundled `index.html`
-from `file://` origin (or any HTTP origin — the SPA is origin-agnostic).
+**Runtime**: current Chrome or Edge on desktop, opening the bundled
+`index.html` from `file://` origin (or any HTTP origin — the SPA is
+origin-agnostic). Other browsers (Firefox, Safari, mobile) are out of
+supported scope; opening the zip in an unsupported browser surfaces
+the boot-time browser-probe banner naming the supported set (see
+§ Browser-compat probes below).
 
 ## Loading sequence (must not deviate)
 
@@ -44,8 +48,8 @@ Spec mapping: FR-014, FR-015, FR-016, FR-017, FR-026.
 | `BriefingItemJson` | inline `<script type="application/json">` | never |
 | `BriefingConfig` | inline `<script type="application/json">` | never |
 | Scene thumbnails | `./scene-thumbnails/scene-{ULID}.png` via `<img>` | never |
-| Basemap tiles | `./tiles/{z}/{x}/{y}.png` via Leaflet `<img>` | never |
-| Tile placeholder | `./tiles/placeholder.png` via Leaflet's `errorTileUrl` | never |
+| Basemap tiles | `./tiles/{z}/{x}/{y}.png` via the extended `<MapView>` component (Leaflet `TileLayer` underneath) | never |
+| Tile placeholder | `./tiles/placeholder.png` via `<MapView errorTileUrl="…">` (new prop, T-MAPVIEW-EXT) | never |
 
 **No `fetch()` calls. No `XMLHttpRequest`. No service worker. No
 WebSocket. No external CDN for fonts/icons.**
@@ -154,11 +158,21 @@ const probes = {
   inlineJsonReadable: canReadInlineJson(),         // always true
   relativeImgLoadable: canLoadRelativeImage(),     // tested with a 1x1 pixel
   leafletTilesLoadable: canLoadRelativeTile(),     // tested with placeholder.png
+  userAgentSupported:  isChromiumBased(),          // current Chrome or Edge
 };
 ```
 
+The supported browser matrix is **current Chrome and Edge** (see
+research.md R6). When `userAgentSupported` is false (Firefox, Safari,
+or any non-Chromium browser), the banner reads:
+
+> This briefing is built for current Chrome or Edge. Other browsers may
+> render the map but interactive playback is not supported. Open this
+> file in Chrome or Edge for the full experience.
+
 A failed probe logs to console and surfaces the banner; the SPA does
-**not** attempt to recover by falling back to network.
+**not** attempt to recover by falling back to network and does **not**
+block mount (Article I.3 — explicit, never silent).
 
 ## Replay behaviour
 

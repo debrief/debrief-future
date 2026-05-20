@@ -42,7 +42,14 @@ the export command (VS Code Node-side) and the SPA (browser).
     verbatim by the SPA's playback adapter),
   - `flavourCheck` + `isTimeRangeScene` (#263, `shared/components/src/storyboard/`)
     — reused at the SPA boundary,
-  - `MapView`
+  - `MapView` — **extended in this feature** with four new optional props
+    so the briefing SPA's tile-layer surface is fully expressed through
+    the shared component rather than reaching for raw Leaflet
+    (`errorTileUrl`, `maxZoom`, `noWrap`, `tileLayerCrossOrigin`). The
+    briefing SPA passes `errorTileUrl="./tiles/placeholder.png"`,
+    `noWrap`, `maxZoom={config.maxBundledZoom}`, and
+    `tileLayerCrossOrigin={false}` (the CORS attribute is meaningless
+    under `file://` and prevents a tile from loading when set).
 - `@debrief/schemas` (StoryboardFeature, SceneFeature, PlotFeatureCollection,
   StacItem — boundary types derived via `Pick`/alias per Article IV.5)
 - `jszip` ^3.10.x (**new** dep — see research.md R3 + Article IX
@@ -72,8 +79,11 @@ the export command (VS Code Node-side) and the SPA (browser).
 **Target Platform**:
 - **Export host**: VS Code Extension Host (Node 20) under macOS,
   Linux, and Windows.
-- **Recipient host**: current Chrome, Firefox, Edge, Safari on
-  desktop OSes. Mobile browsers best-effort.
+- **Recipient host**: current Chrome and Edge on desktop OSes. Other
+  browsers (Firefox, Safari, mobile) are out of supported scope — the
+  SPA's boot-time browser probe surfaces a banner directing the user
+  to a supported browser. Narrowed from the original four-browser
+  matrix during `/speckit.review` (see research.md R6).
 
 **Project Type**: `web` — adds one new SPA (`apps/briefing-renderer/`).
 The SPA is a sibling to `apps/backlog-navigator/` and
@@ -89,8 +99,7 @@ The SPA is a sibling to `apps/backlog-navigator/` and
   — no specific FPS target above "no perceptible drop vs. authoring".
 
 **Constraints**:
-- `file://`-origin loadable in current Chrome, Firefox, Edge, Safari
-  (R1 / R6).
+- `file://`-origin loadable in current Chrome and Edge (R1 / R6).
 - **Zero external network requests at runtime** (FR-015 + SC-002,
   verified by `briefing-zip-network-isolation.spec.ts`).
 - All relative paths inside the zip (FR-013).
@@ -352,7 +361,7 @@ Summary of decisions:
 | R3 | ZIP library | `jszip` ^3.10.x (new dep). |
 | R4 | Playback engine | Hoist `StoryboardPlaybackService` to `shared/components/src/storyboardPlayback/`; reuse the host-agnostic `runTimeRangeTween` already placed there by #263; SPA supplies four port adapters (`PlaybackMapPanel`, `PlaybackSessionManager`, `PlaybackPanelView`, `PlaybackTimeRangeView`). |
 | R5 | Storyboard scoping | Closure of `storyboard_id`-matched Scenes + `visible_feature_ids` union. |
-| R6 | Browser compat | Chrome, Firefox, Edge, Safari current; mobile best-effort. |
+| R6 | Browser compat | Current **Chrome and Edge** on desktop only (narrowed during `/speckit.review`); other browsers see boot-time banner. |
 | R7 | SPA build & distribution | Vite static build → committed-bundle resource in the VS Code extension → copied into each export's zip. |
 | R8 | Scene thumbnail bundling | Copy from `<item>/scene-thumbnails/` byte-for-byte; rewrite `item.json` `assets` map to point at the in-zip relative path. |
 
@@ -471,8 +480,38 @@ captured here for traceability:
 13. **T-PLAYWRIGHT-MODES**: 10 consecutive mode toggles preserve state.
 14. **T-PLAYWRIGHT-E2E**: end-to-end test exercising export → unzip →
     open → play.
-15. **T-DOCS**: in-zip `README.txt` for the recipient; ADR for the
+15. **T-DOCS**: in-zip `README.txt` for the recipient (must state the
+    supported browser matrix: current Chrome and Edge); ADR for the
     "standalone SPA over PDF/screencast" decision.
+16. **T-FAILURE-MODES-ADAPTERS**: wrap each of the four browser port
+    adapters (`BrowserMapAdapter`, `LocalSessionStoreAdapter`,
+    `BrowserPanelViewAdapter`, `BrowserTimeRangeViewAdapter`) in a
+    try/catch surface. An uncaught throw mid-tween today would silently
+    freeze playback; instead, the SPA must transition to a visible
+    "playback halted" Error state naming the adapter that threw.
+    Playwright test injects a throw from a mocked adapter and asserts
+    the visible halted state (Article I.3 — no silent failures).
+    Surfaced during `/speckit.review` failure-modes audit.
+17. **T-FAILURE-MODES-TWEEN**: handle `runTimeRangeTween`'s async `done`
+    Promise rejection. The tween's `done` Promise can reject if a port
+    call throws mid-frame; today the SPA has no catch on that surface.
+    Add a top-level catch in the SPA's playback driver that transitions
+    to the same "playback halted" Error state, with a Playwright test
+    that injects an adapter throw from inside a time-range tween.
+    Surfaced during `/speckit.review` failure-modes audit.
+18. **T-MAPVIEW-EXT**: extend `shared/components/src/MapView/MapView.tsx`
+    with four new optional props — `errorTileUrl?: string`,
+    `maxZoom?: number`, `noWrap?: boolean`,
+    `tileLayerCrossOrigin?: 'anonymous' | 'use-credentials' | false`
+    (false omits the attribute, required under `file://`). Defaults
+    match today's behaviour (`crossOrigin="anonymous"`, no
+    `errorTileUrl`, no `maxZoom` cap, `noWrap` false) so existing
+    consumers are unaffected. Add a Storybook story exercising the
+    `file://`-friendly prop bundle. Verifiable by existing MapView
+    stories still rendering identically plus the new story rendering
+    with the placeholder tile when an XYZ slot is missing. Lands in
+    the same PR as the rest of #264 (decision recorded during
+    `/speckit.review`).
 
 `/speckit.tasks` will expand these into the formal task list with
 dependencies, evidence-collection steps, and the PR-creation phase.

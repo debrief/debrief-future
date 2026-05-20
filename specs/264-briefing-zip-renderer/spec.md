@@ -34,7 +34,7 @@ A recipient receives the briefing zip on a memory stick, in an email attachment,
 
 **Acceptance Scenarios**:
 
-1. **Given** an unpacked briefing zip on a filesystem and a modern browser, **When** the user double-clicks `index.html`, **Then** the SPA loads from local files only — it does not issue any network request to an external host.
+1. **Given** an unpacked briefing zip on a filesystem and a supported browser (current Chrome or Edge on desktop — see Assumptions), **When** the user double-clicks `index.html`, **Then** the SPA loads from local files only — it does not issue any network request to an external host.
 2. **Given** the SPA has finished loading, **When** the user starts playback, **Then** the Storyboard plays back with the same Scene order, the same per-Scene viewports, the same Scene durations, and the same in-Scene behaviour (instant Scenes rest on their captured viewport; time-range Scenes interpolate viewport and time-slider simultaneously) as in the authoring environment.
 3. **Given** a time-range Scene whose interpolation depends on visible features (track motion, chart cursors, feature-visibility windows), **When** the Scene plays back inside the briefing SPA, **Then** every time-driven layer advances in lock-step with the time slider — no layer lags or leads beyond normal redraw latency.
 4. **Given** the Storyboard reaches its final Scene, **When** playback completes, **Then** the SPA rests on that Scene without crashing, looping unbidden, or attempting to fetch additional resources.
@@ -81,7 +81,8 @@ A plot contains several Storyboards — for example, "Phase 1 brief", "Phase 2 b
 - **Storyboard with only instant Scenes (pre-#263 capture)**: the SPA renders these unchanged — viewport tween per Scene, no time-slider scrub between Scenes — matching the authoring environment's behaviour. The shared playback engine handles the absence of `time_range` correctly.
 - **Storyboard with time-range Scenes (#263)**: the SPA simultaneously interpolates viewport and time-slider during each time-range Scene, matching #263's playback contract. Reverse playback (if exposed) also scrubs both axes backward.
 - **Storyboard mixing instant and time-range Scenes**: both kinds coexist within a single playback; transitioning between them does not cause a visible glitch, a slider jump, or a viewport snap that wasn't already part of the authored Storyboard.
-- **Browser refuses to load local resources**: certain browsers restrict `file://`-origin pages from loading sibling files via XHR/`fetch`. The SPA's loading strategy must work under `file://` in mainstream modern browsers, or the briefing-zip user experience is broken.
+- **Browser refuses to load local resources**: certain browsers restrict `file://`-origin pages from loading sibling files via XHR/`fetch`. The SPA's loading strategy is verified for the supported browser matrix (current Chrome and Edge — see Assumptions). Users opening the zip in another browser see a boot-time browser-probe banner naming the supported browsers, rather than a silent failure (Article I.3).
+- **Time-range Scene with very short wall-clock duration**: tile-coverage interpolation samples are floored at 8 per Scene (per `contracts/tile-coverage.md`), so a sub-second time-range Scene still gets adequate viewport sampling. For unusually fast pans across large geographic distances within a sub-second Scene, the SPA may briefly show the bundled placeholder tile mid-tween — explicit, never a network fallback.
 - **Basemap tiles not pre-fetched for a viewport**: if a Scene's viewport extends beyond the captured tile coverage, the SPA shows the available tiles plus a clear placeholder (e.g. neutral background or a "no tile" pattern) — it never silently issues a network request to a tile server.
 - **Scene thumbnail missing**: the SPA falls back gracefully (e.g. the Scene plays back from its viewport and features without showing a thumbnail preview) rather than erroring.
 - **Zip opened on a phone / very small viewport**: the SPA renders the map and Scene content at the available size; transport controls in Minimal mode remain reachable. The feature does not promise a tuned mobile experience but does not crash or become unusable.
@@ -114,7 +115,7 @@ A plot contains several Storyboards — for example, "Phase 1 brief", "Phase 2 b
 
 **SPA playback (recipient side)**
 
-- **FR-014**: The SPA MUST load and run from `file://` origin in mainstream modern desktop browsers without requiring a local web server.
+- **FR-014**: The SPA MUST load and run from `file://` origin in current Chrome and current Edge on desktop without requiring a local web server. Other browsers are out of supported scope (see Assumptions); the SPA's boot-time browser probe MUST surface a banner naming the supported browsers when opened in an unsupported one.
 - **FR-015**: The SPA MUST NOT issue any network request to an external host at any point in its lifecycle — load, playback, mode switch, or replay.
 - **FR-016**: The SPA MUST render the Storyboard using the same playback contract as the authoring environment: instant Scenes rest on their captured viewport; time-range Scenes interpolate viewport and time-slider in lock-step over the Scene's wall-clock duration.
 - **FR-017**: The SPA MUST advance every time-driven layer (track positions, feature-visibility windows, chart cursors, any layer keyed off "current time") in lock-step with the time slider during time-range Scene playback.
@@ -145,7 +146,7 @@ A plot contains several Storyboards — for example, "Phase 1 brief", "Phase 2 b
 ### Key Entities
 
 - **Briefing Zip**: A single `.zip` file that bundles everything needed to render one Storyboard standalone in a browser. Contains the SPA, a `features.geojson`, an `item.json`, Scene-thumbnail assets, and pre-fetched basemap tiles. Produced by the export command, consumed by double-clicking `index.html`.
-- **Briefing SPA**: The bundled single-page application at `apps/briefing-renderer/`. Loads from `file://` in any modern browser, renders the bundled `features.geojson` via the shared playback engine, and exposes Present / Minimal display modes. Read-only.
+- **Briefing SPA**: The bundled single-page application at `apps/briefing-renderer/`. Loads from `file://` in current Chrome or Edge on desktop (the supported browser matrix — see Assumptions), renders the bundled `features.geojson` via the shared playback engine, and exposes Present / Minimal display modes. Read-only.
 - **`features.geojson` (briefing payload)**: A GeoJSON `FeatureCollection` carrying the exported `StoryboardFeature`, its `SceneFeature` entries (including any `time_range` and `viewport_end` fields per #263), and every feature those Scenes reference. Same shape as the authoring environment's plot GeoJSON, scoped to one Storyboard.
 - **Scene thumbnail asset**: An image file representing a Scene's captured viewport. Stored inside the zip alongside the SPA; used by the SPA for Scene previews (e.g. on a Scene strip in Minimal mode, if exposed).
 - **Pre-fetched basemap tiles**: A directory of raster (or vector) tile files covering every Scene's viewport at the zoom levels the SPA may render during playback. Served by the SPA from inside the zip; no network fallback.
@@ -191,7 +192,7 @@ A plot contains several Storyboards — for example, "Phase 1 brief", "Phase 2 b
 
 ### Measurable Outcomes
 
-- **SC-001**: A recipient with a modern desktop browser and no Debrief install can unzip a briefing zip and watch the Storyboard with no further configuration, in under 60 seconds from receiving the file.
+- **SC-001**: A recipient with current Chrome or Edge on desktop and no Debrief install can unzip a briefing zip and watch the Storyboard with no further configuration, in under 60 seconds from receiving the file.
 - **SC-002**: 100% of the SPA's runtime resource loads (HTML, JS, CSS, fonts, icons, GeoJSON, item.json, thumbnails, basemap tiles) come from inside the zip — zero external network requests are observed across load, playback, mode toggle, and replay.
 - **SC-003**: For Storyboards composed of instant Scenes, time-range Scenes, or any mix, the playback sequence observed in the briefing SPA is visually indistinguishable from the sequence observed in the authoring environment — Scene order, per-Scene viewports, time-slider position during time-range Scenes, and motion of time-driven layers all match.
 - **SC-004**: Multi-Storyboard plots produce per-Storyboard zips: a zip exported from Storyboard A contains Storyboard A's Scenes and no other Storyboard's Scenes; the same is independently true for every other Storyboard in the same plot.
@@ -204,7 +205,7 @@ A plot contains several Storyboards — for example, "Phase 1 brief", "Phase 2 b
 - The shared playback engine introduced in #217 and extended in #258 (displayMode capture) and #263 (time-range Scenes) is structured such that it can be reused inside a `file://`-origin SPA — i.e. it does not depend on the VS Code extension host, the MCP layer, or any service round-trip to render a Scene.
 - Scene thumbnails are already produced by #174 and addressable by Scene; the export command can collect them without re-running thumbnail capture.
 - The plot GeoJSON's `StoryboardFeature` carries enough information to identify which `SceneFeature` entries belong to which Storyboard, so the export can scope `features.geojson` to one Storyboard cleanly per `storyboard.yaml`.
-- Modern desktop browsers (current versions of Chrome, Firefox, Edge, Safari) permit a `file://`-origin page to load relative sibling resources via the loading strategy used by the SPA. The export does not promise a polished experience on browsers that block all `file://` sibling loads.
+- Current Chrome and Edge on desktop permit a `file://`-origin page to load relative sibling resources via the loading strategy used by the SPA. Firefox, Safari, and mobile browsers are **out of supported scope** for this feature — the SPA's boot-time browser probe surfaces a banner directing those users to a supported browser (decision recorded in `research.md` R6 during `/speckit.review`).
 - "Pre-fetched basemap tiles" means a tile-set captured at export time covering each Scene's viewport at the zoom levels reachable during playback; the exact tile-coverage strategy (which zoom levels, how much padding around each viewport) is an implementation concern resolved during planning, not a spec-level decision.
 - The exported zip is intended for human briefing audiences, not as a re-import format — Debrief does not need to round-trip a briefing zip back into a plot.
 - "Read-only" applies to the briefing SPA's UI surface; the user is free to copy, share, or delete the zip's files at the OS level.

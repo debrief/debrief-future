@@ -24,7 +24,7 @@ export interface TileCoord {
 export interface TileCoverageInput {
   scenes: readonly SceneFeature[];          // ordered by (timestamp, creation_order)
   tilePadding: number;                       // tiles of padding around each viewport (default 1)
-  interpolationSamples: number;              // samples per time-range Scene (default = 0 means "auto: 250ms intervals")
+  interpolationSamples: number;              // samples per time-range Scene (default = 0 means "auto: max(8, ceil(transition_duration_ms / 1000))" — floor of 8 samples, otherwise ~1 per wall-clock second)
 }
 
 export interface TileCoverageOutput {
@@ -73,9 +73,26 @@ return { tiles, maxZoom = max(z over all tiles), approxBytes }
 
 The `time_range` field (`{ start: ISO8601, end: ISO8601 }`) is *not*
 consumed by tile coverage — only viewports and zooms matter for the
-spatial tile set. Sample count for the interpolation path is wall-clock
-based (default ~250 ms apart) and is derived from the Scene's
-`transition_duration_ms` rather than from the time range itself.
+spatial tile set. Sample count for the interpolation path is derived
+from the Scene's `transition_duration_ms` using the formula
+`max(8, ceil(transition_duration_ms / 1000))`:
+
+- The **floor of 8** guarantees adequate sampling for sub-second
+  tweens (e.g. a 500 ms time-range Scene still gets 8 samples, ~62 ms
+  apart in wall clock — fine for any naturally-paced pan).
+- The **~1 sample per wall-clock second** ceiling rate bounds the
+  tile-set size for long-running Scenes (e.g. a 30 s Scene gets 30
+  samples, not 120).
+
+Trade-off (recorded as a spec edge case): a very fast pan across a
+large geographic distance within a sub-second time-range Scene may
+briefly expose the bundled placeholder tile mid-tween. The SPA never
+falls back to network — the placeholder is the explicit, visible
+failure mode (Article I.3).
+
+This formula replaces the original "every ~250 ms" default; the
+change was recorded during `/speckit.review` (decision 4A) to bound
+the tile-set size for long-running Scenes.
 
 ### `addCoverage(viewport, zoom)`
 

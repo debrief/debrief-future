@@ -257,25 +257,47 @@ Storyboards in the same plot are excluded.
 
 ### Decision
 
-Target current versions of **Chrome, Firefox, Edge, and Safari** on
-desktop OSes (Windows 10+, macOS 12+, mainstream Linux desktops).
-Mobile browsers are best-effort — playback should work but no specific
-guarantees on touch UI quality (spec edge-case "Zip opened on a phone /
-very small viewport").
+Target current versions of **Chrome and Edge** on desktop OSes
+(Windows 10+, macOS 12+, mainstream Linux desktops). Both browsers
+share the Blink engine, so testing against Chromium covers both
+surfaces via a single Playwright project. Firefox, Safari, and all
+mobile browsers are **out of supported scope**. When a user opens the
+zip in an unsupported browser, the SPA's boot-time browser-probe
+banner (see `contracts/spa-loading.md` § Browser-compat probes) names
+the supported set and instructs them to switch — never a silent
+half-loaded UI (Article I.3).
 
 ### Rationale
 
-- The chosen loading strategy (R1) is supported in all four browsers
-  under `file://`. Verification is by Playwright E2E test in CI
-  (see Quickstart).
+- Narrowed from the original "Chrome, Firefox, Edge, Safari" matrix
+  during the `/speckit.review` decision pass — an explicit operator
+  choice that trades reach for tighter test scope (one Chromium
+  Playwright project vs. one each for Chromium / Firefox / WebKit).
+  Article I.3 is preserved by the boot-time browser probe banner: a
+  Firefox or Safari user sees an actionable message naming the
+  supported browsers, not a confused half-loaded UI.
+- The chosen loading strategy (R1) is supported in both Chromium-based
+  browsers under `file://`. Verification is by a single Playwright
+  (Chromium) suite in CI.
+- The boot-time browser probes remain belt-and-braces — they catch the
+  case where a user opens the zip in an unsupported browser and surface
+  the banner.
 - Article XI (Internationalisation) is honoured trivially: the SPA uses
   standard `<html lang>` and respects browser locale for date / time
   formatting via `Intl.DateTimeFormat`.
 
 ### Alternatives considered
 
-- **Chrome-only**: rejected — defence audiences include Firefox /
-  Safari users; ESR Firefox is common.
+- **Wider matrix (Chrome, Firefox, Edge, Safari)**: original spec
+  position, rejected during `/speckit.review`. Maintaining Firefox and
+  WebKit Playwright projects plus the supporting browser binaries in
+  CI is a non-trivial recurring cost for a feature whose primary
+  audience is defence analysts on managed workstations (typically
+  Chromium-based). The probe banner gives Firefox / Safari users a
+  clear next step instead.
+- **Chromium-only with no banner**: rejected — Article I.3 (no silent
+  failures) requires that a user opening the zip in Firefox or Safari
+  sees an actionable message rather than a confused half-loaded UI.
 - **IE / older browsers**: out of scope. The target community runs
   current browsers.
 
