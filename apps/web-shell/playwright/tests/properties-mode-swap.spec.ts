@@ -238,12 +238,18 @@ test.describe('Selection-driven mode swap (#192 Phase 7 / US-3)', () => {
       vertexPath,
     );
 
-    // Stage a vertex label edit.
+    // Stage a vertex label edit. `fill()` writes the value but does NOT
+    // trigger blur, and SubFeatureEditorMode commits to the staging buffer
+    // on blur (the same idiom FeatureEditorMode uses for text fields). To
+    // actually stage the edit, we blur the input — what a real user does
+    // when they click anywhere else (the browser fires blur before the
+    // outgoing click target receives focus).
     const labelInput = page.getByTestId('vertex-label-input');
     await expect(labelInput).toBeVisible();
     await expect(labelInput).toBeEnabled({ timeout: 5_000 });
     await labelInput.fill(stagedLabel);
     await expect(labelInput).toHaveValue(stagedLabel);
+    await labelInput.blur();
 
     // ─── (4) Two features selected → multi-select mode ─────────────
     // Use the store API directly because the FeatureList may have
