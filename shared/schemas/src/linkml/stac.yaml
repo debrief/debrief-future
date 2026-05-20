@@ -353,15 +353,13 @@ classes:
     attributes:
       href:
         description: >-
-          URI to the asset. Required on `StacItem.assets[<key>]` but
-          optional on `StacCollection.item_assets[<key>]` (where it
-          declares an Item Asset Definition Object — a placeholder
-          describing assets each child Item is expected to have, not
-          a concrete asset). Modelled as `required: false` to satisfy
-          both call sites with a single class; consumers reading actual
-          item assets observe `href` is always present.
+          URI to the asset. Required on `StacItem.assets[<key>]` —
+          STAC 1.1 mandates a concrete URI on Item assets. The
+          declaration-only shape on `StacCollection.item_assets[<key>]`
+          (no `href`) is covered by the sibling `StacItemAssetDefinition`
+          class.
         range: string
-        required: false
+        required: true
       type:
         description: IANA media type.
         range: string
@@ -378,6 +376,37 @@ classes:
         description: >-
           Asset roles — "data", "thumbnail", "overview", "source",
           "result", etc.
+        range: string
+        multivalued: true
+        required: false
+
+  StacItemAssetDefinition:
+    description: >-
+      Item Asset Definition Object — declares the shape of an asset that
+      child Items in a Collection are expected to carry. Distinct from
+      `StacAsset` because it does NOT carry an `href`; the asset URI
+      lives on the concrete Item assets that conform to this template
+      (see STAC 1.1 Item Asset Definition spec).
+
+      Open-record per Article XV.2 — same boundary-loose semantics as
+      `StacAsset` so item-asset declarations may carry extension keys.
+      The generator post-processes this class with Pydantic `extra='allow'`
+      and TypeScript `[key: string]: unknown`.
+    attributes:
+      type:
+        description: IANA media type expected on child Item assets.
+        range: string
+        required: false
+      title:
+        description: Human-readable asset title.
+        range: string
+        required: false
+      description:
+        description: Asset description.
+        range: string
+        required: false
+      roles:
+        description: Asset roles expected on child Item assets.
         range: string
         multivalued: true
         required: false
@@ -532,10 +561,13 @@ classes:
         inlined_as_list: true
       item_assets:
         description: >-
-          Optional Item-asset definitions (STAC 1.1 addition) —
-          structurally identical to StacItem.assets but advertised at
-          the Collection level. Same dict-of-StacAsset post-processing
-          as `StacItem.assets`.
+          Optional Item-asset declarations (STAC 1.1 addition). Each
+          entry is a `StacItemAssetDefinition` (no `href`) — distinct
+          from the concrete `StacAsset` shape used by
+          `StacItem.assets[<key>]`. The generator post-processor
+          rewrites this to `dict[str, StacItemAssetDefinition]`
+          (Pydantic) / `Record<string, StacItemAssetDefinition>`
+          (TypeScript) so the call site narrows correctly.
         range: Any
         required: false
       links:

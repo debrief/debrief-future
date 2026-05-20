@@ -1910,8 +1910,8 @@ export interface StacLink {
 Open-record per Article XV.2 — accepts arbitrary extension keys (`file:checksum`, `file:size`, `processing:datetime`, `processing:software`, `proj:shape`, `debrief:provenance`, `debrief:toolId`, `debrief:sourceFeatures`) observed in the live fixtures. The generator post-processes this into Pydantic `extra='allow'` and TypeScript `[key: string]: unknown`.
  */
 export interface StacAsset {
-    /** URI to the asset. Required on `StacItem.assets[<key>]` but optional on `StacCollection.item_assets[<key>]` (where it declares an Item Asset Definition Object — a placeholder describing assets each child Item is expected to have, not a concrete asset). Modelled as `required: false` to satisfy both call sites with a single class; consumers reading actual item assets observe `href` is always present. */
-    href?: string,
+    /** URI to the asset. Required on `StacItem.assets[<key>]` — STAC 1.1 mandates a concrete URI on Item assets. The declaration-only shape on `StacCollection.item_assets[<key>]` (no `href`) is covered by the sibling `StacItemAssetDefinition` class. */
+    href: string,
     /** IANA media type. */
     type?: string,
     /** Human-readable asset title. */
@@ -1919,6 +1919,23 @@ export interface StacAsset {
     /** Asset description (STAC 1.1 addition). */
     description?: string,
     /** Asset roles — "data", "thumbnail", "overview", "source", "result", etc. */
+    roles?: string[],
+    [key: string]: unknown,
+}
+
+
+/**
+ * Item Asset Definition Object — declares the shape of an asset that child Items in a Collection are expected to carry. Distinct from `StacAsset` because it does NOT carry an `href`; the asset URI lives on the concrete Item assets that conform to this template (see STAC 1.1 Item Asset Definition spec).
+Open-record per Article XV.2 — same boundary-loose semantics as `StacAsset` so item-asset declarations may carry extension keys. The generator post-processes this class with Pydantic `extra='allow'` and TypeScript `[key: string]: unknown`.
+ */
+export interface StacItemAssetDefinition {
+    /** IANA media type expected on child Item assets. */
+    type?: string,
+    /** Human-readable asset title. */
+    title?: string,
+    /** Asset description. */
+    description?: string,
+    /** Asset roles expected on child Item assets. */
     roles?: string[],
     [key: string]: unknown,
 }
@@ -1991,8 +2008,8 @@ export interface StacCollection {
     summaries?: StacSummaries,
     /** Organisations involved in producing / hosting this collection (STAC 1.1 addition). */
     providers?: StacProvider[],
-    /** Optional Item-asset definitions (STAC 1.1 addition) — structurally identical to StacItem.assets but advertised at the Collection level. Same dict-of-StacAsset post-processing as `StacItem.assets`. */
-    item_assets?: Record<string, StacAsset>,
+    /** Optional Item-asset declarations (STAC 1.1 addition). Each entry is a `StacItemAssetDefinition` (no `href`) — distinct from the concrete `StacAsset` shape used by `StacItem.assets[<key>]`. The generator post-processor rewrites this to `dict[str, StacItemAssetDefinition]` (Pydantic) / `Record<string, StacItemAssetDefinition>` (TypeScript) so the call site narrows correctly. */
+    item_assets?: Record<string, StacItemAssetDefinition>,
     /** Collection navigation links — `self`, `root`, `parent`, `item` entries pointing at child Items. */
     links: StacLink[],
 }

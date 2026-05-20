@@ -32,7 +32,7 @@ from debrief_schemas import (  # noqa: E402
     StacCollection,
     StacExtent,
     StacItem,
-    StacItemProperties,
+    StacItemAssetDefinition,
     StacLink,
     StacProvider,
     StacSpatialExtent,
@@ -72,7 +72,10 @@ FIXTURES_ROOT = Path(__file__).parent.parent / "fixtures" / "stac"
             StacAsset,
             FIXTURES_ROOT / "StacAsset" / "valid" / "asset-with-extension-keys.json",
         ),
-        (StacAsset, FIXTURES_ROOT / "StacAsset" / "valid" / "item-asset-no-href.json"),
+        (
+            StacItemAssetDefinition,
+            FIXTURES_ROOT / "StacItemAssetDefinition" / "valid" / "definition.json",
+        ),
         (StacExtent, FIXTURES_ROOT / "StacExtent" / "valid" / "spatial-temporal.json"),
         (StacSummaries, FIXTURES_ROOT / "StacSummaries" / "valid" / "full.json"),
         (StacProvider, FIXTURES_ROOT / "StacProvider" / "valid" / "full.json"),
@@ -195,8 +198,9 @@ def test_stac_invalid_fixtures_fail(model_cls: type, fixture: Path) -> None:
 
 def test_stac_catalog_or_collection_python_union_narrows() -> None:
     """Python's Union[StacCatalog, StacCollection] picks the right class."""
-    from debrief_schemas.unions import StacCatalogOrCollection  # noqa: F401
     from pydantic import TypeAdapter
+
+    from debrief_schemas.unions import StacCatalogOrCollection
 
     adapter: TypeAdapter[StacCatalogOrCollection] = TypeAdapter(StacCatalogOrCollection)
 

@@ -10,7 +10,7 @@
  */
 
 import type { CatalogOverviewItem } from '@debrief/components';
-import type { PlatformRecord } from '@debrief/schemas';
+import type { PlatformRecord, StacCatalog, StacItem } from '@debrief/schemas';
 import type { FeatureCollection } from 'geojson';
 import { getActiveStacWriter } from '../services/stacWriterRegistry';
 
@@ -20,26 +20,10 @@ import exerciseAlphaData from '@test-data/local-store/exercise-alpha/exercise-al
 import trainingRun1Item from '@test-data/local-store/training-run-1/item.json';
 import trainingRun1Data from '@test-data/local-store/training-run-1/training-run-1.geojson';
 
-/** STAC Item structure from item.json */
-interface StacItem {
-  id: string;
-  bbox?: [number, number, number, number];
-  properties: {
-    title?: string;
-    datetime?: string;
-    start_datetime?: string;
-    end_datetime?: string;
-    'debrief:platforms'?: PlatformRecord[];
-    'debrief:tags'?: string[];
-    'debrief:feature_tags'?: string[];
-  };
-  assets?: Record<string, { href: string; type?: string; roles?: string[] }>;
-  links?: Array<{ rel: string; href: string }>;
-}
-
-interface StacCatalog {
-  links: Array<{ rel: string; href: string; title?: string }>;
-}
+// StacItem and StacCatalog are now LinkML-rooted at
+// shared/schemas/src/linkml/stac.yaml and re-exported via @debrief/schemas
+// per spec #223. The previous hand-typed local declarations carried the
+// same on-disk drift risk that motivated the migration.
 
 function asStacItem(data: unknown): StacItem { return data as StacItem; }
 function asFeatureCollection(data: unknown): FeatureCollection { return data as FeatureCollection; }
@@ -79,19 +63,40 @@ function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
   // the large (800x600). Naming follows STAC convention.
   const thumbAsset = item.assets?.['thumbnail'];
   const overviewAsset = item.assets?.['overview'];
+  // Narrow the schema's `number[]` bbox to the 4-tuple expected by the
+  // overview row. STAC permits 4- or 6-element bboxes; the catalog
+  // overview UI only needs the 2D corners.
+  const bbox4: [number, number, number, number] | null =
+    Array.isArray(item.bbox) && item.bbox.length >= 4
+      ? [item.bbox[0]!, item.bbox[1]!, item.bbox[2]!, item.bbox[3]!]
+      : null;
+  // The on-disk JSON carries `debrief:*` extension keys; the schema's
+  // StacItemProperties has an open-record `[key: string]: unknown`
+  // (Article XV.2 exception per spec #223) so colon-bearing reads
+  // return `unknown` and require explicit per-extension narrowing.
+  // The hand-types previously declared these keys explicitly; we
+  // preserve that narrowing here as the consumer-side equivalent of
+  // the schema's open-record exception.
+  const { properties } = item;
   return {
     id: item.id,
-    title: item.properties.title ?? item.id,
+    title: (properties.title as string | undefined) ?? item.id,
     itemPath,
-    bbox: item.bbox ?? null,
-    datetime: item.properties.datetime ?? null,
-    startDatetime: item.properties.start_datetime ?? null,
-    endDatetime: item.properties.end_datetime ?? null,
-    platforms: item.properties['debrief:platforms'] ?? [],
-    tags: item.properties['debrief:tags'] ?? [],
-    featureTags: item.properties['debrief:feature_tags'] ?? [],
-    thumbnailHref: thumbAsset ? resolveStacHref(itemPath, thumbAsset.href) : null,
-    overviewHref: overviewAsset ? resolveStacHref(itemPath, overviewAsset.href) : null,
+    bbox: bbox4,
+    datetime: (properties.datetime as string | undefined) ?? null,
+    startDatetime: (properties.start_datetime as string | undefined) ?? null,
+    endDatetime: (properties.end_datetime as string | undefined) ?? null,
+    platforms: (properties['debrief:platforms'] as readonly PlatformRecord[] | undefined) ?? [],
+    tags: (properties['debrief:tags'] as readonly string[] | undefined) ?? [],
+    featureTags: (properties['debrief:feature_tags'] as readonly string[] | undefined) ?? [],
+    thumbnailHref:
+      thumbAsset && typeof thumbAsset.href === 'string'
+        ? resolveStacHref(itemPath, thumbAsset.href)
+        : null,
+    overviewHref:
+      overviewAsset && typeof overviewAsset.href === 'string'
+        ? resolveStacHref(itemPath, overviewAsset.href)
+        : null,
   };
 }
 
@@ -310,10 +315,15 @@ export function createMockStacService(): MockStacService {
       if (!item) throw new Error(`Unknown item path: ${itemPath}`);
 
       const dataEntry = Object.values(item.assets ?? {}).find(
-        (a) => a.roles?.includes('data') && (a.type === 'application/geo+json' || a.href.endsWith('.geojson')),
+        (a) =>
+          a.roles?.includes('data') &&
+          (a.type === 'application/geo+json' ||
+            (typeof a.href === 'string' && a.href.endsWith('.geojson'))),
       );
       const dataAsset = dataEntry ?? item.assets?.['data'];
-      if (!dataAsset) throw new Error(`No data asset in ${itemPath}`);
+      if (!dataAsset || typeof dataAsset.href !== 'string') {
+        throw new Error(`No data asset in ${itemPath}`);
+      }
 
       const url = resolveStacHref(itemPath, dataAsset.href);
       const res = await fetch(url);
@@ -393,16 +403,32 @@ export function createMockStacService(): MockStacService {
       const id = makeUlidIsh();
       const itemPath = `user/${id}/item.json`;
       const nowIso = new Date().toISOString();
+      // STAC requires bbox on every Item. Default to a zero-extent box
+      // when the caller doesn't supply one — the downstream Properties
+      // Panel re-computes from feature geometry on first commit.
+      const bbox: number[] = input.bbox ?? [0, 0, 0, 0];
+      // Synthesise a minimal point-at-origin geometry for the same
+      // reason. The user's actual GeoJSON payload carries the real
+      // shapes; the Item geometry is a coarse bbox-style envelope.
+      const geometry = {
+        type: 'Point' as const,
+        coordinates: [bbox[0]!, bbox[1]!],
+      };
+      const properties: StacItem['properties'] = {
+        title: input.title,
+        datetime: nowIso,
+        'debrief:platforms': input.platforms ?? [],
+        'debrief:tags': input.tags ?? [],
+        'debrief:feature_tags': [],
+      };
       const item: StacItem = {
+        type: 'Feature',
+        stac_version: '1.1.0',
         id,
-        bbox: input.bbox,
-        properties: {
-          title: input.title,
-          datetime: nowIso,
-          'debrief:platforms': input.platforms ?? [],
-          'debrief:tags': input.tags ?? [],
-          'debrief:feature_tags': [],
-        },
+        geometry,
+        bbox,
+        properties,
+        links: [{ rel: 'self', href: `./${id}/item.json` }],
         assets: {
           data: {
             href: `idb:${itemPath}::data`,
@@ -416,19 +442,11 @@ export function createMockStacService(): MockStacService {
         nowMs: () => Date.now(),
         randomId: () => id,
       };
-      // Local StacItem differs structurally from @debrief/stac-writer's
-      // (no index signature). Build the writer's view of the same data
-      // by serialising-and-reparsing — no `as unknown` casts needed.
-      const writerItem: import('@debrief/stac-writer').StacItem = JSON.parse(
-        JSON.stringify({
-          id: item.id,
-          properties: item.properties,
-          assets: item.assets,
-          bbox: item.bbox,
-        }),
-      );
       try {
-        await writer.writeItem({ ctx, itemPath, item: writerItem, mode: 'create' });
+        // Both the local StacItem and @debrief/stac-writer.StacItem now
+        // reference @debrief/schemas.StacItem (spec #223 Decision 1B);
+        // no projection cast required.
+        await writer.writeItem({ ctx, itemPath, item, mode: 'create' });
         await writer.writeAsset({
           ctx,
           itemPath,

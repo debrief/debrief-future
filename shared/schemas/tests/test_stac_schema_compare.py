@@ -23,6 +23,7 @@ from debrief_schemas import (  # noqa: E402
     StacCollection,
     StacExtent,
     StacItem,
+    StacItemAssetDefinition,
     StacItemProperties,
     StacLink,
     StacProvider,
@@ -30,7 +31,6 @@ from debrief_schemas import (  # noqa: E402
     StacSummaries,
     StacTemporalExtent,
 )
-
 
 # Expected required-slot sets per class — matches data-model.md.
 EXPECTED_REQUIRED: dict[type, set[str]] = {
@@ -46,7 +46,8 @@ EXPECTED_REQUIRED: dict[type, set[str]] = {
         "links",
     },
     StacLink: {"rel", "href"},
-    StacAsset: set(),  # all slots optional (href required on items, omitted on item_assets)
+    StacAsset: {"href"},
+    StacItemAssetDefinition: set(),  # all slots optional — declaration only
     StacExtent: {"spatial", "temporal"},
     StacSpatialExtent: {"bbox"},
     StacTemporalExtent: {"interval"},
@@ -90,7 +91,12 @@ def test_open_record_classes_allow_extras() -> None:
     or missing (default-allow) — Pydantic emits it as ``True`` when
     explicitly configured.
     """
-    for cls in (StacItemProperties, StacAsset, StacSummaries):
+    for cls in (
+        StacItemProperties,
+        StacAsset,
+        StacItemAssetDefinition,
+        StacSummaries,
+    ):
         schema = cls.model_json_schema()
         # `additionalProperties` may be absent (defaulting to True) or
         # explicitly True. It must NOT be False.

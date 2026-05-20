@@ -209,7 +209,7 @@ def generate_pydantic() -> bool:
             (
                 "class StacCollection(",
                 "item_assets: Optional[dict[str, object]] = Field",
-                "item_assets: Optional[dict[str, StacAsset]] = Field",
+                "item_assets: Optional[dict[str, StacItemAssetDefinition]] = Field",
             ),
         ]
         for class_marker, old, new in _stac_assets_fixes:
@@ -235,7 +235,12 @@ def generate_pydantic() -> bool:
         # from ConfiguredBaseModel which sets `extra='forbid'`; we override
         # by inserting `model_config = ConfigDict(extra='allow')` after the
         # full linkml_meta declaration (which may span multiple lines).
-        for stac_open_class in ("StacItemProperties", "StacAsset", "StacSummaries"):
+        for stac_open_class in (
+            "StacItemProperties",
+            "StacAsset",
+            "StacItemAssetDefinition",
+            "StacSummaries",
+        ):
             class_marker = f"class {stac_open_class}("
             if class_marker not in content:
                 raise RuntimeError(
@@ -859,7 +864,7 @@ def generate_typescript() -> bool:
             (
                 "export interface StacCollection {",
                 "item_assets?: Any,",
-                "item_assets?: Record<string, StacAsset>,",
+                "item_assets?: Record<string, StacItemAssetDefinition>,",
             ),
         ]
         for marker, old, new in _stac_record_fixes:
@@ -907,6 +912,7 @@ def generate_typescript() -> bool:
         _stac_open_record_classes = (
             "StacItemProperties",
             "StacAsset",
+            "StacItemAssetDefinition",
             "StacSummaries",
         )
         for cls_name in _stac_open_record_classes:

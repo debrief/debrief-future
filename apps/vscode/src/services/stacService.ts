@@ -111,6 +111,19 @@ function isReadOnlyFsError(err: unknown): boolean {
   return code === 'EACCES' || code === 'EROFS' || code === 'EPERM';
 }
 
+/**
+ * Narrow the LinkML-generated `StacItem.bbox: number[]` to the 4-tuple
+ * shape expected by UI summary projections. STAC permits 4- or
+ * 6-element bboxes; the catalog overview / plot UI only needs the 2D
+ * corners. Returns null when the bbox is shorter than 4 elements (the
+ * schema's lower-bound constraint rejects those at validation time,
+ * but the conditional keeps TypeScript happy here).
+ */
+function toBbox4(bbox: number[] | undefined): [number, number, number, number] | null {
+  if (!Array.isArray(bbox) || bbox.length < 4) {return null;}
+  return [bbox[0]!, bbox[1]!, bbox[2]!, bbox[3]!];
+}
+
 export class StacService {
   private catalogCache: Map<string, StacCatalog> = new Map();
   private itemCache: Map<string, StacItem> = new Map();
@@ -280,8 +293,8 @@ export class StacService {
         const item = await this.loadItem(itemPath);
 
         if (item) {
-          const startDatetime = (item.properties.start_datetime as string | undefined) ?? null;
-          const endDatetime = (item.properties.end_datetime as string | undefined) ?? null;
+          const startDatetime = item.properties.start_datetime ?? null;
+          const endDatetime = item.properties.end_datetime ?? null;
           items.push({
             id: item.id,
             title: item.properties.title ?? item.id,
@@ -289,7 +302,7 @@ export class StacService {
             itemPath: relativePath,
             catalogId: catalog.id,
             storeId: store.id,
-            bbox: item.bbox ?? null,
+            bbox: toBbox4(item.bbox),
             startDatetime,
             endDatetime,
             platforms: (item.properties['debrief:platforms'] as PlatformRecord[] | undefined) ?? [],
@@ -361,8 +374,8 @@ export class StacService {
       // falling back to datetime for both bounds
       const fallback = item.properties.datetime;
       const timeExtent: [string, string] = [
-        (item.properties.start_datetime as string | undefined) ?? fallback,
-        (item.properties.end_datetime as string | undefined) ?? fallback,
+        item.properties.start_datetime ?? fallback,
+        item.properties.end_datetime ?? fallback,
       ];
 
       if (geoJsonAsset) {
@@ -407,7 +420,10 @@ export class StacService {
         itemPath,
         catalogId: '', // Will be set by caller
         sourcePath: item.properties.sourcePath as string | undefined,
-        bbox: item.bbox,
+        // Plot.bbox is required as a 4-tuple; supply a zero-extent
+        // fallback for the (validation-rejected) case of a too-short
+        // schema bbox.
+        bbox: toBbox4(item.bbox) ?? [0, 0, 0, 0],
         timeExtent,
         trackCount,
         locationCount,

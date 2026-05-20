@@ -366,9 +366,12 @@ export async function createStacWriterIdb(
         );
       }
 
+      // `props` is built dynamically from the in-memory record's
+      // properties + the user's patch; we trust that the base item's
+      // schema-required keys (notably `datetime`) survive the spread.
       const updatedRecord: StacItem = {
         ...baseItem,
-        properties: props,
+        properties: props as StacItem['properties'],
       };
       const stored: StoredItem = {
         kind,

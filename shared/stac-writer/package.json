@@ -22,7 +22,8 @@
     "dist"
   ],
   "dependencies": {
-    "@debrief/components": "workspace:*"
+    "@debrief/components": "workspace:*",
+    "@debrief/schemas": "workspace:*"
   },
   "scripts": {
     "build": "tsup",
