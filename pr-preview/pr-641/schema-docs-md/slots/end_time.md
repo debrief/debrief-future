@@ -17,8 +17,8 @@ Alias: end_time
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TrackProperties](../classes/TrackProperties.md) | Properties for a TrackFeature |  no  |
 | [SegmentMetadata](../classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |  no  |
+| [TrackProperties](../classes/TrackProperties.md) | Properties for a TrackFeature |  no  |
 | [SystemStateProperties](../classes/SystemStateProperties.md) | Properties for SYSTEM features storing application state |  no  |
 
 

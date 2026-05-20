@@ -17,12 +17,12 @@ Alias: timestamp
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) | Single entry in item |  no  |
-| [FileProvEntry](../classes/FileProvEntry.md) | File-level provenance event (snapshot or branch creation) |  no  |
-| [LogEntry](../classes/LogEntry.md) | A PROV-aligned provenance record stored on GeoJSON features |  no  |
-| [TuneAnnotation](../classes/TuneAnnotation.md) | Records a parameter modification (appended, not replacing original) |  no  |
 | [FeatureSelection](../classes/FeatureSelection.md) | Set of selected feature identifiers with metadata (FR-017) |  no  |
 | [SceneProperties](../classes/SceneProperties.md) | Properties class for a Scene child Feature |  no  |
+| [FileProvEntry](../classes/FileProvEntry.md) | File-level provenance event (snapshot or branch creation) |  no  |
+| [TuneAnnotation](../classes/TuneAnnotation.md) | Records a parameter modification (appended, not replacing original) |  no  |
+| [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) | Single entry in item |  no  |
+| [LogEntry](../classes/LogEntry.md) | A PROV-aligned provenance record stored on GeoJSON features |  no  |
 
 
 
