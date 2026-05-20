@@ -817,9 +817,9 @@ def generate_typescript() -> bool:
 
         # (1) Discriminator type literals
         _stac_type_literal_fixes: list[tuple[str, str, str]] = [
-            ("export interface StacItem {", 'type: string,', 'type: "Feature",'),
-            ("export interface StacCatalog {", 'type: string,', 'type: "Catalog",'),
-            ("export interface StacCollection {", 'type: string,', 'type: "Collection",'),
+            ("export interface StacItem {", "type: string,", 'type: "Feature",'),
+            ("export interface StacCatalog {", "type: string,", 'type: "Catalog",'),
+            ("export interface StacCollection {", "type: string,", 'type: "Collection",'),
         ]
         for marker, old, new in _stac_type_literal_fixes:
             if marker in content:
@@ -977,7 +977,7 @@ def generate_typescript() -> bool:
             'export * from "./unions.js";\n'
             "export type { ToolExecutor, ToolVersionResolver } "
             'from "../../typescript/aliases/mcp-functions.js";\n'
-            'export type { StacCatalogOrCollection } '
+            "export type { StacCatalogOrCollection } "
             'from "../../typescript/aliases/stac-unions.js";\n',
             encoding="utf-8",
             newline="\n",

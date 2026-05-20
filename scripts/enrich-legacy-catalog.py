@@ -23,7 +23,9 @@ from typing import Any
 # typo or shape drift surfaces loudly at script-run time instead of
 # corrupting the on-disk catalog.
 # ---------------------------------------------------------------------------
-_SCHEMAS_PY_DIR = Path(__file__).resolve().parent.parent / "shared" / "schemas" / "src" / "generated" / "python"
+_SCHEMAS_PY_DIR = (
+    Path(__file__).resolve().parent.parent / "shared" / "schemas" / "src" / "generated" / "python"
+)
 if str(_SCHEMAS_PY_DIR) not in sys.path:
     sys.path.insert(0, str(_SCHEMAS_PY_DIR))
 

@@ -70,8 +70,7 @@ def test_required_slots(cls: type, required: set[str]) -> None:
             f"{cls.__name__} has no 'required' field in its model_json_schema"
         )
         assert set(schema["required"]) == required, (
-            f"{cls.__name__} required slots: expected {required}, got "
-            f"{schema['required']}"
+            f"{cls.__name__} required slots: expected {required}, got {schema['required']}"
         )
     else:
         # Empty-required-set classes either omit "required" or carry an
@@ -120,8 +119,7 @@ def test_stac_item_discriminator_is_literal() -> None:
         assert type_prop["enum"] == ["Feature"]
     else:
         pytest.fail(
-            f"StacItem.type discriminator is not a literal in model_json_schema: "
-            f"{type_prop}"
+            f"StacItem.type discriminator is not a literal in model_json_schema: {type_prop}"
         )
 
 
@@ -134,9 +132,7 @@ def test_stac_catalog_discriminator_is_literal() -> None:
     elif "enum" in type_prop:
         assert type_prop["enum"] == ["Catalog"]
     else:
-        pytest.fail(
-            f"StacCatalog.type discriminator is not a literal: {type_prop}"
-        )
+        pytest.fail(f"StacCatalog.type discriminator is not a literal: {type_prop}")
 
 
 def test_stac_collection_discriminator_is_literal() -> None:
@@ -148,9 +144,7 @@ def test_stac_collection_discriminator_is_literal() -> None:
     elif "enum" in type_prop:
         assert type_prop["enum"] == ["Collection"]
     else:
-        pytest.fail(
-            f"StacCollection.type discriminator is not a literal: {type_prop}"
-        )
+        pytest.fail(f"StacCollection.type discriminator is not a literal: {type_prop}")
 
 
 def test_stac_item_assets_is_record_of_stacasset() -> None:
@@ -162,11 +156,8 @@ def test_stac_item_assets_is_record_of_stacasset() -> None:
         f"StacItem.assets is not declared as object: {assets_prop}"
     )
     ap = assets_prop.get("additionalProperties")
-    assert isinstance(ap, dict) and (
-        "$ref" in ap and "StacAsset" in ap["$ref"]
-    ), (
-        f"StacItem.assets.additionalProperties does not reference StacAsset: "
-        f"{ap}"
+    assert isinstance(ap, dict) and ("$ref" in ap and "StacAsset" in ap["$ref"]), (
+        f"StacItem.assets.additionalProperties does not reference StacAsset: {ap}"
     )
 
 
@@ -174,13 +165,10 @@ def test_stac_spatial_extent_bbox_is_nested_array() -> None:
     """``StacSpatialExtent.bbox`` MUST be ``list[list[float]]`` post-processed."""
     schema = StacSpatialExtent.model_json_schema()
     bbox_prop = schema["properties"]["bbox"]
-    assert bbox_prop.get("type") == "array", (
-        f"bbox is not an array: {bbox_prop}"
-    )
+    assert bbox_prop.get("type") == "array", f"bbox is not an array: {bbox_prop}"
     inner = bbox_prop.get("items")
     assert isinstance(inner, dict) and inner.get("type") == "array", (
-        f"bbox.items is not a nested array (post-processor R-011 did not "
-        f"run?): {inner}"
+        f"bbox.items is not a nested array (post-processor R-011 did not run?): {inner}"
     )
 
 
@@ -191,6 +179,5 @@ def test_stac_temporal_interval_is_nested_array() -> None:
     assert interval_prop.get("type") == "array"
     inner = interval_prop.get("items")
     assert isinstance(inner, dict) and inner.get("type") == "array", (
-        f"interval.items is not a nested array (post-processor R-011 did "
-        f"not run?): {inner}"
+        f"interval.items is not a nested array (post-processor R-011 did not run?): {inner}"
     )

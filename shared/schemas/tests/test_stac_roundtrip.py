@@ -98,12 +98,10 @@ def test_stac_roundtrip(model_cls: type, fixture: Path) -> None:
     # Every top-level key from the original MUST survive.
     for key, value in raw.items():
         assert key in dumped, (
-            f"{model_cls.__name__} dropped slot {key!r} on round-trip "
-            f"(fixture: {fixture.name})"
+            f"{model_cls.__name__} dropped slot {key!r} on round-trip (fixture: {fixture.name})"
         )
         assert dumped[key] == value, (
-            f"{model_cls.__name__} mutated slot {key!r}: "
-            f"was {value!r}, became {dumped[key]!r}"
+            f"{model_cls.__name__} mutated slot {key!r}: was {value!r}, became {dumped[key]!r}"
         )
 
 
@@ -115,9 +113,7 @@ def test_stac_roundtrip(model_cls: type, fixture: Path) -> None:
 def test_stac_asset_extension_keys_roundtrip() -> None:
     """STAC `<namespace>:<key>` keys on assets survive Py → JSON → Py."""
     raw = json.loads(
-        (
-            FIXTURES_ROOT / "StacAsset" / "valid" / "asset-with-extension-keys.json"
-        ).read_text()
+        (FIXTURES_ROOT / "StacAsset" / "valid" / "asset-with-extension-keys.json").read_text()
     )
     asset = StacAsset.model_validate(raw)
     dumped = asset.model_dump(mode="json", by_alias=True, exclude_none=True)
@@ -129,28 +125,19 @@ def test_stac_asset_extension_keys_roundtrip() -> None:
 def test_stac_item_properties_extension_keys_roundtrip() -> None:
     """`debrief:*` and other extension keys on properties survive Py → JSON → Py."""
     raw = json.loads(
-        (
-            FIXTURES_ROOT
-            / "StacItem"
-            / "valid"
-            / "stac-11-with-debrief-extensions.json"
-        ).read_text()
+        (FIXTURES_ROOT / "StacItem" / "valid" / "stac-11-with-debrief-extensions.json").read_text()
     )
     item = StacItem.model_validate(raw)
     dumped = item.model_dump(mode="json", by_alias=True, exclude_none=True)
     props = dumped["properties"]
     for ext_key in ("debrief:platforms", "debrief:tags", "debrief:feature_tags"):
-        assert ext_key in props, (
-            f"properties round-trip dropped extension key {ext_key!r}"
-        )
+        assert ext_key in props, f"properties round-trip dropped extension key {ext_key!r}"
         assert props[ext_key] == raw["properties"][ext_key]
 
 
 def test_stac_summaries_extension_keys_roundtrip() -> None:
     """Summary extension keys (`debrief:*`) survive Py → JSON → Py."""
-    raw = json.loads(
-        (FIXTURES_ROOT / "StacSummaries" / "valid" / "full.json").read_text()
-    )
+    raw = json.loads((FIXTURES_ROOT / "StacSummaries" / "valid" / "full.json").read_text())
     summaries = StacSummaries.model_validate(raw)
     dumped = summaries.model_dump(mode="json", by_alias=True, exclude_none=True)
     for ext_key in ("debrief:platforms", "debrief:tags", "debrief:feature_tags"):
@@ -212,9 +199,7 @@ def test_stac_catalog_or_collection_python_union_narrows() -> None:
     assert catalog.type == "Catalog"
 
     collection_raw = json.loads(
-        (
-            FIXTURES_ROOT / "StacCollection" / "valid" / "stac-11-with-extent.json"
-        ).read_text()
+        (FIXTURES_ROOT / "StacCollection" / "valid" / "stac-11-with-extent.json").read_text()
     )
     collection = adapter.validate_python(collection_raw)
     assert isinstance(collection, StacCollection)
@@ -228,9 +213,7 @@ def test_stac_catalog_or_collection_python_union_narrows() -> None:
 
 def test_stac_spatial_extent_is_list_of_lists() -> None:
     """StacSpatialExtent.bbox MUST be list[list[float]] post-generation."""
-    extent = StacSpatialExtent.model_validate(
-        {"bbox": [[-180.0, -90.0, 180.0, 90.0]]}
-    )
+    extent = StacSpatialExtent.model_validate({"bbox": [[-180.0, -90.0, 180.0, 90.0]]})
     assert isinstance(extent.bbox, list)
     assert isinstance(extent.bbox[0], list)
     assert extent.bbox[0][0] == -180.0
@@ -238,7 +221,5 @@ def test_stac_spatial_extent_is_list_of_lists() -> None:
 
 def test_stac_temporal_extent_accepts_nulls() -> None:
     """StacTemporalExtent.interval entries may carry null bounds."""
-    extent = StacTemporalExtent.model_validate(
-        {"interval": [["2024-01-01T00:00:00Z", None]]}
-    )
+    extent = StacTemporalExtent.model_validate({"interval": [["2024-01-01T00:00:00Z", None]]})
     assert extent.interval[0][1] is None

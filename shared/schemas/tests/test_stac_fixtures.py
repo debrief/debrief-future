@@ -111,9 +111,7 @@ def test_committed_catalog_loads(kind: str, catalog_path: Path) -> None:
     elif kind == "Catalog":
         StacCatalog.model_validate(data)
     else:
-        pytest.fail(
-            f"Unexpected catalog 'type' value: {kind!r} at {catalog_path}"
-        )
+        pytest.fail(f"Unexpected catalog 'type' value: {kind!r} at {catalog_path}")
 
 
 def test_item_corpus_non_empty() -> None:
