@@ -1,0 +1,6 @@
+{
+  "name": "Debrief",
+  "description": "Debrief maritime tactical analysis platform",
+  "roles": ["producer", "host"],
+  "url": "https://debrief.info"
+}

@@ -1,0 +1,7 @@
+{
+  "debrief:platforms": [
+    {"id": "NELSON", "name": "HMS Nelson", "nationality": "GB"}
+  ],
+  "debrief:tags": ["training", "exercise"],
+  "debrief:feature_tags": ["radar-detection", "track-merge"]
+}

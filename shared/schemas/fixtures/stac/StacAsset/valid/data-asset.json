@@ -1,0 +1,6 @@
+{
+  "href": "./features.geojson",
+  "type": "application/geo+json",
+  "title": "GeoJSON Features",
+  "roles": ["data"]
+}

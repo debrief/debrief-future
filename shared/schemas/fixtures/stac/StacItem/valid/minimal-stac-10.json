@@ -1,0 +1,19 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "minimal-1",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [0.0, 0.0]
+  },
+  "bbox": [0.0, 0.0, 0.0, 0.0],
+  "properties": {
+    "datetime": "2024-01-01T00:00:00Z"
+  },
+  "links": [
+    {"rel": "self", "href": "./item.json"}
+  ],
+  "assets": {
+    "data": {"href": "./data.geojson"}
+  }
+}

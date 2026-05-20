@@ -18,6 +18,8 @@ from debrief_schemas import (
     PolyAnnotation,
     RectangleAnnotation,
     ReferenceLocation,
+    StacCatalog,
+    StacCollection,
     SystemState,
     TextAnnotation,
     TrackFeature,
@@ -43,4 +45,16 @@ DebriefFeature = Union[
 Use this instead of ``dict[str, Any]`` for domain feature data.
 For runtime discrimination, check ``feature.properties.kind`` against
 ``FeatureKindEnum`` or use ``FEATURE_MODEL_MAP`` from ``debrief_schemas.validation``.
+"""
+
+
+StacCatalogOrCollection = Union[StacCatalog, StacCollection]
+"""STAC root-object union — `catalog.json` is either a flat Catalog or
+a STAC 1.1 Collection. Discriminate via the ``type`` field
+(``"Catalog"`` vs ``"Collection"``).
+
+This module is hand-maintained (not auto-generated): LinkML's
+gen-pydantic emits the two concrete classes but does not produce a
+named union. Mirrors the TS-only alias at
+``shared/schemas/src/typescript/aliases/stac-unions.ts``.
 """

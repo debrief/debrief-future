@@ -24,6 +24,7 @@ imports:
   - log-entry
   - system-record
   - stac-extension
+  - stac
   - raw-geojson
   - session-state
   - tool-result

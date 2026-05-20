@@ -1,0 +1,49 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "id": "with-extensions",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [[-10.0, 50.0], [-10.0, 60.0], [0.0, 60.0], [0.0, 50.0], [-10.0, 50.0]]
+    ]
+  },
+  "bbox": [-10.0, 50.0, 0.0, 60.0],
+  "properties": {
+    "title": "Sample plot",
+    "datetime": "2024-06-01T12:00:00Z",
+    "start_datetime": "2024-06-01T10:00:00Z",
+    "end_datetime": "2024-06-01T14:00:00Z",
+    "debrief:platforms": [
+      {"id": "NELSON", "name": "HMS Nelson", "nationality": "GB"}
+    ],
+    "debrief:tags": ["training"],
+    "debrief:feature_tags": ["radar-detection"],
+    "license": "other",
+    "providers": [
+      {"name": "Debrief", "roles": ["producer"]}
+    ]
+  },
+  "links": [
+    {"rel": "root", "href": "../catalog.json", "type": "application/json"},
+    {"rel": "self", "href": "./item.json", "type": "application/geo+json"}
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "roles": ["data"]
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "roles": ["thumbnail"],
+      "file:size": 13719,
+      "proj:shape": [150, 200]
+    }
+  }
+}
