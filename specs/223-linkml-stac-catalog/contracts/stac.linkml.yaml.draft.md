@@ -333,10 +333,15 @@ classes:
       bboxes for disjoint coverage (e.g. one per continent).
     attributes:
       bbox:
-        # See data-model.md note: LinkML's list-of-lists construct
-        # choice resolved at implementation time. Either an inlined
-        # Bbox wrapper class or the linkml list-value-specification —
-        # both pass the fixture-corpus test.
+        # List-of-lists modelling: LinkML has no native construct for
+        # this shape; the wire format is list[list[float]] (4-or-6
+        # element bboxes). The LinkML stays vanilla `multivalued:
+        # true, range: float` (which generators emit as flat
+        # `list[float]` / `number[]`), and `shared/schemas/scripts/
+        # generate.py` adds a per-class fix-up entry that nests the
+        # generated type to `list[list[float]]` / `number[][]`.
+        # See research.md R-011 — same pattern is used today for
+        # GeoJSONLineString, GeoJSONPolygon, and friends.
         range: float
         multivalued: true
         required: true
@@ -347,6 +352,10 @@ classes:
       intervals for non-contiguous coverage.
     attributes:
       interval:
+        # Same pattern as StacSpatialExtent.bbox — vanilla LinkML;
+        # nesting (and the `string | null` widening for STAC's
+        # "open-ended interval" null sentinel) applied via
+        # generate.py post-processing. See research.md R-011.
         range: string
         multivalued: true
         required: true

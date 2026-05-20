@@ -182,6 +182,7 @@ migration plan"; in summary:
 | `apps/vscode/src/services/sceneThumbnailService.ts` | Delete inline `StacItem` + `StacItemAssets` (lines 63–76); import `StacItem`, `StacAsset` from `@debrief/schemas` |
 | `apps/web-shell/src/mocks/stacService.ts` | Delete private `StacItem` (line 23) and `StacCatalog` (line 39); import from `@debrief/schemas`; remove the JSON projection cast at lines 464–474 (A-009 closure) |
 | `services/stac/` (Python) | Pydantic constructions used by `scripts/enrich-legacy-catalog.py` switched to the generated `debrief_schemas.StacItem` / `StacCatalog` / `StacCollection` classes (FR-012) |
+| `shared/schemas/scripts/generate.py` | Add three small per-class post-processing entries for `StacSpatialExtent.bbox` and `StacTemporalExtent.interval` (Pydantic `list[float]` → `list[list[float]]`; TypeScript `number[]` → `number[][]`; JSON Schema flat array → nested array). Same pattern as the existing GeoJSON `_pydantic_coord_fixes` / `_coordinate_type_fixes` / `_GEOJSON_COORDINATE_SCHEMAS` tables — not a new mechanism. See research.md R-011. |
 
 **Structure Decision**: Use the existing `shared/schemas/` package as
 the single home for the new LinkML source. Co-locate the new STAC

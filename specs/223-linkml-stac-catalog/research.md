@@ -420,6 +420,129 @@ convention.
 
 ---
 
+## R-011 — How to model list-of-lists slots (`StacSpatialExtent.bbox`, `StacTemporalExtent.interval`)
+
+**Context**: The STAC wire format requires nested arrays at two
+points in this schema:
+
+- `StacSpatialExtent.bbox`: `list[list[float]]` — one or more
+  4-or-6-element bounding boxes (`[[w, s, e, n], ...]`).
+- `StacTemporalExtent.interval`: `list[list[str | null]]` — one or
+  more `[start_datetime, end_datetime]` pairs.
+
+LinkML's data model does not natively express list-of-lists. The
+question is how the schema, the generators, and the resulting
+TypeScript / Pydantic types reconcile that gap.
+
+**Investigation** (this is the R-011 spike):
+
+The project's existing `shared/schemas/src/linkml/geojson.yaml`
+already solves this exact problem for GeoJSON coordinates. All seven
+geometry classes (`GeoJSONPoint`, `GeoJSONLineString`,
+`GeoJSONPolygon`, `GeoJSONMultiPoint`, `GeoJSONMultiLineString`,
+`GeoJSONMultiPolygon`, `GeoJSONEmptyPoint`) use *identical* LinkML —
+`range: float, multivalued: true` — yet the generated Python and
+TypeScript code carries different nesting depths per class:
+
+| Class | LinkML | Generated TypeScript | Generated Pydantic |
+|---|---|---|---|
+| `GeoJSONPoint` | flat `multivalued` | `number[]` | `list[float]` |
+| `GeoJSONLineString` | flat `multivalued` | `number[][]` | `list[list[float]]` |
+| `GeoJSONPolygon` | flat `multivalued` | `number[][][]` | `list[list[list[float]]]` |
+| `GeoJSONMultiPolygon` | flat `multivalued` | `number[][][][]` | `list[list[list[list[float]]]]` |
+
+The mechanism: `shared/schemas/scripts/generate.py` post-processes
+the generator output. It carries a small per-class fix-up table
+(`_pydantic_coord_fixes`, `_coordinate_type_fixes`,
+`_GEOJSON_COORDINATE_SCHEMAS`) that replaces the flat type with the
+correctly nested form by string substitution within the matched
+class/interface block.
+
+This is *not* a workaround — it is the project's established pattern
+for this gap (the existing patches are well-documented and stable;
+the same script also patches `geometry: string` → `GeoJSONPoint |
+GeoJSONMultiPoint`-style unions for `gen-typescript`'s missing
+`any_of` support, and template-literal narrowing for enum fields per
+Feature 201 / 205).
+
+**Decision**: Author the LinkML for `StacSpatialExtent.bbox` and
+`StacTemporalExtent.interval` as vanilla flat `multivalued` slots
+(no `Bbox` wrapper class, no `inlined_as_list` gymnastics).
+Add three new entries to `shared/schemas/scripts/generate.py`
+following the GeoJSON precedent:
+
+```python
+# In _pydantic_coord_fixes (or a new _stac_nested_fixes dict)
+"StacSpatialExtent":  ("bbox: list[float]",     "bbox: list[list[float]]"),
+"StacTemporalExtent": ("interval: list[str]",   "interval: list[list[str | None]]"),
+
+# In _coordinate_type_fixes (TypeScript side)
+"StacSpatialExtent":  ("bbox: number[]",        "bbox: number[][]"),
+"StacTemporalExtent": ("interval: string[]",    "interval: (string | null)[][]"),
+
+# In _GEOJSON_COORDINATE_SCHEMAS (JSON Schema side — rename or extend)
+"StacSpatialExtent.bbox":  {"type": "array", "items": {"type": "array",
+                            "items": {"type": "number"}, "minItems": 4, "maxItems": 6}},
+"StacTemporalExtent.interval": {"type": "array", "items": {"type": "array",
+                                "items": {"anyOf": [{"type": "string", "format": "date-time"},
+                                                    {"type": "null"}]},
+                                "minItems": 2, "maxItems": 2}},
+```
+
+**LinkML schema authoring stays vanilla**:
+
+```yaml
+StacSpatialExtent:
+  attributes:
+    bbox:
+      range: float
+      multivalued: true
+      required: true
+StacTemporalExtent:
+  attributes:
+    interval:
+      range: string  # ISO 8601 or null
+      multivalued: true
+      required: true
+```
+
+**Rationale**:
+
+1. **Established precedent**. The post-processing pattern is canon
+   in this repository — five GeoJSON classes use it, two Feature-201
+   enum narrowings use it, two Feature-205 enum narrowings use it.
+   STAC's bbox/interval are the exact same shape problem with the
+   exact same solution.
+2. **Author-time ergonomics**. A `Bbox` wrapper class would force
+   callers to write `extent.spatial.bbox[0].values[0]` instead of
+   `extent.spatial.bbox[0][0]`. The wire format is the simple
+   nested array; the type system should match it.
+3. **No spec lock-in**. If LinkML adds native list-of-lists support
+   in a future version, the post-processing patches become a no-op
+   (the generator will emit the correct shape, the string-replace
+   will find nothing to replace) — graceful future cleanup.
+4. **Scope**. The patch is ~10 lines of dict entries — same order
+   of magnitude as the GeoJSON section. No new generator, no
+   plugin, no fork.
+
+**Article XV implication**: `shared/schemas/scripts/generate.py`
+modification is *not* a new Article XV.2 exception — it is a
+continuation of the existing documented post-processing pattern.
+The patches are mechanical, the inputs (class name + old/new
+type signature) are explicit and inspectable, and the round-trip
+tests (FR-006, FR-011) catch any drift between the patches and
+the real fixtures.
+
+**Plan-edit consequence**: `plan.md` "Risk + open questions" should
+note that `scripts/generate.py` will gain three small per-class
+fix-up entries (Pydantic, TypeScript, JSON Schema). `quickstart.md`
+Step 1 should mention this in the "regenerate schemas" sub-step.
+The contract draft footnote at
+`contracts/stac.linkml.yaml.draft.md` for `StacSpatialExtent.bbox`
+should be replaced with a pointer to this R-011 entry.
+
+---
+
 ## Open follow-ups (not blocking this plan)
 
 - **#214 follow-up — camelCase `StacItemSummary` adapter**: The
