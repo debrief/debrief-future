@@ -13,6 +13,7 @@
 
 import type { FC } from 'react';
 import { useBriefingStore } from '../store';
+import { usePlaybackDriver } from '../playback/PlaybackProvider';
 
 export interface TransportBarProps {
   onPlay?: () => void;
@@ -27,7 +28,7 @@ export const TransportBar: FC<TransportBarProps> = ({ onPlay, onPause, onPrev, o
   const currentSceneIndex = useBriefingStore((s) => s.currentSceneIndex);
   const sceneCount = useBriefingStore((s) => s.scenes.length);
   const setPlayState = useBriefingStore((s) => s.setPlayState);
-  const setCurrentSceneIndex = useBriefingStore((s) => s.setCurrentSceneIndex);
+  const driver = usePlaybackDriver();
 
   const atEnd = sceneCount > 0 && currentSceneIndex >= sceneCount - 1;
   const atStart = currentSceneIndex <= 0;
@@ -39,25 +40,27 @@ export const TransportBar: FC<TransportBarProps> = ({ onPlay, onPause, onPrev, o
       onPause?.();
     } else {
       setPlayState('playing');
+      // "Playing" inside a briefing == auto-advance through Scenes.
+      void driver.forward();
       onPlay?.();
     }
   };
 
   const handlePrev = () => {
     if (atStart) return;
-    setCurrentSceneIndex(currentSceneIndex - 1);
+    void driver.backward();
     onPrev?.();
   };
 
   const handleNext = () => {
     if (atEnd) return;
-    setCurrentSceneIndex(currentSceneIndex + 1);
+    void driver.forward();
     onNext?.();
   };
 
   const handleReplay = () => {
-    setCurrentSceneIndex(0);
     setPlayState('idle');
+    void driver.replay();
     onReplay?.();
   };
 

@@ -348,6 +348,11 @@
         "command": "debrief.storyboard.editScene",
         "title": "Storyboard: Open Scene for Editing",
         "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.exportAsBriefingZip",
+        "title": "Storyboard: Export Storyboard as briefing zip…",
+        "category": "Debrief"
       }
     ],
     "keybindings": [
@@ -785,8 +790,9 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "build": "pnpm --filter @debrief/components build && npm run compile",
+    "build": "pnpm --filter @debrief/components build && npm run compile && npm run sync-briefing-renderer",
     "compile": "npm run compile:extension && npm run compile:webview",
+    "sync-briefing-renderer": "pnpm --filter @debrief/briefing-renderer build && cpy 'apps/briefing-renderer/dist/**' apps/vscode/resources/briefing-renderer-static --cwd ../..",
     "compile:extension": "node esbuild.config.js",
     "compile:webview": "esbuild src/webview/web/mapView.tsx --bundle --outfile=dist/webview/mapView.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/logPanel.tsx --bundle --outfile=dist/webview/logPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/resultsPanel.tsx --bundle --outfile=dist/webview/resultsPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/storyboardPanel.tsx --bundle --outfile=dist/webview/storyboardPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && cpy src/webview/web/styles.css dist/webview/",
     "watch": "npm run watch:extension & npm run watch:webview",

@@ -15,6 +15,6 @@
     "baseUrl": "."
   },
   "include": ["src"],
-  "exclude": ["src/**/__tests__/**", "**/*.test.ts", "**/*.test.tsx", "dist", "node_modules"],
+  "exclude": ["src/**/__tests__/**", "**/*.test.ts", "**/*.test.tsx", "**/*.stories.tsx", "dist", "node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

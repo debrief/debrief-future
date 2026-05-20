@@ -27,5 +27,15 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     assetsInlineLimit: 0,
+    // Don't emit a `crossorigin` attribute on <script>/<link> tags. The
+    // SPA loads from a file:// origin where the attribute triggers a
+    // CORS check that Chrome / Edge fail (the spec defines CORS only
+    // for http(s), so the attribute makes file://-origin loading worse,
+    // not better).
+    rollupOptions: {
+      output: {
+        format: 'es',
+      },
+    },
   },
 });

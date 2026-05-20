@@ -33,6 +33,12 @@ const launchOptions = useSparticuz
         '--metrics-recording-only',
         '--mute-audio',
         '--no-first-run',
+        // The briefing renderer is loaded from `file://`. Chromium
+        // normally blocks XHR / module-script loads from `file://`-origin
+        // pages; this flag lifts that for the test run. The bundled
+        // index.html has no crossorigin checks anyway because every
+        // asset is local.
+        '--allow-file-access-from-files',
       ],
     }
   : undefined;
@@ -54,12 +60,6 @@ export default defineConfig({
     video: 'retain-on-failure',
     viewport: { width: 1280, height: 720 },
     launchOptions,
-  },
-  webServer: {
-    command: 'pnpm preview --port 5174',
-    url: 'http://localhost:5174',
-    reuseExistingServer: !process.env.CI,
-    timeout: 60000,
   },
   timeout: 30000,
 });

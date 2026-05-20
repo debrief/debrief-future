@@ -19,6 +19,7 @@ import { runBrowserProbes, UNSUPPORTED_BROWSER_BANNER } from './probes/browserPr
 import { BriefingMap } from './components/BriefingMap';
 import { MinimalChrome } from './components/MinimalChrome';
 import { PresentChrome } from './components/PresentChrome';
+import { PlaybackProvider } from './playback/PlaybackProvider';
 import type { InlineData, SceneFeature, StoryboardFeature } from './types';
 
 export interface AppProps {
@@ -120,7 +121,7 @@ export const App: FC<AppProps> = ({ inlineData, disableDevFixture = false }) => 
   }
 
   return (
-    <>
+    <PlaybackProvider>
       {!probes.userAgentSupported && (
         <div data-testid="briefing-browser-banner" style={browserBannerStyle}>
           {UNSUPPORTED_BROWSER_BANNER}
@@ -128,7 +129,7 @@ export const App: FC<AppProps> = ({ inlineData, disableDevFixture = false }) => 
       )}
       <BriefingMap />
       {displayMode === 'minimal' ? <MinimalChrome /> : <PresentChrome />}
-    </>
+    </PlaybackProvider>
   );
 };
 

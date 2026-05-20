@@ -19,6 +19,7 @@ import { type FC, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import type { Map as LeafletMap } from 'leaflet';
 import { useBriefingStore } from '../store';
+import { useBrowserMapAdapter, usePlaybackDriver } from '../playback/PlaybackProvider';
 
 export interface BriefingMapProps {
   onMapReady?: (map: LeafletMap) => void;
@@ -29,6 +30,8 @@ export const BriefingMap: FC<BriefingMapProps> = ({ onMapReady }) => {
   const scenes = useBriefingStore((s) => s.scenes);
   const currentSceneIndex = useBriefingStore((s) => s.currentSceneIndex);
   const mapRef = useRef<LeafletMap | null>(null);
+  const mapAdapter = useBrowserMapAdapter();
+  const driver = usePlaybackDriver();
 
   const currentScene = scenes[currentSceneIndex] ?? scenes[0] ?? null;
   const initialCenter: [number, number] = currentScene?.properties.viewport
@@ -40,20 +43,25 @@ export const BriefingMap: FC<BriefingMapProps> = ({ onMapReady }) => {
     : [50, -4];
   const initialZoom = currentScene?.properties.viewport?.zoom ?? 6;
 
-  // Fly to the current Scene's viewport whenever the index changes.
+  // Once the map mounts, run the driver to land on Scene 0 (or whichever
+  // index the store says is current). After this the driver owns
+  // per-Scene transitions; the store-watching effect below only
+  // re-syncs when the user clicks a Scene rectangle (no SceneRectangleLayer
+  // in the briefing) or when the index changes externally.
   useEffect(() => {
-    if (!mapRef.current || !currentScene) return;
-    const v = currentScene.properties.viewport;
-    if (!v) return;
-    const center: [number, number] = [v.center?.[1] as number, v.center?.[0] as number];
-    const duration =
-      (currentScene.properties as { transition_duration_ms?: number }).transition_duration_ms ?? 1000;
-    mapRef.current.flyTo(center, v.zoom, { duration: Math.max(0.25, duration / 1000) });
-  }, [currentSceneIndex, currentScene]);
+    if (!mapRef.current) return;
+    void driver.syncToCurrentScene();
+    // We deliberately depend only on the index here — Scene content is
+    // immutable for the lifetime of the SPA.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSceneIndex]);
 
   const handleMapReady = (map: LeafletMap) => {
     mapRef.current = map;
+    mapAdapter.setMap(map);
     onMapReady?.(map);
+    // Kick the initial Scene 0 render now that the map is alive.
+    void driver.syncToCurrentScene();
   };
 
   return (

@@ -1438,3 +1438,106 @@ tween completed naturally or was cancelled.
 `specs/263-time-range-scenes/evidence/round-trip-evidence.md` and the
 `TimeRangeTween` test suite at
 `shared/components/src/storyboardPlayback/__tests__/timeRangeTween.test.ts`.
+
+---
+
+## ADR-NEW (2026-05-20): Air-gapped briefing ships as a standalone file://-loadable SPA (Spec #264)
+
+**Context.** The Storyboarding feature line (#215–#218, #258, #263)
+produces in-application Storyboards. Recipients downstream of an analyst
+— customers, training audiences, after-action reviewers — often lack
+Debrief installs and may be working on disconnected networks. They need
+to *watch* a Storyboard, not author one. The question for #264 was the
+artefact format.
+
+**Decision.** Ship the briefing as a self-contained zip whose root
+`index.html` boots a bundled React + Leaflet SPA from a `file://`
+origin in current Chrome or Edge on desktop. The zip carries the SPA,
+a scoped `features.geojson` (one Storyboard's Scenes + the features
+they reference), an `item.json` subset, pre-fetched basemap tiles, and
+Scene thumbnails. All paths inside the zip are relative; no runtime
+network requests are issued.
+
+**Alternatives considered.**
+
+1. **Printable PDF.** Captures the Scene grid at export time. Rejected:
+   loses every motion-bearing dimension (per-Scene viewport tweens, the
+   simultaneous viewport + time-slider scrub from #263), and any
+   time-driven layer movement. The whole *briefing* value is the
+   playback, not the still frames.
+
+2. **MP4 / GIF screen recording.** Captures playback as video. Rejected
+   here for #264 — there's no scrub, no Scene-by-Scene step, no Present
+   ↔ Minimal toggle, and the recipient can't pause on a moment of
+   interest to talk through it. (Video export is tracked as #265 — a
+   research spike — not a substitute.)
+
+3. **Hosted briefing on a server (with auth).** Easy delivery via URL
+   share. Rejected: violates Article I (offline by default) and
+   Article III.4 (data stays local), and assumes the recipient has
+   network access at briefing time — the most common reason to need a
+   briefing artefact is precisely that they *don't*.
+
+**Consequences.**
+
+- ✅ Recipients can play the briefing on a memory-stick handoff, on an
+  air-gapped machine, with no install. SC-001 verifies this end-to-end.
+- ✅ The SPA reuses the host-agnostic playback primitive from #263
+  (`runTimeRangeTween`) verbatim — the briefing's lock-step scrub
+  matches the authoring environment frame-for-frame (SC-003).
+- ✅ The zip is a deliverable artefact, not application state — the
+  CSV-export precedent from #178 applies; Article IV.4 (writer
+  abstraction) does not cover one-shot artefact exports.
+- ❌ The SPA is restricted to current Chrome and Edge on desktop. The
+  `file://` origin doesn't permit the same fetch-from-relative-path
+  behaviour in Firefox / Safari / mobile browsers. A boot-time browser
+  probe surfaces a banner for unsupported browsers (no silent failure —
+  Article I.3).
+- ❌ Zip size grows with tile coverage. Typical 5–20 MB; outliers cap
+  around 50 MB given the integer-zoom-only policy (research.md R2).
+  PMTiles is the natural follow-up if size becomes a transport problem
+  (tracked as #272).
+- ❌ The bundled SPA pins React + Leaflet + Zustand versions at zip
+  creation time. Recipients receive a forever-snapshot of the renderer;
+  bug fixes require a re-export. Acceptable because the renderer is
+  the deliverable, not application state.
+
+**Why "file:// in current Chrome / Edge" specifically.** Decision 3C
+during `/speckit.review` narrowed an earlier four-browser matrix
+(Chrome, Edge, Firefox, Safari) to two. The narrowing trades platform
+breadth for a single, testable loading contract — every supported
+browser uses the same inline-`<script type="application/json">` boot
+path. Firefox's stricter `file://`-origin sibling-loading rules and
+Safari's preference for served HTML would have required two additional
+loader paths and three Playwright matrices. Out of scope for v1; an
+unsupported-browser banner directs those users to the supported set.
+
+**Why a SPA-local playback driver instead of hoisting `StoryboardPlaybackService`.**
+The plan's T-HOIST step (relocate the 983-line `StoryboardPlaybackService`
+from `apps/vscode/` to `shared/components/`) would clean up an
+inheritance the briefing renderer should share with the authoring
+environment. But the existing service is tightly coupled to
+`vscode.Event` and `vscode.workspace.fs` — the hoist is a careful
+refactor in its own right and was at high risk of breaking the
+authoring extension if rushed.
+
+For #264 we wrote a SPA-local driver
+(`apps/briefing-renderer/src/playback/playbackDriver.ts`) that:
+
+- Composes the host-agnostic `runTimeRangeTween` primitive from #263
+  directly (the bit the briefing actually needs).
+- Wires four small browser port adapters
+  (`BrowserMapAdapter`, `LocalSessionStoreAdapter`,
+  `BrowserPanelViewAdapter`, `BrowserTimeRangeViewAdapter`).
+- Surfaces a "playback halted" state on any adapter throw or tween
+  rejection (Article I.3 — no silent failures).
+
+This driver is ~150 lines, deliberately narrower than the authoring
+service (no CRUD, no missing-data flow, no panel snapshots). When
+T-HOIST lands as a follow-up, the briefing renderer can swap in the
+shared service and delete the local driver.
+
+**Provenance.** Spec `specs/264-briefing-zip-renderer/`. Plan + contract:
+`specs/264-briefing-zip-renderer/plan.md`,
+`specs/264-briefing-zip-renderer/contracts/{export-command,spa-loading,tile-coverage}.md`.
+Evidence: `specs/264-briefing-zip-renderer/evidence/`.
