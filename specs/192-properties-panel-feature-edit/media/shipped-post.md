@@ -2,8 +2,16 @@
 title: "Building the Properties Panel — feature & sub-feature editing"
 date: 2026-05-20
 feature: 192-properties-panel-feature-edit
-pr: "TBD"
+pr: "https://github.com/debrief/debrief-future/pull/641"
 ---
+
+| | Before #192 | After #192 |
+|---|---|---|
+| Editable surface | Catalog metadata and plot-level fields only | Catalog, plot-level, per-feature, and per-vertex across every geometry in the plot |
+| Selection emitters | Single-select only on the map; the Layers panel and modifier keys did nothing | Single-select plus Ctrl/Cmd multi-select on both the map and the Layers panel |
+| Read-only plots | Edits accepted in the form, then the save silently failed | A pre-flight banner across every panel mode, plus a post-write notice if the filesystem rejects the write anyway |
+| Override revert | Re-type the auto-derived value by hand and hope it matched | One-click revert next to any overridden field, with the auto-derived value shown alongside |
+| Annotation vertices | No metadata anywhere — polygon, line, and point vertices were geometry-only | `label`, `tags`, and `note` on any vertex via the same editor used for track points |
 
 ## What We're Building
 
