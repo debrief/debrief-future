@@ -251,7 +251,7 @@ geometry kinds in one session round-trip lossless).
 - [x] T068 [test] Vitest for `SubFeatureEditorMode` on each annotation geometry (Polygon `rings/R/vertices/V`, LineString `vertices/V`, MultiPoint `vertices/V`, Point `vertex/0`) — same field set, header reads geometry-appropriate identifier `shared/components/src/PropertiesPanel/__tests__/SubFeatureEditorMode.test.tsx`
 - [x] T069 Extend `SubFeatureEditorMode` to handle all four annotation path shapes (header formatter selects the geometry-appropriate label format; form body is unchanged) — same component, no per-geometry forks beyond the label `shared/components/src/PropertiesPanel/modes/SubFeatureEditorMode.tsx`
 - [x] T070 Extend the map vertex-click handlers so Polygon / LineString / MultiPoint / Point layers emit the structured path string into `selection.primary` via the existing `applyClickToSelection` helper from Phase 5 (pixel-distance hit-testing on the click `containerPoint` against each vertex of the rendered geometry; the click handler appends the structured sub-path to `featureId` before calling `onSelect`) `shared/components/src/MapView/MapView.tsx`
-- [ ] T071 [P] ~~deferred to Phase 10~~ Storybook story: `PropertiesForm — Sub-feature mode (polygon vertex)` is captured later in the screenshots phase (T085) to avoid conflict with the cross-phase story file. `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx`
+- [x] T071 [P] ~~deferred to Phase 10~~ Storybook story: `PropertiesForm — Sub-feature mode (polygon vertex)` is captured later in the screenshots phase (T085) to avoid conflict with the cross-phase story file. `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx`
 - [x] T072 [P][test] Playwright web-shell: click a polygon ring vertex, fill, save, reload, re-click, assert restored; inspect saved JSON for `vertex_metadata` entry with `path: "rings/0/vertices/N"` `apps/web-shell/playwright/tests/properties-annotation-vertex.spec.ts`
 - [x] T073 [P][test] Same workflow against a LineString feature (one entry per test for clarity; `vertices/N` path) `apps/web-shell/playwright/tests/properties-annotation-vertex.spec.ts` (extend file from T072)
 - [x] T074 [P][test] Same workflow against a MultiPoint and against a single Point (`vertex/0`) `apps/web-shell/playwright/tests/properties-annotation-vertex.spec.ts` (extend file from T072)
@@ -267,33 +267,33 @@ geometry kinds in one session round-trip lossless).
 
 ### Documentation + cross-feature hygiene
 
-- [ ] T076 Verify no regressions to #447 plot-editor mode by re-running its existing acceptance tests (FR-012 / SC-008) — capture in evidence `task verify`
+- [x] T076 Verify no regressions to #447 plot-editor mode by re-running its existing acceptance tests (FR-012 / SC-008) — capture in evidence `task verify`
 - [ ] T077 [P] Update `BACKLOG.md` row 192 to status `complete` (struck-through) on PR merge — note added to the PR template; not executed here `BACKLOG.md`
-- [ ] T078 [P] Update `CLAUDE.md` if any new Active Technologies actually shipped (no new runtime deps were planned, but re-run the script in case generated `@debrief/schemas` exports changed) `.specify/scripts/bash/update-agent-context.sh claude`
-- [ ] T079 [P] Document the new `vertex_metadata` slot in any consumer-facing docs that reference `BaseFeatureProperties` — at minimum, add a short note in `docs/architecture/` if a property-list doc exists there `docs/architecture/` (verify presence; create only if a stub exists)
+- [x] T078 [P] Update `CLAUDE.md` if any new Active Technologies actually shipped (no new runtime deps were planned, but re-run the script in case generated `@debrief/schemas` exports changed) `.specify/scripts/bash/update-agent-context.sh claude`
+- [x] T079 [P] Document the new `vertex_metadata` slot in any consumer-facing docs that reference `BaseFeatureProperties` — at minimum, add a short note in `docs/architecture/` if a property-list doc exists there `docs/architecture/` (verify presence; create only if a stub exists)
 
 ### Evidence Collection
 
-- [ ] T080 Capture test results using template `.specify/templates/evidence/test-summary-template.md` in `specs/192-properties-panel-feature-edit/evidence/test-summary.md` (YAML front matter: `feature: 192-properties-panel-feature-edit`, `captured_at`, `git_sha`, totals across Vitest + pytest + Playwright + coverage %)
-- [ ] T081 [P] Create usage demonstration walking through all seven user stories `specs/192-properties-panel-feature-edit/evidence/usage-example.md`
-- [ ] T082 [P] Capture schema round-trip evidence (Python ↔ JSON ↔ TS ↔ JSON ↔ Python for `VertexMetadata` across all 8 inheriting classes) using the schema-test runner output `specs/192-properties-panel-feature-edit/evidence/round-trip-evidence.md`
-- [ ] T083 [P] Capture web-shell E2E summary (which of the seven workflows passed, run times, screenshots produced) `specs/192-properties-panel-feature-edit/evidence/webview-e2e-summary.md`
+- [x] T080 Capture test results using template `.specify/templates/evidence/test-summary-template.md` in `specs/192-properties-panel-feature-edit/evidence/test-summary.md` (YAML front matter: `feature: 192-properties-panel-feature-edit`, `captured_at`, `git_sha`, totals across Vitest + pytest + Playwright + coverage %)
+- [x] T081 [P] Create usage demonstration walking through all seven user stories `specs/192-properties-panel-feature-edit/evidence/usage-example.md`
+- [x] T082 [P] Capture schema round-trip evidence (Python ↔ JSON ↔ TS ↔ JSON ↔ Python for `VertexMetadata` across all 8 inheriting classes) using the schema-test runner output `specs/192-properties-panel-feature-edit/evidence/round-trip-evidence.md`
+- [x] T083 [P] Capture web-shell E2E summary (which of the seven workflows passed, run times, screenshots produced) `specs/192-properties-panel-feature-edit/evidence/webview-e2e-summary.md`
 
 ### Storybook screenshots (UI component evidence)
 
-- [ ] T084 [P] Capture Storybook screenshots — feature mode × 3 themes `specs/192-properties-panel-feature-edit/evidence/screenshots/properties-feature-{light,dark,vscode}.png`
-- [ ] T085 [P] Capture Storybook screenshots — sub-feature track-point + polygon-vertex (vscode theme each) `specs/192-properties-panel-feature-edit/evidence/screenshots/properties-subfeature-{track,polygon}-vscode.png`
-- [ ] T086 [P] Capture Storybook screenshots — multi-select summary + read-only state (vscode theme each) `specs/192-properties-panel-feature-edit/evidence/screenshots/properties-{multiselect,readonly}-vscode.png`
+- [x] T084 [P] Capture Storybook screenshots — feature mode × 3 themes `specs/192-properties-panel-feature-edit/evidence/screenshots/properties-feature-{light,dark,vscode}.png`
+- [x] T085 [P] Capture Storybook screenshots — sub-feature track-point + polygon-vertex (vscode theme each) `specs/192-properties-panel-feature-edit/evidence/screenshots/properties-subfeature-{track,polygon}-vscode.png`
+- [x] T086 [P] Capture Storybook screenshots — multi-select summary + read-only state (vscode theme each) `specs/192-properties-panel-feature-edit/evidence/screenshots/properties-{multiselect,readonly}-vscode.png`
 
 ### Web-Shell workflow GIFs / hero screenshots
 
-- [ ] T087 [P] Capture mode-swap interaction GIF (< 5 s, < 2 MB) via Playwright `recordVideo` cycling no → feature → vertex → multi → none `specs/192-properties-panel-feature-edit/evidence/screenshots/workflow-mode-swap.gif`
-- [ ] T088 [P] Capture revert interaction GIF (< 5 s, < 2 MB) showing one click → auto-derived value appears → save → slot absent from JSON `specs/192-properties-panel-feature-edit/evidence/screenshots/workflow-revert.gif`
-- [ ] T089 [P] Capture read-only hero screenshot (banner + disabled inputs across modes) `specs/192-properties-panel-feature-edit/evidence/screenshots/workflow-readonly.png`
+- [x] T087 [P] Capture mode-swap interaction GIF (< 5 s, < 2 MB) via Playwright `recordVideo` cycling no → feature → vertex → multi → none `specs/192-properties-panel-feature-edit/evidence/screenshots/workflow-mode-swap.gif`
+- [x] T088 [P] Capture revert interaction GIF (< 5 s, < 2 MB) showing one click → auto-derived value appears → save → slot absent from JSON `specs/192-properties-panel-feature-edit/evidence/screenshots/workflow-revert.gif`
+- [x] T089 [P] Capture read-only hero screenshot (banner + disabled inputs across modes) `specs/192-properties-panel-feature-edit/evidence/screenshots/workflow-readonly.png`
 
 ### Media Content
 
-- [ ] T090 Create feature blog post (title prefixed `Building `; first three body sections copied verbatim from `evidence/opening-context.md`; remaining sections — Screenshots, By the Numbers, Lessons Learned, What's Next — written from evidence) `specs/192-properties-panel-feature-edit/media/shipped-post.md`
+- [x] T090 Create feature blog post (title prefixed `Building `; first three body sections copied verbatim from `evidence/opening-context.md`; remaining sections — Screenshots, By the Numbers, Lessons Learned, What's Next — written from evidence) `specs/192-properties-panel-feature-edit/media/shipped-post.md`
 
 ### PR Creation
 
