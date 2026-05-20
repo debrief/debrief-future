@@ -234,6 +234,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     modalPromptPort,
     visibilityPort,
     formatDtg,
+    // T-HOIST (spec #264) — the three vscode-backed defaults are now
+    // wired here at the instantiation site rather than baked into the
+    // (now shared) service module.
+    showErrorMessage: (msg) => void vscode.window.showErrorMessage(msg),
+    setContext: (key, value) =>
+      void vscode.commands.executeCommand('setContext', key, value),
+    showInformationMessage: (msg) => void vscode.window.showInformationMessage(msg),
   });
   context.subscriptions.push({ dispose: (): void => storyboardPlaybackService.dispose() });
 

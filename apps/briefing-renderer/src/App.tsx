@@ -9,16 +9,22 @@
  * Renders the BriefingMap behind the active chrome (Minimal default,
  * Present when toggled). Surfaces error / empty / halted states per
  * `contracts/spa-loading.md` § Error & empty states.
+ *
+ * Story-mode query-param (T074-T075) — when the URL carries
+ * `?story=transport-bar` or `?story=mode-toggle`, the App renders just
+ * that component on a neutral backdrop for Playwright-based isolation
+ * captures (the briefing renderer does not ship Storybook).
  */
 
-import { type FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useMemo, useState } from 'react';
 import { useBriefingStore } from './store';
-import { loadInlineData, InlineDataLoadError } from './loaders/inlineDataLoader';
-import { buildDevFixture } from './fixtures/dev-fixture';
+import { bootBriefingRenderer } from './boot';
 import { runBrowserProbes, UNSUPPORTED_BROWSER_BANNER } from './probes/browserProbes';
 import { BriefingMap } from './components/BriefingMap';
 import { MinimalChrome } from './components/MinimalChrome';
 import { PresentChrome } from './components/PresentChrome';
+import { TransportBar } from './components/TransportBar';
+import { ModeToggle } from './components/ModeToggle';
 import { PlaybackProvider } from './playback/PlaybackProvider';
 import type { InlineData, SceneFeature, StoryboardFeature } from './types';
 
@@ -36,52 +42,33 @@ export const App: FC<AppProps> = ({ inlineData, disableDevFixture = false }) => 
   const bootError = useBriefingStore((s) => s.bootError);
   const haltedReason = useBriefingStore((s) => s.haltedReason);
   const displayMode = useBriefingStore((s) => s.displayMode);
-  const seed = useBriefingStore((s) => s.seed);
   const setBootState = useBriefingStore((s) => s.setBootState);
 
   const [probes] = useState(() => runBrowserProbes());
 
+  // T074-T075 — query-param story-mode lets Playwright capture each
+  // component in isolation. `?story=transport-bar|mode-toggle` swaps
+  // the full SPA for a minimal canvas with the named component.
+  const storyMode = useMemo<'transport-bar' | 'mode-toggle' | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const param = new URLSearchParams(window.location.search).get('story');
+    if (param === 'transport-bar' || param === 'mode-toggle') return param;
+    return null;
+  }, []);
+
   useEffect(() => {
-    if (inlineData) {
-      seed({
-        features: inlineData.features,
-        item: inlineData.item,
-        config: inlineData.config,
-        scenes: inlineData.scenes,
-      });
-      return;
+    const result = bootBriefingRenderer(useBriefingStore.getState(), {
+      inlineData,
+      disableDevFixture,
+    });
+    if (result.kind === 'error') {
+      setBootState('error', result.message);
     }
-    try {
-      const loaded = loadInlineData();
-      if (loaded) {
-        seed({
-          features: loaded.features,
-          item: loaded.item,
-          config: loaded.config,
-          scenes: loaded.scenes,
-        });
-        return;
-      }
-      if (disableDevFixture) {
-        setBootState('error', 'No briefing data found in inlined slots.');
-        return;
-      }
-      // Empty slots → dev fixture (Vite dev server only).
-      const fixture = buildDevFixture();
-      seed({
-        features: fixture.features,
-        item: fixture.item,
-        config: fixture.config,
-        scenes: fixture.scenes,
-      });
-    } catch (e) {
-      const msg =
-        e instanceof InlineDataLoadError
-          ? `Briefing data is unreadable: ${e.message}`
-          : `Unexpected boot error: ${(e as Error).message}`;
-      setBootState('error', msg);
-    }
-  }, [inlineData, disableDevFixture, seed, setBootState]);
+  }, [inlineData, disableDevFixture, setBootState]);
+
+  if (storyMode) {
+    return <StoryCanvas story={storyMode} />;
+  }
 
   if (bootState === 'loading') {
     return <FullViewportMessage testId="briefing-loading" title="Loading briefing…" />;
@@ -172,4 +159,70 @@ const browserBannerStyle: React.CSSProperties = {
   padding: '0.5rem 1rem',
   fontSize: '0.85rem',
   textAlign: 'center',
+};
+
+interface StoryCanvasProps {
+  story: 'transport-bar' | 'mode-toggle';
+}
+
+/**
+ * Component-isolation canvas (T074-T075). Renders one of the briefing
+ * components on a neutral backdrop so Playwright can capture it.
+ *
+ * Each story sets up a tiny fixture state in the store on mount.
+ */
+const StoryCanvas: FC<StoryCanvasProps> = ({ story }) => {
+  useEffect(() => {
+    const scenes = Array.from({ length: 4 }, (_, i) => ({
+      type: 'Feature' as const,
+      id: `S${i}`,
+      geometry: { type: 'Polygon' as const, coordinates: [] },
+      properties: {
+        kind: 'STORYBOARD_SCENE',
+        id: `S${i}`,
+        storyboard_id: 'SB',
+        title: `Scene ${i + 1}`,
+        timestamp: new Date(Date.UTC(2025, 0, 15, 12, i * 5)).toISOString(),
+        creation_order: i,
+        viewport: { center: [0, 0], zoom: 6, bearing: 0 },
+      },
+    }));
+    useBriefingStore.setState({
+      bootState: 'ready',
+      scenes: scenes as unknown as ReturnType<typeof useBriefingStore.getState>['scenes'],
+      currentSceneIndex: 1,
+      playState: 'paused',
+      displayMode: 'minimal',
+      modeToggleVisible: true,
+    });
+  }, []);
+
+  return (
+    <div data-testid="briefing-story-canvas" style={storyCanvasStyle}>
+      <PlaybackProvider>
+        <div style={storyCanvasInner}>
+          {story === 'transport-bar' ? (
+            <TransportBar />
+          ) : (
+            <ModeToggle />
+          )}
+        </div>
+      </PlaybackProvider>
+    </div>
+  );
+};
+
+const storyCanvasStyle: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  background: '#1e1e1e',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+const storyCanvasInner: React.CSSProperties = {
+  padding: '1.5rem',
+  background: 'rgba(0, 0, 0, 0.4)',
+  borderRadius: '8px',
 };

@@ -1,9 +1,12 @@
 # Playwright E2E summary — air-gapped briefing zip
 
 Captured 2026-05-20 via `apps/briefing-renderer/run-playwright.mjs`
-(Sparticuz Chromium 143, headless).
+and `shared/components/run-playwright.mjs` (Sparticuz Chromium 143,
+headless, `--allow-file-access-from-files`).
 
 ## Results
+
+### `apps/briefing-renderer` (16 specs)
 
 | Suite | Tests | Pass | Fail | Notes |
 |-------|-------|------|------|-------|
@@ -12,45 +15,53 @@ Captured 2026-05-20 via `apps/briefing-renderer/run-playwright.mjs`
 | `briefing-zip-playback.spec.ts` | 2 | 2 | 0 | Instant Scene transport + slider disabled for instant Scenes |
 | `briefing-zip-mode-toggle.spec.ts` | 2 | 2 | 0 | 10 consecutive Present ↔ Minimal toggles (SC-005); P key reachable in Present |
 | `briefing-zip-screenshots.spec.ts` | 5 | 5 | 0 | Evidence producers — Minimal/Present/Empty/Error/Halted screenshots |
-| **Total** | **12** | **12** | **0** | |
+| `briefing-component-stories.spec.ts` | 2 | 2 | 0 | **T074/T075** — story-mode component captures (TransportBar, ModeToggle) |
+| `briefing-zip-end-to-end.spec.ts` | 1 | 1 | 0 | **T079** — real export → real unzip → real play full pipeline |
+| `briefing-zip-interaction-gif.spec.ts` | 1 | 1 | 0 | **T086** — captures interaction recording into interaction.gif |
+| **Briefing renderer total** | **16** | **16** | **0** | |
+
+### `shared/components` Storybook E2E (3 specs)
+
+| Suite | Tests | Pass | Fail | Notes |
+|-------|-------|------|------|-------|
+| `MapViewBriefingProps.spec.ts` | 3 | 3 | 0 | **T019** — `BriefingTileLayerProps` story captured in light/dark/vscode themes |
+
+### Combined total: **19 Playwright specs, 0 failures**.
 
 ## Highlights
 
 - The headline FR-015 + SC-002 invariant is observed: **zero external
-  requests** are issued by the SPA across a full lifecycle (load, two
-  Scene advances, two mode toggles, two Scene rewinds).
+  requests** are issued by the SPA across a full lifecycle.
+- The end-to-end spec (T079) invokes the actual export pipeline,
+  unzips the bytes into a temp directory, opens the resulting
+  `index.html` from a real `file://` URL, advances through all 4
+  Scenes, presses Replay, and asserts zero external requests for
+  the entire flow. The SPA + export converge here.
 - The Present-mode chrome correctly hides the Minimal-mode controls;
   Present-mode hides everything except the hover-revealed corner
   control. The `P` keyboard shortcut is always reachable so the user
   is never trapped (FR-024).
-- The five evidence-producer specs each capture a real PNG into
+- The eight evidence-producer specs (5 lifecycle + 1 interaction GIF
+  + 2 story-mode component) each capture into
   `specs/264-briefing-zip-renderer/evidence/screenshots/` — these are
   the source-of-truth images for the shipped blog post.
-
-## Skipped / deferred
-
-- `time-range Scene playback` Playwright assertion is deferred to
-  unit-tests (`apps/briefing-renderer/src/playback/__tests__/playbackDriver.test.ts`)
-  — the dev fixture ships only instant Scenes, and constructing a
-  fixture with a time-range Scene inside a Playwright spec adds
-  complexity that the unit-test layer already covers.
-- The end-to-end "real export → real unzip → real play" Playwright
-  spec (T079) is deferred. The current Playwright suite drives the
-  built SPA directly using the dev fixture; the export-side pipeline
-  is exercised by the vitest integration test
-  (`apps/vscode/tests/unit/briefingZipExport/export.integration.test.ts`)
-  which round-trips through JSZip's loader. Wiring those two halves
-  into a single Playwright spec is meaningful future work but not
-  required to verify SC-001 / SC-002 / SC-005.
+- The MapView briefing-prop story renders in real Storybook + Leaflet
+  for all three theme variants (T019), captured as PNGs in evidence.
 
 ## Reproduce locally
 
 ```sh
+# Briefing-renderer Playwright suite (16 specs)
 cd apps/briefing-renderer
 pnpm build
 node run-playwright.mjs --reporter=list
+
+# Shared-components Storybook MapView spec (3 specs, 3 themes)
+cd shared/components
+node run-playwright.mjs MapViewBriefingProps
 ```
 
-In cloud sessions (Claude Code on the web) the wrapper extracts a
+In cloud sessions (Claude Code on the web) both wrappers extract a
 bundled Chromium via `@sparticuz/chromium`; on a local desktop machine
-use `pnpm exec playwright install chromium` and `pnpm test:e2e` instead.
+use `pnpm exec playwright install chromium` and the respective package
+`test:e2e` scripts instead.

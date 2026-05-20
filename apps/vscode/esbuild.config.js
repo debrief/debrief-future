@@ -26,6 +26,8 @@ const extensionConfig = {
     // Briefing-zip export (#264) — same pattern: avoid the Leaflet pull
     // by importing the storyboard helpers directly from source.
     '@debrief/components/storyboard': path.resolve(__dirname, '../../shared/components/src/storyboard/index.ts'),
+    // T-HOIST (spec #264) — the relocated StoryboardPlaybackService.
+    '@debrief/components/storyboardPlayback': path.resolve(__dirname, '../../shared/components/src/storyboardPlayback/index.ts'),
   },
 };
 

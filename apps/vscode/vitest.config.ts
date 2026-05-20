@@ -30,6 +30,8 @@ export default defineConfig({
       '@debrief/components/PropertiesPanel/autoDerivedFields': path.resolve(__dirname, '../../shared/components/src/PropertiesPanel/autoDerivedFields.ts'),
       // Briefing-zip export (#264) — keep tests off the Leaflet-dependent barrel.
       '@debrief/components/storyboard': path.resolve(__dirname, '../../shared/components/src/storyboard/index.ts'),
+      // T-HOIST (spec #264) — the relocated StoryboardPlaybackService.
+      '@debrief/components/storyboardPlayback': path.resolve(__dirname, '../../shared/components/src/storyboardPlayback/index.ts'),
       '@debrief/components': path.resolve(__dirname, '../../shared/components/src/index.ts'),
       '@debrief/schemas': path.resolve(__dirname, '../../shared/schemas/src/generated/typescript/index.ts'),
     },

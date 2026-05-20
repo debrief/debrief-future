@@ -145,19 +145,19 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 
 ### T-HOIST — Hoist `StoryboardPlaybackService` from the VS Code app into `@debrief/components`
 
-- [ ] T010 Move the service file (no logic changes) `shared/components/src/storyboardPlayback/service.ts`
-- [ ] T011 Extract the four port interfaces (`PlaybackMapPanel`, `PlaybackSessionManager`, `PlaybackPanelView`, `PlaybackTimeRangeView`) into their own file `shared/components/src/storyboardPlayback/ports.ts`
-- [ ] T012 Add the barrel export so both consumers import from a stable path `shared/components/src/storyboardPlayback/index.ts`
-- [ ] T013 Update the ~3 VS Code app imports to point at the new location (find via `grep -r "services/storyboardPlayback"`) `apps/vscode/src/services/storyboard*.ts`
-- [ ] T014 Delete the now-obsolete VS Code copy `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T015 [test] Verify existing storyboard playback tests still pass against the hoisted service `apps/vscode/src/services/storyboardPlayback.test.ts`
+- [x] T010 Move the service file (no logic changes) `shared/components/src/storyboardPlayback/service.ts`
+- [x] T011 Extract the four port interfaces (`PlaybackMapPanel`, `PlaybackSessionManager`, `PlaybackPanelView`, `PlaybackTimeRangeView`) into their own file `shared/components/src/storyboardPlayback/ports.ts`
+- [x] T012 Add the barrel export so both consumers import from a stable path `shared/components/src/storyboardPlayback/index.ts`
+- [x] T013 Update the ~3 VS Code app imports to point at the new location (find via `grep -r "services/storyboardPlayback"`) `apps/vscode/src/services/storyboard*.ts`
+- [x] T014 Delete the now-obsolete VS Code copy `apps/vscode/src/services/storyboardPlayback.ts`
+- [x] T015 [test] Verify existing storyboard playback tests still pass against the hoisted service `apps/vscode/src/services/storyboardPlayback.test.ts`
 
 ### T-MAPVIEW-EXT — Extend `MapView` with four optional `file://`-friendly tile-layer props
 
 - [x] T016 Add `errorTileUrl?: string`, `maxZoom?: number`, `noWrap?: boolean`, `tileLayerCrossOrigin?: 'anonymous' | 'use-credentials' | false` props (defaults match today's behaviour so existing consumers are unaffected) `shared/components/src/MapView/MapView.tsx`
 - [x] T017 [P][test] Add vitest covering the four new props — defaults preserve current behaviour; each prop wired through to the underlying `<TileLayer>` `shared/components/src/MapView/MapView.test.tsx`
-- [ ] T018 [P] Add a Storybook story exercising the `file://`-friendly prop bundle (`errorTileUrl`, `noWrap`, `maxZoom={12}`, `tileLayerCrossOrigin={false}`) so the visual regression layer covers the briefing surface `shared/components/src/MapView/MapView.stories.tsx`
-- [ ] T019 [P][test] Storybook E2E spec capturing the new story in the three theme variants for evidence `shared/components/e2e/MapViewBriefingProps.spec.ts`
+- [x] T018 [P] Add a Storybook story exercising the `file://`-friendly prop bundle (`errorTileUrl`, `noWrap`, `maxZoom={12}`, `tileLayerCrossOrigin={false}`) so the visual regression layer covers the briefing surface `shared/components/src/MapView/MapView.stories.tsx`
+- [x] T019 [P][test] Storybook E2E spec capturing the new story in the three theme variants for evidence `shared/components/e2e/MapViewBriefingProps.spec.ts`
 
 **Phase 2 verification gate**: `pnpm -r typecheck && pnpm -r lint && pnpm --filter '!@debrief/web-shell' test` MUST pass before any Phase 3+ task begins. The hoist is net-zero behaviour; the MapView props are additive. Any regression here surfaces immediately and is cheap to fix; later it would block multiple downstream stories.
 
@@ -249,7 +249,7 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 ### Map + chrome wiring (uses the extended MapView from Phase 2)
 
 - [x] T058 Mount a direct `<MapContainer>` + `<TileLayer>` with the briefing prop bundle (`url="./tiles/{z}/{x}/{y}.png"`, `errorTileUrl="./tiles/placeholder.png"`, `noWrap`, `maxZoom={config.maxBundledZoom}`). **Note**: we use react-leaflet directly rather than `<MapView>` from `@debrief/components` to avoid pulling in MapView's drawing toolbar, scene rectangles, and sensor layers (none of which the briefing needs). The four new MapView props (T-MAPVIEW-EXT, T016) are available for a future migration. `apps/briefing-renderer/src/components/BriefingMap.tsx`
-- [ ] T059 Wire the SPA boot sequence per `contracts/spa-loading.md` § Loading sequence: load → validate → mount → instantiate `StoryboardPlaybackService` with the four browser adapters → render Scene 0 at rest `apps/briefing-renderer/src/boot.ts`
+- [x] T059 Wire the SPA boot sequence per `contracts/spa-loading.md` § Loading sequence: load → validate → mount → instantiate `StoryboardPlaybackService` with the four browser adapters → render Scene 0 at rest `apps/briefing-renderer/src/boot.ts`
 
 ### Playwright E2E for US2
 
@@ -281,13 +281,13 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 ### Vitest coverage for the chrome layer
 
 - [x] T071 [P][test] `TransportBar` vitest — click play/pause/prev/next dispatches the right store actions; replay button only shown at end-of-Storyboard; prev disabled at first Scene; scene counter updates `apps/briefing-renderer/src/components/__tests__/TransportBar.test.tsx`
-- [ ] T072 [P][test] `ModeToggle` vitest — setMode/toggleMode dispatches; `P` keyboard listener works; Present-mode hover-reveal is debounced to 3 s `apps/briefing-renderer/src/components/ModeToggle.test.tsx`
-- [ ] T073 [P][test] `TimeSlider` vitest — slider bounds change when `setScrubbableRange` is invoked; slider rests at `timestamp` for instant Scenes `apps/briefing-renderer/src/components/TimeSlider.test.tsx`
+- [x] T072 [P][test] `ModeToggle` vitest — setMode/toggleMode dispatches; `P` keyboard listener works; Present-mode hover-reveal is debounced to 3 s `apps/briefing-renderer/src/components/ModeToggle.test.tsx`
+- [x] T073 [P][test] `TimeSlider` vitest — slider bounds change when `setScrubbableRange` is invoked; slider rests at `timestamp` for instant Scenes `apps/briefing-renderer/src/components/TimeSlider.test.tsx`
 
 ### Storybook E2E (shared/components runner)
 
-- [ ] T074 [P][test] `TransportBar` Storybook E2E in three theme variants (light, dark, vscode); capture screenshots for evidence `shared/components/e2e/BriefingTransportBar.spec.ts`
-- [ ] T075 [P][test] `ModeToggle` Storybook E2E in three theme variants; capture screenshots; capture an interaction recording (hover + keyboard) for the evidence GIF `shared/components/e2e/BriefingModeToggle.spec.ts`
+- [x] T074 [P][test] `TransportBar` Storybook E2E in three theme variants (light, dark, vscode); capture screenshots for evidence `shared/components/e2e/BriefingTransportBar.spec.ts`
+- [x] T075 [P][test] `ModeToggle` Storybook E2E in three theme variants; capture screenshots; capture an interaction recording (hover + keyboard) for the evidence GIF `shared/components/e2e/BriefingModeToggle.spec.ts`
 
 ### Playwright E2E for US3
 
@@ -320,7 +320,7 @@ End-to-end verification, in-zip recipient docs, ADR for the standalone-SPA decis
 
 ### End-to-end verification (T-PLAYWRIGHT-E2E)
 
-- [ ] T079 [test] Full pipeline test exercising: invoke export command → resulting zip on disk → unzip → open `index.html` from `file://` → verify Scene 0 renders → play → verify zero external requests → verify final Scene reached → replay → verify final state. The SPA + export converge here `apps/briefing-renderer/playwright/tests/briefing-zip-end-to-end.spec.ts`
+- [x] T079 [test] Full pipeline test exercising: invoke export command → resulting zip on disk → unzip → open `index.html` from `file://` → verify Scene 0 renders → play → verify zero external requests → verify final Scene reached → replay → verify final state. The SPA + export converge here `apps/briefing-renderer/playwright/tests/briefing-zip-end-to-end.spec.ts`
 
 ### In-zip recipient docs + ADR (T-DOCS)
 
@@ -333,7 +333,7 @@ End-to-end verification, in-zip recipient docs, ADR for the standalone-SPA decis
 - [x] T083 Create usage demonstration covering both flows — analyst side (invoke command, pick destination) and recipient side (unzip, open in Chrome or Edge, play); include the failure-mode banner screenshot showing the supported-browser message for the Firefox/Safari case `specs/264-briefing-zip-renderer/evidence/usage-example.md`
 - [x] T084 [P] Export a sample briefing zip from the fixture plot for inclusion as evidence; this zip is the deliverable referenced by the PR description and the recipient-side walkthrough `specs/264-briefing-zip-renderer/evidence/sample-briefing.zip`
 - [x] T085 [P] Capture SPA screenshots — Minimal mode (light/dark/vscode), Present mode, Empty state, Error state, "Playback halted" state, DevTools Network panel showing 0 external requests — via the Playwright suite from Phase 4/5 `specs/264-briefing-zip-renderer/evidence/screenshots/`
-- [ ] T086 [P] Capture an interaction GIF (< 5 s, < 2 MB) of the mode toggle + playback flow — via Playwright `recordVideo` config, post-process with ffmpeg to GIF `specs/264-briefing-zip-renderer/evidence/screenshots/interaction.gif`
+- [x] T086 [P] Capture an interaction GIF (< 5 s, < 2 MB) of the mode toggle + playback flow — via Playwright `recordVideo` config, post-process with ffmpeg to GIF `specs/264-briefing-zip-renderer/evidence/screenshots/interaction.gif`
 - [x] T087 [P] Summarise every Playwright suite (file-protocol, network-isolation, playback, mode-toggle, failure-modes, end-to-end) with pass counts + assertion highlights `specs/264-briefing-zip-renderer/evidence/webview-e2e-summary.md`
 
 ### Media content
