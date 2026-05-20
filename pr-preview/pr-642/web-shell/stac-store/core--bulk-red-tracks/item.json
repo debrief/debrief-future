@@ -1,0 +1,2858 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "id": "core--bulk-red-tracks",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.010455555555555556,
+          -0.21599444444444446
+        ],
+        [
+          2.010752777777778,
+          -0.21599444444444446
+        ],
+        [
+          2.010752777777778,
+          2.0039
+        ],
+        [
+          -0.010455555555555556,
+          2.0039
+        ],
+        [
+          -0.010455555555555556,
+          -0.21599444444444446
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.010455555555555556,
+    -0.21599444444444446,
+    2.010752777777778,
+    2.0039
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Bulk Red Tracks",
+    "datetime": "2010-01-12T12:13:14+00:00",
+    "description": "Saxon Warrior: Bulk Red Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 300 platform track(s) recorded including HMS Bretagne, USS Diamond, FS Westminster and 297 other(s). Multi-national participation: DE, FR, GB, US.",
+    "start_datetime": "2010-01-12T12:13:14+00:00",
+    "end_datetime": "2010-01-12T20:13:14+00:00",
+    "debrief:platforms": [
+      {
+        "id": "SSK_058",
+        "name": "HMS Bretagne",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_084",
+        "name": "USS Diamond",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_245",
+        "name": "FS Westminster",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_054",
+        "name": "FGS Cole",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_092",
+        "name": "HMS Ramage",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_273",
+        "name": "USS Bainbridge",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_037",
+        "name": "FS Duncan",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_011",
+        "name": "FGS Evertsen",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_214",
+        "name": "HMS Andrea Doria",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_261",
+        "name": "USS Truxtun",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_168",
+        "name": "FS Bergamini",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_150",
+        "name": "FGS Carney",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_183",
+        "name": "HMS Provence",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_083",
+        "name": "USS Northumberland",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_197",
+        "name": "FS Hamburg",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_133",
+        "name": "FGS Portland",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_239",
+        "name": "HMS Mahan",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_104",
+        "name": "USS Argyll",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_223",
+        "name": "FS Laboon",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_110",
+        "name": "FGS Hessen",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_230",
+        "name": "HMS Sutherland",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_290",
+        "name": "USS De Ruyter",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_198",
+        "name": "FS Somerset",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_209",
+        "name": "FGS Otto Sverdrup",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_135",
+        "name": "HMS Auvergne",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_017",
+        "name": "USS Aquitaine",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_073",
+        "name": "FS Visby",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_184",
+        "name": "FGS Roald Amundsen",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_246",
+        "name": "HMS Richmond",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_156",
+        "name": "USS Helsingborg",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_249",
+        "name": "FS Fridtjof Nansen",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_090",
+        "name": "FGS Iron Duke",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_109",
+        "name": "HMS Mason",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_007",
+        "name": "USS Tromp",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_072",
+        "name": "FS Gonzalez",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_175",
+        "name": "FGS De Zeven Provincien",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_271",
+        "name": "HMS Roosevelt",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_071",
+        "name": "USS Kent",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_030",
+        "name": "FS Sachsen",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_120",
+        "name": "FGS Defender",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_146",
+        "name": "HMS Dragon",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_254",
+        "name": "USS Lancaster",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_158",
+        "name": "FS Dauntless",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_202",
+        "name": "FGS Languedoc",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_153",
+        "name": "HMS Ssk_153",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_005",
+        "name": "USS Ssk_005",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_228",
+        "name": "FS Ssk_228",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_034",
+        "name": "FGS Ssk_034",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_272",
+        "name": "HMS Ssk_272",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_032",
+        "name": "USS Ssk_032",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_076",
+        "name": "FS Ssk_076",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_169",
+        "name": "FGS Ssk_169",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_193",
+        "name": "HMS Ssk_193",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_154",
+        "name": "USS Ssk_154",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_232",
+        "name": "FS Ssk_232",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_244",
+        "name": "FGS Ssk_244",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_281",
+        "name": "HMS Ssk_281",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_294",
+        "name": "USS Ssk_294",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_074",
+        "name": "FS Ssk_074",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_226",
+        "name": "FGS Ssk_226",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_148",
+        "name": "HMS Ssk_148",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_293",
+        "name": "USS Ssk_293",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_131",
+        "name": "FS Ssk_131",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_065",
+        "name": "FGS Ssk_065",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_195",
+        "name": "HMS Ssk_195",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_015",
+        "name": "USS Ssk_015",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_039",
+        "name": "FS Ssk_039",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_049",
+        "name": "FGS Ssk_049",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_070",
+        "name": "HMS Ssk_070",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_266",
+        "name": "USS Ssk_266",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_025",
+        "name": "FS Ssk_025",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_087",
+        "name": "FGS Ssk_087",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_121",
+        "name": "HMS Ssk_121",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_177",
+        "name": "USS Ssk_177",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_217",
+        "name": "FS Ssk_217",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_208",
+        "name": "FGS Ssk_208",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_077",
+        "name": "HMS Ssk_077",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_116",
+        "name": "USS Ssk_116",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_292",
+        "name": "FS Ssk_292",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_078",
+        "name": "FGS Ssk_078",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_166",
+        "name": "HMS Ssk_166",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_050",
+        "name": "USS Ssk_050",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_088",
+        "name": "FS Ssk_088",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_149",
+        "name": "FGS Ssk_149",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_205",
+        "name": "HMS Ssk_205",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_238",
+        "name": "USS Ssk_238",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_029",
+        "name": "FS Ssk_029",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_151",
+        "name": "FGS Ssk_151",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_161",
+        "name": "HMS Ssk_161",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_191",
+        "name": "USS Ssk_191",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_119",
+        "name": "FS Ssk_119",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_268",
+        "name": "FGS Ssk_268",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_286",
+        "name": "HMS Ssk_286",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_008",
+        "name": "USS Ssk_008",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_265",
+        "name": "FS Ssk_265",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_095",
+        "name": "FGS Ssk_095",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_299",
+        "name": "HMS Ssk_299",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_018",
+        "name": "USS Ssk_018",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_215",
+        "name": "FS Ssk_215",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_152",
+        "name": "FGS Ssk_152",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_224",
+        "name": "HMS Ssk_224",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_229",
+        "name": "USS Ssk_229",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_155",
+        "name": "FS Ssk_155",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_258",
+        "name": "FGS Ssk_258",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_106",
+        "name": "HMS Ssk_106",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_213",
+        "name": "USS Ssk_213",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_038",
+        "name": "FS Ssk_038",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_108",
+        "name": "FGS Ssk_108",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_231",
+        "name": "HMS Ssk_231",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_010",
+        "name": "USS Ssk_010",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_019",
+        "name": "FS Ssk_019",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_053",
+        "name": "FGS Ssk_053",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_130",
+        "name": "HMS Ssk_130",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_091",
+        "name": "USS Ssk_091",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_126",
+        "name": "FS Ssk_126",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_233",
+        "name": "FGS Ssk_233",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_125",
+        "name": "HMS Ssk_125",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_157",
+        "name": "USS Ssk_157",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_112",
+        "name": "FS Ssk_112",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_114",
+        "name": "FGS Ssk_114",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_241",
+        "name": "HMS Ssk_241",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_064",
+        "name": "USS Ssk_064",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_257",
+        "name": "FS Ssk_257",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_253",
+        "name": "FGS Ssk_253",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_097",
+        "name": "HMS Ssk_097",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_225",
+        "name": "USS Ssk_225",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_270",
+        "name": "FS Ssk_270",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_042",
+        "name": "FGS Ssk_042",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_220",
+        "name": "HMS Ssk_220",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_031",
+        "name": "USS Ssk_031",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_255",
+        "name": "FS Ssk_255",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_046",
+        "name": "FGS Ssk_046",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_101",
+        "name": "HMS Ssk_101",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_001",
+        "name": "USS Ssk_001",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_185",
+        "name": "FS Ssk_185",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_274",
+        "name": "FGS Ssk_274",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_189",
+        "name": "HMS Ssk_189",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_003",
+        "name": "USS Ssk_003",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_221",
+        "name": "FS Ssk_221",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_041",
+        "name": "FGS Ssk_041",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_280",
+        "name": "HMS Ssk_280",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_115",
+        "name": "USS Ssk_115",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_182",
+        "name": "FS Ssk_182",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_036",
+        "name": "FGS Ssk_036",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_219",
+        "name": "HMS Ssk_219",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_117",
+        "name": "USS Ssk_117",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_122",
+        "name": "FS Ssk_122",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_172",
+        "name": "FGS Ssk_172",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_187",
+        "name": "HMS Ssk_187",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_163",
+        "name": "USS Ssk_163",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_243",
+        "name": "FS Ssk_243",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_118",
+        "name": "FGS Ssk_118",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_048",
+        "name": "HMS Ssk_048",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_028",
+        "name": "USS Ssk_028",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_247",
+        "name": "FS Ssk_247",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_139",
+        "name": "FGS Ssk_139",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_082",
+        "name": "HMS Ssk_082",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_102",
+        "name": "USS Ssk_102",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_061",
+        "name": "FS Ssk_061",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_162",
+        "name": "FGS Ssk_162",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_235",
+        "name": "HMS Ssk_235",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_269",
+        "name": "USS Ssk_269",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_052",
+        "name": "FS Ssk_052",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_186",
+        "name": "FGS Ssk_186",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_147",
+        "name": "HMS Ssk_147",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_227",
+        "name": "USS Ssk_227",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_067",
+        "name": "FS Ssk_067",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_138",
+        "name": "FGS Ssk_138",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_086",
+        "name": "HMS Ssk_086",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_298",
+        "name": "USS Ssk_298",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_096",
+        "name": "FS Ssk_096",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_174",
+        "name": "FGS Ssk_174",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_287",
+        "name": "HMS Ssk_287",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_201",
+        "name": "USS Ssk_201",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_047",
+        "name": "FS Ssk_047",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_194",
+        "name": "FGS Ssk_194",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_004",
+        "name": "HMS Ssk_004",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_145",
+        "name": "USS Ssk_145",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_260",
+        "name": "FS Ssk_260",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_275",
+        "name": "FGS Ssk_275",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_178",
+        "name": "HMS Ssk_178",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_079",
+        "name": "USS Ssk_079",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_295",
+        "name": "FS Ssk_295",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_068",
+        "name": "FGS Ssk_068",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_014",
+        "name": "HMS Ssk_014",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_026",
+        "name": "USS Ssk_026",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_105",
+        "name": "FS Ssk_105",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_203",
+        "name": "FGS Ssk_203",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_283",
+        "name": "HMS Ssk_283",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_134",
+        "name": "USS Ssk_134",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_080",
+        "name": "FS Ssk_080",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_267",
+        "name": "FGS Ssk_267",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_180",
+        "name": "HMS Ssk_180",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_136",
+        "name": "USS Ssk_136",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_196",
+        "name": "FS Ssk_196",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_100",
+        "name": "FGS Ssk_100",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_056",
+        "name": "HMS Ssk_056",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_222",
+        "name": "USS Ssk_222",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_021",
+        "name": "FS Ssk_021",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_199",
+        "name": "FGS Ssk_199",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_006",
+        "name": "HMS Ssk_006",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_200",
+        "name": "USS Ssk_200",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_059",
+        "name": "FS Ssk_059",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_276",
+        "name": "FGS Ssk_276",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_040",
+        "name": "HMS Ssk_040",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_093",
+        "name": "USS Ssk_093",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_296",
+        "name": "FS Ssk_296",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_297",
+        "name": "FGS Ssk_297",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_188",
+        "name": "HMS Ssk_188",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_176",
+        "name": "USS Ssk_176",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_023",
+        "name": "FS Ssk_023",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_289",
+        "name": "FGS Ssk_289",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_263",
+        "name": "HMS Ssk_263",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_252",
+        "name": "USS Ssk_252",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_137",
+        "name": "FS Ssk_137",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_107",
+        "name": "FGS Ssk_107",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_081",
+        "name": "HMS Ssk_081",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_165",
+        "name": "USS Ssk_165",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_167",
+        "name": "FS Ssk_167",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_113",
+        "name": "FGS Ssk_113",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_127",
+        "name": "HMS Ssk_127",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_024",
+        "name": "USS Ssk_024",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_140",
+        "name": "FS Ssk_140",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_256",
+        "name": "FGS Ssk_256",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_277",
+        "name": "HMS Ssk_277",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_282",
+        "name": "USS Ssk_282",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_035",
+        "name": "FS Ssk_035",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_210",
+        "name": "FGS Ssk_210",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_099",
+        "name": "HMS Ssk_099",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_262",
+        "name": "USS Ssk_262",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_002",
+        "name": "FS Ssk_002",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_218",
+        "name": "FGS Ssk_218",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_285",
+        "name": "HMS Ssk_285",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_173",
+        "name": "USS Ssk_173",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_159",
+        "name": "FS Ssk_159",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_094",
+        "name": "FGS Ssk_094",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_216",
+        "name": "HMS Ssk_216",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_141",
+        "name": "USS Ssk_141",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_022",
+        "name": "FS Ssk_022",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_044",
+        "name": "FGS Ssk_044",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_051",
+        "name": "HMS Ssk_051",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_033",
+        "name": "USS Ssk_033",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_075",
+        "name": "FS Ssk_075",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_055",
+        "name": "FGS Ssk_055",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_043",
+        "name": "HMS Ssk_043",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_248",
+        "name": "USS Ssk_248",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_300",
+        "name": "FS Ssk_300",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_027",
+        "name": "FGS Ssk_027",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_164",
+        "name": "HMS Ssk_164",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_171",
+        "name": "USS Ssk_171",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_207",
+        "name": "FS Ssk_207",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_259",
+        "name": "FGS Ssk_259",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_085",
+        "name": "HMS Ssk_085",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_144",
+        "name": "USS Ssk_144",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_242",
+        "name": "FS Ssk_242",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_236",
+        "name": "FGS Ssk_236",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_181",
+        "name": "HMS Ssk_181",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_190",
+        "name": "USS Ssk_190",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_279",
+        "name": "FS Ssk_279",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_212",
+        "name": "FGS Ssk_212",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_142",
+        "name": "HMS Ssk_142",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_045",
+        "name": "USS Ssk_045",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_211",
+        "name": "FS Ssk_211",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_129",
+        "name": "FGS Ssk_129",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_132",
+        "name": "HMS Ssk_132",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_009",
+        "name": "USS Ssk_009",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_123",
+        "name": "FS Ssk_123",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_066",
+        "name": "FGS Ssk_066",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_204",
+        "name": "HMS Ssk_204",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_234",
+        "name": "USS Ssk_234",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_098",
+        "name": "FS Ssk_098",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_103",
+        "name": "FGS Ssk_103",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_069",
+        "name": "HMS Ssk_069",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_192",
+        "name": "USS Ssk_192",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_250",
+        "name": "FS Ssk_250",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_111",
+        "name": "FGS Ssk_111",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_012",
+        "name": "HMS Ssk_012",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_264",
+        "name": "USS Ssk_264",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_124",
+        "name": "FS Ssk_124",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_284",
+        "name": "FGS Ssk_284",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_020",
+        "name": "HMS Ssk_020",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_240",
+        "name": "USS Ssk_240",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_016",
+        "name": "FS Ssk_016",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_179",
+        "name": "FGS Ssk_179",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_160",
+        "name": "HMS Ssk_160",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_062",
+        "name": "USS Ssk_062",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_170",
+        "name": "FS Ssk_170",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_288",
+        "name": "FGS Ssk_288",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_128",
+        "name": "HMS Ssk_128",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_206",
+        "name": "USS Ssk_206",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_060",
+        "name": "FS Ssk_060",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_291",
+        "name": "FGS Ssk_291",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_143",
+        "name": "HMS Ssk_143",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_237",
+        "name": "USS Ssk_237",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_063",
+        "name": "FS Ssk_063",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_057",
+        "name": "FGS Ssk_057",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_089",
+        "name": "HMS Ssk_089",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_251",
+        "name": "USS Ssk_251",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SSK_013",
+        "name": "FS Ssk_013",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      },
+      {
+        "id": "SSK_278",
+        "name": "FGS Ssk_278",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "NGFS",
+      "amphibious",
+      "multi-national",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "helicopter-ops",
+      "visual-sighting"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "BULK_RED_TRACKS (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/BULK_RED_TRACKS.rep",
+      "title": "BULK_RED_TRACKS.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-BULK_RED_TRACKS": {
+      "href": "./assets/BULK_RED_TRACKS.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "BULK_RED_TRACKS.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/BULK_RED_TRACKS.rep",
+        "load_timestamp": "2026-04-13T23:12:30.594210Z",
+        "tool_version": "0.1.0"
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:30.594Z",
+      "file:size": 2696281,
+      "file:checksum": "1220812c4c45f226480ae637f14889f0d0fd03a64e17bfe4a942cb1ccce1eec638a2"
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (200x150)",
+      "roles": [
+        "thumbnail"
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 35895,
+      "file:checksum": "12201770cfde3234bb35e860a7df1ac077bbce9aa3a7ae99a2f07ec7bceaf537dc5e"
+    },
+    "overview": {
+      "href": "./overview.png",
+      "type": "image/png",
+      "title": "Plot overview (800x600)",
+      "roles": [
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 195404,
+      "file:checksum": "1220b10a594f72cada04f4d908f99b3a5b10186827501dc2074f388d12f3f3c0000c"
+    }
+  }
+}
