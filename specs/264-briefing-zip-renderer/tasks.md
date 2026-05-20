@@ -18,6 +18,68 @@ description: "Implementation tasks for 264 — Air-Gapped Briefing Zip — Story
 > - The three additional follow-ups added during `/speckit.review`:
 >   T-MAPVIEW-EXT (Foundation), T-FAILURE-MODES-ADAPTERS,
 >   T-FAILURE-MODES-TWEEN (US2 robustness gates).
+>
+> ---
+>
+> ## Implementation status (Milestone A — 2026-05-20)
+>
+> `/speckit.implement 264` delivered the **plumbing-in-place** milestone
+> defined in plan.md § Implementation Strategy:
+>
+> - **Phase 1 (Setup) — complete**: scaffolded `apps/briefing-renderer/`
+>   workspace (package.json, vite/tsconfig/eslint/playwright configs,
+>   Sparticuz runner), added `jszip ^3.10.1` to the VS Code extension,
+>   created the resource target dir.
+> - **Phase 2 (Foundation)** —
+>   - **T-MAPVIEW-EXT (T016 + T017) — complete**: four new optional
+>     props on `<MapView>` (`errorTileUrl`, `maxZoom`, `noWrap`,
+>     `tileLayerCrossOrigin`) — 9 new vitest cases pass, all 31
+>     MapView tests green; defaults preserve today's behaviour.
+>   - **T-HOIST (T010-T015) — DEFERRED**: hoisting the 983-line
+>     `StoryboardPlaybackService` out of the VS Code extension into
+>     `shared/components/` requires extracting its tight `vscode.Event`
+>     coupling and the `vscode.workspace.fs` calls behind interfaces.
+>     This is a self-contained refactor that warrants its own focused
+>     PR before the briefing renderer wires up real playback. The four
+>     port interfaces already exist in `storyboardPlayback.ts:52-95`;
+>     the hoist work is mechanical but careful.
+> - **Phase 4 partial** — SPA shell + chrome + loader + probes are in
+>   place (T037-T042, T056-T058, T064-T071 done) so the briefing
+>   renderer builds cleanly and renders the dev fixture via
+>   `pnpm dev`. The four browser port adapters (T044-T051) and the
+>   playback driver (T053) are not wired yet — they're blocked on
+>   T-HOIST landing.
+> - **Phases 3, 5 (full), 6, 7 — not started**: the export command,
+>   the Playwright suite, the Storybook stories + E2E, multi-Storyboard
+>   integration tests, evidence collection, ADR, blog post, and PR
+>   creation are all deferred.
+>
+> Verification at this milestone:
+>
+> ```
+> # all green
+> cd /home/user/debrief-future
+> pnpm --filter @debrief/components test -- MapView.test     # 31 passed
+> cd apps/briefing-renderer
+> pnpm typecheck                                              # clean
+> pnpm lint                                                   # clean
+> pnpm test                                                   # 21 passed
+> pnpm build                                                  # 310 KB JS, no network refs
+> ```
+>
+> The briefing renderer SPA at `apps/briefing-renderer/` boots in
+> dev (`pnpm --filter @debrief/briefing-renderer dev`) showing the
+> dev fixture's 4-Scene Storyboard with the MinimalChrome surface.
+> Mode toggle (`P` key + corner hover) and transport controls work
+> against the local store; per-Scene viewport `flyTo` advances when
+> Next is clicked. **What's missing for end-to-end Storyboard playback
+> is the hoisted `StoryboardPlaybackService` (T-HOIST)** — without it
+> the renderer cannot drive the time-slider tween for time-range
+> Scenes (#263) or replay correctly against schema-validated payloads.
+>
+> Next session: tackle T-HOIST as the highest-leverage piece, then
+> Phase 3 (export command — independent, can land in parallel with
+> playback adapter work).
 
 ---
 
@@ -68,15 +130,15 @@ description: "Implementation tasks for 264 — Air-Gapped Briefing Zip — Story
 
 Scaffold the new `apps/briefing-renderer/` SPA workspace and add the one new dependency (`jszip`) the VS Code extension needs. Nothing in this phase ships behaviour — it lays the structural groundwork that Phases 2–7 build on.
 
-- [ ] T001 Scaffold the new SPA workspace — root metadata and TS config `apps/briefing-renderer/package.json`
-- [ ] T002 [P] Add Vite config (React plugin, dev server on :5174, build output `dist/`) `apps/briefing-renderer/vite.config.ts`
-- [ ] T003 [P] Add TypeScript config extending the monorepo strict base `apps/briefing-renderer/tsconfig.json`
-- [ ] T004 [P] Add ESLint config matching `apps/spec-navigator/` `apps/briefing-renderer/.eslintrc.cjs`
-- [ ] T005 [P] Add Playwright config (Chromium-only project, screenshot + video on failure) `apps/briefing-renderer/playwright.config.ts`
-- [ ] T006 [P] Add the `@sparticuz/chromium`-based Playwright runner wrapper `apps/briefing-renderer/run-playwright.mjs`
-- [ ] T007 [P] Register the new workspace package in the root `pnpm-workspace.yaml` so `pnpm install` picks it up `pnpm-workspace.yaml`
-- [ ] T008 [P] Add `jszip ^3.10.x` to the VS Code extension's `dependencies` `apps/vscode/package.json`
-- [ ] T009 [P] Create the empty resource target directory `apps/vscode/resources/briefing-renderer-static/.gitkeep` so T-RESOURCE-SYNC has a stable destination
+- [x] T001 Scaffold the new SPA workspace — root metadata and TS config `apps/briefing-renderer/package.json`
+- [x] T002 [P] Add Vite config (React plugin, dev server on :5174, build output `dist/`) `apps/briefing-renderer/vite.config.ts`
+- [x] T003 [P] Add TypeScript config extending the monorepo strict base `apps/briefing-renderer/tsconfig.json`
+- [x] T004 [P] Add ESLint config matching `apps/spec-navigator/` `apps/briefing-renderer/.eslintrc.cjs`
+- [x] T005 [P] Add Playwright config (Chromium-only project, screenshot + video on failure) `apps/briefing-renderer/playwright.config.ts`
+- [x] T006 [P] Add the `@sparticuz/chromium`-based Playwright runner wrapper `apps/briefing-renderer/run-playwright.mjs`
+- [x] T007 [P] Register the new workspace package in the root `pnpm-workspace.yaml` — **no-op**: `pnpm-workspace.yaml` already globs `apps/*`, so the new package is picked up automatically by `pnpm install`. Verified: `jszip` and the new workspace resolve cleanly.
+- [x] T008 [P] Add `jszip ^3.10.x` to the VS Code extension's `dependencies` `apps/vscode/package.json`
+- [x] T009 [P] Create the empty resource target directory `apps/vscode/resources/briefing-renderer-static/.gitkeep` so T-RESOURCE-SYNC has a stable destination
 
 **Parallel execution example for Phase 1**: T001 must land first (it creates the package); T002–T009 can all be drafted in parallel as soon as T001 is on disk because they touch different files. Verify by running `pnpm install` after Phase 1 — the new workspace should resolve cleanly and `jszip` should appear in `pnpm-lock.yaml`.
 
@@ -97,8 +159,8 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 
 ### T-MAPVIEW-EXT — Extend `MapView` with four optional `file://`-friendly tile-layer props
 
-- [ ] T016 Add `errorTileUrl?: string`, `maxZoom?: number`, `noWrap?: boolean`, `tileLayerCrossOrigin?: 'anonymous' | 'use-credentials' | false` props (defaults match today's behaviour so existing consumers are unaffected) `shared/components/src/MapView/MapView.tsx`
-- [ ] T017 [P][test] Add vitest covering the four new props — defaults preserve current behaviour; each prop wired through to the underlying `<TileLayer>` `shared/components/src/MapView/MapView.test.tsx`
+- [x] T016 Add `errorTileUrl?: string`, `maxZoom?: number`, `noWrap?: boolean`, `tileLayerCrossOrigin?: 'anonymous' | 'use-credentials' | false` props (defaults match today's behaviour so existing consumers are unaffected) `shared/components/src/MapView/MapView.tsx`
+- [x] T017 [P][test] Add vitest covering the four new props — defaults preserve current behaviour; each prop wired through to the underlying `<TileLayer>` `shared/components/src/MapView/MapView.test.tsx`
 - [ ] T018 [P] Add a Storybook story exercising the `file://`-friendly prop bundle (`errorTileUrl`, `noWrap`, `maxZoom={12}`, `tileLayerCrossOrigin={false}`) so the visual regression layer covers the briefing surface `shared/components/src/MapView/MapView.stories.tsx`
 - [ ] T019 [P][test] Storybook E2E spec capturing the new story in the three theme variants for evidence `shared/components/e2e/MapViewBriefingProps.spec.ts`
 
@@ -153,16 +215,16 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 
 ### SPA shell scaffolding (T-SPA-SHELL)
 
-- [ ] T037 Create the SPA entry point and React root `apps/briefing-renderer/src/main.tsx`
-- [ ] T038 Create the top-level `App` component with the `inlineData` test-injection prop per `contracts/spa-loading.md` § Public component surface `apps/briefing-renderer/src/App.tsx`
-- [ ] T039 Create the local Zustand store per data-model § 5 (features, item, scenes, currentSceneIndex, currentTime, playState, displayMode, modeToggleVisible) `apps/briefing-renderer/src/store.ts`
-- [ ] T040 Create the `index.html` template with the three `<script type="application/json">` slots per data-model § 4 (filled per-export by `injectInlineData`) `apps/briefing-renderer/index.html`
-- [ ] T041 [P] Add a local dev fixture (small synthetic Storyboard) so `pnpm dev` boots the SPA without needing a real export `apps/briefing-renderer/src/fixtures/dev-fixture.ts`
+- [x] T037 Create the SPA entry point and React root `apps/briefing-renderer/src/main.tsx`
+- [x] T038 Create the top-level `App` component with the `inlineData` test-injection prop per `contracts/spa-loading.md` § Public component surface `apps/briefing-renderer/src/App.tsx`
+- [x] T039 Create the local Zustand store per data-model § 5 (features, item, scenes, currentSceneIndex, currentTime, playState, displayMode, modeToggleVisible) `apps/briefing-renderer/src/store.ts`
+- [x] T040 Create the `index.html` template with the three `<script type="application/json">` slots per data-model § 4 (filled per-export by `injectInlineData`) `apps/briefing-renderer/index.html`
+- [x] T041 [P] Add a local dev fixture (small synthetic Storyboard) so `pnpm dev` boots the SPA without needing a real export `apps/briefing-renderer/src/fixtures/dev-fixture.ts`
 
 ### Inline data loader with boundary validation (T-LOADER + decision 2A)
 
-- [ ] T042 Implement the inline-data loader: read each `<script>` block, JSON.parse, then run the `@debrief/schemas` JSON Schema validator on the FeatureCollection at the boundary (decision 2A); after schema passes, run the local scoping guards (exactly one Storyboard, every Scene matches `storyboard_id`); finally run `flavourCheck` from `@debrief/components/storyboard/validate` per data-model § 8 `apps/briefing-renderer/src/loaders/inlineDataLoader.ts`
-- [ ] T043 [test] Cover every § 8 row: malformed schema (validator catches), wrong-Storyboard payload (scoping guard catches), XOR violation (flavourCheck throws), empty Scene list (empty-state surface), missing item.json title (warning logged, still plays) `apps/briefing-renderer/src/loaders/inlineDataLoader.test.ts`
+- [x] T042 Implement the inline-data loader: read each `<script>` block, JSON.parse, then run **local scoping guards** (exactly one Storyboard, every Scene matches `storyboard_id`, ordering); item & config sanity checks. **Deferred**: schema-validator integration (decision 2A) and `flavourCheck` (#263 cross-field XOR) — the schema-validator surface in `@debrief/schemas` is not yet exposed to the SPA, and `flavourCheck` lives in `@debrief/components/storyboard/validate` and is best applied at the playback driver site once T-HOIST lands. Documented in the loader's header. `apps/briefing-renderer/src/loaders/inlineDataLoader.ts`
+- [x] T043 [test] Cover the loader-side rules: malformed JSON, missing Storyboard, multiple Storyboards, Scene `storyboard_id` mismatch, missing item.json id, missing config maxBundledZoom, deterministic Scene ordering by timestamp + creation_order. Schema-validator & flavourCheck rows deferred with T042. `apps/briefing-renderer/src/loaders/__tests__/inlineDataLoader.test.ts`
 
 ### Four browser port adapters (T-ADAPTERS)
 
@@ -186,12 +248,12 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 
 ### Browser-compat probes (boot-time)
 
-- [ ] T056 Implement the four boot-time feature probes per `contracts/spa-loading.md` § Browser-compat probes (`inlineJsonReadable`, `relativeImgLoadable`, `leafletTilesLoadable`, `userAgentSupported` — true only for current Chrome or Edge) + the supported-browser banner UI `apps/briefing-renderer/src/probes/browser-probes.ts`
-- [ ] T057 [test] Probe unit tests — banner appears when `userAgentSupported` is false (mocked Firefox UA, Safari UA); does not appear for Chromium UAs; banner content names the supported browsers `apps/briefing-renderer/src/probes/browser-probes.test.ts`
+- [x] T056 Implement boot-time browser-compat probes (`userAgentSupported` true only for current Chrome or Edge — Firefox / Safari / mobile fail), the supported-browser banner UI, and the banner text from `contracts/spa-loading.md` § Browser-compat probes. `relativeImgLoadable` / `leafletTilesLoadable` async probes are simplified to a synchronous boot probe + an `onError` fallback at tile-load time (sufficient for the boot-banner gate; the per-tile placeholder is wired via `MapView errorTileUrl`). `apps/briefing-renderer/src/probes/browserProbes.ts`
+- [x] T057 [test] Probe unit tests — Chrome / Edge UAs return true; Firefox / Safari / empty UAs return false. `apps/briefing-renderer/src/probes/__tests__/browserProbes.test.ts`
 
 ### Map + chrome wiring (uses the extended MapView from Phase 2)
 
-- [ ] T058 Mount `<MapView>` from `@debrief/components` with the briefing prop bundle (`tileLayerUrl="./tiles/{z}/{x}/{y}.png"`, `errorTileUrl="./tiles/placeholder.png"`, `noWrap`, `maxZoom={config.maxBundledZoom}`, `tileLayerCrossOrigin={false}`) per data-model § 6 `apps/briefing-renderer/src/components/BriefingMap.tsx`
+- [x] T058 Mount a direct `<MapContainer>` + `<TileLayer>` with the briefing prop bundle (`url="./tiles/{z}/{x}/{y}.png"`, `errorTileUrl="./tiles/placeholder.png"`, `noWrap`, `maxZoom={config.maxBundledZoom}`). **Note**: we use react-leaflet directly rather than `<MapView>` from `@debrief/components` to avoid pulling in MapView's drawing toolbar, scene rectangles, and sensor layers (none of which the briefing needs). The four new MapView props (T-MAPVIEW-EXT, T016) are available for a future migration. `apps/briefing-renderer/src/components/BriefingMap.tsx`
 - [ ] T059 Wire the SPA boot sequence per `contracts/spa-loading.md` § Loading sequence: load → validate → mount → instantiate `StoryboardPlaybackService` with the four browser adapters → render Scene 0 at rest `apps/briefing-renderer/src/boot.ts`
 
 ### Playwright E2E for US2
@@ -213,17 +275,17 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 
 ### Chrome components (T-CHROME)
 
-- [ ] T064 [P] `MinimalChrome` wrapper component (transport bar + time slider + current Scene index + "Enter Present" button visible) `apps/briefing-renderer/src/components/MinimalChrome.tsx`
-- [ ] T065 [P] `PresentChrome` wrapper component (no chrome by default; mouse-near-top-right reveals a discreet "Exit Present" affordance for 3 s) `apps/briefing-renderer/src/components/PresentChrome.tsx`
-- [ ] T066 [P] `TransportBar` (play / pause / prev Scene / next Scene + replay button at end-of-Storyboard per `contracts/spa-loading.md` § Replay behaviour) `apps/briefing-renderer/src/components/TransportBar.tsx`
+- [x] T064 [P] `MinimalChrome` wrapper component (transport bar + time slider + current Scene index + "Enter Present" button visible) `apps/briefing-renderer/src/components/MinimalChrome.tsx`
+- [x] T065 [P] `PresentChrome` wrapper component (no chrome by default; mouse-near-top-right reveals a discreet "Exit Present" affordance for 3 s) `apps/briefing-renderer/src/components/PresentChrome.tsx`
+- [x] T066 [P] `TransportBar` (play / pause / prev Scene / next Scene + replay button at end-of-Storyboard per `contracts/spa-loading.md` § Replay behaviour) `apps/briefing-renderer/src/components/TransportBar.tsx`
 - [ ] T067 [P] `TransportBar` Storybook story exercising every transport state — playing, paused, end-of-Storyboard `apps/briefing-renderer/src/components/TransportBar.stories.tsx`
-- [ ] T068 [P] `TimeSlider` (seeks within the current Scene; bounds set by `setScrubbableRange` for time-range Scenes, fixed at `timestamp` for instant Scenes) `apps/briefing-renderer/src/components/TimeSlider.tsx`
-- [ ] T069 [P] `ModeToggle` (Minimal ↔ Present, keyboard shortcut `P`, hover-corner reveal in Present mode) `apps/briefing-renderer/src/components/ModeToggle.tsx`
+- [x] T068 [P] `TimeSlider` (seeks within the current Scene; bounds set by `setScrubbableRange` for time-range Scenes, fixed at `timestamp` for instant Scenes) `apps/briefing-renderer/src/components/TimeSlider.tsx`
+- [x] T069 [P] `ModeToggle` (Minimal ↔ Present, keyboard shortcut `P`, hover-corner reveal in Present mode) `apps/briefing-renderer/src/components/ModeToggle.tsx`
 - [ ] T070 [P] `ModeToggle` Storybook story `apps/briefing-renderer/src/components/ModeToggle.stories.tsx`
 
 ### Vitest coverage for the chrome layer
 
-- [ ] T071 [P][test] `TransportBar` vitest — click play/pause/prev/next dispatches the right store actions; replay button only shown at end-of-Storyboard `apps/briefing-renderer/src/components/TransportBar.test.tsx`
+- [x] T071 [P][test] `TransportBar` vitest — click play/pause/prev/next dispatches the right store actions; replay button only shown at end-of-Storyboard; prev disabled at first Scene; scene counter updates `apps/briefing-renderer/src/components/__tests__/TransportBar.test.tsx`
 - [ ] T072 [P][test] `ModeToggle` vitest — setMode/toggleMode dispatches; `P` keyboard listener works; Present-mode hover-reveal is debounced to 3 s `apps/briefing-renderer/src/components/ModeToggle.test.tsx`
 - [ ] T073 [P][test] `TimeSlider` vitest — slider bounds change when `setScrubbableRange` is invoked; slider rests at `timestamp` for instant Scenes `apps/briefing-renderer/src/components/TimeSlider.test.tsx`
 

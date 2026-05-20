@@ -833,6 +833,7 @@
     "@debrief/stac-writer": "workspace:*",
     "@debrief/utils": "workspace:*",
     "vscrui": "^0.1.0",
+    "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
     "leaflet-image": "^0.4.0",
     "react": "^18.2.0",
