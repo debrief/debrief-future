@@ -19,8 +19,15 @@ const EVIDENCE_DIR = resolve(
   '../../../specs/192-properties-panel-feature-edit/evidence/screenshots',
 );
 
-const storyUrl = (variant: string, theme: 'light' | 'dark' | 'vscode' = 'vscode') =>
-  `${STORY_BASE}--${variant}&globals=theme:${theme}`;
+// Valid theme values per `shared/components/.storybook/preview.tsx` globalTypes:
+// 'light' | 'dark' | 'high-contrast-light' | 'high-contrast-dark' | 'system'.
+// The spec's `*-vscode.png` filenames are by codebase convention the
+// VS Code-style dark variant — map 'vscode' → 'dark' at the URL boundary.
+type ScreenshotTheme = 'light' | 'dark' | 'vscode';
+const themeToStorybook = (t: ScreenshotTheme): string =>
+  t === 'vscode' ? 'dark' : t;
+const storyUrl = (variant: string, theme: ScreenshotTheme = 'vscode') =>
+  `${STORY_BASE}--${variant}&globals=theme:${themeToStorybook(theme)}`;
 
 test.beforeAll(async () => {
   await mkdir(EVIDENCE_DIR, { recursive: true });

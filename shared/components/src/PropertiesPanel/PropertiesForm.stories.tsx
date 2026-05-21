@@ -20,7 +20,6 @@ import { FeatureEditorMode } from './modes/FeatureEditorMode';
 import { SubFeatureEditorMode } from './modes/SubFeatureEditorMode';
 import { MultiSelectSummaryMode } from './modes/MultiSelectSummaryMode';
 import { ReadOnlyBanner } from './readOnlyBanner';
-import { ThemeProvider } from '../ThemeProvider';
 
 // ─── Mock features ────────────────────────────────────────────────────
 
@@ -116,12 +115,15 @@ const meta: Meta = {
   },
   tags: ['autodocs'],
   decorators: [
+    // NB: no <ThemeProvider> here — the global preview decorator at
+    // `.storybook/preview.tsx` wraps every story with the toolbar's
+    // current variant. Adding a second ThemeProvider here would shadow
+    // it and silently pin every story to the inner default (light),
+    // which is exactly the bug the original capture run had.
     (Story) => (
-      <ThemeProvider>
-        <div style={{ width: 360, padding: 12 }}>
-          <Story />
-        </div>
-      </ThemeProvider>
+      <div style={{ width: 360, padding: 12 }}>
+        <Story />
+      </div>
     ),
   ],
 };
