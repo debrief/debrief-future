@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -307,7 +307,7 @@ class TestNonGeometryClassesOmitVertexMetadata:
     def test_narrative_entry_properties_omits_unset_vertex_metadata(self) -> None:
         props = NarrativeEntryProperties(
             kind="NARRATIVE",
-            time=datetime(1995, 12, 12, 5, 0, 0, tzinfo=timezone.utc),
+            time=datetime(1995, 12, 12, 5, 0, 0, tzinfo=UTC),
             text="COMEX",
             style={  # type: ignore[arg-type]
                 "shape": "circle",
@@ -342,7 +342,7 @@ class TestNonGeometryClassesOmitVertexMetadata:
             storyboard_id="01HZ7777777777777777777777",
             title="121530Z MAR 26",
             viewport={"center": [-1.25, 50.75], "zoom": 11.0, "bearing": 0},  # type: ignore[arg-type]
-            timestamp=datetime(2026, 3, 12, 15, 30, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2026, 3, 12, 15, 30, 0, tzinfo=UTC),
             creation_order=0,
             visible_feature_ids=["track-001"],
             feature_set_hash="0" * 64,
