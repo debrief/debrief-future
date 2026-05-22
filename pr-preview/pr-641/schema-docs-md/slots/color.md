@@ -19,8 +19,8 @@ Alias: color
 | --- | --- | --- |
 | [PointProperties](../classes/PointProperties.md) | Styling schema for Point and MultiPoint geometries |  no  |
 | [LineProperties](../classes/LineProperties.md) | Styling schema for LineString and MultiLineString geometries |  no  |
-| [SensorData](../classes/SensorData.md) | Named sensor with contact measurements |  no  |
 | [PolygonProperties](../classes/PolygonProperties.md) | Styling schema for Polygon and MultiPolygon geometries |  no  |
+| [SensorData](../classes/SensorData.md) | Named sensor with contact measurements |  no  |
 | [SensorContact](../classes/SensorContact.md) | Single sensor measurement record |  no  |
 
 

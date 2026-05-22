@@ -17,8 +17,8 @@ Alias: default
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [ParameterValue](../classes/ParameterValue.md) | A typed parameter value with replay metadata |  no  |
 | [ToolParameterMeta](../classes/ToolParameterMeta.md) | Tunable parameter metadata recorded alongside a tool result for provenance |  no  |
+| [ParameterValue](../classes/ParameterValue.md) | A typed parameter value with replay metadata |  no  |
 
 
 
