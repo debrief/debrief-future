@@ -17,11 +17,11 @@ Alias: time
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [NarrativeEntryProperties](../classes/NarrativeEntryProperties.md) | Properties for a NarrativeEntry annotation |  no  |
-| [TimestampedPosition](../classes/TimestampedPosition.md) | Temporal and kinematic metadata for a single track position |  no  |
-| [SensorContact](../classes/SensorContact.md) | Single sensor measurement record |  no  |
 | [TUASolution](../classes/TUASolution.md) | Single Target Uncertainty Area estimate |  no  |
+| [SensorContact](../classes/SensorContact.md) | Single sensor measurement record |  no  |
+| [NarrativeEntryProperties](../classes/NarrativeEntryProperties.md) | Properties for a NarrativeEntry annotation |  no  |
 | [MeasuredArrayPosition](../classes/MeasuredArrayPosition.md) | Timestamped geographic position of a towed array centre |  no  |
+| [TimestampedPosition](../classes/TimestampedPosition.md) | Temporal and kinematic metadata for a single track position |  no  |
 
 
 
