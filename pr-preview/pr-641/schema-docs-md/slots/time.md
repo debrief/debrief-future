@@ -20,8 +20,8 @@ Alias: time
 | [SensorContact](../classes/SensorContact.md) | Single sensor measurement record |  no  |
 | [NarrativeEntryProperties](../classes/NarrativeEntryProperties.md) | Properties for a NarrativeEntry annotation |  no  |
 | [TUASolution](../classes/TUASolution.md) | Single Target Uncertainty Area estimate |  no  |
-| [TimestampedPosition](../classes/TimestampedPosition.md) | Temporal and kinematic metadata for a single track position |  no  |
 | [MeasuredArrayPosition](../classes/MeasuredArrayPosition.md) | Timestamped geographic position of a towed array centre |  no  |
+| [TimestampedPosition](../classes/TimestampedPosition.md) | Temporal and kinematic metadata for a single track position |  no  |
 
 
 

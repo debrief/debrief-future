@@ -17,8 +17,8 @@ Alias: version
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SessionFile](../classes/SessionFile.md) | Persisted session file format (FR-024) |  no  |
 | [Tool](../classes/Tool.md) | An analysis operation with a name, description, version, and selection requir... |  no  |
+| [SessionFile](../classes/SessionFile.md) | Persisted session file format (FR-024) |  no  |
 
 
 

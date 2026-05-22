@@ -17,8 +17,8 @@ Alias: branched_at
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [BranchOrigin](../classes/BranchOrigin.md) | Reverse link on a branch plot's system record, pointing to the source plot |  no  |
 | [BranchRecord](../classes/BranchRecord.md) | Reference to a branched plot |  no  |
+| [BranchOrigin](../classes/BranchOrigin.md) | Reverse link on a branch plot's system record, pointing to the source plot |  no  |
 
 
 
