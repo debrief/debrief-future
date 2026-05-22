@@ -18,8 +18,8 @@ Alias: show_label
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [PositionStyleOverride](../classes/PositionStyleOverride.md) | Per-position style override |  no  |
-| [PositionStyle](../classes/PositionStyle.md) | Default styling configuration for track positions |  no  |
 | [SensorContact](../classes/SensorContact.md) | Single sensor measurement record |  no  |
+| [PositionStyle](../classes/PositionStyle.md) | Default styling configuration for track positions |  no  |
 
 
 
