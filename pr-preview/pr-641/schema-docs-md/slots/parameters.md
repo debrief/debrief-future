@@ -17,8 +17,8 @@ Alias: parameters
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [WasGeneratedBy](../classes/WasGeneratedBy.md) | Identifies the tool and its parameters for a specific invocation |  no  |
 | [ToolResult](../classes/ToolResult.md) | Logical tool invocation result as seen by the consumer (after the MCP layer h... |  no  |
+| [WasGeneratedBy](../classes/WasGeneratedBy.md) | Identifies the tool and its parameters for a specific invocation |  no  |
 
 
 
