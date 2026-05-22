@@ -126,12 +126,56 @@ interface SceneDef {
   centerLat: number;
   zoom: number;
   visibleIds: string[];
+  /**
+   * If set, the Scene becomes a time-range Scene (#263). The slider
+   * binds to this range during the Scene; the viewport interpolates
+   * from `(centerLon, centerLat, zoom)` → `endViewport` in lock-step
+   * with the slider over `transitionDurationMs` wall-clock.
+   */
+  timeRange?: {
+    startIso: string;
+    endIso: string;
+    endLon: number;
+    endLat: number;
+    endZoom: number;
+    durationMs: number;
+  };
 }
 
 function makeScene(def: SceneDef): SceneFeature {
   const suffix = String(def.index + 1).padStart(11, '0');
   const timestamp = new Date(T0 + def.index * 30 * 60 * 1000).toISOString();
   const padding = 360 / Math.pow(2, def.zoom + 1);
+  const baseProperties = {
+    kind: 'STORYBOARD_SCENE',
+    id: `01HKVZ0DEVSCENE${suffix}`,
+    storyboard_id: STORYBOARD_ID,
+    title: def.title,
+    description: def.description,
+    timestamp,
+    creation_order: def.index,
+    viewport: {
+      center: [def.centerLon, def.centerLat],
+      zoom: def.zoom,
+      bearing: 0,
+    },
+    transition_duration_ms: def.timeRange?.durationMs ?? 1500,
+    visible_feature_ids: def.visibleIds,
+    displayMode: 'full',
+  };
+  const timeRangeProperties = def.timeRange
+    ? {
+        time_range: {
+          start: def.timeRange.startIso,
+          end: def.timeRange.endIso,
+        },
+        viewport_end: {
+          center: [def.timeRange.endLon, def.timeRange.endLat],
+          zoom: def.timeRange.endZoom,
+          bearing: 0,
+        },
+      }
+    : {};
   return {
     type: 'Feature',
     id: `01HKVZ0DEVSCENE${suffix}`,
@@ -147,23 +191,7 @@ function makeScene(def: SceneDef): SceneFeature {
         ],
       ],
     },
-    properties: {
-      kind: 'STORYBOARD_SCENE',
-      id: `01HKVZ0DEVSCENE${suffix}`,
-      storyboard_id: STORYBOARD_ID,
-      title: def.title,
-      description: def.description,
-      timestamp,
-      creation_order: def.index,
-      viewport: {
-        center: [def.centerLon, def.centerLat],
-        zoom: def.zoom,
-        bearing: 0,
-      },
-      transition_duration_ms: 1500,
-      visible_feature_ids: def.visibleIds,
-      displayMode: 'full',
-    },
+    properties: { ...baseProperties, ...timeRangeProperties },
   } as unknown as SceneFeature;
 }
 
@@ -225,13 +253,23 @@ export function buildDevFixture(): LoadedInlineData {
     }),
     makeScene({
       index: 3,
-      title: 'Tracks diverge — situation closed',
+      title: 'Diverge & close — slider-driven scrub (#263)',
       description:
-        'End-of-exercise state — Track-Alpha entering the southern North Sea, Track-Bravo clearing Brittany. Both tracks complete the captured time window.',
-      centerLon: 0,
-      centerLat: 52,
-      zoom: 5,
+        'Time-range Scene (#263). The slider binds to the closing-phase time window; the viewport interpolates Dover Strait → North Sea in lock-step with the slider as both tracks separate. Drag the slider to rewind the climax.',
+      centerLon: 1.5,
+      centerLat: 51.2,
+      zoom: 6,
       visibleIds: [TRACK_ALPHA_ID, TRACK_BRAVO_ID, REF_DOVER_ID, REF_BREST_ID],
+      // Closing 60-minute window (last hour of the 4-hour exercise),
+      // panning Dover Strait → southern North Sea.
+      timeRange: {
+        startIso: new Date(T0 + 180 * 60 * 1000).toISOString(),
+        endIso: new Date(T_END).toISOString(),
+        endLon: 3,
+        endLat: 52.5,
+        endZoom: 6,
+        durationMs: 2500,
+      },
     }),
   ];
 

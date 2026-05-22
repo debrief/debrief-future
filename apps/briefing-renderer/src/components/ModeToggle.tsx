@@ -23,16 +23,12 @@ export const ModeToggle: FC<ModeToggleProps> = () => {
   const toggle = useBriefingStore((s) => s.toggleDisplayMode);
   const setModeToggleVisible = useBriefingStore((s) => s.setModeToggleVisible);
 
-  // Keyboard shortcut — always reachable, even in Present mode.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'p' || e.key === 'P') {
-        toggle();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [toggle]);
+  // Note: the `P` keyboard shortcut listener lives in `App.tsx`, not
+  // here. Hosting it here meant the listener un- and re-registered on
+  // every mode flip (because ModeToggle lives inside the (un)mount-
+  // cycling chrome wrappers) — and a keypress landing in the brief
+  // gap between cleanup and re-add went unhandled. App-level keeps
+  // the listener registered for the entire SPA lifetime.
 
   // In Present mode, hover near the top-right reveals the toggle for 3 s.
   useEffect(() => {

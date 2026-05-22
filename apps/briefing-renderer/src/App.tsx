@@ -26,6 +26,7 @@ import { PresentChrome } from './components/PresentChrome';
 import { TransportBar } from './components/TransportBar';
 import { ModeToggle } from './components/ModeToggle';
 import { PlaybackProvider } from './playback/PlaybackProvider';
+import { useKeyboardModeToggle } from './hooks/useKeyboardModeToggle';
 import type { InlineData, SceneFeature, StoryboardFeature } from './types';
 
 export interface AppProps {
@@ -73,6 +74,10 @@ export const App: FC<AppProps> = ({ inlineData, disableDevFixture = false }) => 
       setBootState('error', result.message);
     }
   });
+
+  // App-level `P` listener — single, lifetime-stable. See the hook for
+  // the full rationale.
+  useKeyboardModeToggle();
 
   if (storyMode) {
     return <StoryCanvas story={storyMode} />;

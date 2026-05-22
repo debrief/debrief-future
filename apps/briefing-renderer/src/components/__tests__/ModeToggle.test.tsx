@@ -11,8 +11,21 @@
 /// <reference lib="dom" />
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
+import type { FC } from 'react';
 import { ModeToggle } from '../ModeToggle';
 import { useBriefingStore } from '../../store';
+import { useKeyboardModeToggle } from '../../hooks/useKeyboardModeToggle';
+
+/**
+ * Renders the ModeToggle alongside the keyboard-shortcut hook. The
+ * App-level hook owns the `P` listener (post the
+ * briefing-zip-mode-toggle.spec.ts soak fix); this harness lets the
+ * unit tests still exercise the keyboard behaviour.
+ */
+const WithKeyboardHook: FC = () => {
+  useKeyboardModeToggle();
+  return <ModeToggle />;
+};
 
 beforeEach(() => {
   useBriefingStore.setState({
@@ -39,19 +52,19 @@ describe('ModeToggle', () => {
   });
 
   it('responds to the `P` keyboard shortcut (lowercase)', () => {
-    render(<ModeToggle />);
+    render(<WithKeyboardHook />);
     fireEvent.keyDown(window, { key: 'p' });
     expect(useBriefingStore.getState().displayMode).toBe('present');
   });
 
   it('responds to the `P` keyboard shortcut (uppercase)', () => {
-    render(<ModeToggle />);
+    render(<WithKeyboardHook />);
     fireEvent.keyDown(window, { key: 'P' });
     expect(useBriefingStore.getState().displayMode).toBe('present');
   });
 
   it('flips both directions via the keyboard', () => {
-    render(<ModeToggle />);
+    render(<WithKeyboardHook />);
     fireEvent.keyDown(window, { key: 'p' });
     expect(useBriefingStore.getState().displayMode).toBe('present');
     fireEvent.keyDown(window, { key: 'p' });

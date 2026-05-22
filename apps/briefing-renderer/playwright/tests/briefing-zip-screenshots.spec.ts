@@ -97,6 +97,23 @@ test.describe('briefing-renderer evidence screenshots', () => {
     await page.screenshot({ path: `${evidenceRoot}/briefing-error.png`, fullPage: false });
   });
 
+  test('Time-range Scene — slider active (#263)', async ({ page }) => {
+    await page.goto(indexUrl);
+    await expect(page.locator('[data-testid="briefing-map"]')).toBeVisible({ timeout: 15_000 });
+    // Advance to Scene 3 (the time-range "Diverge & close" scene).
+    await page.locator('[data-testid="transport-next"]').click();
+    await page.locator('[data-testid="transport-next"]').click();
+    await page.locator('[data-testid="transport-next"]').click();
+    await expect(page.locator('[data-testid="briefing-time-slider-input"]')).toBeEnabled();
+    // Let the tween settle a little to mid-Scene so the slider thumb
+    // sits visibly within the bar (not at either end).
+    await page.waitForTimeout(2400);
+    await page.screenshot({
+      path: `${evidenceRoot}/briefing-time-range-scene.png`,
+      fullPage: false,
+    });
+  });
+
   test('Halted state', async ({ page }) => {
     await page.goto(indexUrl);
     await expect(page.locator('[data-testid="briefing-map"]')).toBeVisible({ timeout: 15_000 });

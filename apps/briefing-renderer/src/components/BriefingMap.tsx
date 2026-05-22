@@ -42,11 +42,42 @@ interface FeatureLike {
 const DEFAULT_TRACK_COLOR = '#1f77b4';
 const DEFAULT_POINT_COLOR = '#2ca02c';
 
+/**
+ * Linear-interpolate a track's position at a given epoch-ms time.
+ * Returns `null` if the time falls outside the track's recorded range
+ * or the track is missing timestamps.
+ */
+function interpolateTrackPosition(
+  track: FeatureLike,
+  currentTimeMs: number,
+): [number, number] | null {
+  const coords = track.geometry?.coordinates as Array<[number, number]> | undefined;
+  const times = (track.properties as { timestamps?: unknown } | null | undefined)?.timestamps;
+  if (!coords || !Array.isArray(times) || coords.length < 2) return null;
+  if (coords.length !== times.length) return null;
+  const epochs = (times as string[]).map((iso) => Date.parse(iso));
+  if (epochs.some((e) => Number.isNaN(e))) return null;
+  if (currentTimeMs < epochs[0]! || currentTimeMs > epochs[epochs.length - 1]!) return null;
+  for (let i = 1; i < epochs.length; i++) {
+    const e0 = epochs[i - 1]!;
+    const e1 = epochs[i]!;
+    if (currentTimeMs <= e1) {
+      const span = e1 - e0;
+      const f = span > 0 ? (currentTimeMs - e0) / span : 0;
+      const c0 = coords[i - 1]!;
+      const c1 = coords[i]!;
+      return [c0[0] + (c1[0] - c0[0]) * f, c0[1] + (c1[1] - c0[1]) * f];
+    }
+  }
+  return null;
+}
+
 export const BriefingMap: FC<BriefingMapProps> = ({ onMapReady }) => {
   const config = useBriefingStore((s) => s.config);
   const features = useBriefingStore((s) => s.features);
   const scenes = useBriefingStore((s) => s.scenes);
   const currentSceneIndex = useBriefingStore((s) => s.currentSceneIndex);
+  const currentTime = useBriefingStore((s) => s.currentTime);
   const mapRef = useRef<LeafletMap | null>(null);
   const mapAdapter = useBrowserMapAdapter();
   const driver = usePlaybackDriver();
@@ -105,6 +136,32 @@ export const BriefingMap: FC<BriefingMapProps> = ({ onMapReady }) => {
       features: lineFeatures as Feature[],
     };
   }, [lineFeatures]);
+
+  // Per-track "current time" markers. For tracks that carry per-position
+  // timestamps, we interpolate the vessel's position at `currentTime`
+  // and render a filled circle there. The slider drives `currentTime`;
+  // so does the playback driver during time-range Scenes — both paths
+  // make the marker visibly move.
+  const timeMarkers = useMemo<
+    Array<{ id: string; lat: number; lon: number; colour: string; name: string }>
+  >(() => {
+    const markers: Array<{ id: string; lat: number; lon: number; colour: string; name: string }> = [];
+    for (const track of lineFeatures) {
+      if (track.geometry?.type !== 'LineString') continue;
+      const pos = interpolateTrackPosition(track, currentTime);
+      if (!pos) continue;
+      const fid = (track.properties?.id ?? track.id) as string | undefined;
+      if (!fid) continue;
+      markers.push({
+        id: fid,
+        lat: pos[1],
+        lon: pos[0],
+        colour: track.properties?.colour ?? DEFAULT_TRACK_COLOR,
+        name: (track.properties?.name as string | undefined) ?? '',
+      });
+    }
+    return markers;
+  }, [lineFeatures, currentTime]);
 
   const styleFeature = (feature?: Feature): PathOptions => {
     const colour =
@@ -177,6 +234,21 @@ export const BriefingMap: FC<BriefingMapProps> = ({ onMapReady }) => {
             </CircleMarker>
           );
         })}
+        {timeMarkers.map((m) => (
+          <CircleMarker
+            key={`time-marker-${m.id}`}
+            center={[m.lat, m.lon]}
+            pathOptions={{
+              color: '#ffffff',
+              weight: 2,
+              fillColor: m.colour,
+              fillOpacity: 1,
+            }}
+            radius={9}
+          >
+            {m.name ? <Popup>{m.name}</Popup> : null}
+          </CircleMarker>
+        ))}
       </MapContainer>
     </div>
   );
