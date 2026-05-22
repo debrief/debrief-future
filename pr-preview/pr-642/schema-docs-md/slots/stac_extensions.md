@@ -17,9 +17,9 @@ Alias: stac_extensions
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [StacCatalog](../classes/StacCatalog.md) | A flat STAC Catalog (no extent, no summaries) |  no  |
-| [StacItem](../classes/StacItem.md) | A STAC 1 |  no  |
 | [StacCollection](../classes/StacCollection.md) | A STAC 1 |  no  |
+| [StacItem](../classes/StacItem.md) | A STAC 1 |  no  |
+| [StacCatalog](../classes/StacCatalog.md) | A flat STAC Catalog (no extent, no summaries) |  no  |
 
 
 

@@ -17,9 +17,9 @@ Alias: speed
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SegmentMetadata](../classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |  no  |
 | [TimestampedPosition](../classes/TimestampedPosition.md) | Temporal and kinematic metadata for a single track position |  no  |
 | [TUASolution](../classes/TUASolution.md) | Single Target Uncertainty Area estimate |  no  |
+| [SegmentMetadata](../classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |  no  |
 
 
 

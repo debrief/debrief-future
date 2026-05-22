@@ -17,8 +17,8 @@ Alias: temporal
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SessionState](../classes/SessionState.md) | Root entity containing all session state slices (FR-001, FR-002) |  no  |
 | [SessionFile](../classes/SessionFile.md) | Persisted session file format (FR-024) |  no  |
+| [SessionState](../classes/SessionState.md) | Root entity containing all session state slices (FR-001, FR-002) |  no  |
 | [StacExtent](../classes/StacExtent.md) | Spatial + temporal extent on a Collection |  no  |
 
 
