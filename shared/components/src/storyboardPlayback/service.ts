@@ -205,7 +205,7 @@ export class StoryboardPlaybackService implements HostDisposable {
         console.info('[StoryboardPlaybackService] info:', msg);
       });
     this.resolveThumbnailHref =
-      options.resolveThumbnailHref ?? ((_sceneId: string): string => '');
+      options.resolveThumbnailHref ?? ((): string => '');
     this.formatDtg =
       options.formatDtg ?? ((iso: string): string => iso);
 
