@@ -12,6 +12,7 @@
 
 import { test, expect } from '@playwright/test';
 import { CatalogPage, AnalysisPage } from '../pages';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
