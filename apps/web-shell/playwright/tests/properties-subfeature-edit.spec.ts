@@ -28,6 +28,7 @@
 
 import { test, expect } from '@playwright/test';
 import { AnalysisPage } from '../pages/AnalysisPage';
+import { clearReadOnly } from '../fixtures/read-only';
 
 /**
  * Find the first TRACK feature in the loaded plot and return its id +
@@ -191,6 +192,12 @@ test.describe('Sub-feature editor — track point (#192 Phase 4 / US-2)', () => 
         'No plot with TRACK features found among the visible catalog rows',
       );
     }
+    // Headless Chromium's `navigator.storage.persisted()` returns false,
+    // which the IDB writer probe surfaces as a read-only plot — all
+    // vertex-form inputs become `disabled` and the test's `fill()` /
+    // click() calls time out at 30 s. Reset the signal explicitly to
+    // keep the suite deterministic in CI.
+    await clearReadOnly(page);
   });
 
   test('selecting a track point opens sub-feature mode with the right header', async ({

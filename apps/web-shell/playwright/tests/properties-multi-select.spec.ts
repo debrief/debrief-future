@@ -20,6 +20,7 @@
 
 import { test, expect } from '@playwright/test';
 import { AnalysisPage } from '../pages/AnalysisPage';
+import { clearReadOnly } from '../fixtures/read-only';
 
 test.describe('Multi-select emitter (#192 Phase 5)', () => {
   test.beforeEach(async ({ page }) => {
@@ -42,6 +43,14 @@ test.describe('Multi-select emitter (#192 Phase 5)', () => {
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({
       timeout: 15_000,
     });
+    // Headless Chromium's `navigator.storage.persisted()` returns false,
+    // which the IDB writer probe surfaces as a read-only plot. The Layers
+    // row click target is unaffected, but inputs elsewhere in the panel
+    // become `disabled`, and any spec that types into them — or any later
+    // spec in the same Playwright run that inherits the same in-memory
+    // store between cases — sees its clicks time out at 30 s. Reset the
+    // signal explicitly per spec to keep the suite deterministic in CI.
+    await clearReadOnly(page);
   });
 
   /**
