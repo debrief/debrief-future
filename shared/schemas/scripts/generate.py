@@ -183,12 +183,12 @@ def generate_pydantic() -> bool:
                 "\n"
                 "    @model_validator(mode='after')\n"
                 "    def _validate_vertex_metadata_unique_paths(self) -> 'BaseFeatureProperties':\n"
-                "        \"\"\"Reject duplicate `path` values within `vertex_metadata`.\n"
+                '        """Reject duplicate `path` values within `vertex_metadata`.\n'
                 "\n"
                 "        Spec #192 contract requires duplicate-path rejection across all\n"
                 "        three schema implementations. Injected post-generation; see\n"
                 "        scripts/generate.py.\n"
-                "        \"\"\"\n"
+                '        """\n'
                 "        vm = self.vertex_metadata\n"
                 "        if not vm:\n"
                 "            return self\n"
@@ -196,8 +196,8 @@ def generate_pydantic() -> bool:
                 "        for entry in vm:\n"
                 "            if entry.path in seen:\n"
                 "                raise ValueError(\n"
-                "                    f\"duplicate vertex_metadata path {entry.path!r} \"\n"
-                "                    f\"— each path must appear at most once per feature\"\n"
+                '                    f"duplicate vertex_metadata path {entry.path!r} "\n'
+                '                    f"— each path must appear at most once per feature"\n'
                 "                )\n"
                 "            seen.add(entry.path)\n"
                 "        return self\n"
