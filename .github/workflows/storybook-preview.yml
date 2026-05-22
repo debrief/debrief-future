@@ -1,15 +1,17 @@
-# Storybook & Web Shell Deployment
+# Storybook & Web Shell & Briefing Renderer Deployment
 #
 # - On PRs: deploys preview to pr-preview/pr-{number}/ (cleaned up on close)
-# - On main: deploys persistent copies to components-storybook/ and web-shell/
+# - On main: deploys persistent copies to components-storybook/, web-shell/, and briefing-renderer/
 #
 # Preview URLs:
-#   Storybook: https://debrief.github.io/debrief-future/pr-preview/pr-{number}/
-#   Web Shell: https://debrief.github.io/debrief-future/pr-preview/pr-{number}/web-shell/
+#   Storybook:         https://debrief.github.io/debrief-future/pr-preview/pr-{number}/
+#   Web Shell:         https://debrief.github.io/debrief-future/pr-preview/pr-{number}/web-shell/
+#   Briefing Renderer: https://debrief.github.io/debrief-future/pr-preview/pr-{number}/briefing-renderer/
 #
 # Persistent URLs:
-#   Storybook: https://debrief.github.io/debrief-future/components-storybook/
-#   Web Shell: https://debrief.github.io/debrief-future/web-shell/
+#   Storybook:         https://debrief.github.io/debrief-future/components-storybook/
+#   Web Shell:         https://debrief.github.io/debrief-future/web-shell/
+#   Briefing Renderer: https://debrief.github.io/debrief-future/briefing-renderer/
 
 name: Storybook Preview
 
@@ -20,6 +22,7 @@ on:
     paths:
       - 'shared/components/**'
       - 'apps/web-shell/**'
+      - 'apps/briefing-renderer/**'
       - 'apps/vscode/**'
       - 'preview/workspace/samples/**'
       - 'services/calc/**'
@@ -29,6 +32,7 @@ on:
     paths:
       - 'shared/components/**'
       - 'apps/web-shell/**'
+      - 'apps/briefing-renderer/**'
       - 'apps/vscode/**'
       - 'preview/workspace/samples/**'
       - 'services/calc/**'
@@ -76,6 +80,11 @@ jobs:
           VITE_BASE_URL: /debrief-future/web-shell/
           STAC_STORE_PATH: ${{ github.workspace }}/preview/workspace/samples/local-store
 
+      - name: Build Briefing Renderer
+        run: pnpm --filter @debrief/briefing-renderer build
+        env:
+          VITE_BASE_URL: /debrief-future/briefing-renderer/
+
       - name: Create root landing page
         run: |
           mkdir -p /tmp/gh-pages-root
@@ -117,6 +126,14 @@ jobs:
           destination_dir: web-shell
           keep_files: true
 
+      - name: Deploy Briefing Renderer to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/briefing-renderer/dist
+          destination_dir: briefing-renderer
+          keep_files: true
+
   # Deploy PR preview
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -154,6 +171,11 @@ jobs:
           VITE_BASE_URL: /debrief-future/pr-preview/pr-${{ github.event.pull_request.number }}/web-shell/
           STAC_STORE_PATH: ${{ github.workspace }}/preview/workspace/samples/local-store
 
+      - name: Build Briefing Renderer
+        run: pnpm --filter @debrief/briefing-renderer build
+        env:
+          VITE_BASE_URL: /debrief-future/pr-preview/pr-${{ github.event.pull_request.number }}/briefing-renderer/
+
       - name: Deploy Storybook to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -170,6 +192,14 @@ jobs:
           destination_dir: pr-preview/pr-${{ github.event.pull_request.number }}/web-shell
           keep_files: true
 
+      - name: Deploy Briefing Renderer to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/briefing-renderer/dist
+          destination_dir: pr-preview/pr-${{ github.event.pull_request.number }}/briefing-renderer
+          keep_files: true
+
       - name: Comment PR with preview link
         uses: actions/github-script@v7
         with:
@@ -178,9 +208,11 @@ jobs:
             const baseUrl = `https://debrief.github.io/debrief-future`;
             const previewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/`;
             const webShellPreviewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/web-shell/`;
+            const briefingRendererPreviewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/briefing-renderer/`;
             const codeServerUrl = `https://debrief-preview-pr-${prNumber}.herokuapp.com`;
             const persistentUrl = `${baseUrl}/components-storybook/`;
             const webShellUrl = `${baseUrl}/web-shell/`;
+            const briefingRendererUrl = `${baseUrl}/briefing-renderer/`;
 
             // Find existing preview comment across all pages
             const marker = '<!-- storybook-preview-comment -->';
@@ -216,15 +248,20 @@ jobs:
               '',
               'Browse all components, stories, and documentation.',
               '',
+              '### Briefing Renderer (Air-gapped Storyboard Player — spec #264)',
+              `🎬 [Open Briefing Renderer](${briefingRendererPreviewUrl})`,
+              '',
+              'Standalone SPA that plays a Storyboard from a `file://`-origin zip. Loaded here on HTTPS as a static demo with the dev-fixture Storyboard (Channel Crossing — Demo Briefing).',
+              '',
               '---',
               '',
               '<details>',
               '<summary>All Links</summary>',
               '',
-              '| Environment | Code Server | Web Shell | Storybook |',
-              '|-------------|-------------|-----------|-----------|',
-              `| This PR | [Open IDE](${codeServerUrl}) | [Open App](${webShellPreviewUrl}) | [Open Storybook](${previewUrl}) |`,
-              `| Main branch | — | [Open App](${webShellUrl}) | [Open Storybook](${persistentUrl}) |`,
+              '| Environment | Code Server | Web Shell | Storybook | Briefing Renderer |',
+              '|-------------|-------------|-----------|-----------|-------------------|',
+              `| This PR | [Open IDE](${codeServerUrl}) | [Open App](${webShellPreviewUrl}) | [Open Storybook](${previewUrl}) | [Open Briefing](${briefingRendererPreviewUrl}) |`,
+              `| Main branch | — | [Open App](${webShellUrl}) | [Open Storybook](${persistentUrl}) | [Open Briefing](${briefingRendererUrl}) |`,
               '',
               '</details>',
               '',

@@ -10,6 +10,12 @@ tags: [storyboarding, briefing, offline, file-protocol, react, leaflet, shipped]
 excerpt: "A Debrief Storyboard now leaves the tool as a single zip. Double-click index.html, the briefing plays — no install, no server, no network."
 ---
 
+> 🎬 **Try it now** — the briefing renderer is live at
+> [debrief.github.io/debrief-future/briefing-renderer/](https://debrief.github.io/debrief-future/briefing-renderer/)
+> with the **Channel Crossing — Demo Briefing** dev fixture pre-loaded.
+> The same bundle, served from HTTPS today, ships inside every exported
+> briefing zip and runs from `file://` with no network.
+
 ## What We're Building
 
 A briefing leaves Debrief as a single `.zip` file. The recipient unzips it on any machine with a modern browser — a classified workstation, a stakeholder's laptop, a training-room PC with the network cable out — double-clicks `index.html`, and the Storyboard plays. Same Scene order, same viewport tweens, same time-slider scrub through every time-range Scene from #263, same per-frame track motion. No install, no extension host, no server, no network call. The zip carries its own basemap tiles, its own Scene thumbnails, its own GeoJSON, its own SPA.

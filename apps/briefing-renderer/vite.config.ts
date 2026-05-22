@@ -7,11 +7,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // The briefing-renderer ships as a static SPA loadable from a file://
-// origin. Use base: './' so all asset paths in the built index.html
-// are relative — required by FR-013 (briefing zip must be portable
-// across any unpack path including paths with spaces / non-ASCII chars).
+// origin. Use base: './' by default so all asset paths in the built
+// index.html are relative — required by FR-013 (briefing zip must be
+// portable across any unpack path including paths with spaces / non-ASCII
+// chars). VITE_BASE_URL overrides this when the same build is deployed
+// as a GitHub Pages preview at a fixed path; see
+// .github/workflows/storybook-preview.yml.
 export default defineConfig({
-  base: './',
+  base: process.env.VITE_BASE_URL || './',
   plugins: [react()],
   resolve: {
     alias: {
