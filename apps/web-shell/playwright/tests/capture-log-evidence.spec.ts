@@ -67,6 +67,7 @@ test.describe('Evidence screenshots: LogPanel states', () => {
     await catalogPage.waitForLoad();
     analysisPage = await catalogPage.openFirstItem();
     await analysisPage.waitForLoad();
+    await collapsePropertiesSection(page);
   });
 
   // ── 1. Empty log ──────────────────────────────────────────────────────────

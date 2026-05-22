@@ -10,6 +10,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 
 /**
  * Helper: select a track feature via the feature list.
@@ -36,6 +37,7 @@ test.describe('Run Dropdown', () => {
     await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
+    await collapsePropertiesSection(page);
   });
 
   test('run dropdown shows analysis tools when track selected', async ({ page }) => {
@@ -84,6 +86,7 @@ test.describe('Visibility Toggle', () => {
     await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
+    await collapsePropertiesSection(page);
   });
 
   test('hiding a track removes it from the map', async ({ page }) => {
@@ -159,6 +162,7 @@ test.describe('Info Dialog', () => {
     await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
+    await collapsePropertiesSection(page);
   });
 
   test('info dialog shows properties and geometry', async ({ page }) => {
@@ -269,6 +273,7 @@ test.describe('Format Property Verification', () => {
     await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
+    await collapsePropertiesSection(page);
   });
 
   test('format line colour updates feature style property', async ({ page }) => {

@@ -101,6 +101,7 @@ test.describe('Event Log Propagation', () => {
     // Open Exercise Alpha
     analysisPage = await catalogPage.openFirstItem();
     await analysisPage.waitForLoad();
+    await collapsePropertiesSection(page);
   });
 
   test('amending first move event re-applies subsequent move events', async ({ page }) => {

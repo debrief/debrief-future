@@ -43,6 +43,7 @@ test.describe('Log Panel Edit Face', () => {
     await catalogPage.waitForLoad();
     analysisPage = await catalogPage.openFirstItem();
     await analysisPage.waitForLoad();
+    await collapsePropertiesSection(page);
   });
 
   test('clicking edit icon shows parameter editors, not skeleton loader', async ({ page }) => {
