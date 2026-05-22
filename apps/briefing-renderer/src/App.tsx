@@ -56,7 +56,15 @@ export const App: FC<AppProps> = ({ inlineData, disableDevFixture = false }) => 
     return null;
   }, []);
 
-  useEffect(() => {
+  // Seed the store SYNCHRONOUSLY on first render via useState's lazy
+  // initializer. If we did this in useEffect, `BriefingMap` would mount
+  // first with empty scenes — picking the default center/zoom — and
+  // Leaflet's subsequent flyTo would zoom out to "fit" the transition,
+  // showing the whole continent before settling. Seeding before any
+  // child mounts means `BriefingMap` reads the right Scene 0 viewport
+  // on first paint.
+  useState<void>(() => {
+    if (typeof window === 'undefined') return;
     const result = bootBriefingRenderer(useBriefingStore.getState(), {
       inlineData,
       disableDevFixture,
@@ -64,7 +72,7 @@ export const App: FC<AppProps> = ({ inlineData, disableDevFixture = false }) => 
     if (result.kind === 'error') {
       setBootState('error', result.message);
     }
-  }, [inlineData, disableDevFixture, setBootState]);
+  });
 
   if (storyMode) {
     return <StoryCanvas story={storyMode} />;

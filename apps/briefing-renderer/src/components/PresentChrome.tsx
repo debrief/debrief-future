@@ -29,6 +29,9 @@ const styles: Record<string, React.CSSProperties> = {
     position: 'absolute',
     inset: 0,
     pointerEvents: 'none',
+    // Sit above Leaflet's panes (z-index 200..700) so the hover-revealed
+    // "Exit Present" toggle is reliably clickable.
+    zIndex: 1000,
   },
   toggleSlot: {
     pointerEvents: 'auto',
