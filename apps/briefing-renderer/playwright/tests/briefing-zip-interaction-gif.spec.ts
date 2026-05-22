@@ -104,16 +104,16 @@ test.afterAll(async () => {
   const gifPath = join(evidenceRoot, 'interaction.gif');
 
   // Convert to a small, looping GIF. Filter chain:
-  //   fps=12         — bring frame rate down to GIF-friendly 12 fps
-  //   scale=720:-1   — width 720 px, height preserves aspect
-  //   palettegen + paletteuse with bayer:bayer_scale=5 — small file
+  //   fps=6           — GIF-friendly 6 fps for the 2 MB budget
+  //   scale=480:-1    — narrower width to bring size down
+  //   max_colors=32   — small palette (map-heavy frames need this)
+  //   bayer:5 dither  — keep diff frames small
   //
   // The two-pass paletted approach keeps the GIF under the 2 MB target
-  // even for ~5 s of recording. The split filter lets us run both
-  // palettegen and paletteuse in one ffmpeg invocation.
+  // for the map-heavy frames the dev fixture renders.
   try {
     execSync(
-      `ffmpeg -y -i "${webm}" -vf "fps=12,scale=720:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=64[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5" -loop 0 "${gifPath}" 2>&1`,
+      `ffmpeg -y -i "${webm}" -vf "fps=6,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=32[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5" -loop 0 "${gifPath}" 2>&1`,
       { stdio: 'pipe' },
     );
     // eslint-disable-next-line no-console
