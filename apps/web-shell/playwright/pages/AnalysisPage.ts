@@ -333,8 +333,15 @@ export class AnalysisPage {
       return;
     }
 
-    // Layers-panel row
+    // Layers-panel row. The FeatureList is virtualised via @tanstack/
+    // react-virtual; after the first selection expands the Properties
+    // form below, the Layers section can shrink and the target row
+    // gets virtualised out of view, so a plain `click()` times out at
+    // 30 s. `scrollIntoViewIfNeeded()` walks up the scroll parents
+    // until the row is in view (Playwright handles virtualised lists
+    // by triggering scroll which the virtualiser observes).
     const row = this.page.getByTestId(`feature-row-${id}`);
+    await row.scrollIntoViewIfNeeded();
     await row.locator('.debrief-feature-row__content').click(clickOpts);
   }
 

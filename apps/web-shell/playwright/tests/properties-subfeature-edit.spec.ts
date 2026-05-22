@@ -330,7 +330,13 @@ test.describe('Sub-feature editor — track point (#192 Phase 4 / US-2)', () => 
     // resolver-driven path the analyst hits in production is the
     // plot-mode fallback, asserted here.
     const dispatch = page.getByTestId('properties-panel-dispatch');
-    await expect(dispatch).toBeVisible({ timeout: 5_000 });
+    // We assert presence (locator resolves to an element) rather than
+    // visibility: in stale/plot mode with no items in `plotFormProps.fields`,
+    // the dispatcher renders a wrapping div whose intrinsic height is 0
+    // and Playwright counts that as "hidden" even though the element is
+    // in the DOM with the correct `data-mode` attribute the assertion
+    // below depends on.
+    await expect(dispatch).toHaveAttribute('data-mode', /plot|stale/, { timeout: 5_000 });
     const mode = await dispatch.getAttribute('data-mode');
     // Either 'plot' (clean fallback) or 'stale' (resolver-rendered
     // pre-prune); the dispatcher renders both via the plot branch.

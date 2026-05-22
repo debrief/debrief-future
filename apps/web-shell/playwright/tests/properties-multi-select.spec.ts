@@ -51,7 +51,41 @@ test.describe('Multi-select emitter (#192 Phase 5)', () => {
     // store between cases — sees its clicks time out at 30 s. Reset the
     // signal explicitly per spec to keep the suite deterministic in CI.
     await clearReadOnly(page);
+    // GoldenLayout sometimes mounts the Log tab in front by default —
+    // when it does, the Activity panel's Layers list never mounts and
+    // `feature-row-<id>` is absent from the DOM, so every Layers-panel
+    // click in this spec times out at 30 s. Force the Activity tab to
+    // the front (mirrors the mode-swap + evidence-captures pattern).
+    const activityTab = page.locator('.lm_tab:has-text("Activity")');
+    if ((await activityTab.count()) > 0) {
+      const isActive = ((await activityTab.getAttribute('class')) ?? '').includes(
+        'lm_active',
+      );
+      if (!isActive) await activityTab.click();
+    }
   });
+
+  /**
+   * Some tests select multiple features in sequence via the Layers
+   * panel. After the first selection, the FeatureEditorMode renders
+   * 7+ field rows in the Properties section; with Properties expanded
+   * the Layers section shrinks and `@tanstack/react-virtual`
+   * virtualises every row out of the DOM, so the second click can't
+   * find its target. The Layers-panel tests call this helper to give
+   * the FeatureList enough vertical room to keep all 3+ rows mounted.
+   * Tests that exercise the map directly skip this (collapsing the
+   * Properties section resizes the map and shifts `.leaflet-interactive`
+   * geometry, which would change which feature the first path resolves to).
+   */
+  async function collapsePropertiesSection(page: import('@playwright/test').Page): Promise<void> {
+    const propertiesHeader = page.locator(
+      'button.debrief-activity-panel__section-header:has-text("Properties")',
+    );
+    if ((await propertiesHeader.count()) > 0) {
+      const expanded = await propertiesHeader.getAttribute('aria-expanded');
+      if (expanded === 'true') await propertiesHeader.click();
+    }
+  }
 
   /**
    * Read at least three distinct feature ids from
@@ -66,6 +100,12 @@ test.describe('Multi-select emitter (#192 Phase 5)', () => {
     b: string;
     c: string;
   }> {
+    // Collapse the Properties section first — see collapsePropertiesSection
+    // for the rationale. Every test that needs ≥ 2 Layers-panel rows to
+    // remain mounted across selection events goes through this picker, so
+    // routing the collapse here gets it in front of all those tests
+    // without polluting the map-only tests that skip the picker.
+    await collapsePropertiesSection(page);
     const ids = await page.evaluate(() => {
       const features =
         (window as unknown as { __currentPlotFeatures?: Array<{ id?: string | number }> })
