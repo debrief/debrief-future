@@ -181,7 +181,16 @@ export const BriefingMap: FC<BriefingMapProps> = ({ onMapReady }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSceneIndex]);
 
+  // React calls ref callbacks on EVERY render (when the callback identity
+  // is a new closure). BriefingMap re-renders whenever `currentTime`
+  // changes — and `setCurrentTime` fires every tween frame. If
+  // `handleMapReady` ran on each ref-callback invocation it would
+  // re-trigger `syncToCurrentScene`, cancelling and restarting the tween
+  // every frame — producing the slider-oscillation symptom in #264.
+  // Gate by comparing against the stable `mapRef` so the work only runs
+  // the first time a new Leaflet map instance is attached.
   const handleMapReady = (map: LeafletMap): void => {
+    if (mapRef.current === map) return;
     mapRef.current = map;
     mapAdapter.setMap(map);
     onMapReady?.(map);

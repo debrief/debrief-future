@@ -43,19 +43,21 @@ test('instant Scene transport — Next / Prev / Replay', async ({ page }) => {
   await expect(page.locator('[data-testid="transport-scene-index"]')).toContainText('1 / 4');
 });
 
-test('time slider stays disabled for instant Scenes', async ({ page }) => {
+test('time slider hidden for instant Scenes', async ({ page }) => {
   await page.goto(indexUrl);
   await expect(page.locator('[data-testid="briefing-map"]')).toBeVisible({ timeout: 15_000 });
-  // Scene 0 of the dev fixture is an instant Scene → slider disabled.
-  await expect(page.locator('[data-testid="briefing-time-slider-input"]')).toBeDisabled();
+  // Scene 0 of the dev fixture is an instant Scene → slider is not
+  // rendered (the chrome hides controls that don't apply to the current
+  // Scene flavour so the viewer isn't confused by a dead input).
+  await expect(page.locator('[data-testid="briefing-time-slider"]')).toHaveCount(0);
 });
 
 test('time slider becomes interactive on a time-range Scene (#263)', async ({ page }) => {
   await page.goto(indexUrl);
   await expect(page.locator('[data-testid="briefing-map"]')).toBeVisible({ timeout: 15_000 });
 
-  // Scene 0 (instant) → disabled.
-  await expect(page.locator('[data-testid="briefing-time-slider-input"]')).toBeDisabled();
+  // Scene 0 (instant) → slider hidden.
+  await expect(page.locator('[data-testid="briefing-time-slider"]')).toHaveCount(0);
 
   // Step to Scene 3 (time-range — "Diverge & close — slider-driven scrub").
   await page.locator('[data-testid="transport-next"]').click();
@@ -63,10 +65,12 @@ test('time slider becomes interactive on a time-range Scene (#263)', async ({ pa
   await page.locator('[data-testid="transport-next"]').click();
   await expect(page.locator('[data-testid="transport-scene-index"]')).toContainText('4 / 4');
 
-  // Allow the playback driver to install the scrubbable range.
-  await page.waitForTimeout(500);
+  // Allow the playback driver to install the scrubbable range and finish
+  // the entry tween.
+  await page.waitForTimeout(2500);
 
   const slider = page.locator('[data-testid="briefing-time-slider-input"]');
+  await expect(slider).toBeVisible();
   await expect(slider).toBeEnabled();
 
   // The slider should have a non-zero range (start !== end).

@@ -16,6 +16,14 @@ export interface MinimalChromeProps {
 
 export const MinimalChrome: FC<MinimalChromeProps> = ({ children }) => {
   const title = useBriefingStore((s) => s.config?.storyboardName ?? '');
+  // The slider is only meaningful on time-range Scenes (#263). On instant
+  // Scenes the playback driver clears the range to (null, null); hiding
+  // the input here — rather than just disabling it — avoids confusing the
+  // viewer with a dead control.
+  const rangeStart = useBriefingStore((s) => s.scrubbableRangeStart);
+  const rangeEnd = useBriefingStore((s) => s.scrubbableRangeEnd);
+  const sliderRelevant =
+    rangeStart !== null && rangeEnd !== null && rangeStart !== rangeEnd;
 
   return (
     <div data-testid="briefing-minimal-chrome" style={styles.wrapper}>
@@ -26,7 +34,7 @@ export const MinimalChrome: FC<MinimalChromeProps> = ({ children }) => {
       </div>
       <div data-testid="briefing-minimal-controls" style={styles.controls}>
         <TransportBar />
-        <TimeSlider />
+        {sliderRelevant && <TimeSlider />}
       </div>
     </div>
   );

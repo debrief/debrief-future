@@ -124,8 +124,6 @@ export function createPlaybackDriver(opts: PlaybackDriverOpts): PlaybackDriver {
         session.setCurrentTime(epochMs);
       },
       flyToViewport(viewport: { center: number[]; zoom: number }, durationMs: 0) {
-        // The runTimeRangeTween Viewport type has `center: number[]`;
-        // narrow it to a 2-tuple at the adapter boundary.
         const center: [number, number] = [
           viewport.center[0] ?? 0,
           viewport.center[1] ?? 0,
@@ -140,9 +138,18 @@ export function createPlaybackDriver(opts: PlaybackDriverOpts): PlaybackDriver {
       durationMs: scene.properties.transition_duration_ms ?? 500,
       ports,
     });
-    activeCancel = () => handle.cancel();
+    const myCancel = () => handle.cancel();
+    activeCancel = myCancel;
     await guardTween(handle.done, `Scene ${scene.properties.id}`);
-    activeCancel = null;
+    // Only clear the shared slot if we still own it. A concurrent sync may
+    // have cancelled this tween and installed its own; nulling
+    // unconditionally would wipe out that newer cancel reference and let
+    // a subsequent sync skip cancellation — producing overlapping tweens
+    // that both write `setCurrentTime`, which the user sees as the slider
+    // oscillating between two values.
+    if (activeCancel === myCancel) {
+      activeCancel = null;
+    }
   }
 
   async function syncToCurrentScene(): Promise<void> {
