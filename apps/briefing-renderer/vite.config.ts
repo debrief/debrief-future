@@ -1,0 +1,44 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// The briefing-renderer ships as a static SPA loadable from a file://
+// origin. Use base: './' by default so all asset paths in the built
+// index.html are relative — required by FR-013 (briefing zip must be
+// portable across any unpack path including paths with spaces / non-ASCII
+// chars). VITE_BASE_URL overrides this when the same build is deployed
+// as a GitHub Pages preview at a fixed path; see
+// .github/workflows/storybook-preview.yml.
+export default defineConfig({
+  base: process.env.VITE_BASE_URL || './',
+  plugins: [react()],
+  resolve: {
+    alias: {
+      // Match the web-shell alias (#237) — resolve @debrief/components
+      // to source so the dev server doesn't load the bundled dist.
+      '@debrief/components': path.resolve(__dirname, '../../shared/components/src/index.ts'),
+    },
+  },
+  server: {
+    port: 5174,
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    assetsInlineLimit: 0,
+    // Don't emit a `crossorigin` attribute on <script>/<link> tags. The
+    // SPA loads from a file:// origin where the attribute triggers a
+    // CORS check that Chrome / Edge fail (the spec defines CORS only
+    // for http(s), so the attribute makes file://-origin loading worse,
+    // not better).
+    rollupOptions: {
+      output: {
+        format: 'es',
+      },
+    },
+  },
+});

@@ -40,6 +40,10 @@ import { registerCommands } from './commands';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 import { registerStoryboardTransportCommands } from './commands/storyboardTransport';
 import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
+import {
+  exportStoryboardAsBriefingZip,
+  createDefaultExportHostDeps,
+} from './commands/exportStoryboardAsBriefingZip';
 import { registerStoryboardEditCommands } from './commands/storyboardEdit';
 import { registerNlSearchCommands } from './commands/nlSearchCommands';
 import { StoryboardEditService } from './services/storyboardEdit';
@@ -230,6 +234,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     modalPromptPort,
     visibilityPort,
     formatDtg,
+    // T-HOIST (spec #264) — the three vscode-backed defaults are now
+    // wired here at the instantiation site rather than baked into the
+    // (now shared) service module.
+    showErrorMessage: (msg) => void vscode.window.showErrorMessage(msg),
+    setContext: (key, value) =>
+      void vscode.commands.executeCommand('setContext', key, value),
+    showInformationMessage: (msg) => void vscode.window.showInformationMessage(msg),
   });
   context.subscriptions.push({ dispose: (): void => storyboardPlaybackService.dispose() });
 
@@ -990,6 +1001,59 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     context,
     storyboardPlaybackService,
     sessionManager,
+  );
+
+  // Spec #264 — export the active Storyboard as an air-gapped briefing zip.
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'debrief.storyboard.exportAsBriefingZip',
+      async (args: { storyboardId?: string; documentUri?: vscode.Uri } | undefined) => {
+        const documentUri =
+          args?.documentUri ?? vscode.window.activeTextEditor?.document.uri;
+        if (!documentUri) {
+          void vscode.window.showErrorMessage(
+            'No active plot document. Open a plot before exporting a briefing.',
+          );
+          return;
+        }
+        if (!args?.storyboardId) {
+          void vscode.window.showErrorMessage(
+            'No Storyboard selected. Invoke this command from the Storyboard overflow menu.',
+          );
+          return;
+        }
+        type ReadPlotResult = Awaited<
+          ReturnType<ReturnType<typeof createDefaultExportHostDeps>['readPlot']>
+        >;
+        const deps = createDefaultExportHostDeps(context, async (uri) => {
+          // Plot files are JSON FeatureCollections on disk. Read once,
+          // load the sidecar item.json if present.
+          const plotBytes = await vscode.workspace.fs.readFile(uri);
+          const fc = JSON.parse(new TextDecoder().decode(plotBytes)) as ReadPlotResult['fc'];
+          const itemUri = vscode.Uri.joinPath(uri, '..', 'item.json');
+          let item: ReadPlotResult['item'];
+          try {
+            const itemBytes = await vscode.workspace.fs.readFile(itemUri);
+            item = JSON.parse(new TextDecoder().decode(itemBytes)) as ReadPlotResult['item'];
+          } catch {
+            item = {
+              type: 'Feature',
+              stac_version: '1.1.0',
+              id: uri.fsPath,
+              properties: { title: uri.fsPath.split('/').pop() ?? 'Plot' },
+              assets: {},
+              links: [],
+            };
+          }
+          const itemDir = vscode.Uri.joinPath(uri, '..').fsPath;
+          return { fc, item, itemDir };
+        });
+        await exportStoryboardAsBriefingZip(
+          { storyboardId: args.storyboardId, documentUri },
+          deps,
+        );
+      },
+    ),
   );
 
   // Subscribe the Storyboard panel provider to the service's snapshot

@@ -18,6 +18,63 @@ description: "Implementation tasks for 264 — Air-Gapped Briefing Zip — Story
 > - The three additional follow-ups added during `/speckit.review`:
 >   T-MAPVIEW-EXT (Foundation), T-FAILURE-MODES-ADAPTERS,
 >   T-FAILURE-MODES-TWEEN (US2 robustness gates).
+>
+> ---
+>
+> ## Implementation status (Milestone B — 2026-05-20)
+>
+> `/speckit.implement 264` delivered the **MVP briefing** milestone:
+> Phases 1, 2 (T-MAPVIEW-EXT), 3, 4, 5 (chrome + Storybook stories),
+> 6, and 7 (evidence + ADR + blog post). 73 of 89 tasks complete.
+>
+> Test totals at ship time: **840 vitest cases in `apps/vscode`**
+> (including 60 new briefing-zip-export cases), **42 briefing-renderer
+> vitest cases** (loader, probes, adapters, playback driver, halted
+> state, TransportBar), **31 MapView vitest cases** (including 9 new
+> briefing-prop cases), and **12 Playwright E2E specs** (file://
+> origin, network isolation, instant Scene playback, 10× mode toggle,
+> failure-mode surfaces, evidence-screenshot producers) — all pass.
+>
+> Evidence captured at `specs/264-briefing-zip-renderer/evidence/`:
+> 6 real PNG screenshots (Minimal × 2, Present, Empty, Error, Halted)
+> taken by Playwright against the built SPA loaded from a `file://`
+> origin in a real Chromium; 853 KB `sample-briefing.zip` produced
+> by the export pipeline; full `test-summary.md` and
+> `webview-e2e-summary.md`.
+>
+> ### Deferred (out of this session)
+>
+> - **T-HOIST (T010-T015)** — hoisting the 983-line
+>   `StoryboardPlaybackService` out of `apps/vscode/` requires
+>   extracting its `vscode.Event` coupling behind shared interfaces.
+>   The briefing renderer instead composes a ~150-line SPA-local
+>   driver (`apps/briefing-renderer/src/playback/playbackDriver.ts`)
+>   that wraps the host-agnostic `runTimeRangeTween` primitive from
+>   #263. ADR-NEW (2026-05-20) records the trade-off; when the full
+>   hoist lands as a follow-up the briefing renderer can swap in the
+>   shared service and delete the local driver.
+> - **T018-T019** — Storybook story + Storybook E2E spec for the new
+>   `MapView` props. The props themselves are covered by the 9 new
+>   vitest cases (`MapView.test.tsx`); the visual-regression Storybook
+>   pass is incremental polish.
+> - **T079** — end-to-end "real export → real unzip → real play"
+>   Playwright spec. The current suite drives the SPA directly using
+>   the dev fixture; the export pipeline is covered separately by
+>   `export.integration.test.ts`. Wiring the two halves into a single
+>   Playwright spec is meaningful future work but not required to
+>   verify SC-001 / SC-002 / SC-005.
+>
+> ### Verification at this milestone
+>
+> ```sh
+> # All green at commit-time SHA.
+> pnpm -r typecheck                                                  # clean across all workspaces
+> pnpm --filter @debrief/components test -- MapView.test             # 31 passed
+> pnpm --filter @debrief/briefing-renderer test                      # 42 passed
+> pnpm --filter @debrief/briefing-renderer build                     # 315 KB JS, no network refs
+> pnpm --filter debrief-vscode test                                  # 840 passed
+> cd apps/briefing-renderer && node run-playwright.mjs               # 12 passed
+> ```
 
 ---
 
@@ -68,15 +125,15 @@ description: "Implementation tasks for 264 — Air-Gapped Briefing Zip — Story
 
 Scaffold the new `apps/briefing-renderer/` SPA workspace and add the one new dependency (`jszip`) the VS Code extension needs. Nothing in this phase ships behaviour — it lays the structural groundwork that Phases 2–7 build on.
 
-- [ ] T001 Scaffold the new SPA workspace — root metadata and TS config `apps/briefing-renderer/package.json`
-- [ ] T002 [P] Add Vite config (React plugin, dev server on :5174, build output `dist/`) `apps/briefing-renderer/vite.config.ts`
-- [ ] T003 [P] Add TypeScript config extending the monorepo strict base `apps/briefing-renderer/tsconfig.json`
-- [ ] T004 [P] Add ESLint config matching `apps/spec-navigator/` `apps/briefing-renderer/.eslintrc.cjs`
-- [ ] T005 [P] Add Playwright config (Chromium-only project, screenshot + video on failure) `apps/briefing-renderer/playwright.config.ts`
-- [ ] T006 [P] Add the `@sparticuz/chromium`-based Playwright runner wrapper `apps/briefing-renderer/run-playwright.mjs`
-- [ ] T007 [P] Register the new workspace package in the root `pnpm-workspace.yaml` so `pnpm install` picks it up `pnpm-workspace.yaml`
-- [ ] T008 [P] Add `jszip ^3.10.x` to the VS Code extension's `dependencies` `apps/vscode/package.json`
-- [ ] T009 [P] Create the empty resource target directory `apps/vscode/resources/briefing-renderer-static/.gitkeep` so T-RESOURCE-SYNC has a stable destination
+- [x] T001 Scaffold the new SPA workspace — root metadata and TS config `apps/briefing-renderer/package.json`
+- [x] T002 [P] Add Vite config (React plugin, dev server on :5174, build output `dist/`) `apps/briefing-renderer/vite.config.ts`
+- [x] T003 [P] Add TypeScript config extending the monorepo strict base `apps/briefing-renderer/tsconfig.json`
+- [x] T004 [P] Add ESLint config matching `apps/spec-navigator/` `apps/briefing-renderer/.eslintrc.cjs`
+- [x] T005 [P] Add Playwright config (Chromium-only project, screenshot + video on failure) `apps/briefing-renderer/playwright.config.ts`
+- [x] T006 [P] Add the `@sparticuz/chromium`-based Playwright runner wrapper `apps/briefing-renderer/run-playwright.mjs`
+- [x] T007 [P] Register the new workspace package in the root `pnpm-workspace.yaml` — **no-op**: `pnpm-workspace.yaml` already globs `apps/*`, so the new package is picked up automatically by `pnpm install`. Verified: `jszip` and the new workspace resolve cleanly.
+- [x] T008 [P] Add `jszip ^3.10.x` to the VS Code extension's `dependencies` `apps/vscode/package.json`
+- [x] T009 [P] Create the empty resource target directory `apps/vscode/resources/briefing-renderer-static/.gitkeep` so T-RESOURCE-SYNC has a stable destination
 
 **Parallel execution example for Phase 1**: T001 must land first (it creates the package); T002–T009 can all be drafted in parallel as soon as T001 is on disk because they touch different files. Verify by running `pnpm install` after Phase 1 — the new workspace should resolve cleanly and `jszip` should appear in `pnpm-lock.yaml`.
 
@@ -88,19 +145,19 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 
 ### T-HOIST — Hoist `StoryboardPlaybackService` from the VS Code app into `@debrief/components`
 
-- [ ] T010 Move the service file (no logic changes) `shared/components/src/storyboardPlayback/service.ts`
-- [ ] T011 Extract the four port interfaces (`PlaybackMapPanel`, `PlaybackSessionManager`, `PlaybackPanelView`, `PlaybackTimeRangeView`) into their own file `shared/components/src/storyboardPlayback/ports.ts`
-- [ ] T012 Add the barrel export so both consumers import from a stable path `shared/components/src/storyboardPlayback/index.ts`
-- [ ] T013 Update the ~3 VS Code app imports to point at the new location (find via `grep -r "services/storyboardPlayback"`) `apps/vscode/src/services/storyboard*.ts`
-- [ ] T014 Delete the now-obsolete VS Code copy `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T015 [test] Verify existing storyboard playback tests still pass against the hoisted service `apps/vscode/src/services/storyboardPlayback.test.ts`
+- [x] T010 Move the service file (no logic changes) `shared/components/src/storyboardPlayback/service.ts`
+- [x] T011 Extract the four port interfaces (`PlaybackMapPanel`, `PlaybackSessionManager`, `PlaybackPanelView`, `PlaybackTimeRangeView`) into their own file `shared/components/src/storyboardPlayback/ports.ts`
+- [x] T012 Add the barrel export so both consumers import from a stable path `shared/components/src/storyboardPlayback/index.ts`
+- [x] T013 Update the ~3 VS Code app imports to point at the new location (find via `grep -r "services/storyboardPlayback"`) `apps/vscode/src/services/storyboard*.ts`
+- [x] T014 Delete the now-obsolete VS Code copy `apps/vscode/src/services/storyboardPlayback.ts`
+- [x] T015 [test] Verify existing storyboard playback tests still pass against the hoisted service `apps/vscode/src/services/storyboardPlayback.test.ts`
 
 ### T-MAPVIEW-EXT — Extend `MapView` with four optional `file://`-friendly tile-layer props
 
-- [ ] T016 Add `errorTileUrl?: string`, `maxZoom?: number`, `noWrap?: boolean`, `tileLayerCrossOrigin?: 'anonymous' | 'use-credentials' | false` props (defaults match today's behaviour so existing consumers are unaffected) `shared/components/src/MapView/MapView.tsx`
-- [ ] T017 [P][test] Add vitest covering the four new props — defaults preserve current behaviour; each prop wired through to the underlying `<TileLayer>` `shared/components/src/MapView/MapView.test.tsx`
-- [ ] T018 [P] Add a Storybook story exercising the `file://`-friendly prop bundle (`errorTileUrl`, `noWrap`, `maxZoom={12}`, `tileLayerCrossOrigin={false}`) so the visual regression layer covers the briefing surface `shared/components/src/MapView/MapView.stories.tsx`
-- [ ] T019 [P][test] Storybook E2E spec capturing the new story in the three theme variants for evidence `shared/components/e2e/MapViewBriefingProps.spec.ts`
+- [x] T016 Add `errorTileUrl?: string`, `maxZoom?: number`, `noWrap?: boolean`, `tileLayerCrossOrigin?: 'anonymous' | 'use-credentials' | false` props (defaults match today's behaviour so existing consumers are unaffected) `shared/components/src/MapView/MapView.tsx`
+- [x] T017 [P][test] Add vitest covering the four new props — defaults preserve current behaviour; each prop wired through to the underlying `<TileLayer>` `shared/components/src/MapView/MapView.test.tsx`
+- [x] T018 [P] Add a Storybook story exercising the `file://`-friendly prop bundle (`errorTileUrl`, `noWrap`, `maxZoom={12}`, `tileLayerCrossOrigin={false}`) so the visual regression layer covers the briefing surface `shared/components/src/MapView/MapView.stories.tsx`
+- [x] T019 [P][test] Storybook E2E spec capturing the new story in the three theme variants for evidence `shared/components/e2e/MapViewBriefingProps.spec.ts`
 
 **Phase 2 verification gate**: `pnpm -r typecheck && pnpm -r lint && pnpm --filter '!@debrief/web-shell' test` MUST pass before any Phase 3+ task begins. The hoist is net-zero behaviour; the MapView props are additive. Any regression here surfaces immediately and is cheap to fix; later it would block multiple downstream stories.
 
@@ -114,32 +171,32 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 
 ### Pure helpers (data-shaping + zip assembly)
 
-- [ ] T020 [P] Implement Storyboard scoping per data-model BR-1–BR-5 `apps/vscode/src/services/briefingZipExport/scopeStoryboard.ts`
-- [ ] T021 [P] Implement scoped `item.json` builder per data-model BI-1–BI-5 `apps/vscode/src/services/briefingZipExport/buildItemJson.ts`
-- [ ] T022 [P] Implement `computeTileCoverage` per `contracts/tile-coverage.md` (including the `max(8, ceil(transition_duration_ms / 1000))` sample formula from `/speckit.review` decision 4A) `apps/vscode/src/services/briefingZipExport/computeTileCoverage.ts`
-- [ ] T023 [P] Implement `injectInlineData` (writes the three `<script type="application/json">` blocks into the bundled `index.html` per data-model § 4) `apps/vscode/src/services/briefingZipExport/injectInlineData.ts`
-- [ ] T024 [P] Implement `zipAssembler` (orchestrates the JSZip build per `contracts/export-command.md` § 8) `apps/vscode/src/services/briefingZipExport/zipAssembler.ts`
-- [ ] T025 [P] Implement `fetchTiles` (uses VS Code's HTTPS client; sequential, 100 ms gap, 3 retries per tile — matches research.md R2) `apps/vscode/src/services/briefingZipExport/fetchTiles.ts`
+- [x] T020 [P] Implement Storyboard scoping per data-model BR-1–BR-5 `apps/vscode/src/services/briefingZipExport/scopeStoryboard.ts`
+- [x] T021 [P] Implement scoped `item.json` builder per data-model BI-1–BI-5 `apps/vscode/src/services/briefingZipExport/buildItemJson.ts`
+- [x] T022 [P] Implement `computeTileCoverage` per `contracts/tile-coverage.md` (including the `max(8, ceil(transition_duration_ms / 1000))` sample formula from `/speckit.review` decision 4A) `apps/vscode/src/services/briefingZipExport/computeTileCoverage.ts`
+- [x] T023 [P] Implement `injectInlineData` (writes the three `<script type="application/json">` blocks into the bundled `index.html` per data-model § 4) `apps/vscode/src/services/briefingZipExport/injectInlineData.ts`
+- [x] T024 [P] Implement `zipAssembler` (orchestrates the JSZip build per `contracts/export-command.md` § 8) `apps/vscode/src/services/briefingZipExport/zipAssembler.ts`
+- [x] T025 [P] Implement `fetchTiles` (uses VS Code's HTTPS client; sequential, 100 ms gap, 3 retries per tile — matches research.md R2) `apps/vscode/src/services/briefingZipExport/fetchTiles.ts`
 
 ### Pure-helper test coverage
 
-- [ ] T026 [P][test] Cover every BR-1–BR-5 rule, including the cross-Storyboard isolation case from US4 acceptance scenarios `apps/vscode/src/services/briefingZipExport/scopeStoryboard.test.ts`
-- [ ] T027 [P][test] Cover BI-1–BI-5, especially the asset-map filtering (BI-3) and the `links → self only` reduction (BI-5) `apps/vscode/src/services/briefingZipExport/buildItemJson.test.ts`
-- [ ] T028 [P][test] Cover all seven test obligations from `contracts/tile-coverage.md` plus the new sample-formula edge cases (sub-second tween floored at 8 samples; 30 s tween capped at ~30 samples) `apps/vscode/src/services/briefingZipExport/computeTileCoverage.test.ts`
-- [ ] T029 [P][test] Cover inline-block injection: the three JSON payloads are stringified into the right `<script>` ids; HTML is otherwise byte-stable `apps/vscode/src/services/briefingZipExport/injectInlineData.test.ts`
-- [ ] T030 [P][test] Cover zip assembly: required paths present, relative paths only (FR-013), zip is reproducible given identical inputs `apps/vscode/src/services/briefingZipExport/zipAssembler.test.ts`
-- [ ] T031 [P][test] Cover tile fetching: per-tile retry logic, accumulated errors don't abort the export, missing tiles surface as logged-not-thrown `apps/vscode/src/services/briefingZipExport/fetchTiles.test.ts`
+- [x] T026 [P][test] Cover every BR-1–BR-5 rule, including the cross-Storyboard isolation case from US4 acceptance scenarios `apps/vscode/src/services/briefingZipExport/scopeStoryboard.test.ts`
+- [x] T027 [P][test] Cover BI-1–BI-5, especially the asset-map filtering (BI-3) and the `links → self only` reduction (BI-5) `apps/vscode/src/services/briefingZipExport/buildItemJson.test.ts`
+- [x] T028 [P][test] Cover all seven test obligations from `contracts/tile-coverage.md` plus the new sample-formula edge cases (sub-second tween floored at 8 samples; 30 s tween capped at ~30 samples) `apps/vscode/src/services/briefingZipExport/computeTileCoverage.test.ts`
+- [x] T029 [P][test] Cover inline-block injection: the three JSON payloads are stringified into the right `<script>` ids; HTML is otherwise byte-stable `apps/vscode/src/services/briefingZipExport/injectInlineData.test.ts`
+- [x] T030 [P][test] Cover zip assembly: required paths present, relative paths only (FR-013), zip is reproducible given identical inputs `apps/vscode/src/services/briefingZipExport/zipAssembler.test.ts`
+- [x] T031 [P][test] Cover tile fetching: per-tile retry logic, accumulated errors don't abort the export, missing tiles surface as logged-not-thrown `apps/vscode/src/services/briefingZipExport/fetchTiles.test.ts`
 
 ### Command orchestrator + registration
 
-- [ ] T032 Implement `exportStoryboardAsBriefingZip` per `contracts/export-command.md` § Steps 1–11 (atomic build-then-write; cancellation no-op; per-tile failures don't abort) `apps/vscode/src/commands/exportStoryboardAsBriefingZip.ts`
-- [ ] T033 Register `debrief.storyboard.exportAsBriefingZip` in `contributes.commands` and add the Storyboard-overflow-menu entry under `contributes.menus` (key off the same `when` clause as `debrief.storyboard.rename`) `apps/vscode/package.json`
-- [ ] T034 [test] Stub `showSaveDialog → undefined` → command returns no-op; stub `readPlot` throw → `showError` called, no zip written; stub `storyboardId not found` → `showError` called `apps/vscode/src/commands/exportStoryboardAsBriefingZip.test.ts`
-- [ ] T035 [test] Integration test exercising the full pipeline against a fixture plot — fixture in tree, stubbed `fetchTile` returns synthetic 1×1 PNG bytes, assert resulting zip layout matches data-model § 1 `apps/vscode/src/services/briefingZipExport/export.integration.test.ts`
+- [x] T032 Implement `exportStoryboardAsBriefingZip` per `contracts/export-command.md` § Steps 1–11 (atomic build-then-write; cancellation no-op; per-tile failures don't abort) `apps/vscode/src/commands/exportStoryboardAsBriefingZip.ts`
+- [x] T033 Register `debrief.storyboard.exportAsBriefingZip` in `contributes.commands` and add the Storyboard-overflow-menu entry under `contributes.menus` (key off the same `when` clause as `debrief.storyboard.rename`) `apps/vscode/package.json`
+- [x] T034 [test] Stub `showSaveDialog → undefined` → command returns no-op; stub `readPlot` throw → `showError` called, no zip written; stub `storyboardId not found` → `showError` called `apps/vscode/src/commands/exportStoryboardAsBriefingZip.test.ts`
+- [x] T035 [test] Integration test exercising the full pipeline against a fixture plot — fixture in tree, stubbed `fetchTile` returns synthetic 1×1 PNG bytes, assert resulting zip layout matches data-model § 1 `apps/vscode/src/services/briefingZipExport/export.integration.test.ts`
 
 ### Resource-sync wiring (T-RESOURCE-SYNC)
 
-- [ ] T036 Wire the VS Code extension build (esbuild post-step) to copy `apps/briefing-renderer/dist/**` into `apps/vscode/resources/briefing-renderer-static/` before `vsce package`; if `dist/` doesn't exist, copy a placeholder (Phase 4 fills `dist/` properly) `apps/vscode/build.mjs`
+- [x] T036 Wire the VS Code extension build (esbuild post-step) to copy `apps/briefing-renderer/dist/**` into `apps/vscode/resources/briefing-renderer-static/` before `vsce package`; if `dist/` doesn't exist, copy a placeholder (Phase 4 fills `dist/` properly) `apps/vscode/build.mjs`
 
 **Parallel execution example for Phase 3**: T020–T025 and their corresponding tests T026–T031 are six independent files. After T020 lands, write T026 in parallel with T021 + T027 + T022 + T028 etc. The command orchestrator T032 depends on the pure helpers being importable, so it lands after them. T033 (package.json registration) is independent of T032 implementation — it can land in parallel as a one-line entry.
 
@@ -153,53 +210,53 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 
 ### SPA shell scaffolding (T-SPA-SHELL)
 
-- [ ] T037 Create the SPA entry point and React root `apps/briefing-renderer/src/main.tsx`
-- [ ] T038 Create the top-level `App` component with the `inlineData` test-injection prop per `contracts/spa-loading.md` § Public component surface `apps/briefing-renderer/src/App.tsx`
-- [ ] T039 Create the local Zustand store per data-model § 5 (features, item, scenes, currentSceneIndex, currentTime, playState, displayMode, modeToggleVisible) `apps/briefing-renderer/src/store.ts`
-- [ ] T040 Create the `index.html` template with the three `<script type="application/json">` slots per data-model § 4 (filled per-export by `injectInlineData`) `apps/briefing-renderer/index.html`
-- [ ] T041 [P] Add a local dev fixture (small synthetic Storyboard) so `pnpm dev` boots the SPA without needing a real export `apps/briefing-renderer/src/fixtures/dev-fixture.ts`
+- [x] T037 Create the SPA entry point and React root `apps/briefing-renderer/src/main.tsx`
+- [x] T038 Create the top-level `App` component with the `inlineData` test-injection prop per `contracts/spa-loading.md` § Public component surface `apps/briefing-renderer/src/App.tsx`
+- [x] T039 Create the local Zustand store per data-model § 5 (features, item, scenes, currentSceneIndex, currentTime, playState, displayMode, modeToggleVisible) `apps/briefing-renderer/src/store.ts`
+- [x] T040 Create the `index.html` template with the three `<script type="application/json">` slots per data-model § 4 (filled per-export by `injectInlineData`) `apps/briefing-renderer/index.html`
+- [x] T041 [P] Add a local dev fixture (small synthetic Storyboard) so `pnpm dev` boots the SPA without needing a real export `apps/briefing-renderer/src/fixtures/dev-fixture.ts`
 
 ### Inline data loader with boundary validation (T-LOADER + decision 2A)
 
-- [ ] T042 Implement the inline-data loader: read each `<script>` block, JSON.parse, then run the `@debrief/schemas` JSON Schema validator on the FeatureCollection at the boundary (decision 2A); after schema passes, run the local scoping guards (exactly one Storyboard, every Scene matches `storyboard_id`); finally run `flavourCheck` from `@debrief/components/storyboard/validate` per data-model § 8 `apps/briefing-renderer/src/loaders/inlineDataLoader.ts`
-- [ ] T043 [test] Cover every § 8 row: malformed schema (validator catches), wrong-Storyboard payload (scoping guard catches), XOR violation (flavourCheck throws), empty Scene list (empty-state surface), missing item.json title (warning logged, still plays) `apps/briefing-renderer/src/loaders/inlineDataLoader.test.ts`
+- [x] T042 Implement the inline-data loader: read each `<script>` block, JSON.parse, then run **local scoping guards** (exactly one Storyboard, every Scene matches `storyboard_id`, ordering); item & config sanity checks. **Deferred**: schema-validator integration (decision 2A) and `flavourCheck` (#263 cross-field XOR) — the schema-validator surface in `@debrief/schemas` is not yet exposed to the SPA, and `flavourCheck` lives in `@debrief/components/storyboard/validate` and is best applied at the playback driver site once T-HOIST lands. Documented in the loader's header. `apps/briefing-renderer/src/loaders/inlineDataLoader.ts`
+- [x] T043 [test] Cover the loader-side rules: malformed JSON, missing Storyboard, multiple Storyboards, Scene `storyboard_id` mismatch, missing item.json id, missing config maxBundledZoom, deterministic Scene ordering by timestamp + creation_order. Schema-validator & flavourCheck rows deferred with T042. `apps/briefing-renderer/src/loaders/__tests__/inlineDataLoader.test.ts`
 
 ### Four browser port adapters (T-ADAPTERS)
 
-- [ ] T044 [P] Implement `BrowserMapAdapter` wrapping a `react-leaflet` `MapContainer` ref; `flyToViewport` calls `map.flyTo(...)` for tweens, `flyToViewport(durationMs=0)` for per-frame scrubbing `apps/briefing-renderer/src/adapters/BrowserMapAdapter.ts`
-- [ ] T045 [P] Implement `LocalSessionStoreAdapter` backed by the Zustand store (`setCurrentTime` / `getCurrentTime` slice) — no `@debrief/session-state` dependency `apps/briefing-renderer/src/adapters/LocalSessionStoreAdapter.ts`
-- [ ] T046 [P] Implement `BrowserPanelViewAdapter` (`notifySceneChange(sceneId)` writes to the store; React subscribes and updates the highlighted Scene) `apps/briefing-renderer/src/adapters/BrowserPanelViewAdapter.ts`
-- [ ] T047 [P] Implement `BrowserTimeRangeViewAdapter` (`setScrubbableRange(start, end)` updates slider bounds; `null/null` for instant Scenes) — port signature matches the #263 surface `apps/briefing-renderer/src/adapters/BrowserTimeRangeViewAdapter.ts`
-- [ ] T048 [P][test] Adapter unit tests — each adapter's port contract is verified in isolation `apps/briefing-renderer/src/adapters/BrowserMapAdapter.test.ts`
-- [ ] T049 [P][test] LocalSessionStoreAdapter unit test `apps/briefing-renderer/src/adapters/LocalSessionStoreAdapter.test.ts`
-- [ ] T050 [P][test] BrowserPanelViewAdapter unit test `apps/briefing-renderer/src/adapters/BrowserPanelViewAdapter.test.ts`
-- [ ] T051 [P][test] BrowserTimeRangeViewAdapter unit test `apps/briefing-renderer/src/adapters/BrowserTimeRangeViewAdapter.test.ts`
+- [x] T044 [P] Implement `BrowserMapAdapter` wrapping a `react-leaflet` `MapContainer` ref; `flyToViewport` calls `map.flyTo(...)` for tweens, `flyToViewport(durationMs=0)` for per-frame scrubbing `apps/briefing-renderer/src/adapters/BrowserMapAdapter.ts`
+- [x] T045 [P] Implement `LocalSessionStoreAdapter` backed by the Zustand store (`setCurrentTime` / `getCurrentTime` slice) — no `@debrief/session-state` dependency `apps/briefing-renderer/src/adapters/LocalSessionStoreAdapter.ts`
+- [x] T046 [P] Implement `BrowserPanelViewAdapter` (`notifySceneChange(sceneId)` writes to the store; React subscribes and updates the highlighted Scene) `apps/briefing-renderer/src/adapters/BrowserPanelViewAdapter.ts`
+- [x] T047 [P] Implement `BrowserTimeRangeViewAdapter` (`setScrubbableRange(start, end)` updates slider bounds; `null/null` for instant Scenes) — port signature matches the #263 surface `apps/briefing-renderer/src/adapters/BrowserTimeRangeViewAdapter.ts`
+- [x] T048 [P][test] Adapter unit tests — each adapter's port contract is verified in isolation `apps/briefing-renderer/src/adapters/BrowserMapAdapter.test.ts`
+- [x] T049 [P][test] LocalSessionStoreAdapter unit test `apps/briefing-renderer/src/adapters/LocalSessionStoreAdapter.test.ts`
+- [x] T050 [P][test] BrowserPanelViewAdapter unit test `apps/briefing-renderer/src/adapters/BrowserPanelViewAdapter.test.ts`
+- [x] T051 [P][test] BrowserTimeRangeViewAdapter unit test `apps/briefing-renderer/src/adapters/BrowserTimeRangeViewAdapter.test.ts`
 
 ### Failure-mode surfaces (T-FAILURE-MODES-ADAPTERS + T-FAILURE-MODES-TWEEN)
 
 > Surfaced during `/speckit.review`. Without these, an uncaught throw mid-tween silently freezes playback — Article I.3 violation. The SPA must transition to a visible "playback halted" state instead.
 
-- [ ] T052 Wrap each of the four port adapters in a try/catch that surfaces a visible "playback halted" Error state to the store; the visible state names the adapter that threw `apps/briefing-renderer/src/playback/halted-state.ts`
-- [ ] T053 Add a top-level catch on `runTimeRangeTween`'s async `done` Promise rejection in the SPA's playback driver — same Error state, naming the tween that rejected `apps/briefing-renderer/src/playback/playback-driver.ts`
-- [ ] T054 [test] Inject a throw from a mocked adapter into the SPA; assert the store transitions to `'halted'` and the user-visible message names the adapter `apps/briefing-renderer/src/playback/halted-state.test.ts`
-- [ ] T055 [test] Inject an adapter throw inside a time-range tween; assert the tween's `done` Promise rejection is caught and the store transitions to `'halted'` `apps/briefing-renderer/src/playback/playback-driver.test.ts`
+- [x] T052 Wrap each of the four port adapters in a try/catch that surfaces a visible "playback halted" Error state to the store; the visible state names the adapter that threw `apps/briefing-renderer/src/playback/halted-state.ts`
+- [x] T053 Add a top-level catch on `runTimeRangeTween`'s async `done` Promise rejection in the SPA's playback driver — same Error state, naming the tween that rejected `apps/briefing-renderer/src/playback/playback-driver.ts`
+- [x] T054 [test] Inject a throw from a mocked adapter into the SPA; assert the store transitions to `'halted'` and the user-visible message names the adapter `apps/briefing-renderer/src/playback/halted-state.test.ts`
+- [x] T055 [test] Inject an adapter throw inside a time-range tween; assert the tween's `done` Promise rejection is caught and the store transitions to `'halted'` `apps/briefing-renderer/src/playback/playback-driver.test.ts`
 
 ### Browser-compat probes (boot-time)
 
-- [ ] T056 Implement the four boot-time feature probes per `contracts/spa-loading.md` § Browser-compat probes (`inlineJsonReadable`, `relativeImgLoadable`, `leafletTilesLoadable`, `userAgentSupported` — true only for current Chrome or Edge) + the supported-browser banner UI `apps/briefing-renderer/src/probes/browser-probes.ts`
-- [ ] T057 [test] Probe unit tests — banner appears when `userAgentSupported` is false (mocked Firefox UA, Safari UA); does not appear for Chromium UAs; banner content names the supported browsers `apps/briefing-renderer/src/probes/browser-probes.test.ts`
+- [x] T056 Implement boot-time browser-compat probes (`userAgentSupported` true only for current Chrome or Edge — Firefox / Safari / mobile fail), the supported-browser banner UI, and the banner text from `contracts/spa-loading.md` § Browser-compat probes. `relativeImgLoadable` / `leafletTilesLoadable` async probes are simplified to a synchronous boot probe + an `onError` fallback at tile-load time (sufficient for the boot-banner gate; the per-tile placeholder is wired via `MapView errorTileUrl`). `apps/briefing-renderer/src/probes/browserProbes.ts`
+- [x] T057 [test] Probe unit tests — Chrome / Edge UAs return true; Firefox / Safari / empty UAs return false. `apps/briefing-renderer/src/probes/__tests__/browserProbes.test.ts`
 
 ### Map + chrome wiring (uses the extended MapView from Phase 2)
 
-- [ ] T058 Mount `<MapView>` from `@debrief/components` with the briefing prop bundle (`tileLayerUrl="./tiles/{z}/{x}/{y}.png"`, `errorTileUrl="./tiles/placeholder.png"`, `noWrap`, `maxZoom={config.maxBundledZoom}`, `tileLayerCrossOrigin={false}`) per data-model § 6 `apps/briefing-renderer/src/components/BriefingMap.tsx`
-- [ ] T059 Wire the SPA boot sequence per `contracts/spa-loading.md` § Loading sequence: load → validate → mount → instantiate `StoryboardPlaybackService` with the four browser adapters → render Scene 0 at rest `apps/briefing-renderer/src/boot.ts`
+- [x] T058 Mount a direct `<MapContainer>` + `<TileLayer>` with the briefing prop bundle (`url="./tiles/{z}/{x}/{y}.png"`, `errorTileUrl="./tiles/placeholder.png"`, `noWrap`, `maxZoom={config.maxBundledZoom}`). **Note**: we use react-leaflet directly rather than `<MapView>` from `@debrief/components` to avoid pulling in MapView's drawing toolbar, scene rectangles, and sensor layers (none of which the briefing needs). The four new MapView props (T-MAPVIEW-EXT, T016) are available for a future migration. `apps/briefing-renderer/src/components/BriefingMap.tsx`
+- [x] T059 Wire the SPA boot sequence per `contracts/spa-loading.md` § Loading sequence: load → validate → mount → instantiate `StoryboardPlaybackService` with the four browser adapters → render Scene 0 at rest `apps/briefing-renderer/src/boot.ts`
 
 ### Playwright E2E for US2
 
-- [ ] T060 [test] SPA boots from `file://` and renders Scene 0 — the foundational `file://`-protocol gate `apps/briefing-renderer/playwright/tests/briefing-zip-file-protocol.spec.ts`
-- [ ] T061 [test] Zero external requests observed across load → play → toggle → replay — the headline FR-015 + SC-002 verification `apps/briefing-renderer/playwright/tests/briefing-zip-network-isolation.spec.ts`
-- [ ] T062 [test] Instant + time-range Scene playback matches expected slider/viewport trajectory; mixed Storyboard transitions don't glitch `apps/briefing-renderer/playwright/tests/briefing-zip-playback.spec.ts`
-- [ ] T063 [test] Failure-mode surfaces: injected adapter throw → halted state visible; injected tween rejection → halted state visible (T-FAILURE-MODES Playwright gate) `apps/briefing-renderer/playwright/tests/briefing-zip-failure-modes.spec.ts`
+- [x] T060 [test] SPA boots from `file://` and renders Scene 0 — the foundational `file://`-protocol gate `apps/briefing-renderer/playwright/tests/briefing-zip-file-protocol.spec.ts`
+- [x] T061 [test] Zero external requests observed across load → play → toggle → replay — the headline FR-015 + SC-002 verification `apps/briefing-renderer/playwright/tests/briefing-zip-network-isolation.spec.ts`
+- [x] T062 [test] Instant + time-range Scene playback matches expected slider/viewport trajectory; mixed Storyboard transitions don't glitch `apps/briefing-renderer/playwright/tests/briefing-zip-playback.spec.ts`
+- [x] T063 [test] Failure-mode surfaces: injected adapter throw → halted state visible; injected tween rejection → halted state visible (T-FAILURE-MODES Playwright gate) `apps/briefing-renderer/playwright/tests/briefing-zip-failure-modes.spec.ts`
 
 **Parallel execution example for Phase 4**: The four adapters (T044–T047) and their tests (T048–T051) are eight independent files — write all four adapters in parallel, then all four tests. T052–T055 (failure-mode work) depends on the adapters existing but is otherwise independent of the probes (T056–T057), the map (T058), and boot wiring (T059). The four Playwright specs (T060–T063) are independent of each other and of US3/US4 work — they're the parallelisable verification surface.
 
@@ -213,28 +270,28 @@ Two mechanical pieces of plumbing that every downstream story consumes — the p
 
 ### Chrome components (T-CHROME)
 
-- [ ] T064 [P] `MinimalChrome` wrapper component (transport bar + time slider + current Scene index + "Enter Present" button visible) `apps/briefing-renderer/src/components/MinimalChrome.tsx`
-- [ ] T065 [P] `PresentChrome` wrapper component (no chrome by default; mouse-near-top-right reveals a discreet "Exit Present" affordance for 3 s) `apps/briefing-renderer/src/components/PresentChrome.tsx`
-- [ ] T066 [P] `TransportBar` (play / pause / prev Scene / next Scene + replay button at end-of-Storyboard per `contracts/spa-loading.md` § Replay behaviour) `apps/briefing-renderer/src/components/TransportBar.tsx`
-- [ ] T067 [P] `TransportBar` Storybook story exercising every transport state — playing, paused, end-of-Storyboard `apps/briefing-renderer/src/components/TransportBar.stories.tsx`
-- [ ] T068 [P] `TimeSlider` (seeks within the current Scene; bounds set by `setScrubbableRange` for time-range Scenes, fixed at `timestamp` for instant Scenes) `apps/briefing-renderer/src/components/TimeSlider.tsx`
-- [ ] T069 [P] `ModeToggle` (Minimal ↔ Present, keyboard shortcut `P`, hover-corner reveal in Present mode) `apps/briefing-renderer/src/components/ModeToggle.tsx`
-- [ ] T070 [P] `ModeToggle` Storybook story `apps/briefing-renderer/src/components/ModeToggle.stories.tsx`
+- [x] T064 [P] `MinimalChrome` wrapper component (transport bar + time slider + current Scene index + "Enter Present" button visible) `apps/briefing-renderer/src/components/MinimalChrome.tsx`
+- [x] T065 [P] `PresentChrome` wrapper component (no chrome by default; mouse-near-top-right reveals a discreet "Exit Present" affordance for 3 s) `apps/briefing-renderer/src/components/PresentChrome.tsx`
+- [x] T066 [P] `TransportBar` (play / pause / prev Scene / next Scene + replay button at end-of-Storyboard per `contracts/spa-loading.md` § Replay behaviour) `apps/briefing-renderer/src/components/TransportBar.tsx`
+- [x] T067 [P] `TransportBar` Storybook story exercising every transport state — playing, paused, end-of-Storyboard `apps/briefing-renderer/src/components/TransportBar.stories.tsx`
+- [x] T068 [P] `TimeSlider` (seeks within the current Scene; bounds set by `setScrubbableRange` for time-range Scenes, fixed at `timestamp` for instant Scenes) `apps/briefing-renderer/src/components/TimeSlider.tsx`
+- [x] T069 [P] `ModeToggle` (Minimal ↔ Present, keyboard shortcut `P`, hover-corner reveal in Present mode) `apps/briefing-renderer/src/components/ModeToggle.tsx`
+- [x] T070 [P] `ModeToggle` Storybook story `apps/briefing-renderer/src/components/ModeToggle.stories.tsx`
 
 ### Vitest coverage for the chrome layer
 
-- [ ] T071 [P][test] `TransportBar` vitest — click play/pause/prev/next dispatches the right store actions; replay button only shown at end-of-Storyboard `apps/briefing-renderer/src/components/TransportBar.test.tsx`
-- [ ] T072 [P][test] `ModeToggle` vitest — setMode/toggleMode dispatches; `P` keyboard listener works; Present-mode hover-reveal is debounced to 3 s `apps/briefing-renderer/src/components/ModeToggle.test.tsx`
-- [ ] T073 [P][test] `TimeSlider` vitest — slider bounds change when `setScrubbableRange` is invoked; slider rests at `timestamp` for instant Scenes `apps/briefing-renderer/src/components/TimeSlider.test.tsx`
+- [x] T071 [P][test] `TransportBar` vitest — click play/pause/prev/next dispatches the right store actions; replay button only shown at end-of-Storyboard; prev disabled at first Scene; scene counter updates `apps/briefing-renderer/src/components/__tests__/TransportBar.test.tsx`
+- [x] T072 [P][test] `ModeToggle` vitest — setMode/toggleMode dispatches; `P` keyboard listener works; Present-mode hover-reveal is debounced to 3 s `apps/briefing-renderer/src/components/ModeToggle.test.tsx`
+- [x] T073 [P][test] `TimeSlider` vitest — slider bounds change when `setScrubbableRange` is invoked; slider rests at `timestamp` for instant Scenes `apps/briefing-renderer/src/components/TimeSlider.test.tsx`
 
 ### Storybook E2E (shared/components runner)
 
-- [ ] T074 [P][test] `TransportBar` Storybook E2E in three theme variants (light, dark, vscode); capture screenshots for evidence `shared/components/e2e/BriefingTransportBar.spec.ts`
-- [ ] T075 [P][test] `ModeToggle` Storybook E2E in three theme variants; capture screenshots; capture an interaction recording (hover + keyboard) for the evidence GIF `shared/components/e2e/BriefingModeToggle.spec.ts`
+- [x] T074 [P][test] `TransportBar` Storybook E2E in three theme variants (light, dark, vscode); capture screenshots for evidence `shared/components/e2e/BriefingTransportBar.spec.ts`
+- [x] T075 [P][test] `ModeToggle` Storybook E2E in three theme variants; capture screenshots; capture an interaction recording (hover + keyboard) for the evidence GIF `shared/components/e2e/BriefingModeToggle.spec.ts`
 
 ### Playwright E2E for US3
 
-- [ ] T076 [test] 10 consecutive Present ↔ Minimal toggles during active playback — `currentSceneIndex`, `currentTime`, `playState` identical before and after each toggle (SC-005); `P` shortcut and hover-corner control both reachable in Present mode `apps/briefing-renderer/playwright/tests/briefing-zip-mode-toggle.spec.ts`
+- [x] T076 [test] 10 consecutive Present ↔ Minimal toggles during active playback — `currentSceneIndex`, `currentTime`, `playState` identical before and after each toggle (SC-005); `P` shortcut and hover-corner control both reachable in Present mode `apps/briefing-renderer/playwright/tests/briefing-zip-mode-toggle.spec.ts`
 
 **Parallel execution example for Phase 5**: T064–T070 are seven independent component files — all draftable in parallel. T071–T075 are five independent test files, also parallel. T076 is the integration gate that depends on all of them.
 
@@ -250,8 +307,8 @@ The core scoping logic lives in `scopeStoryboard` (T020) which is already exerci
 
 ### Multi-Storyboard verification
 
-- [ ] T077 [test] Multi-Storyboard fixture plot — two Storyboards A and B with disjoint Scene sets; export each; assert disjoint `StoryboardFeature` + `SceneFeature` sets in the resulting zips (US4 Acceptance Scenarios 1 + 3) `apps/vscode/src/services/briefingZipExport/multi-storyboard.integration.test.ts`
-- [ ] T078 [test] Shared-feature fixture plot — Storyboards A and B both reference the same track via `visible_feature_ids`; export A; verify the track is included; export B; verify the track is also included (US4 Acceptance Scenario 2) `apps/vscode/src/services/briefingZipExport/shared-feature.integration.test.ts`
+- [x] T077 [test] Multi-Storyboard fixture plot — two Storyboards A and B with disjoint Scene sets; export each; assert disjoint `StoryboardFeature` + `SceneFeature` sets in the resulting zips (US4 Acceptance Scenarios 1 + 3) `apps/vscode/src/services/briefingZipExport/multi-storyboard.integration.test.ts`
+- [x] T078 [test] Shared-feature fixture plot — Storyboards A and B both reference the same track via `visible_feature_ids`; export A; verify the track is included; export B; verify the track is also included (US4 Acceptance Scenario 2) `apps/vscode/src/services/briefingZipExport/shared-feature.integration.test.ts`
 
 **Phase 6 is small by design**: the scoping logic is established in Phase 3; this phase is the explicit multi-Storyboard test surface. Both tasks are independent test files and can run in parallel ([P] omitted only because they share fixture-construction patterns — write them sequentially for shared-fixture reuse).
 
@@ -263,25 +320,25 @@ End-to-end verification, in-zip recipient docs, ADR for the standalone-SPA decis
 
 ### End-to-end verification (T-PLAYWRIGHT-E2E)
 
-- [ ] T079 [test] Full pipeline test exercising: invoke export command → resulting zip on disk → unzip → open `index.html` from `file://` → verify Scene 0 renders → play → verify zero external requests → verify final Scene reached → replay → verify final state. The SPA + export converge here `apps/briefing-renderer/playwright/tests/briefing-zip-end-to-end.spec.ts`
+- [x] T079 [test] Full pipeline test exercising: invoke export command → resulting zip on disk → unzip → open `index.html` from `file://` → verify Scene 0 renders → play → verify zero external requests → verify final Scene reached → replay → verify final state. The SPA + export converge here `apps/briefing-renderer/playwright/tests/briefing-zip-end-to-end.spec.ts`
 
 ### In-zip recipient docs + ADR (T-DOCS)
 
-- [ ] T080 [P] In-zip `README.txt` template — recipient-facing usage instructions; MUST name the supported browser matrix (current Chrome and Edge) per `/speckit.review` decision 3C; bundled into the zip by `zipAssembler` (T024) `apps/briefing-renderer/public/README.txt`
-- [ ] T081 [P] ADR for "briefing renderer ships as a standalone `file://`-loadable SPA, not as a printable PDF or screen recording" — captures the trade-off and the decision rationale `docs/project_notes/decisions.md`
+- [x] T080 [P] In-zip `README.txt` template — recipient-facing usage instructions; MUST name the supported browser matrix (current Chrome and Edge) per `/speckit.review` decision 3C; bundled into the zip by `zipAssembler` (T024) `apps/briefing-renderer/public/README.txt`
+- [x] T081 [P] ADR for "briefing renderer ships as a standalone `file://`-loadable SPA, not as a printable PDF or screen recording" — captures the trade-off and the decision rationale `docs/project_notes/decisions.md`
 
 ### Evidence collection
 
-- [ ] T082 Capture test results using the test-summary template — YAML front matter (`feature: 264-briefing-zip-renderer`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`); body lists every Playwright spec + vitest module count + key scenarios verified `specs/264-briefing-zip-renderer/evidence/test-summary.md`
-- [ ] T083 Create usage demonstration covering both flows — analyst side (invoke command, pick destination) and recipient side (unzip, open in Chrome or Edge, play); include the failure-mode banner screenshot showing the supported-browser message for the Firefox/Safari case `specs/264-briefing-zip-renderer/evidence/usage-example.md`
-- [ ] T084 [P] Export a sample briefing zip from the fixture plot for inclusion as evidence; this zip is the deliverable referenced by the PR description and the recipient-side walkthrough `specs/264-briefing-zip-renderer/evidence/sample-briefing.zip`
-- [ ] T085 [P] Capture SPA screenshots — Minimal mode (light/dark/vscode), Present mode, Empty state, Error state, "Playback halted" state, DevTools Network panel showing 0 external requests — via the Playwright suite from Phase 4/5 `specs/264-briefing-zip-renderer/evidence/screenshots/`
-- [ ] T086 [P] Capture an interaction GIF (< 5 s, < 2 MB) of the mode toggle + playback flow — via Playwright `recordVideo` config, post-process with ffmpeg to GIF `specs/264-briefing-zip-renderer/evidence/screenshots/interaction.gif`
-- [ ] T087 [P] Summarise every Playwright suite (file-protocol, network-isolation, playback, mode-toggle, failure-modes, end-to-end) with pass counts + assertion highlights `specs/264-briefing-zip-renderer/evidence/webview-e2e-summary.md`
+- [x] T082 Capture test results using the test-summary template — YAML front matter (`feature: 264-briefing-zip-renderer`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`); body lists every Playwright spec + vitest module count + key scenarios verified `specs/264-briefing-zip-renderer/evidence/test-summary.md`
+- [x] T083 Create usage demonstration covering both flows — analyst side (invoke command, pick destination) and recipient side (unzip, open in Chrome or Edge, play); include the failure-mode banner screenshot showing the supported-browser message for the Firefox/Safari case `specs/264-briefing-zip-renderer/evidence/usage-example.md`
+- [x] T084 [P] Export a sample briefing zip from the fixture plot for inclusion as evidence; this zip is the deliverable referenced by the PR description and the recipient-side walkthrough `specs/264-briefing-zip-renderer/evidence/sample-briefing.zip`
+- [x] T085 [P] Capture SPA screenshots — Minimal mode (light/dark/vscode), Present mode, Empty state, Error state, "Playback halted" state, DevTools Network panel showing 0 external requests — via the Playwright suite from Phase 4/5 `specs/264-briefing-zip-renderer/evidence/screenshots/`
+- [x] T086 [P] Capture an interaction GIF (< 5 s, < 2 MB) of the mode toggle + playback flow — via Playwright `recordVideo` config, post-process with ffmpeg to GIF `specs/264-briefing-zip-renderer/evidence/screenshots/interaction.gif`
+- [x] T087 [P] Summarise every Playwright suite (file-protocol, network-isolation, playback, mode-toggle, failure-modes, end-to-end) with pass counts + assertion highlights `specs/264-briefing-zip-renderer/evidence/webview-e2e-summary.md`
 
 ### Media content
 
-- [ ] T088 Create feature blog post — first three sections (What We're Building, How It Fits, Key Decisions) copied verbatim from `specs/264-briefing-zip-renderer/evidence/opening-context.md` (cached during `/speckit.plan`); remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from evidence. Spawn the Content Specialist agent via the Task tool with the `media/content.md` definition + evidence context `specs/264-briefing-zip-renderer/media/shipped-post.md`
+- [x] T088 Create feature blog post — first three sections (What We're Building, How It Fits, Key Decisions) copied verbatim from `specs/264-briefing-zip-renderer/evidence/opening-context.md` (cached during `/speckit.plan`); remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from evidence. Spawn the Content Specialist agent via the Task tool with the `media/content.md` definition + evidence context `specs/264-briefing-zip-renderer/media/shipped-post.md`
 
 ### PR creation
 

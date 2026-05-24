@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { useState } from 'react';
 import { MapView } from './MapView';
 import { ThemeProvider } from '../ThemeProvider';
@@ -491,3 +492,41 @@ export const NoToolbar: Story = {
     },
   },
 };
+
+// ── Briefing-renderer tile-layer props (spec #264 T-MAPVIEW-EXT) ──────
+
+export const BriefingTileLayerProps: Story = {
+  args: {
+    features: sampleData,
+    height: 400,
+    // The four new props this story exercises:
+    tileLayerUrl: './tiles/{z}/{x}/{y}.png',
+    tileLayerAttribution:
+      '© OpenStreetMap contributors (basemap tiles bundled for offline briefing)',
+    errorTileUrl: './tiles/placeholder.png',
+    maxZoom: 12,
+    noWrap: true,
+    tileLayerCrossOrigin: false,
+    // Explicit spies for the action callbacks Storybook would otherwise
+    // bind implicitly (Storybook 8 deprecation).
+    onSelect: fn(),
+    onBackgroundClick: fn(),
+    onZoomChange: fn(),
+    onBoundsChange: fn(),
+    onMapReady: fn(),
+    onFlyToComplete: fn(),
+    onSceneRectangleClick: fn(),
+    onDrawingModeChange: fn(),
+    onShapeCreated: fn(),
+    onViewportLockChange: fn(),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The four props the air-gapped briefing renderer SPA (#264) needs to load tiles from a `file://` origin: `errorTileUrl` (placeholder served when a tile is missing), `maxZoom` (clamps zoom-in attempts to the bundled-tile depth), `noWrap` (keeps playback bounded to the captured tile set), and `tileLayerCrossOrigin={false}` (omits the `crossorigin` attribute that would otherwise block `file://`-origin loads in Chromium). All four default to today\'s behaviour for existing MapView consumers.',
+      },
+    },
+  },
+};
+
