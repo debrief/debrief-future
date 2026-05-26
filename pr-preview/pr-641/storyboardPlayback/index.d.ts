@@ -1,16 +1,16 @@
 /**
- * Public barrel for the shared storyboard playback primitives (#263).
+ * Public barrel for the shared storyboard playback primitives.
  *
- * Currently exports the `TimeRangeTween` RAF primitive used by the VS Code
- * (and, in a follow-up, the web-shell) playback engines to drive a
- * synchronised viewport + slider scrub for time-range Scenes.
- *
- * The full engine relocation from `apps/vscode/src/services/storyboardPlayback.ts`
- * into this module (per spec #263 plan T047a–T047e) is deferred to a
- * follow-up — the web-shell does not yet have a storyboard playback engine
- * at all (#264 work), and a relocation without a second consumer is
- * premature.
+ * Originally introduced for #263 (`TimeRangeTween` only); extended in #264
+ * (T-HOIST) to export the full `StoryboardPlaybackService` so both
+ * consumers — the VS Code authoring environment and the air-gapped
+ * briefing renderer SPA — compose the same engine.
  */
 export { blendViewport, runTimeRangeTween, } from './timeRangeTween';
 export type { TimeRangeTweenDirection, TimeRangeTweenHandle, TimeRangeTweenPorts, TimeRangeTweenResult, FrameScheduler, RunTimeRangeTweenInput, } from './timeRangeTween';
+export { StoryboardPlaybackService } from './service';
+export type { StoryboardPlaybackServiceOptions, StoryboardPlaybackSnapshot, PlaybackMapPanel, PlaybackPanelView, PlaybackSessionManager, PlaybackSessionStore, PlaybackTimeRangeView, ModalPromptPort, VisibilityPort, } from './service';
+export { plotFromFeatures, featuresFromPlot, } from './plotFromFeatures';
+export { HostEventEmitter } from './events';
+export type { HostDisposable, HostEvent } from './events';
 //# sourceMappingURL=index.d.ts.map
