@@ -217,17 +217,34 @@ test.describe('Multi-select emitter (#192 Phase 5)', () => {
     await ap.clickMapBackground();
     expect(await ap.getSelectedFeatureIds()).toEqual([]);
 
-    // Click the first `.leaflet-interactive` path. We can't predict
-    // which feature id that maps to (Leaflet renders in its own order
-    // after MultiPolygon decomposition + STORYBOARD_SCENE filtering),
-    // but the contract only requires that a plain map click produces
-    // a single-feature selection with primary = that feature.
-    const firstPath = page.locator('.leaflet-interactive').first();
-    await firstPath.click({ force: true });
+    // Click `.leaflet-interactive` paths until one produces a selection.
+    // We can't predict which feature id a given path maps to (Leaflet
+    // renders in its own order after MultiPolygon decomposition +
+    // STORYBOARD_SCENE filtering), and not every interactive path is a
+    // selectable feature — STORYBOARD_SCENE rectangles render as
+    // `.leaflet-interactive` but the resolver filters them out, so a
+    // click there yields an empty selection. Iterating proves the
+    // contract ("a plain map click on a feature routes through the
+    // emitter → exactly one feature") without depending on the SVG
+    // paint order, which the #264 storyboard work made less predictable.
+    const paths = page.locator('.leaflet-interactive');
+    const pathCount = await paths.count();
+    expect(pathCount).toBeGreaterThan(0);
 
-    const featureIds = await ap.getSelectedFeatureIds();
-    expect(featureIds.length).toBe(1);
-    expect(await ap.getSelectedPrimary()).toBe(featureIds[0]);
+    let selectedAfterClick: string[] = [];
+    for (let i = 0; i < pathCount; i++) {
+      // eslint-disable-next-line no-await-in-loop -- ordered probe
+      await ap.clickMapBackground();
+      // eslint-disable-next-line no-await-in-loop
+      await paths.nth(i).click({ force: true });
+      // eslint-disable-next-line no-await-in-loop
+      selectedAfterClick = await ap.getSelectedFeatureIds();
+      if (selectedAfterClick.length > 0) break;
+    }
+
+    // At least one interactive path must map to a selectable feature.
+    expect(selectedAfterClick.length).toBe(1);
+    expect(await ap.getSelectedPrimary()).toBe(selectedAfterClick[0]);
   });
 
   test('two Cmd-clicks in the Layers panel produce the same selection set as the map path', async ({
