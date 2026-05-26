@@ -18,6 +18,7 @@
 - **C-B4**: The extension opens the system browser at `await asExternalUri(http://127.0.0.1:<port>/?features=/features.geojson)` via `openExternal`.
 - **C-B5**: Works with no external network (loopback only). Server is reused across previews and disposed on deactivation.
 - **C-B6**: If the active storyboard has no scenes, the command does not launch and the UI explains why (mirrors `canPreview`).
+- **C-B7**: The server binds `127.0.0.1` only and enforces a **`Host` header allowlist** — requests whose `Host` is not `127.0.0.1[:<port>]` (or the literal loopback the extension opened) are rejected with `403`. This defeats DNS-rebinding, where a malicious page resolves an attacker-controlled domain to `127.0.0.1` to reach the loopback server from its own browser origin. (Loopback binding alone blocks remote network access but not rebinding, which arrives as an ordinary local request carrying a foreign `Host`.)
 
 ## C. Web-shell preview launch
 

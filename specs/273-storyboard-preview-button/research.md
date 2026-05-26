@@ -75,6 +75,8 @@ This document resolves the open technical questions behind the spec. It is groun
 - `asExternalUri` makes the loopback URL correct in Remote/Codespaces tunnels; `openExternal` then launches the system browser. Fully **offline** (loopback only).
 - This is a **new pattern** for the extension (no existing local server). It is read-only serving, not persistence and not a Python service, so it does not cross an Article IV boundary — but it is novel enough to warrant an ADR (Article VIII.3).
 
+**Security — DNS-rebinding hardening**: Binding `127.0.0.1` blocks *remote* network access but **not** DNS rebinding: a malicious page can resolve an attacker-controlled domain to `127.0.0.1` and reach the server from its own browser origin, where the request arrives as an ordinary local connection carrying a *foreign* `Host` header. The server therefore enforces a **`Host` header allowlist** — only `127.0.0.1[:<port>]` (the literal loopback the extension opened) is served; anything else gets `403`. Combined with the ephemeral lifetime, read-only scope, and OS-assigned port, this closes the loopback-server attack surface (Article X). Captured as contract `C-B7` and folded into the ADR.
+
 **Alternatives considered**:
 - *Open in a VS Code webview instead of an external tab* — rejected: the user explicitly chose a new browser tab; webview also can't host the renderer offline without similar plumbing.
 - *Write a temp HTML with inlined data and `openExternal` a `file://`* — rejected: that is the zip path in disguise (packing step), contradicting the "live URL, no zip" requirement, and `file://` fetch/relative-asset behaviour is brittle across browsers.

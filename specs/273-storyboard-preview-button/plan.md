@@ -33,7 +33,7 @@ Add a **Preview** control to the shared storyboard panel header (both VS Code an
 | **VI / VII. Testing & TDD** | PASS (planned). Renderer inline-boot tests stay green; new url-boot, shared-export-core, panel-control, and web-shell E2E tests written before/with implementation. |
 | **VIII. Documentation** | PASS with action: **new ADR** for (a) the VS Code loopback-preview-server pattern and (b) the renderer dual-boot-path. Spec + this plan satisfy "specs before code". |
 | **IX. Dependencies** | PASS — **no new external dependency** (`node:http`, `fetch`, `Blob` native; JSZip already pinned). New *internal* workspace package `@debrief/briefing-export`. |
-| **X. Security** | PASS. No secrets. Loopback server binds 127.0.0.1 only, serves read-only scoped data, ephemeral lifetime. |
+| **X. Security** | PASS. No secrets. Loopback server binds 127.0.0.1 only, serves read-only scoped data, ephemeral lifetime, **and enforces a `Host` header allowlist to defeat DNS-rebinding** (contract C-B7; folded into the ADR). |
 | **XI. i18n** | PASS. New user-facing strings (Preview label/tooltip, errors) externalised like existing panel strings. |
 | **XIII. Contribution standards** | PASS. Atomic commits; PR review; CI gate. |
 | **XV. Strict type safety** | PASS. Renderer fetch boundary narrows via existing validators before use; no `any`; strict mode throughout. |
