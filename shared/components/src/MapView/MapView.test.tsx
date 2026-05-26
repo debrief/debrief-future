@@ -11,7 +11,24 @@ vi.mock('react-leaflet', () => ({
       {children}
     </div>
   ),
-  TileLayer: ({ url }: { url: string }) => <div data-testid="tile-layer" data-url={url} />,
+  TileLayer: (props: {
+    url: string;
+    attribution?: string;
+    crossOrigin?: 'anonymous' | 'use-credentials';
+    errorTileUrl?: string;
+    maxZoom?: number;
+    noWrap?: boolean;
+  }) => (
+    <div
+      data-testid="tile-layer"
+      data-url={props.url}
+      data-attribution={props.attribution ?? ''}
+      data-cross-origin={props.crossOrigin ?? ''}
+      data-error-tile-url={props.errorTileUrl ?? ''}
+      data-max-zoom={props.maxZoom !== undefined ? String(props.maxZoom) : ''}
+      data-no-wrap={props.noWrap ? 'true' : 'false'}
+    />
+  ),
   GeoJSON: ({ data, onEachFeature }: {
     data: { features: Array<{ id?: string | number; properties: Record<string, unknown> }> };
     onEachFeature?: (feature: Record<string, unknown>, layer: { on: ReturnType<typeof vi.fn>; bindTooltip: ReturnType<typeof vi.fn>; setStyle: ReturnType<typeof vi.fn>; bringToFront: ReturnType<typeof vi.fn> }) => void;
@@ -156,6 +173,61 @@ describe('MapView', () => {
       render(<MapView features={[mockTrackFeature]} />);
 
       expect(screen.getByTestId('feature-track-001')).toBeInTheDocument();
+    });
+  });
+
+  describe('briefing tile-layer props (spec #264 T-MAPVIEW-EXT)', () => {
+    it('passes crossOrigin="anonymous" by default', () => {
+      render(<MapView features={mockFeatureCollection} />);
+      expect(screen.getByTestId('tile-layer')).toHaveAttribute('data-cross-origin', 'anonymous');
+    });
+
+    it('omits the crossOrigin attribute when tileLayerCrossOrigin={false}', () => {
+      render(<MapView features={mockFeatureCollection} tileLayerCrossOrigin={false} />);
+      expect(screen.getByTestId('tile-layer')).toHaveAttribute('data-cross-origin', '');
+    });
+
+    it('passes through errorTileUrl when provided', () => {
+      render(<MapView features={mockFeatureCollection} errorTileUrl="./tiles/placeholder.png" />);
+      expect(screen.getByTestId('tile-layer')).toHaveAttribute(
+        'data-error-tile-url',
+        './tiles/placeholder.png',
+      );
+    });
+
+    it('omits errorTileUrl by default', () => {
+      render(<MapView features={mockFeatureCollection} />);
+      expect(screen.getByTestId('tile-layer')).toHaveAttribute('data-error-tile-url', '');
+    });
+
+    it('passes through maxZoom when provided', () => {
+      render(<MapView features={mockFeatureCollection} maxZoom={12} />);
+      expect(screen.getByTestId('tile-layer')).toHaveAttribute('data-max-zoom', '12');
+    });
+
+    it('omits maxZoom by default (Leaflet default applies)', () => {
+      render(<MapView features={mockFeatureCollection} />);
+      expect(screen.getByTestId('tile-layer')).toHaveAttribute('data-max-zoom', '');
+    });
+
+    it('passes noWrap=true when provided', () => {
+      render(<MapView features={mockFeatureCollection} noWrap />);
+      expect(screen.getByTestId('tile-layer')).toHaveAttribute('data-no-wrap', 'true');
+    });
+
+    it('defaults noWrap to false', () => {
+      render(<MapView features={mockFeatureCollection} />);
+      expect(screen.getByTestId('tile-layer')).toHaveAttribute('data-no-wrap', 'false');
+    });
+
+    it('passes through use-credentials when explicitly set', () => {
+      render(
+        <MapView features={mockFeatureCollection} tileLayerCrossOrigin="use-credentials" />,
+      );
+      expect(screen.getByTestId('tile-layer')).toHaveAttribute(
+        'data-cross-origin',
+        'use-credentials',
+      );
     });
   });
 

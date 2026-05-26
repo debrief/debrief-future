@@ -12,6 +12,16 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./storyboard": {
+      "types": "./dist/storyboard/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./storyboardPlayback": {
+      "types": "./dist/storyboardPlayback/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
     "./MapView": {
       "types": "./dist/MapView/index.d.ts",
       "import": "./dist/MapView/index.js"

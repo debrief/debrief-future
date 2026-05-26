@@ -1,0 +1,61 @@
+import { defineConfig } from '@playwright/test';
+import { readFileSync, existsSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+var __filename = fileURLToPath(import.meta.url);
+var __dirname = dirname(__filename);
+var chromiumPathFile = join(__dirname, '.chromium-path');
+var chromiumPath = process.env.CHROMIUM_PATH;
+if (!chromiumPath && existsSync(chromiumPathFile)) {
+    chromiumPath = readFileSync(chromiumPathFile, 'utf8').trim();
+}
+var useSparticuz = !!chromiumPath;
+var launchOptions = useSparticuz
+    ? {
+        executablePath: chromiumPath,
+        headless: true,
+        args: [
+            '--disable-setuid-sandbox',
+            '--no-sandbox',
+            '--no-zygote',
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '--disable-features=IsolateOrigins,site-per-process',
+            '--disable-site-isolation-trials',
+            '--disable-background-networking',
+            '--disable-default-apps',
+            '--disable-extensions',
+            '--disable-sync',
+            '--disable-translate',
+            '--metrics-recording-only',
+            '--mute-audio',
+            '--no-first-run',
+        ],
+    }
+    : undefined;
+// The briefing renderer runs both in dev (against `pnpm preview` on :5174)
+// and — for the file:// origin gate — via direct `playwright.goto('file://…')`
+// using the built `dist/index.html`. Both paths configure their own URL;
+// the dev server is the default fallback.
+export default defineConfig({
+    testDir: './playwright/tests',
+    fullyParallel: false,
+    forbidOnly: !!process.env.CI,
+    retries: 1,
+    workers: 1,
+    reporter: [['list'], ['html', { open: 'never' }]],
+    use: {
+        trace: 'on-first-retry',
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
+        viewport: { width: 1280, height: 720 },
+        launchOptions: launchOptions,
+    },
+    webServer: {
+        command: 'pnpm preview --port 5174',
+        url: 'http://localhost:5174',
+        reuseExistingServer: !process.env.CI,
+        timeout: 60000,
+    },
+    timeout: 30000,
+});

@@ -1,0 +1,6 @@
+# Build artefacts produced by `pnpm --filter @debrief/briefing-renderer build`
+# + the `sync-briefing-renderer` post-step. Regenerated on every VS Code
+# extension build (see apps/vscode/package.json "build" script).
+*
+!.gitignore
+!.gitkeep
