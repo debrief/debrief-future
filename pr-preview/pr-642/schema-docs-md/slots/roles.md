@@ -17,10 +17,10 @@ Alias: roles
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [StacProvider](../classes/StacProvider.md) | STAC provider entry |  no  |
-| [StacAsset](../classes/StacAsset.md) | A single asset entry within `assets[<key>]` |  no  |
 | [StacItemAssetDefinition](../classes/StacItemAssetDefinition.md) | Item Asset Definition Object — declares the shape of an asset that child Item... |  no  |
+| [StacAsset](../classes/StacAsset.md) | A single asset entry within `assets[<key>]` |  no  |
 | [SceneThumbnailAssetEntry](../classes/SceneThumbnailAssetEntry.md) | A single STAC Item asset entry produced by Storyboarding (#216) for one |  no  |
+| [StacProvider](../classes/StacProvider.md) | STAC provider entry |  no  |
 
 
 

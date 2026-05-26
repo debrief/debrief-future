@@ -17,8 +17,8 @@ Alias: annotations
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [MCPToolDefinition](../classes/MCPToolDefinition.md) | Static catalogue entry advertised by the MCP server |  no  |
 | [MCPContentItem](../classes/MCPContentItem.md) | A single MCP content item (resource, text, or image) |  no  |
+| [MCPToolDefinition](../classes/MCPToolDefinition.md) | Static catalogue entry advertised by the MCP server |  no  |
 
 
 

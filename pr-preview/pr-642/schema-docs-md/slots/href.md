@@ -17,10 +17,10 @@ Alias: href
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [StacLink](../classes/StacLink.md) | A single link entry within `links[]` |  no  |
 | [StacAsset](../classes/StacAsset.md) | A single asset entry within `assets[<key>]` |  no  |
-| [ToolResultAnnotations](../classes/ToolResultAnnotations.md) | Annotations for MCP tool result content items |  no  |
 | [SceneThumbnailAssetEntry](../classes/SceneThumbnailAssetEntry.md) | A single STAC Item asset entry produced by Storyboarding (#216) for one |  no  |
+| [StacLink](../classes/StacLink.md) | A single link entry within `links[]` |  no  |
+| [ToolResultAnnotations](../classes/ToolResultAnnotations.md) | Annotations for MCP tool result content items |  no  |
 
 
 
