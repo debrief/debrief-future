@@ -28,7 +28,9 @@ export type StoryboardErrorCode =
   | "DuplicateCreationOrder"
   | "CreationOrderOutOfRange"
   | "MissingCreationOrder"
-  | "UnsupportedSchemaVersion";
+  | "UnsupportedSchemaVersion"
+  | "SceneFlavourXorViolation"
+  | "SceneTimeRangeEndNotAfterStart";
 
 export abstract class StoryboardError extends Error {
   abstract readonly code: StoryboardErrorCode;
@@ -182,5 +184,41 @@ export class UnsupportedSchemaVersionError extends StoryboardError {
       `Storyboard ${storyboardId} has schema_version=${foundVersion} but the reader requires >= ${requiredMinimum} (pre-#259 plot — no migration provided)`,
     );
     this.name = "UnsupportedSchemaVersionError";
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────
+// #263 — Scene flavour errors (time-range Scenes)
+// ───────────────────────────────────────────────────────────────────
+
+export class SceneFlavourXorViolationError extends StoryboardError {
+  readonly code = "SceneFlavourXorViolation";
+  constructor(
+    readonly sceneId: string,
+    readonly timeRangePresent: boolean,
+    readonly viewportEndPresent: boolean,
+  ) {
+    super(
+      `Scene ${sceneId} has \`time_range\` ${
+        timeRangePresent ? "present" : "absent"
+      } but \`viewport_end\` ${
+        viewportEndPresent ? "present" : "absent"
+      }; both must be present (time-range flavour) or both absent (instant flavour).`,
+    );
+    this.name = "SceneFlavourXorViolationError";
+  }
+}
+
+export class SceneTimeRangeEndNotAfterStartError extends StoryboardError {
+  readonly code = "SceneTimeRangeEndNotAfterStart";
+  constructor(
+    readonly sceneId: string,
+    readonly start: string,
+    readonly end: string,
+  ) {
+    super(
+      `Scene ${sceneId} has \`time_range.end\` (${end}) not strictly greater than \`time_range.start\` (${start}).`,
+    );
+    this.name = "SceneTimeRangeEndNotAfterStartError";
   }
 }

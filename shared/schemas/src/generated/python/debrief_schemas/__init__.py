@@ -4739,14 +4739,12 @@ class TimeInstant(ConfiguredBaseModel):
 
 class TimeRange(ConfiguredBaseModel):
     """
-    A temporal interval with inclusive start and end
+    Time interval for a time-range Scene (#263). The interval is closed on both ends. `end` MUST be strictly greater than `start`. Introduced by Spec #263 to make `SceneProperties.time_range` a first-class slot.
     """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state',
-         'rules': [{'postconditions': {'description': 'Start must be less than or '
-                                                      'equal to end'}}]})
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/storyboard'})
 
-    start: TimeInstant = Field(default=..., description="""Start of interval""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
-    end: TimeInstant = Field(default=..., description="""End of interval""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
+    start: datetime  = Field(default=..., description="""ISO-8601 instant; the slider position at the first capture action. By convention CRUD writes the owning Scene's `timestamp` into this slot, but the system does not depend on the two being equal — ordering reads `time_range?.start ?? timestamp`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
+    end: datetime  = Field(default=..., description="""ISO-8601 instant; the slider position at the second (confirm) capture action. MUST be strictly greater than `start`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
 
 
 class TimeFilter(ConfiguredBaseModel):
@@ -5321,7 +5319,23 @@ class SceneProperties(BaseFeatureProperties):
     """
     Properties class for a Scene child Feature. A Scene is a single captured moment in a Storyboard — viewport, timestamp, and per-feature visibility.
     """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/storyboard'})
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/storyboard',
+         'rules': [{'description': 'Scene flavour XOR (#263): a Scene is either the '
+                                   'instant flavour (both `time_range` and '
+                                   '`viewport_end` absent) or the time-range flavour '
+                                   '(both present). Any other combination is rejected '
+                                   'with `SceneFlavourXorViolation`.',
+                    'postconditions': {'slot_conditions': {'viewport_end': {'name': 'viewport_end',
+                                                                            'value_presence': 'PRESENT'}}},
+                    'preconditions': {'slot_conditions': {'time_range': {'name': 'time_range',
+                                                                         'value_presence': 'PRESENT'}}}},
+                   {'description': 'Scene flavour XOR (#263, reverse): if '
+                                   '`viewport_end` is present then `time_range` MUST '
+                                   'also be present.',
+                    'postconditions': {'slot_conditions': {'time_range': {'name': 'time_range',
+                                                                          'value_presence': 'PRESENT'}}},
+                    'preconditions': {'slot_conditions': {'viewport_end': {'name': 'viewport_end',
+                                                                           'value_presence': 'PRESENT'}}}}]})
 
     kind: Literal["STORYBOARD_SCENE"] = Field(default=..., description="""Feature kind discriminator (pinned to STORYBOARD_SCENE)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'TrackProperties',
@@ -5389,7 +5403,8 @@ class SceneProperties(BaseFeatureProperties):
                        'FeatureSelection',
                        'SceneProperties']} })
     creation_order: int = Field(default=..., description="""Per-Storyboard monotonic sequence value assigned by the platform at capture time. Acts as the secondary sort key for Scenes — when two Scenes share a `timestamp` the one with the lower `creation_order` comes first. Unique within a Storyboard; gaps are permitted (left by deletion). The platform — not the client — is the source of truth. Introduced by #259; absent on pre-#259 plots which are rejected at load (no migration shim — Article XIV pre-release freedom).""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
-    time_range: Optional[str] = Field(default=None, description="""Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
+    time_range: Optional[TimeRange] = Field(default=None, description="""For instant Scenes (#215 default): MUST be absent. For time-range Scenes (#263): a TimeRange sub-record. When present, the Scene is the time-range flavour and `viewport_end` MUST also be present. See cross-field rule `scene-flavour-xor-rule`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
+    viewport_end: Optional[Viewport] = Field(default=None, description="""Map viewport camera state at the end of a time-range Scene (#263). MUST be present if and only if `time_range` is present. Reuses the Viewport sub-record (`bearing` MUST be 0). For instant Scenes this slot MUST be absent.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     visible_feature_ids: list[str] = Field(default=..., description="""Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     feature_set_hash: str = Field(default=..., description="""SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     thumbnail_asset_ref: str = Field(default=..., description="""STAC asset key (path + name within the plot's STAC item). Populated by #216 at capture time via #174 helpers.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })

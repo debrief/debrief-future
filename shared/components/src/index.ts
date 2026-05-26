@@ -365,6 +365,9 @@ export type {
 // Storyboard CRUD module (Feature: 215-storyboarding-schema)
 export * from './storyboard';
 
+// Storyboard playback primitives (Feature: 263-time-range-scenes)
+export * from './storyboardPlayback';
+
 // Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback + 218-storyboarding-edit + 230-storyboard-edit-wiring)
 export {
   StoryboardPanel,

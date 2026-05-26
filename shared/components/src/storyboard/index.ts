@@ -19,13 +19,22 @@ export type {
   Plot as StoryboardPlot,
   SceneFeature,
   StoryboardFeature,
+  TimeRange,
+  Viewport,
   Ulid,
   StoryboardId,
   SceneId,
+  // #263 — Scene flavour discriminated union
+  InstantSceneFeature,
+  TimeRangeSceneFeature,
+  InstantSceneProperties,
+  TimeRangeSceneProperties,
 } from "./types";
 export {
   isStoryboardFeature,
   isSceneFeature,
+  // #263 — Scene flavour predicate
+  isTimeRangeScene,
   asUlid,
   asStoryboardId,
   asSceneId,
@@ -49,6 +58,9 @@ export {
   CreationOrderOutOfRangeError,
   MissingCreationOrderError,
   UnsupportedSchemaVersionError,
+  // #263 — Scene flavour XOR + range validity
+  SceneFlavourXorViolationError,
+  SceneTimeRangeEndNotAfterStartError,
 } from "./errors";
 export type { StoryboardErrorCode } from "./errors";
 
@@ -121,7 +133,7 @@ export {
   canonicaliseVisibleFeatureIds,
   computeFeatureSetHash,
 } from "./hash";
-export { validatePlot } from "./validate";
+export { validatePlot, flavourCheck } from "./validate";
 
 // ---------------------------------------------------------------------------
 // Active-storyboard selection persistence (#237)

@@ -26,7 +26,8 @@ TimeRange:
 
 **Validation**:
 - `end > start` (rejected with named error otherwise).
-- `start == owning_scene.timestamp` (R8 sort-anchor invariant).
+
+> **Note (review resolution 2A — 2026-05-19)**: the earlier-drafted `start == owning_scene.timestamp` sort-anchor invariant (R8) is **dropped**. Ordering instead reads `time_range?.start ?? timestamp` directly (see §5). This removes one cross-field rule, one error code, one invalid fixture, and the parallel hand-written Pydantic + TS validators that LinkML's expression grammar couldn't generate from a single source.
 
 **TypeScript shape** (generated):
 
@@ -91,13 +92,15 @@ The existing slot keeps its definition but its semantics widen:
 
 No YAML change.
 
-### 2d. `timestamp` — invariant tightening (no schema edit)
+### 2d. `timestamp` — semantic note (no schema edit, no new invariant)
 
-The existing slot keeps its definition but for time-range Scenes the invariant `timestamp == time_range.start` is enforced (R8, cross-field rule in §3).
+The existing slot keeps its definition. For time-range Scenes `timestamp` retains its v1 meaning ("the Scene's anchor moment"); by convention CRUD may write `time_range.start` into `timestamp` at capture time, but the system does **not** depend on the two being equal — ordering reads `time_range?.start ?? timestamp` (see §5).
 
 ## 3. Cross-field rules (LinkML `rules` block)
 
-Three rules added to the `SceneProperties` class. All three are declared in LinkML so they propagate to the Pydantic validator and JSON Schema constraint.
+Two rules added to the `SceneProperties` / `TimeRange` classes. Both are declared in LinkML so they propagate to the Pydantic validator and JSON Schema constraint.
+
+> **Removed at review (2A, 2026-05-19)**: the originally-drafted third rule `scene-timestamp-equals-time-range-start-rule` is dropped. LinkML's expression grammar cannot express datetime equality across slots, so the rule would have landed as parallel hand-written Pydantic + TS validators — a soft Article II.1 violation. The ordering path now reads `time_range?.start ?? timestamp` (one line in `ordering.ts`), making the invariant unnecessary.
 
 ### Rule `scene-flavour-xor-rule`
 
@@ -129,21 +132,14 @@ rules:
 
 Implemented as a `TimeRange`-class-level rule with an `equals_expression` comparing the two slots, OR (fallback if LinkML expression grammar doesn't cover datetime compare) as a hand-written Pydantic `model_validator` AND a hand-written `flavourCheck` in `validate.ts`. Both implementations live; the Pydantic + TS pair are tested against the same golden invalid fixture.
 
-### Rule `scene-timestamp-equals-time-range-start-rule`
-
-> **For time-range Scenes, `timestamp == time_range.start`.**
-
-Same implementation strategy as above (LinkML expression preferred; Pydantic + TS hand-validator if grammar can't express it).
-
 ### Error format
 
-All three rules MUST produce a single error per rejected Scene with a stable error code and a message naming every involved slot:
+Both rules MUST produce a single error per rejected Scene with a stable error code and a message naming every involved slot:
 
 | Code | Slots named in message | Trigger |
 |------|------------------------|---------|
 | `SceneFlavourXorViolation` | `properties.time_range`, `properties.viewport_end` | XOR violated |
 | `SceneTimeRangeEndNotAfterStartError` | `properties.time_range.start`, `properties.time_range.end` | `end <= start` |
-| `SceneTimestampDoesNotEqualTimeRangeStartError` | `properties.timestamp`, `properties.time_range.start` | drift |
 
 These codes are exported from `shared/components/src/storyboard/errors.ts` and consumed by both the validator and the capture command for user-facing messages.
 
@@ -191,9 +187,9 @@ type _Exhaustive = Exclude<keyof SceneProperties, keyof InstantSceneProperties |
 
 ## 5. Sort invariants and ordering
 
-The Storyboard sort key is unchanged from #259: `(timestamp, creation_order)` ascending. No edits to `ordering.ts`.
+The Storyboard sort key extends #259's `(timestamp, creation_order)` ascending by reading `time_range?.start ?? timestamp` as the first key component. Single-line change in `ordering.ts`. For instant Scenes (`time_range` absent) the sort behaviour is byte-equivalent to #259's. For time-range Scenes the sort uses `time_range.start` directly, without depending on any `timestamp == time_range.start` invariant.
 
-Time-range Scenes participate via their `timestamp` slot, which (per §3 rule `scene-timestamp-equals-time-range-start-rule`) equals `time_range.start`. This keeps the sort path single-key-tuple and uniform across flavours.
+> **Why this changed (review resolution 2A, 2026-05-19)**: the original design (R8) added a third LinkML cross-field rule asserting `timestamp == time_range.start` so `ordering.ts` could stay flavour-agnostic. LinkML's expression grammar can't express datetime equality across slots, so the rule would have landed as parallel Pydantic + TS hand-written validators — a soft Article II.1 violation for no value. Reading `time_range?.start ?? timestamp` in the sort key is one line and removes the rule, fixture, error code, and two validators.
 
 **Test added**: `ordering.flavour.test.ts` asserts that a mixed-flavour Storyboard with the following capture order
 
@@ -250,6 +246,7 @@ See research.md §R9 for the retire/add list. Summarised:
 | `invalid/scene-time-range-missing-viewport-end.json` | time-range (broken) | invalid | XOR violation, code `SceneFlavourXorViolation` |
 | `invalid/scene-instant-with-viewport-end.json` | instant (broken) | invalid | XOR violation, code `SceneFlavourXorViolation` |
 | `invalid/scene-time-range-end-not-after-start.json` | time-range (broken) | invalid | range validity, code `SceneTimeRangeEndNotAfterStartError` |
-| `invalid/scene-time-range-timestamp-mismatch.json` | time-range (broken) | invalid | sort-anchor invariant, code `SceneTimestampDoesNotEqualTimeRangeStartError` |
+
+> **Note (review resolution 2A — 2026-05-19)**: the originally-drafted `invalid/scene-time-range-timestamp-mismatch.json` is **not** added. The R8 invariant it enforced was dropped (see §3 and §5).
 
 Round-trip and structural-comparison tests run against the schema artefacts (Pydantic, JSON Schema, TS) using these fixtures, per Article II.

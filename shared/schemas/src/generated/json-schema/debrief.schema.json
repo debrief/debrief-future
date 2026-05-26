@@ -2758,6 +2758,44 @@
     },
     "SceneProperties": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "time_range": {}
+            },
+            "required": [
+              "time_range"
+            ]
+          },
+          "then": {
+            "properties": {
+              "viewport_end": {}
+            },
+            "required": [
+              "viewport_end"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "viewport_end": {}
+            },
+            "required": [
+              "viewport_end"
+            ]
+          },
+          "then": {
+            "properties": {
+              "time_range": {}
+            },
+            "required": [
+              "time_range"
+            ]
+          }
+        }
+      ],
       "description": "Properties class for a Scene child Feature. A Scene is a single captured moment in a Storyboard \u2014 viewport, timestamp, and per-feature visibility.",
       "properties": {
         "_polygon_source": {
@@ -2825,11 +2863,15 @@
           "type": "string"
         },
         "time_range": {
-          "description": "Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TimeRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "For instant Scenes (#215 default): MUST be absent. For time-range Scenes (#263): a TimeRange sub-record. When present, the Scene is the time-range flavour and `viewport_end` MUST also be present. See cross-field rule `scene-flavour-xor-rule`."
         },
         "timestamp": {
           "description": "ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard) as the primary sort key. Multiple Scenes MAY share the same timestamp; ties are broken by `creation_order` ascending (see #259).",
@@ -2858,6 +2900,17 @@
         "viewport": {
           "$ref": "#/$defs/Viewport",
           "description": "Map viewport camera state at capture time"
+        },
+        "viewport_end": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Viewport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Map viewport camera state at the end of a time-range Scene (#263). MUST be present if and only if `time_range` is present. Reuses the Viewport sub-record (`bearing` MUST be 0). For instant Scenes this slot MUST be absent."
         },
         "visible_feature_ids": {
           "description": "Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective.",
@@ -4034,6 +4087,28 @@
         "style"
       ],
       "title": "TextAnnotationProperties",
+      "type": "object"
+    },
+    "TimeRange": {
+      "additionalProperties": false,
+      "description": "Time interval for a time-range Scene (#263). The interval is closed on both ends. `end` MUST be strictly greater than `start`. Introduced by Spec #263 to make `SceneProperties.time_range` a first-class slot.",
+      "properties": {
+        "end": {
+          "description": "ISO-8601 instant; the slider position at the second (confirm) capture action. MUST be strictly greater than `start`.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "start": {
+          "description": "ISO-8601 instant; the slider position at the first capture action. By convention CRUD writes the owning Scene's `timestamp` into this slot, but the system does not depend on the two being equal \u2014 ordering reads `time_range?.start ?? timestamp`.",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeRange",
       "type": "object"
     },
     "TimestampedPosition": {

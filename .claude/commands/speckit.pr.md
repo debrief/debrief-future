@@ -142,6 +142,34 @@ You **MUST** consider the user input before proceeding (if not empty).
    - For APIs: verify sample request/response JSON exists
    - Report missing type-specific evidence as warnings (not blockers)
 
+7c. **Screenshot audit (HARD BLOCKER, not a warning)**:
+   - Run `.specify/scripts/bash/audit-evidence-screenshots.sh` from the repo root
+   - The script scans `tasks.md` for `evidence/screenshots/*.{png,gif,jpg,webp}` paths
+     and `evidence/opening-context.md` for markdown image references, then checks
+     that every referenced file exists on disk
+   - **Exit 0 (no screenshots committed OR all present)**: continue
+   - **Exit 2 (one or more screenshots missing)**: STOP. Do not proceed to PR creation.
+     Read the script's stderr — it lists the missing files and the Playwright wrapper
+     to run for each (`shared/components/run-playwright.mjs` for Storybook,
+     `apps/web-shell/run-playwright.mjs` for the workflow + GIF). Capture them, commit,
+     then re-run this step.
+   - **Override path**: only if the post genuinely doesn't need the listed screenshots
+     (e.g. the opening-context was written before UI scope was descoped), explicitly
+     re-run with `SPECIFY_SKIP_SCREENSHOT_AUDIT=1` set, AND remove the orphaned
+     references from `opening-context.md` and `tasks.md` in the same commit. The
+     override exists so a maintainer can ship a no-images post knowingly — it does
+     not exist to bypass producing screenshots that the spec committed to.
+   - **Why this is a blocker**: see `docs/project_notes/bugs.md` →
+     "feature posts shipped without screenshots". Past sessions deferred screenshot
+     tasks citing UI scope, then shipped posts with broken image links and prose
+     placeholders. The blog post IS the user-facing artefact; this guard removes the
+     choice from the author at the moment it matters.
+
+   The same audit also fires as a `PreToolUse` hook on
+   `mcp__github__create_pull_request` (see `.claude/settings.json`) so attempting to
+   skip this step by jumping directly to the tool call will block at the tool
+   boundary too.
+
 8. **Check git and branch status**:
    - Verify all changes are committed
    - Check current branch name

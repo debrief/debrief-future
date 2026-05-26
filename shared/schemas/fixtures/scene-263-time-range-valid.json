@@ -1,0 +1,44 @@
+{
+  "type": "Feature",
+  "id": "01HZ263263263263263263263A",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [-1.5, 50.5],
+        [-1.5, 51.0],
+        [-1.0, 51.0],
+        [-1.0, 50.5],
+        [-1.5, 50.5]
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "STORYBOARD_SCENE",
+    "id": "01HZ263263263263263263263A",
+    "storyboard_id": "01HZ7777777777777777777777",
+    "title": "151200Z MAY 26",
+    "viewport": {
+      "center": [-1.25, 50.75],
+      "zoom": 11.0,
+      "bearing": 0
+    },
+    "viewport_end": {
+      "center": [-1.10, 50.85],
+      "zoom": 12.0,
+      "bearing": 0
+    },
+    "timestamp": "2026-05-15T12:00:00Z",
+    "time_range": {
+      "start": "2026-05-15T12:00:00Z",
+      "end": "2026-05-15T12:01:30Z"
+    },
+    "visible_feature_ids": ["track-001", "track-002"],
+    "feature_set_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "thumbnail_asset_ref": "scene-thumbnail-01HZ263263263263263263263A",
+    "transition_duration_ms": 500,
+    "creation_order": 1,
+    "display_mode": "trail",
+    "_polygon_source": "bounds"
+  }
+}

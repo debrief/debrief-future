@@ -10,8 +10,9 @@
    - `properties.time_range == null/absent` AND `properties.viewport_end == null/absent` (instant flavour), OR
    - `properties.time_range` is a `TimeRange` value AND `properties.viewport_end` is a `Viewport` value (time-range flavour).
 2. **Range validity**. If time-range flavour: `time_range.end > time_range.start`.
-3. **Sort-anchor invariant**. If time-range flavour: `timestamp == time_range.start`.
-4. **Bearing zero**. Both `viewport.bearing == 0` and (if present) `viewport_end.bearing == 0` (v1 reserved; unchanged by this feature).
+3. **Bearing zero**. Both `viewport.bearing == 0` and (if present) `viewport_end.bearing == 0` (v1 reserved; unchanged by this feature).
+
+> **Removed at review 2A (2026-05-19)**: the originally-drafted "sort-anchor invariant" (`timestamp == time_range.start` for time-range Scenes) is dropped. `ordering.ts` now reads `time_range?.start ?? timestamp` directly. See research.md R8 (revised) and data-model.md §5.
 
 ## Validation outputs (errors)
 
@@ -21,7 +22,6 @@ A failing Scene MUST raise exactly one error per violated invariant, drawn from 
 |-----------|------------|-------------------|
 | XOR | `SceneFlavourXorViolation` | "Scene {id} has `time_range` {present/absent} but `viewport_end` {absent/present}; both must be present (time-range flavour) or both absent (instant flavour)." |
 | Range validity | `SceneTimeRangeEndNotAfterStartError` | "Scene {id} has `time_range.end` ({end}) not strictly greater than `time_range.start` ({start})." |
-| Sort anchor | `SceneTimestampDoesNotEqualTimeRangeStartError` | "Scene {id} has `timestamp` ({timestamp}) not equal to `time_range.start` ({start})." |
 | Bearing zero | `ReservedSlotViolationError` (existing) | unchanged from #215 |
 
 Errors carry the `properties.id` (ULID) and the involved field paths; no other data leaks through.

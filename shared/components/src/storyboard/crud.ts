@@ -40,6 +40,7 @@ import type {
   PolygonSource,
   SceneProperties,
   StoryboardProperties,
+  TimeRange,
   Viewport,
   WasGeneratedBy,
 } from "@debrief/schemas";
@@ -49,6 +50,8 @@ import {
   DuplicateStoryboardNameError,
   OrphanSceneError,
   ReservedSlotViolationError,
+  SceneFlavourXorViolationError,
+  SceneTimeRangeEndNotAfterStartError,
   ThumbnailDeepCopyFailedError,
   UnknownSceneError,
   UnknownStoryboardError,
@@ -515,6 +518,24 @@ export interface CreateSceneInput {
   visibleFeatureIds: string[];
   thumbnailAssetRef: string;
   transitionDurationMs?: number;
+  /**
+   * Time-range flavour pair (#263). MUST be supplied together or both omitted:
+   *
+   * - **Instant flavour** (default): omit both `timeRange` and `viewportEnd`.
+   *   The captured Scene has `time_range = undefined` and
+   *   `viewport_end = undefined`. Behaviour identical to #215.
+   * - **Time-range flavour**: supply both `timeRange` (with
+   *   `timeRange.end > timeRange.start`) and `viewportEnd`. The captured
+   *   Scene records both slots and plays back as a synchronised viewport +
+   *   slider scrub (per #263 FR-PLAY-001..006).
+   *
+   * Mixed-presence inputs (`timeRange` without `viewportEnd` or vice versa)
+   * throw `SceneFlavourXorViolationError`. Reversed/zero ranges throw
+   * `SceneTimeRangeEndNotAfterStartError`. Both errors fire before any
+   * mutation, so the plot is left untouched on rejection.
+   */
+  timeRange?: TimeRange;
+  viewportEnd?: Viewport;
   actor: string;
   now?: string;
   idOverride?: string;
@@ -548,6 +569,29 @@ export async function createScene(
     throw new OrphanSceneError("<new-scene>", input.storyboardId);
   }
   assertViewportBearingZero(input.viewport);
+  // #263 — Scene flavour XOR (input-side). Reject before any mutation so the
+  // plot is untouched on rejection. The `idOverride ?? "<new-scene>"` shape
+  // mirrors the OrphanSceneError above (an id may not yet exist).
+  const sceneIdForError = input.idOverride ?? "<new-scene>";
+  const trPresent = input.timeRange !== undefined;
+  const vePresent = input.viewportEnd !== undefined;
+  if (trPresent !== vePresent) {
+    throw new SceneFlavourXorViolationError(
+      sceneIdForError,
+      trPresent,
+      vePresent,
+    );
+  }
+  if (input.timeRange !== undefined && input.viewportEnd !== undefined) {
+    assertViewportBearingZero(input.viewportEnd);
+    if (!(input.timeRange.end > input.timeRange.start)) {
+      throw new SceneTimeRangeEndNotAfterStartError(
+        sceneIdForError,
+        input.timeRange.start,
+        input.timeRange.end,
+      );
+    }
+  }
   const canonical = canonicaliseVisibleFeatureIds(input.visibleFeatureIds);
   const hash = await computeFeatureSetHash(canonical);
   const newId = input.idOverride ?? generateUlid();
@@ -588,6 +632,10 @@ export async function createScene(
     transition_duration_ms: input.transitionDurationMs ?? 500,
     creation_order: creationOrder,
     ...(input.displayMode !== undefined && { display_mode: input.displayMode }),
+    // #263 — time-range flavour pair. Either both present or both omitted;
+    // the input-side XOR check above guarantees this is well-formed.
+    ...(input.timeRange !== undefined && { time_range: input.timeRange }),
+    ...(input.viewportEnd !== undefined && { viewport_end: input.viewportEnd }),
     _polygon_source: polygonSource,
     tags: [],
     provenance: [logEntry],

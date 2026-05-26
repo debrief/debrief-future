@@ -85,6 +85,43 @@ export interface MapViewProps {
   /** Tile layer attribution */
   tileLayerAttribution?: string;
 
+  /**
+   * URL of the tile served when an XYZ slot is missing or unreachable
+   * (Leaflet `TileLayer.options.errorTileUrl`). Set by the briefing
+   * renderer SPA (spec #264) to `./tiles/placeholder.png` so that
+   * out-of-bundle Scene viewports show a neutral placeholder rather
+   * than triggering a network fallback. Defaults to undefined — Leaflet
+   * shows a transparent tile, matching today's behaviour.
+   */
+  errorTileUrl?: string;
+
+  /**
+   * Maximum zoom level for the tile layer (`TileLayer.options.maxZoom`).
+   * The briefing renderer passes its bundled-zoom cap so users can't
+   * zoom past the cache. Defaults to undefined — Leaflet picks the
+   * library default (18), matching today's behaviour.
+   */
+  maxZoom?: number;
+
+  /**
+   * When true, tiles are not repeated horizontally across the
+   * antimeridian (`TileLayer.options.noWrap`). The briefing renderer
+   * sets this to keep playback bounded to the captured tile set.
+   * Defaults to false (Leaflet's default — tiles wrap), matching
+   * today's behaviour.
+   */
+  noWrap?: boolean;
+
+  /**
+   * Value passed through as the `crossOrigin` attribute on the
+   * underlying `<TileLayer>`. Pass `false` to omit the attribute
+   * entirely (required under `file://` origin in current Chrome /
+   * Edge — the attribute is meaningless there and CAUSES the tile
+   * to fail to load if set). Defaults to `'anonymous'` (today's
+   * behaviour, unchanged for non-briefing consumers).
+   */
+  tileLayerCrossOrigin?: 'anonymous' | 'use-credentials' | false;
+
   /** CSS class name */
   className?: string;
 
@@ -584,6 +621,10 @@ export function MapView({
   fitBoundsTrigger,
   tileLayerUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   tileLayerAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  errorTileUrl,
+  maxZoom,
+  noWrap = false,
+  tileLayerCrossOrigin = 'anonymous',
   className,
   style,
   height = 400,
@@ -963,7 +1004,16 @@ export function MapView({
         style={{ height: '100%', width: '100%' }}
         zoomControl={!showToolbar}
       >
-        <TileLayer url={tileLayerUrl} attribution={tileLayerAttribution} crossOrigin="anonymous" />
+        <TileLayer
+          url={tileLayerUrl}
+          attribution={tileLayerAttribution}
+          {...(tileLayerCrossOrigin === false
+            ? {}
+            : { crossOrigin: tileLayerCrossOrigin })}
+          {...(errorTileUrl ? { errorTileUrl } : {})}
+          {...(maxZoom !== undefined ? { maxZoom } : {})}
+          {...(noWrap ? { noWrap: true } : {})}
+        />
 
         {showToolbar && (
           <LeafletToolbar

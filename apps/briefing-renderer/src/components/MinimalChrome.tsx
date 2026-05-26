@@ -1,0 +1,106 @@
+/**
+ * MinimalChrome — visible in the default Minimal display mode.
+ * Wraps the transport bar, the time slider, the Scene counter, and the
+ * mode-toggle button in a compact bottom panel.
+ */
+
+import type { FC, ReactNode } from 'react';
+import { useBriefingStore } from '../store';
+import { TransportBar } from './TransportBar';
+import { TimeSlider } from './TimeSlider';
+import { ModeToggle } from './ModeToggle';
+
+export interface MinimalChromeProps {
+  children?: ReactNode;
+}
+
+export const MinimalChrome: FC<MinimalChromeProps> = ({ children }) => {
+  const title = useBriefingStore((s) => s.config?.storyboardName ?? '');
+  // The slider is only meaningful on time-range Scenes (#263). On instant
+  // Scenes the playback driver clears the range to (null, null); hiding
+  // the input here — rather than just disabling it — avoids confusing the
+  // viewer with a dead control.
+  const rangeStart = useBriefingStore((s) => s.scrubbableRangeStart);
+  const rangeEnd = useBriefingStore((s) => s.scrubbableRangeEnd);
+  const sliderRelevant =
+    rangeStart !== null && rangeEnd !== null && rangeStart !== rangeEnd;
+
+  return (
+    <div data-testid="briefing-minimal-chrome" style={styles.wrapper}>
+      {children}
+      <div data-testid="briefing-minimal-titlebar" style={styles.titlebar}>
+        <span style={styles.title}>{title}</span>
+        <ModeToggle />
+      </div>
+      <div data-testid="briefing-minimal-controls" style={styles.controls}>
+        <TransportBar />
+        {sliderRelevant && <TimeSlider />}
+      </div>
+    </div>
+  );
+};
+
+const styles: Record<string, React.CSSProperties> = {
+  wrapper: {
+    position: 'absolute',
+    inset: 0,
+    pointerEvents: 'none',
+    display: 'flex',
+    flexDirection: 'column',
+    // Sit above the Leaflet panes (which use z-index 200..700). Without
+    // this, a stacking-context reshuffle (e.g. when Leaflet's drag
+    // handler promotes the map pane) can briefly clip the chrome.
+    zIndex: 1000,
+  },
+  titlebar: {
+    pointerEvents: 'auto',
+    position: 'absolute',
+    top: '0.5rem',
+    // Cap width + horizontally centre on ultra-wide viewports so the
+    // bar doesn't span the full screen.
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 'calc(100% - 1rem)',
+    maxWidth: '64rem',
+    boxSizing: 'border-box',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '1rem',
+    padding: '0.5rem 0.75rem',
+    background: 'rgba(0, 0, 0, 0.72)',
+    borderRadius: '6px',
+    color: '#f0f0f0',
+    backdropFilter: 'blur(6px)',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.35)',
+  },
+  title: {
+    fontWeight: 600,
+    fontSize: '0.95rem',
+    // Flexbox shrink + ellipsis so a long Storyboard name doesn't push
+    // the mode toggle off-screen on narrow viewports.
+    minWidth: 0,
+    flex: '1 1 auto',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  controls: {
+    pointerEvents: 'auto',
+    position: 'absolute',
+    bottom: '0.5rem',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 'calc(100% - 1rem)',
+    maxWidth: '64rem',
+    boxSizing: 'border-box',
+    display: 'flex',
+    gap: '0.75rem',
+    alignItems: 'center',
+    padding: '0.5rem 0.75rem',
+    background: 'rgba(0, 0, 0, 0.72)',
+    borderRadius: '6px',
+    backdropFilter: 'blur(6px)',
+    boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.35)',
+  },
+};
