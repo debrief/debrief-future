@@ -95,6 +95,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                  'log-entry',
                  'system-record',
                  'stac-extension',
+                 'stac',
                  'raw-geojson',
                  'session-state',
                  'tool-result',
@@ -775,6 +776,19 @@ class FileProvDirectionEnum(str, Enum):
     """
 
 
+class StacTypeEnum(str, Enum):
+    """
+    Discriminator for STAC top-level objects. STAC mandates exactly these three values for `type`:
+  - "Feature"     → StacItem
+  - "Catalog"     → StacCatalog
+  - "Collection"  → StacCollection
+Used with the `equals_string` constraint on each class's `type` slot so the generated TypeScript carries a literal-string discriminator (Research R-001).
+    """
+    Feature = "Feature"
+    Catalog = "Catalog"
+    Collection = "Collection"
+
+
 class PlaybackStateEnum(str, Enum):
     """
     Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
@@ -1154,6 +1168,12 @@ class GeoJSONPoint(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -1202,6 +1222,12 @@ class GeoJSONEmptyPoint(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -1250,6 +1276,12 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -1298,6 +1330,12 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -1346,6 +1384,12 @@ class GeoJSONMultiPoint(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -1394,6 +1438,12 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -1442,6 +1492,12 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -1481,6 +1537,7 @@ class SegmentMetadata(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -1584,6 +1641,7 @@ class SensorData(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -1656,6 +1714,7 @@ class TUAData(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -1834,6 +1893,12 @@ class TrackFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -1861,6 +1926,9 @@ class TrackFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -1882,6 +1950,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -1898,6 +1967,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -1907,6 +1977,8 @@ class TrackFeature(ConfiguredBaseModel):
                        'MultiPolygonFeature',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacSpatialExtent',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection']} })
 
@@ -1926,6 +1998,7 @@ class PointMetadataEntry(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -1966,6 +2039,7 @@ class ReferenceLocationProperties(BaseFeatureProperties):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -1977,6 +2051,12 @@ class ReferenceLocationProperties(BaseFeatureProperties):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -2043,6 +2123,12 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -2070,6 +2156,9 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -2090,6 +2179,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -2106,6 +2196,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -2145,6 +2236,8 @@ class SystemStateProperties(ConfiguredBaseModel):
                        'MultiPolygonFeature',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacSpatialExtent',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection']} })
     zoom: Optional[float] = Field(default=None, description="""Map zoom level - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'ViewportPolygon', 'Viewport']} })
@@ -2185,6 +2278,12 @@ class SystemState(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -2212,6 +2311,9 @@ class SystemState(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -2231,6 +2333,7 @@ class SystemState(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -2247,6 +2350,7 @@ class SystemState(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -2321,6 +2425,12 @@ class MultiPointFeatureProperties(BaseFeatureProperties):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -2362,6 +2472,12 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -2389,6 +2505,9 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -2408,6 +2527,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -2424,6 +2544,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -2433,6 +2554,8 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'MultiPolygonFeature',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacSpatialExtent',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection']} })
 
@@ -2493,6 +2616,12 @@ class MultiPolygonFeatureProperties(BaseFeatureProperties):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -2534,6 +2663,12 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -2561,6 +2696,9 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -2580,6 +2718,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -2596,6 +2735,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -2605,6 +2745,8 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'MultiPolygonFeature',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacSpatialExtent',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection']} })
 
@@ -2690,6 +2832,7 @@ class InputFeatureState(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature'],
@@ -2710,6 +2853,7 @@ class InputFeatureState(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature'],
@@ -2825,6 +2969,12 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -2852,6 +3002,9 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -2871,6 +3024,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -2887,6 +3041,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -2990,6 +3145,12 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -3017,6 +3178,9 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -3036,6 +3200,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3052,6 +3217,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3151,6 +3317,12 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -3178,6 +3350,9 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -3197,6 +3372,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3213,6 +3389,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3312,6 +3489,12 @@ class LineAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -3339,6 +3522,9 @@ class LineAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -3358,6 +3544,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3374,6 +3561,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3464,6 +3652,12 @@ class TextAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -3491,6 +3685,9 @@ class TextAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -3510,6 +3707,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3526,6 +3724,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3631,6 +3830,12 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -3658,6 +3863,9 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -3677,6 +3885,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3693,6 +3902,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3794,6 +4004,12 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -3821,6 +4037,9 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -3840,6 +4059,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3856,6 +4076,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -3912,6 +4133,9 @@ class Tool(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -3926,6 +4150,7 @@ class Tool(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -3936,6 +4161,12 @@ class Tool(ConfiguredBaseModel):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -3961,6 +4192,7 @@ class ToolParameter(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -3987,6 +4219,12 @@ class ToolParameter(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -4002,6 +4240,12 @@ class ToolParameter(ConfiguredBaseModel):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -4119,6 +4363,12 @@ class FileProvEntry(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -4163,6 +4413,9 @@ class PlatformRecord(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -4177,6 +4430,7 @@ class PlatformRecord(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -4364,6 +4618,9 @@ class PlotSummary(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -4372,10 +4629,16 @@ class PlotSummary(ConfiguredBaseModel):
                        'ToolDefinition']} })
     title: str = Field(default=..., description="""Plot title from STAC metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
                        'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'DatasetEntry',
                        'SceneProperties',
                        'SceneThumbnailAssetEntry']} })
-    datetime: str = Field(default=..., description="""Creation/capture timestamp (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
+    datetime: str = Field(default=..., description="""Creation/capture timestamp (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary', 'StacItemProperties']} })
     item_path: str = Field(default=..., description="""Path to item.json relative to store root""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
     catalog_id: str = Field(default=..., description="""Parent catalog identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
     source_path: Optional[str] = Field(default=None, description="""Original source file path (for provenance)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary']} })
@@ -4385,6 +4648,8 @@ class PlotSummary(ConfiguredBaseModel):
                        'MultiPolygonFeature',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacSpatialExtent',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection']} })
     time_extent: Optional[PlotTimeExtent] = Field(default=None, description="""Temporal extent of the plot (start/end ISO 8601 strings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary']} })
@@ -4415,6 +4680,9 @@ class StacItemSummary(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -4423,10 +4691,16 @@ class StacItemSummary(ConfiguredBaseModel):
                        'ToolDefinition']} })
     title: str = Field(default=..., description="""Item title""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
                        'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'DatasetEntry',
                        'SceneProperties',
                        'SceneThumbnailAssetEntry']} })
-    datetime: Optional[str] = Field(default=None, description="""Single datetime (ISO 8601) — fallback when start/end not available""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
+    datetime: Optional[str] = Field(default=None, description="""Single datetime (ISO 8601) — fallback when start/end not available""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary', 'StacItemProperties']} })
     item_path: str = Field(default=..., description="""Path to item.json relative to store root""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
     catalog_id: str = Field(default=..., description="""Parent catalog identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
     store_id: str = Field(default=..., description="""Parent store identifier (needed for URI construction)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
@@ -4436,16 +4710,763 @@ class StacItemSummary(ConfiguredBaseModel):
                        'MultiPolygonFeature',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacSpatialExtent',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection']} })
-    start_datetime: Optional[str] = Field(default=None, description="""Range start datetime (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
-    end_datetime: Optional[str] = Field(default=None, description="""Range end datetime (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
+    start_datetime: Optional[str] = Field(default=None, description="""Range start datetime (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary', 'StacItemProperties']} })
+    end_datetime: Optional[str] = Field(default=None, description="""Range end datetime (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary', 'StacItemProperties']} })
     platforms: Optional[list[PlatformRecord]] = Field(default=[], description="""Fully-resolved per-platform metadata array for filtering. Same structure as StacExtensionProperties.platforms.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
     tags: Optional[list[str]] = Field(default=[], description="""Plot-level tags from debrief:tags""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     feature_tags: Optional[list[str]] = Field(default=[], description="""Feature-level tags from debrief:feature_tags""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
+
+
+class StacProvider(ConfiguredBaseModel):
+    """
+    STAC provider entry. Captures organisations involved in producing or hosting the asset. STAC 1.1 spec — present in every live preview/workspace/samples/local-store/ item.json under `properties.providers`. Captured explicitly (rather than as a wildcard) because the shape is stable in the STAC spec.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+
+    name: str = Field(default=..., description="""Organization or person responsible for providing the data.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'SensorData',
+                       'TUAData',
+                       'PointMetadataEntry',
+                       'ReferenceLocationProperties',
+                       'Tool',
+                       'ToolParameter',
+                       'PlatformRecord',
+                       'StacProvider',
+                       'LevelDefinition',
+                       'DatasetSeries',
+                       'StoryboardProperties',
+                       'MCPToolDefinition',
+                       'ToolDefinition']} })
+    description: Optional[str] = Field(default=None, description="""Optional human-readable description.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'Tool',
+                       'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'LevelDefinition',
+                       'StoryboardProperties',
+                       'SceneProperties',
+                       'MCPParamSchema',
+                       'MCPToolDefinition',
+                       'ToolDefinition']} })
+    roles: Optional[list[str]] = Field(default=[], description="""Roles played by this provider — \"licensor\", \"producer\", \"processor\", or \"host\".""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacProvider',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'SceneThumbnailAssetEntry']} })
+    url: Optional[str] = Field(default=None, description="""Provider homepage / contact URL.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacProvider']} })
+
+
+class StacItemProperties(StacExtensionProperties):
+    """
+    STAC Item `properties` block. Carries STAC-spec core fields (`datetime`, `start_datetime?`, `end_datetime?`, `title?`, `description?`, `license?`, `providers?`, `created?`, `updated?`) and mixes in `StacExtensionProperties` from stac-extension.yaml for the `debrief:*` extension fields (Research R-003).
+    Open-record per Article XV.2 — the generator post-processor at `shared/schemas/scripts/generate.py` adds Pydantic `model_config = ConfigDict(extra='allow', ...)` and TypeScript `[key: string]: unknown` so additional `<extension>:<key>` keys (`processing:*`, `proj:*`, future extensions) pass through without rejection. Consumers narrow per extension via per-extension Zod / type-guard helpers (the pattern already established for `debrief:platforms`).
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac',
+         'mixins': ['StacExtensionProperties']})
+    model_config = ConfigDict(
+        extra='allow',
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_assignment=True,
+        validate_default=True,
+        arbitrary_types_allowed=True,
+        use_enum_values=True,
+    )
+
+    datetime: str = Field(default=..., description="""Item datetime per STAC spec (ISO 8601). May be null when start_datetime + end_datetime are set; the live fixtures always carry a non-null value so it is modelled as required string.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary', 'StacItemProperties']} })
+    start_datetime: Optional[str] = Field(default=None, description="""ISO 8601 range start. Required when datetime is null.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary', 'StacItemProperties']} })
+    end_datetime: Optional[str] = Field(default=None, description="""ISO 8601 range end. Required when datetime is null.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary', 'StacItemProperties']} })
+    title: Optional[str] = Field(default=None, description="""Human-readable plot title.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
+                       'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'DatasetEntry',
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
+    description: Optional[str] = Field(default=None, description="""Human-readable plot description.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'Tool',
+                       'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'LevelDefinition',
+                       'StoryboardProperties',
+                       'SceneProperties',
+                       'MCPParamSchema',
+                       'MCPToolDefinition',
+                       'ToolDefinition']} })
+    license: Optional[str] = Field(default=None, description="""SPDX identifier or \"other\" (STAC 1.1 addition).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemProperties', 'StacCollection']} })
+    providers: Optional[list[StacProvider]] = Field(default=[], description="""Organisations involved in producing / hosting this plot. STAC 1.1 addition; present on every live preview/workspace/samples item.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemProperties', 'StacCollection']} })
+    created: Optional[str] = Field(default=None, description="""Processing-time creation timestamp (ISO 8601).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemProperties']} })
+    updated: Optional[str] = Field(default=None, description="""Processing-time last-update timestamp (ISO 8601).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemProperties']} })
+    platforms: Optional[list[PlatformRecord]] = Field(default=[], description="""Fully-resolved per-platform metadata array. Each entry represents one platform in the plot with merged registry + override data.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
+         'slot_uri': 'debrief:platforms'} })
+    tags: Optional[list[str]] = Field(default=[], description="""Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary'],
+         'slot_uri': 'debrief:tags'} })
+    feature_tags: Optional[list[str]] = Field(default=[], description="""Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
+         'slot_uri': 'debrief:feature_tags'} })
+    overrides: Optional[list[str]] = Field(default=[], description="""Flat list of field names on item.properties that the analyst has overridden via the Properties Panel. Auto-derivation routines (e.g. stacService.updateTemporalMetadata) MUST skip any field whose name appears here. Sorted alphabetically on write; deduplicated.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:overrides'} })
+    provenance_log: Optional[list[PropertiesProvenanceEntry]] = Field(default=[], description="""Per-commit provenance entries written by the Properties Panel. Bounded at 500 entries per item; overflow rotates to sibling provenance_log_archive.jsonl in the item directory. Append-only (Article III.3 — audit trail immutable).
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:provenance_log'} })
+
+
+class StacItem(ConfiguredBaseModel):
+    """
+    A STAC 1.1 Item describing one plot. Closes audit §3.1 rows for `apps/vscode/src/types/stac.ts`, `apps/vscode/src/services/sceneThumbnailService.ts`, and `apps/web-shell/src/mocks/stacService.ts`. Persisted to `<store>/<catalog>/<plot-slug>/item.json`.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+
+    type: Literal["Feature"] = Field(default=..., description="""STAC discriminator — always \"Feature\" for Items.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
+                       'DatasetAxisMetadata',
+                       'DatasetEntry',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry',
+                       'MCPContentItem',
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
+         'equals_string': 'Feature'} })
+    stac_version: str = Field(default=..., description="""STAC version string — \"1.0.0\" or \"1.1.0\" (Research R-005).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem', 'StacCatalog', 'StacCollection']} })
+    stac_extensions: Optional[list[str]] = Field(default=[], description="""Optional STAC extension schema URIs. Absent on STAC 1.0 fixtures, present on STAC 1.1 fixtures (Research R-005).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem', 'StacCatalog', 'StacCollection']} })
+    id: str = Field(default=..., description="""Item identifier (slug, UUID, or composite).""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'Tool',
+                       'PlatformRecord',
+                       'PlotSummary',
+                       'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
+                       'RawGeoJSONFeature',
+                       'StoryboardProperties',
+                       'SceneProperties',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'ToolDefinition']} })
+    geometry: Union[GeoJSONEmptyPoint, GeoJSONLineString, GeoJSONMultiLineString, GeoJSONMultiPoint, GeoJSONMultiPolygon, GeoJSONPoint, GeoJSONPolygon] = Field(default=..., description="""GeoJSON geometry — any_of union over the seven existing geometry classes in geojson.yaml. Reuses the same pattern as RawGeoJSONFeature.geometry.""", json_schema_extra = { "linkml_meta": {'any_of': [{'range': 'GeoJSONPoint'},
+                    {'range': 'GeoJSONEmptyPoint'},
+                    {'range': 'GeoJSONLineString'},
+                    {'range': 'GeoJSONPolygon'},
+                    {'range': 'GeoJSONMultiPoint'},
+                    {'range': 'GeoJSONMultiLineString'},
+                    {'range': 'GeoJSONMultiPolygon'}],
+         'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'StacItem',
+                       'RawGeoJSONFeature',
+                       'StoryboardFeature',
+                       'SceneFeature']} })
+    bbox: list[float] = Field(default=..., description="""Bounding box — either [west, south, east, north] (4-element 2D) or [west, south, min_alt, east, north, max_alt] (6-element 3D). Live fixtures use 4-element 2D (Research R-004).""", min_length=4, max_length=6, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'SystemStateProperties',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'PlotSummary',
+                       'StacItemSummary',
+                       'StacItem',
+                       'StacSpatialExtent',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection']} })
+    properties: StacItemProperties = Field(default=..., description="""STAC Item properties — core fields + debrief: extension + open-record additional keys (Research R-002 / R-003).""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'StacItem',
+                       'RawGeoJSONFeature',
+                       'StoryboardFeature',
+                       'SceneFeature']} })
+    links: list[StacLink] = Field(default=..., description="""Catalog navigation links (`self`, `root`, `parent`, `derived_from`, etc.). Order is preserved.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem', 'StacCatalog', 'StacCollection']} })
+    assets: dict[str, StacAsset] = Field(default=..., description="""Asset map keyed by arbitrary string (`features`, `thumbnail`, `overview`, `source-<id>`, `scene-thumbnail-<id>`). Open-record per Research R-002 — modelled as `range: Any` here because the STAC wire format is a dict, not a list. The generator post-processor rewrites this to `dict[str, StacAsset]` (Pydantic) and `Record<string, StacAsset>` (TypeScript).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem']} })
+    collection: Optional[str] = Field(default=None, description="""Parent Collection ID, when the Item belongs to a Collection (STAC 1.1 optional field).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem']} })
+
+
+class StacCatalog(ConfiguredBaseModel):
+    """
+    A flat STAC Catalog (no extent, no summaries). Closes audit §3.1 rows for `apps/vscode/src/types/stac.ts` and `apps/web-shell/src/mocks/stacService.ts`. Persisted to `<store>/<catalog>/catalog.json` for stores not upgraded to STAC 1.1 Collection.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+
+    type: Literal["Catalog"] = Field(default=..., description="""STAC discriminator — always \"Catalog\" for flat Catalogs.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
+                       'DatasetAxisMetadata',
+                       'DatasetEntry',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry',
+                       'MCPContentItem',
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
+         'equals_string': 'Catalog'} })
+    stac_version: str = Field(default=..., description="""STAC version string (\"1.0.0\" or \"1.1.0\").""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem', 'StacCatalog', 'StacCollection']} })
+    stac_extensions: Optional[list[str]] = Field(default=[], description="""Optional STAC extension schema URIs.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem', 'StacCatalog', 'StacCollection']} })
+    id: str = Field(default=..., description="""Catalog identifier.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'Tool',
+                       'PlatformRecord',
+                       'PlotSummary',
+                       'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
+                       'RawGeoJSONFeature',
+                       'StoryboardProperties',
+                       'SceneProperties',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'ToolDefinition']} })
+    title: Optional[str] = Field(default=None, description="""Human-readable catalog title.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
+                       'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'DatasetEntry',
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
+    description: str = Field(default=..., description="""STAC-mandated catalog description.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'Tool',
+                       'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'LevelDefinition',
+                       'StoryboardProperties',
+                       'SceneProperties',
+                       'MCPParamSchema',
+                       'MCPToolDefinition',
+                       'ToolDefinition']} })
+    links: list[StacLink] = Field(default=..., description="""Catalog navigation links — `self`, `root`, `parent`, and one `item` per child Item.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem', 'StacCatalog', 'StacCollection']} })
+
+
+class StacLink(ConfiguredBaseModel):
+    """
+    A single link entry within `links[]`. Used by StacItem, StacCatalog, and StacCollection. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+
+    rel: str = Field(default=..., description="""Link relation (`self`, `root`, `parent`, `item`, `child`, `derived_from`, etc.).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacLink']} })
+    href: str = Field(default=..., description="""URI (relative or absolute) to the linked resource.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacLink',
+                       'StacAsset',
+                       'ToolResultAnnotations',
+                       'SceneThumbnailAssetEntry']} })
+    type: Optional[str] = Field(default=None, description="""IANA media type of the linked resource.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
+                       'DatasetAxisMetadata',
+                       'DatasetEntry',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry',
+                       'MCPContentItem',
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage']} })
+    title: Optional[str] = Field(default=None, description="""Human-readable link title.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
+                       'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'DatasetEntry',
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
+
+
+class StacAsset(ConfiguredBaseModel):
+    """
+    A single asset entry within `assets[<key>]`. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts` and the inline `StacItemAssets` alias at `apps/vscode/src/services/sceneThumbnailService.ts`.
+    Open-record per Article XV.2 — accepts arbitrary extension keys (`file:checksum`, `file:size`, `processing:datetime`, `processing:software`, `proj:shape`, `debrief:provenance`, `debrief:toolId`, `debrief:sourceFeatures`) observed in the live fixtures. The generator post-processes this into Pydantic `extra='allow'` and TypeScript `[key: string]: unknown`.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+    model_config = ConfigDict(
+        extra='allow',
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_assignment=True,
+        validate_default=True,
+        arbitrary_types_allowed=True,
+        use_enum_values=True,
+    )
+
+    href: str = Field(default=..., description="""URI to the asset. Required on `StacItem.assets[<key>]` — STAC 1.1 mandates a concrete URI on Item assets. The declaration-only shape on `StacCollection.item_assets[<key>]` (no `href`) is covered by the sibling `StacItemAssetDefinition` class.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacLink',
+                       'StacAsset',
+                       'ToolResultAnnotations',
+                       'SceneThumbnailAssetEntry']} })
+    type: Optional[str] = Field(default=None, description="""IANA media type.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
+                       'DatasetAxisMetadata',
+                       'DatasetEntry',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry',
+                       'MCPContentItem',
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage']} })
+    title: Optional[str] = Field(default=None, description="""Human-readable asset title.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
+                       'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'DatasetEntry',
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
+    description: Optional[str] = Field(default=None, description="""Asset description (STAC 1.1 addition).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'Tool',
+                       'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'LevelDefinition',
+                       'StoryboardProperties',
+                       'SceneProperties',
+                       'MCPParamSchema',
+                       'MCPToolDefinition',
+                       'ToolDefinition']} })
+    roles: Optional[list[str]] = Field(default=[], description="""Asset roles — \"data\", \"thumbnail\", \"overview\", \"source\", \"result\", etc.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacProvider',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'SceneThumbnailAssetEntry']} })
+
+
+class StacItemAssetDefinition(ConfiguredBaseModel):
+    """
+    Item Asset Definition Object — declares the shape of an asset that child Items in a Collection are expected to carry. Distinct from `StacAsset` because it does NOT carry an `href`; the asset URI lives on the concrete Item assets that conform to this template (see STAC 1.1 Item Asset Definition spec).
+    Open-record per Article XV.2 — same boundary-loose semantics as `StacAsset` so item-asset declarations may carry extension keys. The generator post-processes this class with Pydantic `extra='allow'` and TypeScript `[key: string]: unknown`.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+    model_config = ConfigDict(
+        extra='allow',
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_assignment=True,
+        validate_default=True,
+        arbitrary_types_allowed=True,
+        use_enum_values=True,
+    )
+
+    type: Optional[str] = Field(default=None, description="""IANA media type expected on child Item assets.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
+                       'DatasetAxisMetadata',
+                       'DatasetEntry',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry',
+                       'MCPContentItem',
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage']} })
+    title: Optional[str] = Field(default=None, description="""Human-readable asset title.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
+                       'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'DatasetEntry',
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
+    description: Optional[str] = Field(default=None, description="""Asset description.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'Tool',
+                       'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'LevelDefinition',
+                       'StoryboardProperties',
+                       'SceneProperties',
+                       'MCPParamSchema',
+                       'MCPToolDefinition',
+                       'ToolDefinition']} })
+    roles: Optional[list[str]] = Field(default=[], description="""Asset roles expected on child Item assets.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacProvider',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'SceneThumbnailAssetEntry']} })
+
+
+class StacSpatialExtent(ConfiguredBaseModel):
+    """
+    Spatial extent on a Collection. The wire shape is `{ \"bbox\": [[west, south, east, north], ...] }` — a list of bounding-box arrays. LinkML emits a flat `list[float]` / `number[]` which the post-processor in `shared/schemas/scripts/generate.py` rewrites to nested list-of-lists per Research R-011 (same precedent as GeoJSON coordinates).
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+
+    bbox: list[list[float]] = Field(default=..., description="""List of bounding-box arrays `[[w, s, e, n], ...]`. Each inner array is 4-element 2D or 6-element 3D.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'SystemStateProperties',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'PlotSummary',
+                       'StacItemSummary',
+                       'StacItem',
+                       'StacSpatialExtent',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection']} })
+
+
+class StacTemporalExtent(ConfiguredBaseModel):
+    """
+    Temporal extent on a Collection. The wire shape is `{ \"interval\": [[start, end], ...] }` — a list of `[start_iso, end_iso]` pairs (either side may be null per STAC spec). LinkML emits a flat `list[string]` which the post-processor rewrites to nested list-of-lists per Research R-011.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+
+    interval: list[list[Optional[str]]] = Field(default=..., description="""List of `[start_datetime, end_datetime]` pairs. Either side may be null (unbounded).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacTemporalExtent']} })
+
+
+class StacExtent(ConfiguredBaseModel):
+    """
+    Spatial + temporal extent on a Collection. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+
+    spatial: StacSpatialExtent = Field(default=..., description="""Spatial extent — one or more bounding boxes.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
+    temporal: StacTemporalExtent = Field(default=..., description="""Temporal extent — one or more start/end intervals.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
+
+
+class StacSummaries(ConfiguredBaseModel):
+    """
+    Pre-aggregated extension summaries on a Collection. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`. Carries the debrief: extension summary fields plus open-record additional keys (Article XV.2 exception).
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+    model_config = ConfigDict(
+        extra='allow',
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_assignment=True,
+        validate_default=True,
+        arbitrary_types_allowed=True,
+        use_enum_values=True,
+    )
+
+    debrief_platforms: Optional[list[PlatformRecord]] = Field(default=[], description="""Aggregated per-platform metadata across all Items in the Collection. Same shape as StacExtensionProperties.platforms. Disk key is `debrief:platforms` (colon syntax preserved via slot_uri).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacSummaries'], 'slot_uri': 'debrief:platforms'} })
+    debrief_tags: Optional[list[str]] = Field(default=[], description="""Aggregated plot-level tags across all Items in the Collection. Disk key is `debrief:tags`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacSummaries'], 'slot_uri': 'debrief:tags'} })
+    debrief_feature_tags: Optional[list[str]] = Field(default=[], description="""Aggregated feature-level tags across all Items in the Collection. Disk key is `debrief:feature_tags`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacSummaries'], 'slot_uri': 'debrief:feature_tags'} })
+
+
+class StacCollection(ConfiguredBaseModel):
+    """
+    A STAC 1.1 Collection — flat Catalog plus license, extent, optional summaries, optional providers, optional item_assets. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`. Persisted to `<store>/<catalog>/catalog.json` for stores upgraded to STAC 1.1.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
+
+    type: Literal["Collection"] = Field(default=..., description="""STAC discriminator — always \"Collection\".""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
+                       'DatasetAxisMetadata',
+                       'DatasetEntry',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry',
+                       'MCPContentItem',
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
+         'equals_string': 'Collection'} })
+    stac_version: str = Field(default=..., description="""STAC version string (always \"1.1.0\" in current fixtures).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem', 'StacCatalog', 'StacCollection']} })
+    stac_extensions: Optional[list[str]] = Field(default=[], description="""Optional STAC extension schema URIs.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem', 'StacCatalog', 'StacCollection']} })
+    id: str = Field(default=..., description="""Collection identifier.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'Tool',
+                       'PlatformRecord',
+                       'PlotSummary',
+                       'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
+                       'RawGeoJSONFeature',
+                       'StoryboardProperties',
+                       'SceneProperties',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'ToolDefinition']} })
+    title: Optional[str] = Field(default=None, description="""Human-readable collection title.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
+                       'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'DatasetEntry',
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
+    description: str = Field(default=..., description="""STAC-mandated collection description.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'Tool',
+                       'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
+                       'LevelDefinition',
+                       'StoryboardProperties',
+                       'SceneProperties',
+                       'MCPParamSchema',
+                       'MCPToolDefinition',
+                       'ToolDefinition']} })
+    license: str = Field(default=..., description="""SPDX identifier or \"other\" (STAC 1.1 mandates this).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemProperties', 'StacCollection']} })
+    extent: StacExtent = Field(default=..., description="""Spatial + temporal extent.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacCollection']} })
+    summaries: Optional[StacSummaries] = Field(default=None, description="""Optional pre-aggregated extension summaries (open-record per Research R-002).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacCollection']} })
+    providers: Optional[list[StacProvider]] = Field(default=[], description="""Organisations involved in producing / hosting this collection (STAC 1.1 addition).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemProperties', 'StacCollection']} })
+    item_assets: Optional[dict[str, StacItemAssetDefinition]] = Field(default=None, description="""Optional Item-asset declarations (STAC 1.1 addition). Each entry is a `StacItemAssetDefinition` (no `href`) — distinct from the concrete `StacAsset` shape used by `StacItem.assets[<key>]`. The generator post-processor rewrites this to `dict[str, StacItemAssetDefinition]` (Pydantic) / `Record<string, StacItemAssetDefinition>` (TypeScript) so the call site narrows correctly.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacCollection']} })
+    links: list[StacLink] = Field(default=..., description="""Collection navigation links — `self`, `root`, `parent`, `item` entries pointing at child Items.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItem', 'StacCatalog', 'StacCollection']} })
 
 
 class RawGeoJSONFeature(ConfiguredBaseModel):
@@ -4475,6 +5496,12 @@ class RawGeoJSONFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -4503,6 +5530,9 @@ class RawGeoJSONFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -4529,6 +5559,7 @@ class RawGeoJSONFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -4545,6 +5576,7 @@ class RawGeoJSONFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -4554,6 +5586,8 @@ class RawGeoJSONFeature(ConfiguredBaseModel):
                        'MultiPolygonFeature',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacSpatialExtent',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection']} })
 
@@ -4585,6 +5619,12 @@ class RawGeoJSONFeatureCollection(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -4607,6 +5647,8 @@ class RawGeoJSONFeatureCollection(ConfiguredBaseModel):
                        'MultiPolygonFeature',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacSpatialExtent',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection']} })
 
@@ -4705,6 +5747,7 @@ class LevelDefinition(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -4716,6 +5759,12 @@ class LevelDefinition(ConfiguredBaseModel):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -4831,8 +5880,8 @@ class SessionState(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state', 'tree_root': True})
 
     schemaVersion: str = Field(default=..., description="""Schema version for persistence compatibility (FR-026)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState']} })
-    temporal: TemporalSlice = Field(default=..., description="""Time-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
-    spatial: SpatialSlice = Field(default=..., description="""Geographic view state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
+    temporal: TemporalSlice = Field(default=..., description="""Time-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
+    spatial: SpatialSlice = Field(default=..., description="""Geographic view state""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
     features: FeaturesSlice = Field(default=..., description="""Feature-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
                        'SessionState',
                        'SessionFile',
@@ -4863,8 +5912,8 @@ class SessionFile(ConfiguredBaseModel):
     schema: Optional[str] = Field(default=None, alias="$schema", description="""JSON Schema URI""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionFile']} })
     version: str = Field(default=..., description="""Schema version""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool', 'SessionFile']} })
     savedAt: str = Field(default=..., description="""When the session was saved (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionFile']} })
-    temporal: TemporalSlice = Field(default=..., description="""Temporal state (excluding ephemeral playbackState)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
-    spatial: SpatialSlice = Field(default=..., description="""Spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
+    temporal: TemporalSlice = Field(default=..., description="""Temporal state (excluding ephemeral playbackState)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
+    spatial: SpatialSlice = Field(default=..., description="""Spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
     features: FeaturesSlice = Field(default=..., description="""Features state""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
                        'SessionState',
                        'SessionFile',
@@ -4930,7 +5979,10 @@ class ToolResultAnnotations(ConfiguredBaseModel):
                        'ToolResultAnnotations',
                        'DatasetAxisMetadata'],
          'slot_uri': 'debrief:label'} })
-    href: Optional[str] = Field(default=None, description="""Relative path to artifact file (REQUIRED for artifacts)""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultAnnotations', 'SceneThumbnailAssetEntry'],
+    href: Optional[str] = Field(default=None, description="""Relative path to artifact file (REQUIRED for artifacts)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacLink',
+                       'StacAsset',
+                       'ToolResultAnnotations',
+                       'SceneThumbnailAssetEntry'],
          'slot_uri': 'debrief:href'} })
     deletedFeatures: Optional[list[str]] = Field(default=None, description="""IDs of features removed (REQUIRED for deletions)""", min_length=1, json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultAnnotations'], 'slot_uri': 'debrief:deletedFeatures'} })
 
@@ -4987,6 +6039,12 @@ class DatasetAxisMetadata(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -5040,6 +6098,7 @@ class DatasetSeries(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -5077,6 +6136,12 @@ class DatasetEntry(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -5089,6 +6154,12 @@ class DatasetEntry(ConfiguredBaseModel):
                        'ToolsUpdateMessage']} })
     title: str = Field(default=..., description="""Human-readable chart title""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
                        'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'DatasetEntry',
                        'SceneProperties',
                        'SceneThumbnailAssetEntry']} })
@@ -5156,6 +6227,9 @@ class StoryboardProperties(BaseFeatureProperties):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -5170,6 +6244,7 @@ class StoryboardProperties(BaseFeatureProperties):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -5180,6 +6255,12 @@ class StoryboardProperties(BaseFeatureProperties):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -5265,6 +6346,9 @@ class SceneProperties(BaseFeatureProperties):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -5274,6 +6358,12 @@ class SceneProperties(BaseFeatureProperties):
     storyboard_id: str = Field(default=..., description="""Foreign key to parent Storyboard.properties.id (ULID).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     title: str = Field(default=..., description="""Display title. Defaults to DTG of timestamp in DDHHmmZ MMM YY; falls back to ISO-8601 on parse failure.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
                        'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'DatasetEntry',
                        'SceneProperties',
                        'SceneThumbnailAssetEntry']} })
@@ -5282,6 +6372,12 @@ class SceneProperties(BaseFeatureProperties):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -5378,6 +6474,12 @@ class StoryboardFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -5405,6 +6507,9 @@ class StoryboardFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -5424,6 +6529,7 @@ class StoryboardFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -5440,6 +6546,7 @@ class StoryboardFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -5472,6 +6579,12 @@ class SceneFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -5499,6 +6612,9 @@ class SceneFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -5518,6 +6634,7 @@ class SceneFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -5534,6 +6651,7 @@ class SceneFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'StacItem',
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
@@ -5569,7 +6687,10 @@ class SceneThumbnailAssetEntry(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/storyboard'})
 
-    href: str = Field(default=..., description="""URI-reference relative to the Item directory; conventionally ./scene-thumbnails/scene-{ULID}.png (large) or ./scene-thumbnails/scene-{ULID}-sm.png (small).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultAnnotations', 'SceneThumbnailAssetEntry']} })
+    href: str = Field(default=..., description="""URI-reference relative to the Item directory; conventionally ./scene-thumbnails/scene-{ULID}.png (large) or ./scene-thumbnails/scene-{ULID}-sm.png (small).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacLink',
+                       'StacAsset',
+                       'ToolResultAnnotations',
+                       'SceneThumbnailAssetEntry']} })
     type: Literal["image/png"] = Field(default=..., description="""Always image/png — Storyboarding capture writes PNGs only.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
@@ -5591,6 +6712,12 @@ class SceneThumbnailAssetEntry(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -5602,9 +6729,18 @@ class SceneThumbnailAssetEntry(ConfiguredBaseModel):
                        'MCPParamSchema',
                        'ToolsUpdateMessage'],
          'equals_string': 'image/png'} })
-    roles: list[str] = Field(default=..., description="""Exactly [\"thumbnail\"]. Storyboarding-derived thumbnails are not declared as overview (which is reserved for plot-level overviews of dimensions 600x800).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneThumbnailAssetEntry']} })
+    roles: list[str] = Field(default=..., description="""Exactly [\"thumbnail\"]. Storyboarding-derived thumbnails are not declared as overview (which is reserved for plot-level overviews of dimensions 600x800).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacProvider',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'SceneThumbnailAssetEntry']} })
     title: Optional[str] = Field(default=None, description="""Optional human label. Storyboarding writer emits \"Scene thumbnail\" (large) or \"Scene thumbnail (small)\" (small).""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
                        'StacItemSummary',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'DatasetEntry',
                        'SceneProperties',
                        'SceneThumbnailAssetEntry']} })
@@ -5647,6 +6783,12 @@ class MCPContentItem(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -5721,6 +6863,12 @@ class MCPParamSchema(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -5736,6 +6884,12 @@ class MCPParamSchema(ConfiguredBaseModel):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -5786,6 +6940,7 @@ class MCPToolDefinition(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -5796,6 +6951,12 @@ class MCPToolDefinition(ConfiguredBaseModel):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -5839,6 +7000,9 @@ class ToolDefinition(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -5853,6 +7017,7 @@ class ToolDefinition(ConfiguredBaseModel):
                        'Tool',
                        'ToolParameter',
                        'PlatformRecord',
+                       'StacProvider',
                        'LevelDefinition',
                        'DatasetSeries',
                        'StoryboardProperties',
@@ -5863,6 +7028,12 @@ class ToolDefinition(ConfiguredBaseModel):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter',
+                       'StacProvider',
+                       'StacItemProperties',
+                       'StacCatalog',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'LevelDefinition',
                        'StoryboardProperties',
                        'SceneProperties',
@@ -5965,6 +7136,12 @@ class ToolsUpdateMessage(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
+                       'StacItem',
+                       'StacCatalog',
+                       'StacLink',
+                       'StacAsset',
+                       'StacItemAssetDefinition',
+                       'StacCollection',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
@@ -6047,6 +7224,18 @@ StacExtensionProperties.model_rebuild()
 PlotTimeExtent.model_rebuild()
 PlotSummary.model_rebuild()
 StacItemSummary.model_rebuild()
+StacProvider.model_rebuild()
+StacItemProperties.model_rebuild()
+StacItem.model_rebuild()
+StacCatalog.model_rebuild()
+StacLink.model_rebuild()
+StacAsset.model_rebuild()
+StacItemAssetDefinition.model_rebuild()
+StacSpatialExtent.model_rebuild()
+StacTemporalExtent.model_rebuild()
+StacExtent.model_rebuild()
+StacSummaries.model_rebuild()
+StacCollection.model_rebuild()
 RawGeoJSONFeature.model_rebuild()
 RawGeoJSONFeatureCollection.model_rebuild()
 TimeInstant.model_rebuild()

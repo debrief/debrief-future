@@ -351,6 +351,43 @@ Pydantic class (`StacItem` / `StacCatalog` / `StacCollection`) with
 output modulo key ordering (which Pydantic's `model_dump` already
 canonicalises).
 
+## TypeScript adoption is types-only (Decision 4A)
+
+**No runtime validation on the TypeScript side.** The migration installs
+generated *types* from `@debrief/schemas` at the consumer call sites
+(`apps/vscode/src/types/stac.ts`,
+`apps/vscode/src/services/sceneThumbnailService.ts`,
+`apps/web-shell/src/mocks/stacService.ts`); it does NOT introduce
+runtime Zod parsers, ad-hoc `.parse()` calls, or `is*()` predicates on
+the imported types.
+
+The rationale, in three lines:
+
+1. **Pydantic on the Python side IS the validation point.** Article II
+   plus the new `test_stac_fixtures.py` corpus tests cover every
+   committed STAC artefact; if Pydantic accepts a payload, TypeScript
+   structurally trusts it.
+2. **Article IV.1 — thick services / thin frontends.** Frontends
+   consume already-validated data. Re-validating in TypeScript would
+   duplicate the schema definition in a second runtime form and create
+   exactly the drift this feature is designed to prevent.
+3. **Article XV's narrowing exception covers extension keys at the
+   boundary.** The open-record slots (`StacItemProperties`,
+   `StacAsset`, `StacSummaries`) intentionally accept arbitrary
+   `<namespace>:<key>` extensions; consumers narrow per extension via
+   the existing per-extension type guards (e.g. the `debrief:platforms`
+   typed reader). This pattern was already in place before #223.
+
+**Enforcement**: a grep gate runs in `quickstart.md` Step 3 — `z.object`,
+`.parse(`, `is${StacClass}` predicates on imported `@debrief/schemas`
+STAC types are absent from the diff. Existing narrowing helpers in
+unrelated modules are not affected.
+
+Cross-references: Constitution Article IV.1 (frontends never duplicate
+validation); Constitution Article II.2 (schema-adherence tests are the
+cross-language validator); plan.md Complexity Tracking (Article XV.2
+exception for the three open-record classes).
+
 ## Open follow-ups (deferred — not blocking #223)
 
 - Per-extension typed narrowing for `StacAsset[file:*]`,

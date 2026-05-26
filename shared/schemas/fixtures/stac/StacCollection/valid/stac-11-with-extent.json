@@ -1,0 +1,32 @@
+{
+  "type": "Collection",
+  "stac_version": "1.1.0",
+  "id": "sample-collection",
+  "title": "Sample Collection",
+  "description": "A STAC 1.1 Collection for testing.",
+  "license": "other",
+  "extent": {
+    "spatial": {
+      "bbox": [[-20.0, 50.0, 10.0, 70.0]]
+    },
+    "temporal": {
+      "interval": [["2024-01-01T00:00:00Z", "2024-12-31T23:59:59Z"]]
+    }
+  },
+  "summaries": {
+    "debrief:platforms": [
+      {"id": "NELSON", "name": "HMS Nelson", "nationality": "GB"}
+    ],
+    "debrief:tags": ["training", "exercise"]
+  },
+  "providers": [
+    {"name": "Debrief", "roles": ["producer"]}
+  ],
+  "item_assets": {
+    "features": {"type": "application/geo+json", "roles": ["data"], "title": "Features"}
+  },
+  "links": [
+    {"rel": "self", "href": "./catalog.json"},
+    {"rel": "item", "href": "./item-1/item.json", "title": "Item 1"}
+  ]
+}

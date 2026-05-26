@@ -915,6 +915,9 @@ importers:
       '@debrief/components':
         specifier: workspace:*
         version: link:../components
+      '@debrief/schemas':
+        specifier: workspace:*
+        version: link:../schemas
     devDependencies:
       '@types/node':
         specifier: ^20.0.0

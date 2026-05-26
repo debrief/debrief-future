@@ -1,0 +1,12 @@
+{
+  "type": "Catalog",
+  "stac_version": "1.0.0",
+  "id": "sample-catalog",
+  "title": "Sample Catalog",
+  "description": "A flat STAC 1.0 catalog for testing.",
+  "links": [
+    {"rel": "root", "href": "./catalog.json"},
+    {"rel": "self", "href": "./catalog.json"},
+    {"rel": "item", "href": "./item-1/item.json", "title": "Item 1"}
+  ]
+}

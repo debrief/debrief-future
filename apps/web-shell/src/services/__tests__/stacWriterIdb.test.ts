@@ -10,7 +10,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { StacWriterError } from '@debrief/stac-writer';
+import { StacWriterError, type StacItem } from '@debrief/stac-writer';
 import { createStacWriterIdb, type StacWriterIdb } from '../stacWriterIdb';
 import { WRITER_DB_NAME } from '../stacWriterCapability';
 
@@ -19,13 +19,40 @@ const TINY_PNG_BASE64 =
 
 const VALID_ULID = '01HFA8B7C2D3E4F5G6H7J8K9M0';
 
-const SAMPLE_BUNDLED = {
+// Helper: synthesise a fully-formed StacItem from the minimal subset
+// these tests actually care about. The schema now requires `type`,
+// `stac_version`, `geometry`, `bbox`, `links` etc.; the writer-layer
+// tests previously stubbed only `id`, `properties`, `assets`. Wrap
+// minimal stubs in this helper to keep test intent legible.
+function mkItem(stub: {
+  id: string;
+  properties?: Record<string, unknown>;
+  assets?: Record<string, unknown>;
+}): StacItem {
+  const properties: StacItem['properties'] = {
+    datetime: '2024-01-01T00:00:00Z',
+    ...(stub.properties ?? {}),
+  };
+  const assets: StacItem['assets'] = (stub.assets ?? {}) as StacItem['assets'];
+  return {
+    type: 'Feature',
+    stac_version: '1.1.0',
+    id: stub.id,
+    geometry: { type: 'Point', coordinates: [0, 0] },
+    bbox: [0, 0, 0, 0],
+    properties,
+    links: [{ rel: 'self', href: `./${stub.id}/item.json` }],
+    assets,
+  };
+}
+
+const SAMPLE_BUNDLED: StacItem = mkItem({
   id: 'exercise-alpha',
   properties: { title: 'Bundled', 'debrief:platforms': ['HMS Boat'] },
   assets: {
     thumbnail: { href: './thumb.png', type: 'image/png' },
   },
-};
+});
 
 const ctx = {
   kind: 'idb' as const,
@@ -212,7 +239,7 @@ describe('stacWriterIdb.writeItem (standalone create)', () => {
       ctx,
       itemPath,
       mode: 'create',
-      item: { id: 'user-track-1', properties: { title: 'My track' } },
+      item: mkItem({ id: 'user-track-1', properties: { title: 'My track' } }),
     });
     const stored = await w.readStoredItem(itemPath);
     expect(stored!.kind).toBe('standalone');
@@ -225,14 +252,14 @@ describe('stacWriterIdb.writeItem (standalone create)', () => {
       ctx,
       itemPath,
       mode: 'create',
-      item: { id: 'x', properties: {} },
+      item: mkItem({ id: 'x' }),
     });
     await expect(
       w.writeItem({
         ctx,
         itemPath,
         mode: 'create',
-        item: { id: 'x', properties: {} },
+        item: mkItem({ id: 'x' }),
       }),
     ).rejects.toMatchObject({ kind: 'validation-failed' });
   });
@@ -257,7 +284,7 @@ describe('stacWriterIdb.writeAsset (geojson payload)', () => {
       ctx,
       itemPath: 'user/01HX/item.json',
       mode: 'create',
-      item: { id: 'user-track-1', properties: {} },
+      item: mkItem({ id: 'user-track-1' }),
     });
     const fc = JSON.stringify({ type: 'FeatureCollection', features: [] });
     const res = await w.writeAsset({
@@ -288,7 +315,7 @@ describe('stacWriterIdb.deleteItem', () => {
       ctx,
       itemPath: 'user/01HX/item.json',
       mode: 'create',
-      item: { id: 'x', properties: {} },
+      item: mkItem({ id: 'x' }),
     });
     await w.writeAsset({
       ctx,
