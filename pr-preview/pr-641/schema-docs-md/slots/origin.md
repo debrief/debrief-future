@@ -17,8 +17,8 @@ Alias: origin
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [VectorAnnotationProperties](../classes/VectorAnnotationProperties.md) | Properties for a VectorAnnotation |  no  |
 | [SensorContact](../classes/SensorContact.md) | Single sensor measurement record |  no  |
+| [VectorAnnotationProperties](../classes/VectorAnnotationProperties.md) | Properties for a VectorAnnotation |  no  |
 
 
 

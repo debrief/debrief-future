@@ -17,9 +17,9 @@ Alias: duration_ms
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [ToolExecutionResultForReplay](../classes/ToolExecutionResultForReplay.md) | Minimal tool-execution result returned by the Replay Engine's `execute_tool` ... |  no  |
-| [MCPToolResponse](../classes/MCPToolResponse.md) | Successful MCP tool response |  no  |
 | [ToolResultForLog](../classes/ToolResultForLog.md) | Persisted tool-result shape written by the live tool-result logger and read b... |  no  |
+| [MCPToolResponse](../classes/MCPToolResponse.md) | Successful MCP tool response |  no  |
+| [ToolExecutionResultForReplay](../classes/ToolExecutionResultForReplay.md) | Minimal tool-execution result returned by the Replay Engine's `execute_tool` ... |  no  |
 | [MCPErrorResponse](../classes/MCPErrorResponse.md) | MCP error response envelope |  no  |
 
 
