@@ -17,8 +17,8 @@ Alias: line_cap
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [PolygonProperties](../classes/PolygonProperties.md) | Styling schema for Polygon and MultiPolygon geometries |  no  |
 | [LineProperties](../classes/LineProperties.md) | Styling schema for LineString and MultiLineString geometries |  no  |
+| [PolygonProperties](../classes/PolygonProperties.md) | Styling schema for Polygon and MultiPolygon geometries |  no  |
 
 
 
