@@ -132,7 +132,7 @@ zip, confirm a `.zip` downloads, then open it offline and confirm it plays back 
 
 - [ ] T031 Create the web-shell export host adapter `apps/web-shell/src/services/briefingExportWebDeps.ts` (implement `ExportDeps`: `readPlot` from in-memory `featureCollection` + `item.json` via `@debrief/stac-writer` reader — C-D4; `readThumbnail` via stac-writer asset reader; `readStaticBundle` from the served `/briefing-renderer/` tree; `fetchTile` via browser `fetch`; `writeOrDeliver` → anchor + object-URL browser download — C-D3; `ui` → web-shell panel host prompts/toasts)
 - [ ] T032 Wire the web-shell Export control `apps/web-shell/src/StoryboardPanelMount.tsx` (pass the existing Export callback for the active storyboard, constructing the web `ExportDeps` and calling the shared orchestrator)
-- [ ] T033 [test] Prove cross-surface zip equivalence `shared/briefing-export/src/__tests__/equivalence.test.ts` (given equivalent inputs, `assembleZip` produces a functionally-equivalent archive regardless of host adapter — FR-015/C-D2; assert no new external dependency is pulled in — C-D5)
+- [x] T033 [test] Prove cross-surface zip equivalence `shared/briefing-export/src/__tests__/equivalence.test.ts` (given equivalent inputs, `assembleZip` produces a functionally-equivalent archive regardless of host adapter — FR-015/C-D2; assert no new external dependency is pulled in — C-D5)
 
 
 ## Phase 5: User Story 3 — Distributed offline briefings keep working unchanged (Priority: P1)
