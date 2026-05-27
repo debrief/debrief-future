@@ -159,14 +159,14 @@ confirm it plays back identically — no new errors, no network calls for storyb
 
 ### Documentation
 
-- [ ] T040 Add an ADR for the loopback-preview-server pattern + renderer dual-boot-path `docs/project_notes/decisions.md` (Article VIII.3 — covers the `127.0.0.1` ephemeral server, the `Host`-allowlist DNS-rebinding defence (C-B7), and the additive URL-boot path; cross-link from the spec)
+- [x] T040 Add an ADR for the loopback-preview-server pattern + renderer dual-boot-path `docs/project_notes/decisions.md` (Article VIII.3 — covers the `127.0.0.1` ephemeral server, the `Host`-allowlist DNS-rebinding defence (C-B7), and the additive URL-boot path; cross-link from the spec)
 
 ### Evidence Collection
 
-- [ ] T041 Capture test results using template (.specify/templates/evidence/test-summary-template.md) in `specs/273-storyboard-preview-button/evidence/test-summary.md` (YAML front matter: `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; breakdown by suite: renderer / shared-export / panel / web-shell E2E)
-- [ ] T042 Create usage demonstration in `specs/273-storyboard-preview-button/evidence/usage-example.md` (click Preview → renderer tab plays; web-shell Export → downloaded zip; both surfaces)
-- [ ] T043 [P] Capture the headline web-shell preview-playback screenshot `specs/273-storyboard-preview-button/evidence/screenshots/preview-playback-webshell.png` (produced by T038 — do NOT defer)
-- [ ] T044 [P] Capture the disabled-no-scenes state screenshot `specs/273-storyboard-preview-button/evidence/screenshots/preview-disabled-no-scenes.png` (produced by T037 — do NOT defer)
+- [x] T041 Capture test results using template (.specify/templates/evidence/test-summary-template.md) in `specs/273-storyboard-preview-button/evidence/test-summary.md` (YAML front matter: `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; breakdown by suite: renderer / shared-export / panel / web-shell E2E)
+- [x] T042 Create usage demonstration in `specs/273-storyboard-preview-button/evidence/usage-example.md` (click Preview → renderer tab plays; web-shell Export → downloaded zip; both surfaces)
+- [x] T043 [P] Capture the headline web-shell preview-playback screenshot `specs/273-storyboard-preview-button/evidence/screenshots/preview-playback-webshell.png` (produced by T038 — do NOT defer)
+- [x] T044 [P] Capture the disabled-no-scenes state screenshot `specs/273-storyboard-preview-button/evidence/screenshots/preview-disabled-no-scenes.png` (produced by T037 — do NOT defer)
 
 ### Media Content
 

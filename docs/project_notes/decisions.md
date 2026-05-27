@@ -1541,3 +1541,78 @@ shared service and delete the local driver.
 `specs/264-briefing-zip-renderer/plan.md`,
 `specs/264-briefing-zip-renderer/contracts/{export-command,spa-loading,tile-coverage}.md`.
 Evidence: `specs/264-briefing-zip-renderer/evidence/`.
+
+---
+
+### ADR-034: Live storyboard preview — renderer dual-boot path + VS Code loopback server (#273, 2026-05-27)
+
+**Status:** Accepted.
+
+**Context.** The briefing renderer (#264) booted exactly one way: from JSON
+inlined into its `index.html` at zip-export time, read synchronously before
+first paint. That path is deliberately air-gapped — a distributed briefing zip
+plays back offline with zero network requests. Spec #273 adds a **live
+Preview** button (both VS Code and web-shell) that opens the renderer in a new
+browser tab, loaded from the *current* plot's storyboard with no zip-packing
+step. An external browser tab cannot read `vscode-webview-resource:` URIs, so a
+reachable URL is required, and the air-gapped offline guarantee must not
+regress.
+
+**Decision.**
+
+1. **Renderer gains a second, additive boot path.** When the launch URL carries
+   `?features=<url>`, the renderer enters an async `loading → ready/error`
+   lifecycle: `fetch` the URL, validate with the **existing** boundary
+   validators (one storyboard, scene ordering), seed the **unchanged** store.
+   When `?features` is absent, the synchronous inline path runs exactly as
+   before. The two paths share validators + `store.seed()` but never each
+   other's I/O — the inline path imports no `fetch`, so the offline zip path
+   provably issues zero network requests for storyboard data (test-guarded). An
+   optional renderer-local `BriefingConfig.tileLayerUrl` selects an online
+   basemap for preview; the inline/zip path leaves it unset and keeps its
+   bundled local tiles (byte-identical to pre-#273). This is a renderer-local
+   TS field, **not** a LinkML/schema change.
+
+2. **VS Code serves preview via an ephemeral loopback HTTP server.**
+   `BriefingPreviewServer` (pure Node, no `vscode` import) binds `127.0.0.1` on
+   an OS-assigned port, serves the bundled renderer at `/` and the active
+   storyboard's scoped features at `/features.geojson`. The extension opens the
+   system browser via `openExternal(await asExternalUri(...))` so the URL is
+   correct under Remote/Codespaces tunnels and works fully offline. One shared
+   lazily-started instance, disposed on deactivation; read-only serving only.
+
+   **Security — DNS-rebinding defence (C-B7).** Binding loopback blocks remote
+   network access but *not* DNS rebinding, where a malicious page resolves an
+   attacker-controlled domain to `127.0.0.1` and reaches the server from its own
+   origin — arriving as an ordinary local request carrying a *foreign* `Host`
+   header. The server enforces a **`Host` allowlist**: only `127.0.0.1[:<port>]`
+   is served; anything else gets `403`. With the ephemeral lifetime,
+   OS-assigned port, and read-only scope, this closes the loopback attack
+   surface (Article X).
+
+3. **Web-shell hands off via a same-origin blob URL.** Web-shell scopes the
+   active storyboard, builds a `Blob`, and opens the renderer (served
+   same-origin under `/briefing-renderer/`) at `?features=<blobUrl>` in a reused
+   named tab. No server needed — one code path across dev, `vite preview`, and
+   the static Pages build.
+
+4. **Packing core extracted to `@debrief/briefing-export`.** The pure
+   briefing-zip core moved out of `apps/vscode` into a shared package so both
+   hosts share one implementation and cannot drift (FR-016). VS Code keeps its
+   filesystem/save-dialog host adapter; the package is browser-safe (JSZip is
+   the only zip lib, already present — no new dependency).
+
+**Alternatives rejected.** Merging the two boot paths into one loader (pollutes
+the proven sync path, risks the air-gap); a webview instead of an external tab
+(the user chose a new tab; a webview also can't host the renderer offline
+without similar plumbing); a `file://` temp page with inlined data (that *is*
+the zip path in disguise — a packing step, contradicting "live URL, no zip").
+
+**Consequences.** One novel pattern (a local HTTP server in the extension),
+scoped tightly: loopback-only, ephemeral, read-only, `Host`-allowlisted. The
+offline distribution path is unchanged and test-guarded.
+
+**Provenance.** Spec `specs/273-storyboard-preview-button/`. Plan + contracts:
+`specs/273-storyboard-preview-button/plan.md`,
+`specs/273-storyboard-preview-button/contracts/{preview-boot,host-integration}.md`.
+Evidence: `specs/273-storyboard-preview-button/evidence/`.
