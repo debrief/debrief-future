@@ -163,6 +163,126 @@ def generate_pydantic() -> bool:
             content,
         )
 
+        # ----------------------------------------------------------------------
+        # STAC cluster post-processing (Feature #223 / Research R-011)
+        # ----------------------------------------------------------------------
+        # LinkML cannot express list-of-lists slots directly, so the
+        # StacSpatialExtent.bbox and StacTemporalExtent.interval slots are
+        # authored as flat `multivalued` and rewritten here. Same precedent
+        # as the GeoJSON coordinate fixes above.
+        _stac_nested_pydantic_fixes = {
+            "StacSpatialExtent": (
+                "bbox: list[float]",
+                "bbox: list[list[float]]",
+            ),
+            "StacTemporalExtent": (
+                "interval: list[str]",
+                "interval: list[list[Optional[str]]]",
+            ),
+        }
+        for class_name, (old_type, new_type) in _stac_nested_pydantic_fixes.items():
+            class_marker = f"class {class_name}("
+            if class_marker in content:
+                idx = content.index(class_marker)
+                next_class = content.find("\nclass ", idx + 1)
+                block_end = next_class if next_class != -1 else len(content)
+                block = content[idx:block_end]
+                fixed_block = block.replace(old_type, new_type, 1)
+                if fixed_block == block:
+                    raise RuntimeError(
+                        f"generate.py: STAC nested-array post-processor had no "
+                        f"effect on {class_name} — gen-pydantic output no longer "
+                        f"contains the expected `{old_type}` token. Update "
+                        f"generate.py (Feature 223)."
+                    )
+                content = content[:idx] + fixed_block + content[block_end:]
+
+        # Rewrite the open-record asset map slot. Authored as `range: Any` in
+        # LinkML (which renders as `Any` in Pydantic), it must become a typed
+        # `dict[str, StacAsset]` so consumers get autocomplete on asset
+        # values. StacItem.assets is required; StacCollection.item_assets is
+        # optional. Note: the earlier post-processor at the top of this
+        # function rewrites `Optional[Any]` → `Optional[dict[str, object]]`,
+        # so we match the already-substituted form for the Collection slot.
+        _stac_assets_fixes: list[tuple[str, str, str]] = [
+            ("class StacItem(", "assets: Any = Field", "assets: dict[str, StacAsset] = Field"),
+            (
+                "class StacCollection(",
+                "item_assets: Optional[dict[str, object]] = Field",
+                "item_assets: Optional[dict[str, StacItemAssetDefinition]] = Field",
+            ),
+        ]
+        for class_marker, old, new in _stac_assets_fixes:
+            if class_marker in content:
+                idx = content.index(class_marker)
+                next_class = content.find("\nclass ", idx + 1)
+                block_end = next_class if next_class != -1 else len(content)
+                block = content[idx:block_end]
+                fixed_block = block.replace(old, new, 1)
+                if fixed_block == block:
+                    raise RuntimeError(
+                        f"generate.py: STAC asset-dict post-processor had no "
+                        f"effect on {class_marker} — gen-pydantic output no "
+                        f"longer contains `{old}`. Update generate.py "
+                        f"(Feature 223)."
+                    )
+                content = content[:idx] + fixed_block + content[block_end:]
+
+        # Mark the three open-record classes as `extra='allow'` so STAC
+        # extension keys (`debrief:*`, `file:*`, `processing:*`, `proj:*`)
+        # pass through validation without rejection. Article XV.2 exception
+        # documented in plan.md Complexity Tracking. The classes inherit
+        # from ConfiguredBaseModel which sets `extra='forbid'`; we override
+        # by inserting `model_config = ConfigDict(extra='allow')` after the
+        # full linkml_meta declaration (which may span multiple lines).
+        for stac_open_class in (
+            "StacItemProperties",
+            "StacAsset",
+            "StacItemAssetDefinition",
+            "StacSummaries",
+        ):
+            class_marker = f"class {stac_open_class}("
+            if class_marker not in content:
+                raise RuntimeError(
+                    f"generate.py: STAC extra='allow' post-processor could "
+                    f"not find `{class_marker}` — gen-pydantic output is "
+                    f"missing the expected class. Update generate.py "
+                    f"(Feature 223)."
+                )
+            idx = content.index(class_marker)
+            linkml_meta_idx = content.index("linkml_meta: ClassVar[LinkMLMeta]", idx)
+            # Walk forward from the start of LinkMLMeta(...) and balance
+            # parentheses to find the true end of the call expression.
+            paren_open = content.index("LinkMLMeta(", linkml_meta_idx)
+            cursor = paren_open + len("LinkMLMeta")
+            depth = 0
+            while cursor < len(content):
+                ch = content[cursor]
+                if ch == "(":
+                    depth += 1
+                elif ch == ")":
+                    depth -= 1
+                    if depth == 0:
+                        cursor += 1
+                        break
+                cursor += 1
+            # Advance past the trailing newline so insertion lands on its
+            # own line.
+            newline_idx = content.find("\n", cursor)
+            line_end = (newline_idx + 1) if newline_idx != -1 else cursor
+            insertion = (
+                "    model_config = ConfigDict(\n"
+                "        extra='allow',\n"
+                "        serialize_by_alias=True,\n"
+                "        validate_by_name=True,\n"
+                "        validate_assignment=True,\n"
+                "        validate_default=True,\n"
+                "        arbitrary_types_allowed=True,\n"
+                "        use_enum_values=True,\n"
+                "    )\n"
+            )
+            content = content[:line_end] + insertion + content[line_end:]
+
         # Prepend DO NOT EDIT header
         content = "# AUTO-GENERATED — DO NOT EDIT\n" + content
 
@@ -677,6 +797,139 @@ def generate_typescript() -> bool:
             '    type: "FeatureCollection",',
         )
 
+        # ----------------------------------------------------------------------
+        # STAC cluster post-processing (Feature #223)
+        # ----------------------------------------------------------------------
+        # 1) Narrow the discriminator `type` slot to a string literal on each
+        #    of StacItem / StacCatalog / StacCollection. gen-typescript loses
+        #    equals_string when the range is a permissible-value enum.
+        # 2) Replace the StacItem.geometry placeholder (`string`) with the
+        #    full any_of union (same pattern as RawGeoJSONFeature.geometry).
+        # 3) Rewrite the open-record asset map slot:
+        #       StacItem.assets       unknown          → Record<string, StacAsset>
+        #       StacCollection.item_assets unknown    → Record<string, StacAsset>
+        # 4) Rewrite StacSpatialExtent.bbox / StacTemporalExtent.interval to
+        #    nested arrays (Research R-011 precedent).
+        # 5) Add `[key: string]: unknown` to StacItemProperties, StacAsset, and
+        #    StacSummaries so extension keys (`debrief:*`, `file:*`,
+        #    `processing:*`, `proj:*`) are permitted at the type level — same
+        #    boundary-loose semantics as the Pydantic `extra='allow'` above.
+
+        # (1) Discriminator type literals
+        _stac_type_literal_fixes: list[tuple[str, str, str]] = [
+            ("export interface StacItem {", "type: string,", 'type: "Feature",'),
+            ("export interface StacCatalog {", "type: string,", 'type: "Catalog",'),
+            ("export interface StacCollection {", "type: string,", 'type: "Collection",'),
+        ]
+        for marker, old, new in _stac_type_literal_fixes:
+            if marker in content:
+                start = content.index(marker)
+                end = content.index("}\n", start) + 2
+                block = content[start:end]
+                fixed_block = block.replace(old, new, 1)
+                if fixed_block == block:
+                    raise RuntimeError(
+                        f"generate.py: STAC type-literal post-processor had no "
+                        f"effect on `{marker}` — `{old}` not found. Update "
+                        f"generate.py (Feature 223)."
+                    )
+                content = content[:start] + fixed_block + content[end:]
+
+        # (2) StacItem.geometry — any_of geometry union (same as RawGeoJSONFeature)
+        stac_item_start = content.find("export interface StacItem {\n")
+        if stac_item_start != -1:
+            stac_item_end = content.index("}\n", stac_item_start) + 2
+            stac_item_block = content[stac_item_start:stac_item_end]
+            new_block = stac_item_block.replace(
+                "    geometry: string,\n",
+                "    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | "
+                "GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | "
+                "GeoJSONMultiPolygon,\n",
+                1,
+            )
+            if new_block == stac_item_block:
+                raise RuntimeError(
+                    "generate.py: STAC geometry post-processor had no effect — "
+                    "gen-typescript output no longer contains the expected "
+                    "`geometry: string` token inside StacItem. Update generate.py."
+                )
+            content = content[:stac_item_start] + new_block + content[stac_item_end:]
+
+        # (3) Open-record asset map. gen-typescript emits `Any` for
+        # `range: Any` slots; this patch must run BEFORE the bulk
+        # `Any → unknown` substitution later in this function so we can
+        # match the typed `Any` token, not the post-substitution `unknown`.
+        _stac_record_fixes: list[tuple[str, str, str]] = [
+            ("export interface StacItem {", "assets: Any,", "assets: Record<string, StacAsset>,"),
+            (
+                "export interface StacCollection {",
+                "item_assets?: Any,",
+                "item_assets?: Record<string, StacItemAssetDefinition>,",
+            ),
+        ]
+        for marker, old, new in _stac_record_fixes:
+            if marker in content:
+                start = content.index(marker)
+                end = content.index("}\n", start) + 2
+                block = content[start:end]
+                fixed_block = block.replace(old, new, 1)
+                if fixed_block == block:
+                    raise RuntimeError(
+                        f"generate.py: STAC asset-record post-processor had no "
+                        f"effect on `{marker}` — `{old}` not found. Update "
+                        f"generate.py (Feature 223)."
+                    )
+                content = content[:start] + fixed_block + content[end:]
+
+        # (4) Nested-array slots (Research R-011)
+        _stac_nested_ts_fixes: list[tuple[str, str, str]] = [
+            (
+                "export interface StacSpatialExtent {",
+                "bbox: number[],",
+                "bbox: number[][],",
+            ),
+            (
+                "export interface StacTemporalExtent {",
+                "interval: string[],",
+                "interval: (string | null)[][],",
+            ),
+        ]
+        for marker, old, new in _stac_nested_ts_fixes:
+            if marker in content:
+                start = content.index(marker)
+                end = content.index("}\n", start) + 2
+                block = content[start:end]
+                fixed_block = block.replace(old, new, 1)
+                if fixed_block == block:
+                    raise RuntimeError(
+                        f"generate.py: STAC nested-array post-processor had no "
+                        f"effect on `{marker}` — `{old}` not found. Update "
+                        f"generate.py (Feature 223)."
+                    )
+                content = content[:start] + fixed_block + content[end:]
+
+        # (5) Extension-key open-record on the three boundary-loose classes
+        _stac_open_record_classes = (
+            "StacItemProperties",
+            "StacAsset",
+            "StacItemAssetDefinition",
+            "StacSummaries",
+        )
+        for cls_name in _stac_open_record_classes:
+            marker = f"export interface {cls_name}"
+            if marker not in content:
+                raise RuntimeError(
+                    f"generate.py: STAC open-record post-processor could not "
+                    f"find `{marker}`. Update generate.py (Feature 223)."
+                )
+            start = content.index(marker)
+            # Find the closing brace of this interface block.
+            end = content.index("}\n", start)
+            # Insert the index signature on a new line just before the close.
+            # Preserve the trailing comma convention used by gen-typescript.
+            insertion = "    [key: string]: unknown,\n"
+            content = content[:end] + insertion + content[end:]
+
         # Drop the empty `export interface Any {}` stub — it's the LinkML
         # wildcard class that the post-processor has already mapped to
         # `Record<string, unknown>` at the usage site. Leaving it in the
@@ -723,7 +976,9 @@ def generate_typescript() -> bool:
             'export * from "./types.js";\n'
             'export * from "./unions.js";\n'
             "export type { ToolExecutor, ToolVersionResolver } "
-            'from "../../typescript/aliases/mcp-functions.js";\n',
+            'from "../../typescript/aliases/mcp-functions.js";\n'
+            "export type { StacCatalogOrCollection } "
+            'from "../../typescript/aliases/stac-unions.js";\n',
             encoding="utf-8",
             newline="\n",
         )

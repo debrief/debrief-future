@@ -171,6 +171,75 @@ consumer's responsibility — see the per-slot docstrings in
 `mcp.yaml` for the precedent (the `raw-geojson.yaml` `JsonObject`
 pattern).
 
+## Worked example: STAC catalog envelopes (cluster #223)
+
+The STAC catalog cluster — five audit-flagged hand-typed TypeScript
+shapes (3× `StacItem` + 2× `StacCatalog`) plus seven R4-masked sibling
+shapes (`StacLink`, `StacAsset`, `StacExtent`, `StacSummaries`,
+`StacCollection`, `StacCatalogOrCollection`, inline `StacItemAssets`)
+— is rooted in LinkML at `src/linkml/stac.yaml`. STAC files are
+persistent on-disk artefacts (Python writes them, TypeScript reads
+them next session); a hand-type drift between the two languages
+silently corrupts data, which is what motivated the migration.
+
+The cluster composes existing classes from `stac-extension.yaml`
+(`StacExtensionProperties`, `PlatformRecord`) and `geojson.yaml`
+(the seven geometry classes) rather than redeclaring them, matching
+the precedent set by #222 (MCP).
+
+Generated artefacts:
+
+- `StacItem`, `StacCatalog`, `StacCollection` — the three top-level
+  STAC envelope classes. Each carries a literal-string `type`
+  discriminator via the `equals_string` constraint on the
+  `StacTypeEnum` slot, so TypeScript narrows via
+  `if (root.type === 'Collection')` without `as unknown` casts.
+- `StacItemProperties`, `StacAsset`, `StacSummaries` — the three
+  Article XV.2 open-record classes (extra='allow' on Pydantic,
+  `[key: string]: unknown` on TypeScript) that preserve the STAC
+  `<namespace>:<key>` extension convention (`debrief:*`,
+  `processing:*`, `file:*`, `proj:*`).
+- `StacLink`, `StacExtent`, `StacSpatialExtent`,
+  `StacTemporalExtent`, `StacProvider` — strictly-typed member
+  classes.
+- TS-only alias `StacCatalogOrCollection` at
+  `src/typescript/aliases/stac-unions.ts` plus the Python mirror at
+  `src/generated/python/debrief_schemas/unions.py` — LinkML emits
+  the two concrete classes; the union is hand-maintained alongside.
+
+Two pieces of generator post-processing are required (per Research
+R-011 — same precedent as the GeoJSON coordinate fixes):
+
+1. **Nested-array slots**: `StacSpatialExtent.bbox` and
+   `StacTemporalExtent.interval` are authored as flat `multivalued`
+   in LinkML and rewritten to `list[list[float]]` /
+   `list[list[Optional[str]]]` in Pydantic + `number[][]` /
+   `(string | null)[][]` in TypeScript by
+   `scripts/generate.py`.
+2. **Open-record asset map**: `StacItem.assets` is authored as
+   `range: Any` (LinkML can't express `dict[str, X]` with a
+   strongly-typed value) and rewritten to `dict[str, StacAsset]`
+   in Pydantic + `Record<string, StacAsset>` in TypeScript.
+
+The `tests/test_stac_*` modules cover round-trip, schema-comparison,
+golden + negative fixtures, AND a corpus test that loads every
+committed `item.json` / `catalog.json` under
+`preview/workspace/samples/local-store/` (73 items + 1 STAC 1.1
+Collection) and `apps/vscode/test-data/local-store/` (2 items + 1
+STAC 1.0 Catalog) — the strongest evidence of additive correctness
+(FR-011: schema widens to accept fixtures, fixtures never rewritten).
+
+### Article XV.2 open-record exception
+
+Three classes carry `extra='allow'` (Pydantic) + `[key: string]:
+unknown` (TypeScript) to support STAC's namespaced extension keys:
+`StacItemProperties`, `StacAsset`, `StacSummaries`. The pattern
+matches the `raw-geojson.yaml` `JsonObject` precedent and the #222
+`MCPContentItem.structuredContent` precedent. Consumers narrow per
+extension via the existing per-extension type guards (e.g. the
+`debrief:platforms` typed reader). See plan.md Complexity Tracking
+for the exception rationale.
+
 ## Known Limitations
 
 LinkML has a limitation with nested array types. GeoJSON coordinates should be arrays of position arrays (e.g., `[[lon, lat], ...]`), but the generated JSON Schema expects flat number arrays. Track features with proper GeoJSON coordinates will validate correctly with Pydantic models but may show validation errors in JSON Schema.
