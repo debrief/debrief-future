@@ -1,149 +1,97 @@
-# Contract: Slice ↔ SystemState variant field mappings
+# Contract: Store-slice ↔ SystemState variant field mappings
 
 **Feature**: `261-session-state-systemstate`
-**Authoritative source for the migration scope**.
+**Authoritative source for the migration scope.**
 
-This contract pins the **per-field** mapping between Zustand store slices (in-memory) and `SystemStateProperties` variants (on-plot-file). It is the canonical source the spec's "Per-slice migration scope" table refers to. The implementation MUST encode this mapping as a single typed constant in `services/session-state/src/system-state/mapping.ts` — never duplicate it in `read.ts` / `write.ts`. Adding or removing a row here requires a spec amendment.
+Pins the per-field mapping between the in-memory Zustand store slices and the on-plot-file `SystemState` variants (and the per-feature `visible` flag). Encoded as the single set of conversion functions in `services/session-state/src/system-state/mapping.ts` — never duplicated in `read.ts`/`write.ts`. Adding/removing a row requires a spec amendment.
+
+> **These are NOT pure identity maps.** The store uses epoch numbers and a `FeatureSelection` object; the feature uses ISO strings and flat arrays. The conversions below are the contract.
 
 ---
 
-## `temporal` slice ↔ `temporal` SystemState variant
+## Temporal: `TemporalSlice` ↔ `state.temporal`
 
-| Zustand store key (`TemporalSlice.X`) | SystemStateProperties field | Verdict | Notes |
+| Store key (`TemporalSlice.X`) | Type in store | Feature field | Type on feature | Verdict | Conversion |
+|---|---|---|---|---|---|
+| `timeRange.start` | epoch number | `start_time` | ISO-8601 | **Migrate** | `epochToISO` / `isoToEpoch` |
+| `timeRange.end` | epoch number | `end_time` | ISO-8601 | **Migrate** | `epochToISO` / `isoToEpoch` |
+| `currentTime` | epoch number \| null | `current_time` | ISO-8601 (optional) | **Migrate** | `null` ⇒ omit; else `epochToISO` |
+| `timeFilter.start` | epoch number \| undefined | `filter_start_time` | ISO-8601 (optional) | **Migrate** | absent ⇒ omit; else `epochToISO` |
+| `timeFilter.end` | epoch number \| undefined | `filter_end_time` | ISO-8601 (optional) | **Migrate** | absent ⇒ omit; else `epochToISO` |
+| `displayMode` | enum | `display_mode` | `DisplayModeEnum` | **Migrate** | identity |
+| `stepSize` | `{value,unit}` | `step_size` | `TimeStep` | **Migrate** | identity |
+| `playbackRate` | number | `playback_rate` | float | **Migrate** | identity |
+| `playbackState` | enum | — | — | **Ephemeral** | not persisted (→ `stopped` on load) |
+
+`timeRange === null` ⇒ omit the whole `state.temporal` feature (no analytical window). On load, an absent `state.temporal` feature leaves the store at defaults (existing no-sidecar behaviour).
+
+---
+
+## Spatial: `SpatialSlice` ↔ `state.spatial`
+
+| Store key (`SpatialSlice.X`) | Type | Feature field | Verdict | Conversion |
+|---|---|---|---|---|
+| `viewport` | `ViewportPolygon \| null` | `viewport` | **Migrate** | identity (same shape). `null` ⇒ omit `state.spatial` |
+| `rotation` | number | `rotation` | **Migrate** | identity |
+| `drawingMode` | enum \| null | — | **Ephemeral** | → `null` on load |
+| `drawingPaletteIndex` | number | — | **Ephemeral** | → `0` on load |
+| `viewportLocked` | boolean | — | **Ephemeral** | → `false` on load (spec 260 force-unlock) |
+
+If `viewport` is null but `rotation` is non-default, the feature is still written (rotation is a meaningful view attribute); the spatial `rules:` block requires `viewport`, so when only rotation differs the helper writes the current `viewport` too (it will be non-null whenever a map has rendered). Practically `viewport === null` ⇒ omit; otherwise write both.
+
+---
+
+## Selection: `FeaturesSlice` ↔ `state.selection`
+
+| Store key (`FeaturesSlice.X`) | Type | Feature field | Verdict | Conversion |
+|---|---|---|---|---|
+| `selection.featureIds` | string[] | `selected_ids` | **Migrate** | identity (selection-path strings pass through) |
+| `selection.primary` | string \| null | `selected_primary` | **Migrate** | `null` ⇒ omit |
+| `selection.timestamp` | `TimeInstant` | — | **Ephemeral** | regenerated (`createTimeInstant(Date.now())`) on load |
+| `hiddenFeatureIds` | string[] | per-feature `properties.visible:false` | **Per-feature** | via `applyVisibilityToFeatureCollection` / `readHiddenFeatureIds` (NOT a SystemState field) |
+| `featureCollectionUri` | string \| null | — | **Eliminated** | derived from the plot's own URI at load (self-reference) |
+| `styleVersion` | number | — | **Ephemeral** | → `0` on load |
+
+Empty `selected_ids: []` is meaningful (explicit no-selection) and round-trips as an empty array, not as an absent feature — but note: an empty selection ⇒ omit the `state.selection` feature entirely (absence and empty are equivalent for selection, since "nothing selected" is the default). The `state.selection` feature is written only when `featureIds.length > 0`.
+
+---
+
+## active_storyboard: storyboard slice ↔ `state.activestoryboard`
+
+| Store key | Feature field | Verdict | Conversion |
 |---|---|---|---|
-| `timeRange.start` (ISO-8601 string) | `start_time` (datetime) | **Migrate** | Plot-shared analytical window. |
-| `timeRange.end` (ISO-8601 string) | `end_time` (datetime) | **Migrate** | Plot-shared analytical window. |
-| `currentTime` (ISO-8601 string \| null) | `current_time` (datetime) | **Migrate** | Q2=B: plot-shared playhead. Null on Zustand side → absent on SystemState side. |
-| `timeFilter` (object) | — | Stay in sidecar | Per-machine filter UI state. |
-| `stepSize` (number) | — | Stay in sidecar | Per-machine playback granularity. |
-| `playbackRate` (number) | — | Stay in sidecar | Per-machine playback speed. |
-| `playbackState` (`'playing' \| 'paused' \| 'stopped'`) | — | Stay in sidecar | Per-machine transport state. |
-| `displayMode` (enum) | — | Stay in sidecar | Per-machine viewport mode. |
-
-**MIGRATION_SCOPE.temporal**:
-```typescript
-const TEMPORAL_MIGRATION_SCOPE = {
-  storeToVariant: {
-    'timeRange.start': 'start_time',
-    'timeRange.end':   'end_time',
-    'currentTime':     'current_time',
-  },
-  staysInSidecar: [
-    'timeFilter', 'stepSize', 'playbackRate', 'playbackState', 'displayMode',
-  ],
-} as const;
-```
+| `activeStoryboardId` (string \| null) | `active_storyboard_id` | **Already #237** | identity; `null` ⇒ no feature. Helper delegates to `@debrief/components` `setActiveStoryboardSelection`/`getActiveStoryboardSelection` (R-011), unchanged wire shape (NG-002) |
 
 ---
 
-## `spatial` slice ↔ `spatial` SystemState variant
+## Visibility: `hiddenFeatureIds` ↔ per-feature `visible`
 
-Post-review (1B), the LinkML schema's `SystemStateProperties.spatial` variant carries a `viewport: ViewportPolygon` field whose shape is **identical** to `SpatialSlice.viewport`. The mapping is therefore an identity — no transformation, no derivation, no risk of round-trip drift.
+| Direction | Operation |
+|---|---|
+| save | for each feature, set `properties.visible = false` iff its id ∈ `hiddenFeatureIds`; otherwise omit/clear the flag |
+| load | `hiddenFeatureIds = readHiddenFeatureIds(fc)` = ids of features with `properties.visible === false` |
 
-| Zustand store key (`SpatialSlice.X`) | SystemStateProperties field | Verdict | Notes |
-|---|---|---|---|
-| `viewport` (`ViewportPolygon \| null`) | `viewport` (`ViewportPolygon`) | **Migrate** (identity) | Plot-shared map view. Same shape on both sides — no conversion. `null` on the slice maps to "no SystemState/spatial feature written" (and vice versa on load). |
-| `rotation` (number) | — | Stay in sidecar | Per-machine map rotation; no schema home. |
-| `drawingMode` (enum) | — | Stay in sidecar | Per-machine editor state. |
-| `drawingPaletteIndex` (number) | — | Stay in sidecar | Per-machine editor state. |
-| `viewportLocked` (boolean) | — | Stay in sidecar | Per-machine UI lock state. |
-
-**MIGRATION_SCOPE.spatial**:
-```typescript
-const SPATIAL_MIGRATION_SCOPE = {
-  storeToVariant: {
-    'viewport': 'viewport',   // identity — same ViewportPolygon shape on both sides
-  },
-  staysInSidecar: [
-    'rotation', 'drawingMode', 'drawingPaletteIndex', 'viewportLocked',
-  ],
-} as const;
-```
-
-**Why identity, not bbox/zoom/center**: Resolves a pre-existing Article II.1 violation in the LinkML schema, where `ViewportPolygon` and the old `bbox`/`zoom`/`center` parallel fields modelled the same concept. The schema is now the single source of truth for "what a saved viewport is shaped like", and the helper does not need a spatial-shape conversion function. See `linkml-delta.md` and `research.md` § R-010 for rationale.
+Absent `visible` ⇒ visible. Toggling appends a `LogEntry` to that feature's own `provenance` via the host's `LogService` (R-012) — not by the pure helper.
 
 ---
 
-## `features` slice ↔ `selection` SystemState variant
+## Ephemeral set (persisted nowhere; defaulted on load)
 
-The `features` slice in `services/session-state/src/store/slices/features.ts` carries multiple concerns; only the `selection` portion migrates.
-
-| Zustand store key (`FeaturesSlice.X`) | SystemStateProperties field | Verdict | Notes |
-|---|---|---|---|
-| `selection` (`string[]`) | `selected_ids` (`string[]`) | **Migrate** | Q1=B: plot-shared selection. Empty array maps to empty array (explicit no-selection); migrates as such. |
-| `hiddenFeatureIds` (`string[]`) | — | Stay in sidecar | Per-machine visibility state. |
-| `styleVersion` (number) | — | Stay in sidecar | Per-machine style cache marker. |
-| `featureCollectionUri` (string) | — | Stay in sidecar | Per-machine URI binding (the actual plot file location varies per host). |
-
-**MIGRATION_SCOPE.selection**:
-```typescript
-const SELECTION_MIGRATION_SCOPE = {
-  storeToVariant: {
-    'selection': 'selected_ids',
-  },
-  staysInSidecar: [
-    'hiddenFeatureIds', 'styleVersion', 'featureCollectionUri',
-  ],
-} as const;
-```
+`playbackState` → `stopped`; `drawingMode` → `null`; `drawingPaletteIndex` → `0`; `viewportLocked` → `false`; `styleVersion` → `0`; `selection.timestamp` → regenerated; `featureCollectionUri` → derived from plot URI.
 
 ---
 
-## `active_storyboard` slice ↔ `active_storyboard` SystemState variant
-
-The `active_storyboard` variant is consumed by the **storyboard slice** (separate from the three sidecar slices above). #237 already ships this end-to-end in web-shell.
-
-| Storyboard slice key | SystemStateProperties field | Verdict | Notes |
-|---|---|---|---|
-| `activeStoryboardId` (`string \| null`) | `active_storyboard_id` (`string`) | **Already migrated by #237.** | Wire shape unchanged by this work (NG-004). Read/write path is consolidated into the shared helper (FR-011/FR-012). |
-
-**MIGRATION_SCOPE.active_storyboard**:
-```typescript
-const ACTIVE_STORYBOARD_MIGRATION_SCOPE = {
-  storeToVariant: {
-    'activeStoryboardId': 'active_storyboard_id',
-  },
-  staysInSidecar: [],
-} as const;
-```
-
-The `staysInSidecar: []` is intentional — no part of the storyboard selection is sidecar-persisted today, and none becomes so post-migration.
-
----
-
-## Type-level expression
-
-The four `MIGRATION_SCOPE` constants are combined into one typed structure in `mapping.ts`:
-
-```typescript
-export const MIGRATION_SCOPE = {
-  temporal:           TEMPORAL_MIGRATION_SCOPE,
-  spatial:            SPATIAL_MIGRATION_SCOPE,
-  selection:          SELECTION_MIGRATION_SCOPE,
-  active_storyboard:  ACTIVE_STORYBOARD_MIGRATION_SCOPE,
-} as const;
-
-export type MigratedTemporalKeys =
-  keyof (typeof MIGRATION_SCOPE)['temporal']['storeToVariant'];
-// 'timeRange.start' | 'timeRange.end' | 'currentTime'
-
-// …same pattern for spatial / selection.
-```
-
-These `MigratedXxxKeys` derived types feed the `PartialOmit<>` boundary-derivation in `data-model.md` § Entity 5, satisfying Article IV.5 (no hand-rewritten subset types).
-
----
-
-## Round-trip invariant
-
-For every migrated key in this contract, the following round-trip MUST hold (verified by R-006 tests):
+## Round-trip invariant (verified by R-006 tests)
 
 ```text
-store value V at save time
-  ──save→ written into plot file's SystemState feature
-  ──load→ read back into SystemStateMap
-  ──reconcile→ rehydrated into Zustand store
-  →  value V (bit-equal modulo float-precision tolerance per SC-001)
+store value V at explicit save
+  ──map→ write into features.geojson state.<type> feature (or per-feature visible)
+  ──read→ SystemStateMap (+ hidden ids)
+  ──map→ rehydrate store
+  →  V'   where V' === V modulo:
+          - float/ISO precision (≤ 1e-9 numeric; ISO-second timestamps — SC-001/SC-002)
+          - regenerated selection.timestamp (intentional)
+          - ephemeral fields reset to defaults (intentional)
 ```
 
-For every key marked "Stay in sidecar", the round-trip operates entirely through the sidecar (no SystemState feature involvement) and is governed by the existing pre-migration round-trip tests in `services/session-state/src/persistence/__tests__/` (unchanged).
+For every key marked **Ephemeral** / **Eliminated**, the round-trip yields the default — that is the contract, not a loss.

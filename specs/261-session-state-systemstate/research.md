@@ -1,351 +1,192 @@
-# Research: Migrate session-state slices into in-plot SystemState features
+# Research: Retire the sidecar — all plot state in the FeatureCollection
 
-**Feature**: `261-session-state-systemstate`
-**Phase**: 0 (pre-design research)
-**Date**: 2026-05-19
+**Feature**: `261-session-state-systemstate` | **Phase**: 0 | **Date**: 2026-05-27
 
-This document resolves open design questions surfaced by `plan.md`. The spec's [NEEDS CLARIFICATION] markers (Q1, Q2) were resolved at spec time — this document captures the **downstream design decisions** that flow from those resolutions.
+This phase resolves the open design questions surfaced during the spec rewrite. Each item is a binding decision for Phase 1+ unless a later spec amendment overrides it. Findings are grounded in the actual codebase (verified file reads), not the aspirational shapes of the prior #261 artefacts.
 
 ---
 
-## R-001: Where does the shared SystemState helper live?
+## R-001 — Shared helper location
 
-**Decision**: `services/session-state/src/system-state/` — a new module *inside* the existing `@debrief/session-state` package.
+**Decision**: A single module at `services/session-state/src/system-state/`, re-exported from `@debrief/session-state`. Not a new workspace package.
 
-**Rationale**:
-- The helper exists to back the session-state slices' persistence boundary. It is not a general-purpose utility — it is the persistence shim for a specific store.
-- Both hosts already depend on `@debrief/session-state`. Adding a new sub-export (`@debrief/session-state/system-state`) is zero new dependency graph.
-- Per Article IX.1 (minimal dependencies) the bar for spinning up a new workspace package is "would another consumer need this without taking the whole session-state package?" — currently no, and we don't speculate. If a future consumer needs SystemState read/write without the store, the module is movable via `git mv` with no behavioural change.
-- The web-shell's existing `activeStoryboardPersistence.ts` is conceptually in the wrong place — it lives in `apps/web-shell/src/services/` but is host-agnostic logic. Moving its replacement to `services/session-state/src/system-state/` corrects this.
+**Rationale**: It exists to hydrate/extract the existing Zustand store across the persistence boundary — tightly coupled to that store. Both hosts already import `@debrief/session-state`. A ~5-file module does not justify a new build/test pipeline (Article IX.1). Promotable to a package later via `git mv` if a non-session consumer emerges.
 
-**Alternatives considered**:
-1. **Separate workspace package `@debrief/system-state`**. Rejected — package proliferation cost (build pipeline, test pipeline, version bumping) without a second consumer to justify it.
-2. **`shared/components/src/system-state/`**. Rejected — components are UI artefacts; this is a data-shape helper. Wrong shelf.
-3. **Leave at `apps/web-shell/src/services/activeStoryboardPersistence.ts` and add VS Code copy**. Rejected — explicitly violates FR-011/FR-012 (single producer).
-
-**ADR**: The decision will be recorded in `docs/project_notes/decisions.md` as a new ADR during implementation.
+**Alternatives**: New `@debrief/system-state` package (rejected — premature, package proliferation); host-private helpers (rejected — violates FR-015 single-producer).
 
 ---
 
-## R-002: How is the LinkML schema extended for `current_time`?
+## R-002 — SystemState wire shape (the authoritative runtime, not the aspirational docs)
 
-**Decision**: Add `current_time: datetime` as a new **optional** attribute on `SystemStateProperties` in `shared/schemas/src/linkml/geojson.yaml`. Enforce the "if `state_type == temporal` then `current_time` SHOULD be present" rule via a LinkML `rules` block (LinkML ≥1.7 supports class-level rules).
+**Decision**: Follow #237's *shipped* shape exactly (spec Assumption: the runtime is authoritative):
+- `id`: deterministic `state.<type>` — `state.spatial`, `state.temporal`, `state.selection`, `state.activestoryboard`. Matches the existing schema `id` pattern `^state\.[a-z]+$`.
+- `geometry`: `{ "type": "Point", "coordinates": [] }` (the schema's `GeoJSONEmptyPoint`), **not** `null`.
+- `properties`: `{ kind: "SYSTEM", state_type, …variant fields }`.
+- The deterministic id makes "at most one per `state_type`" a natural upsert key (find by id / state_type, replace in place).
 
-**Rationale**:
-- LinkML 1.7+ supports `rules` with `preconditions`/`postconditions` blocks that express discriminator-conditional constraints, which is the natural shape for "temporal variant requires current_time".
-- Making the attribute optional at the *class* level keeps generated Pydantic/TS types simple — `current_time: Optional[datetime]` / `current_time?: string`.
-- Strict-on-import (Article XIV.4) is enforced by the helper's `validate.ts` (R-005), not the schema, because the schema's role is shape definition, not runtime narrowing per-variant.
-- Per FR-016 and the spec's Q2 resolution: optional initially, with the option to tighten to required in a future deprecation cycle.
+**Rationale**: The prior #261 `data-model.md` claimed ULID ids, `null` geometry, and *required* provenance — all three contradicted by `shared/components/src/storyboard/activeStoryboardSelection.ts` (verified) and the `SystemState` class in `geojson.yaml`. NG-002 forbids changing the `active_storyboard` wire shape, so the other three variants adopt the same shape for consistency.
 
-**Field shape**:
-```yaml
-current_time:
-  description: >-
-    For temporal SystemState features, the analyst's playhead position at
-    save time (the moment the time-cursor was scrubbed to). When absent on
-    a temporal SystemState feature, the playhead is assumed unset and
-    falls back to the start of the analytical window.
-  range: datetime
-  required: false
-```
-
-**Alternatives considered**:
-1. **Add as required, gate runtime against unmigrated plots**. Rejected — would break #237's existing `active_storyboard` fixtures and any plots web-shell has already written, which lack the field by definition. Violates the "additive only" gate.
-2. **Create a new sub-variant `temporal_with_playhead`**. Rejected — pointless variant proliferation. The discriminator already disambiguates; the new field is just additional data on the existing variant.
-3. **Store as a separate `playhead` `SystemState` variant**. Rejected — splits semantically-coupled state across two features and complicates the "at most one per state_type per plot" rule (FR-003).
+**Alternatives**: ULID ids (rejected — the schema id pattern is `^state\.[a-z]+$`; digits/hyphens are illegal, and a deterministic id is a better upsert key than a random one for a singleton-per-type feature). `null` geometry (rejected — diverges from shipped shape and the `GeoJSONEmptyPoint` schema type).
 
 ---
 
-## R-003: Reconciliation algorithm when both sources disagree (FR-007)
+## R-003 — Typing against a flat generated interface
 
-**Decision**: Two-pass load. First pass reads the plot's `FeatureCollection` and extracts all `SystemState` features into a `SystemStateMap` keyed by `state_type`. Second pass loads the sidecar — for each migrated field, if the corresponding `SystemStateMap` entry exists, the SystemState value wins and the sidecar value for that field is discarded (in-memory, before applying to the store). Non-migrated fields (playback state, drawing mode, etc.) load from the sidecar normally.
+**Decision**: The generated `SystemStateProperties` is a **flat interface** with `kind: string` / `state_type: string` (verified — `gen-typescript` does not emit discriminated unions or string-literal enums for slot ranges). The helper therefore:
+- Defines a **Zod discriminated union** keyed on `state_type` (one schema per variant) in `validate.ts`, which is the runtime narrowing boundary (Article XV.5).
+- Exposes per-variant value types via `z.infer` of those schemas (or `Extract`-style aliases layered over a locally-declared discriminated union), so callers get fully-typed variants without re-listing fields by hand (Article IV.5).
+- Keeps a compile-time exhaustiveness guard over `SystemStateTypeEnum` (`exhaustive.ts`) so adding a LinkML variant fails the build until the helper handles it.
 
-**Algorithm**:
+**Rationale**: `Extract<SystemStateProperties, { state_type: 'temporal' }>` (the prior contract's pattern) resolves to `never` against a flat `state_type: string` interface — it cannot work as written. Zod is already a project dependency and is the established JSON-boundary validator.
 
-```text
-function loadSession(store, plotPath):
-    fc = await readPlotFile(plotPath)
-    sysStateMap = readSystemStateFromFeatureCollection(fc)
-    # sysStateMap is a typed map: { temporal?: TemporalState, spatial?: SpatialState, selection?: SelectionState, active_storyboard?: ActiveStoryboardState }
-
-    sidecar = await readSidecar(sidecarPath(plotPath)) | { /* defaults */ }
-
-    # For each migrated field, prefer sysStateMap, fall back to sidecar
-    temporal = applyTemporalReconciliation(sysStateMap.temporal, sidecar.temporal)
-    spatial = applySpatialReconciliation(sysStateMap.spatial, sidecar.spatial)
-    selection = applySelectionReconciliation(sysStateMap.selection, sidecar.features)
-
-    # Non-migrated fields always come from sidecar
-    playback = sidecar.temporal.playback ?? defaultPlayback()
-    drawing = sidecar.spatial.drawing ?? defaultDrawing()
-    # …
-
-    store.applyHydratedState({ temporal, spatial, selection, playback, drawing, … })
-    store.applyActiveStoryboard(sysStateMap.active_storyboard)
-```
-
-Per-slice reconciliation functions are pure, unit-testable, and live in `mapping.ts` alongside the slice↔variant field maps.
-
-**Error path**: If the plot contains a malformed `SystemState` feature (FR-003, FR-004 edge cases), the load surfaces an error to the host with the offending feature IDs; the host decides whether to surface a user-visible message, a logged warning, or both. The helper itself does not silently fall back to sidecar — strict on import (Article XIV.4).
-
-**Alternatives considered**:
-1. **Sidecar wins**. Rejected per FR-007 (the plot file is the canonical, portable artefact).
-2. **Last-write-wins by timestamp comparison**. Rejected — both sources carry timestamps but they're not synchronised (sidecar's `savedAt` vs SystemState's `provenance[*].timestamp`); using them invites Byzantine "clock skew" bugs and adds no real value over "plot wins".
-3. **Merge field-by-field within a slice**. Rejected — gives the user no mental model. "If the plot has a spatial SystemState feature, the plot's bbox/zoom/center are authoritative. Period."
+**Alternatives**: Hand-written variant interfaces (rejected — Article IV.5 forbids re-listing fields; drift risk). Post-processing `gen-typescript` to emit a discriminated union (rejected — large generator change, out of scope; runtime narrowing is sufficient).
 
 ---
 
-## R-004: Sidecar version bump strategy
+## R-004 — Schema value-type consolidation (FR-002a)
 
-**Decision**: Bump `SessionFile.version` minor from `1.1.0` → `1.2.0`. Add a `migration_lineage` field (optional) for diagnostic purposes only — not used by the load path.
+**Decision**: Move the shared value types into `common.yaml` (which `geojson.yaml` already imports) as their single definition, and delete the duplicates:
+- `ViewportPolygon` (today only in `session-state.yaml`) → `common.yaml`.
+- `Coordinate` (in both `common.yaml` and `session-state.yaml`) → keep `common.yaml`, delete the `session-state.yaml` copy.
+- `TimeStep` + `TimeUnitEnum`, `DisplayModeEnum`, `PlaybackStateEnum`, and the temporal value types the store still consumes (`TimeInstant`, `TimeRange`, `TimeFilter`) → `common.yaml`.
+- Delete the duplicate `DisplayModeEnum` in `storyboard.yaml`.
+- Remove the now-vestigial `SessionFile` / `SessionState` root classes from `session-state.yaml`; remove slice classes left with no runtime consumer.
 
-**Rationale**:
-- Per spec FR-015, the bump signals "this sidecar was written under the post-migration regime — migrated fields will be absent".
-- Semver minor (1.1.0 → 1.2.0) signals additive change (the **schema** is additive — a sidecar with the old `version` and a complete-shape body still loads; a sidecar with the new `version` is missing fields the loader knows to look for in the plot file).
-- Older readers (running pre-migration code) reading a new-version sidecar would: see the bumped version (which they treat as forward-compatible because semver minor); see absent migrated fields; fall back to *their* defaults. This is wrong behaviour for them (they wouldn't know to look in the plot), but they're not in deployment anyway — the cross-host parity matrix tests cover both hosts running the new code.
-- No backward-incompatibility break per Article II.3 — migration path is documented (this file).
+**Rationale**: `geojson.yaml` imports only `common`/`styling`/`log-entry` (verified) — it cannot reference types siloed in `session-state.yaml`. Consolidating into the common base both unblocks `SystemStateProperties` references and pays down a pre-existing Article II.1 duplication.
 
-**`migration_lineage` field shape**:
-```json
-"migration_lineage": {
-  "schema_version_at_write": "1.2.0",
-  "migrated_variants": ["temporal", "spatial", "selection"]
-}
-```
+**Alternatives**: Make `geojson.yaml` import `session-state.yaml` (rejected — creates a cluster cycle and entrenches the duplication; `session-state.yaml` is being gutted anyway). Redefine the types a third time in `geojson.yaml` (rejected — Article II.1).
 
-Purpose: forensic diagnosis if a sidecar has been corrupted or hand-edited. Not load-relevant.
-
-**Alternatives considered**:
-1. **Bump major (2.0.0)**. Rejected — Article II.3 reserves major for breaking changes; this is additive.
-2. **No version bump; rely on field presence to detect era**. Rejected — version is the existing detection mechanism per FR-015; reusing it is cheaper than inventing a parallel detection.
+**Verification before edit**: confirm the duplicate `Coordinate`/`DisplayModeEnum` definitions are semantically identical (they appear to be), and that codegen names are unaffected by which file defines them (the `debrief.yaml` aggregator merges all clusters, so generated TS/Pydantic symbol names do not change — only the authoring file moves).
 
 ---
 
-## R-005: Runtime validation at the schema boundary (Article XV.5, Article XIV.4)
+## R-005 — gen-json-schema + ViewportPolygon.coordinates risk (FR-006a)
 
-**Decision**: Use Zod for TypeScript runtime validation, derived structurally from the generated `SystemStateProperties` type via `z.discriminatedUnion('state_type', [tempSchema, spatialSchema, selectionSchema, activeStoryboardSchema])`. Use Pydantic v2 for the Python adherence-test side (already in place — no change needed beyond regenerating from LinkML).
+**Decision**: Anticipate that placing `viewport: ViewportPolygon` on `SystemStateProperties` (in `geojson.yaml`, which IS in the JSON Schema build via `debrief-jsonschema.yaml`) may trip the known `gen-json-schema` bug with `Coordinate` as a multivalued class range — the documented reason `session-state.yaml` is excluded from the JSON Schema build today (`generate.py` lines ~24–26, verified). Resolution path, in order of preference:
+1. Add a targeted `generate.py` post-processor for the `ViewportPolygon`/SystemState JSON Schema slot, mirroring the existing GeoJSON-coordinate post-processors already in that script.
+2. If that proves brittle, validate SystemState fixtures through **Pydantic only** (the cross-language round-trip already exercises Python validation) and exclude the SystemState JSON Schema slot from AJV.
 
-**Rationale**:
-- Article XV.5 requires explicit type-narrowing at every untyped-data ingress. The plot's `FeatureCollection` is parsed JSON — its `properties` blob is `unknown` until narrowed.
-- A discriminated union over `state_type` is exactly the shape LinkML defines and exactly the shape the runtime needs.
-- Zod is already used elsewhere in the project (spec-navigator, backlog-navigator) — not a new dependency. No `any` introduced.
-- The Zod schemas live in `services/session-state/src/system-state/validate.ts` and are derived from the generated `SystemStateProperties` interface via the existing pattern (declaring `z.object` shapes that the type checker verifies match the generated types via `z.infer`).
+**Rationale**: The bug is pre-existing and file-scoped; we must not let it silently produce a broken SystemState JSON Schema. Pydantic adherence + round-trip is the stronger gate regardless.
 
-**Compile-time exhaustiveness guard** (Article IV.5):
-```typescript
-// In exhaustive.ts — fails the build if LinkML adds a new state_type and the helper hasn't been updated.
-type _ExhaustiveStateTypeGuard = Exclude<
-  SystemStateTypeEnum,
-  'temporal' | 'spatial' | 'selection' | 'active_storyboard'
-> extends never
-  ? true
-  : never;
-const _exhaustive: _ExhaustiveStateTypeGuard = true;
-```
-
-**Alternatives considered**:
-1. **Hand-rolled validators using `typeof` checks**. Rejected — Article XV.7 (cast as expert override) and Article IV.5 (no hand-rolled subset types) both push toward generated/derived validators.
-2. **Validate at the host level (re-validate in VS Code and web-shell separately)**. Rejected — duplicates the validation contract; the shared helper IS the boundary.
-3. **Skip runtime validation; trust the generated types**. Rejected — Article XV.5 explicitly requires a typed model at each ingress. Parsed JSON is the canonical ingress.
+**Alternatives**: Ignore (rejected — Article I.3/II.2; a broken JSON Schema is a silent validation hole). Move SystemState out of the JSON Schema build wholesale (rejected — SystemState is core plot content, unlike the sidecar-only session-state cluster).
 
 ---
 
-## R-006: Cross-host test matrix architecture
+## R-006 — Field conversions (the mappings are NOT identity)
 
-**Decision**: Three layers of tests, each adding coverage at a different granularity:
+**Decision** (authoritative mapping lives in `contracts/slice-mappings.md`):
+- **Temporal** — store holds **epoch numbers**; the feature holds **ISO-8601 strings**. Convert with the existing `epochToISO`/`isoToEpoch` / `timeRangeToISO`/`timeRangeFromISO` helpers (`services/session-state/src/types/temporal.ts`, verified). `currentTime: null` ⇒ `current_time` absent. The time *filter* (`{start?,end?}` epoch) maps to `filter_start_time`/`filter_end_time` ISO bounds so every timestamp on the feature is ISO (spec decision).
+- **Spatial** — `viewport: ViewportPolygon` is a genuine identity map (same shape both sides). `rotation: number` → `rotation`.
+- **Selection** — store holds a `FeatureSelection` object `{ featureIds, primary, timestamp }`; only `featureIds → selected_ids` and `primary → selected_primary` migrate. `timestamp` is dropped (regenerated on load).
+- **active_storyboard** — `activeStoryboardId ↔ active_storyboard_id`, identity, unchanged from #237.
 
-1. **Schema adherence** (`shared/schemas/tests/test_system_state_adherence.py`) — Pydantic round-trips every fixture in `shared/schemas/fixtures/system-state/{valid,invalid}/`. Counts toward Article VI.1 and SC-006.
-2. **Helper unit tests** (`services/session-state/src/system-state/__tests__/*.test.ts`) — Vitest covers each pure function (`read`, `write`, mapping per variant, reconciliation per variant). Counts toward Article VI.2.
-3. **Cross-host parity matrix** (Playwright in web-shell, Mocha extension-host in VS Code) — for each of the 4 variants × 2 producers × 2 readers = 16 test cases, save in producer / load in reader / assert state matches. Counts toward Article VI.3 and SC-003.
+**Rationale**: The prior contract called these "identity" — false for temporal (epoch vs ISO) and selection (object vs array). Getting the conversions explicit prevents silent data loss.
 
-The matrix runs as two Playwright specs + one VS Code extension test file:
-- `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts` — web-shell-produces → web-shell-reads (4 cases) + web-shell-produces → VS Code-reads (4 cases, via shared file fixture and Mocha companion).
-- `apps/vscode/test/system-state-roundtrip.test.ts` — VS Code-produces → VS Code-reads (4 cases) + VS Code-produces → web-shell-reads (4 cases, via shared file fixture).
-
-The "produced in A → read in B" pairs share a fixture corpus at `specs/261-session-state-systemstate/contracts/fixtures/` so neither host has to host-shell out to the other.
-
-**Alternatives considered**:
-1. **Single Playwright suite that drives both hosts**. Rejected — VS Code automation via Playwright (#142) is unreliable and reserved for chrome-level concerns. Use the native VS Code test runner for the VS Code half.
-2. **Skip the cross-product, just test "round-trip in same host"**. Rejected — cross-host parity is exactly the point of the migration (SC-003); same-host round-trip wouldn't catch helper-version-mismatch regressions.
+**Alternatives**: Store ISO in the slice (rejected — Review Decision 5C deliberately uses epoch for hot-path updates; out of scope to revisit). Persist the whole `FeatureSelection` (rejected — `timestamp` is per-session noise; `selected_ids`/`selected_primary` are the meaningful state).
 
 ---
 
-## R-007: Backward compatibility — what about the existing `active_storyboard` runtime?
+## R-007 — Visibility as a per-feature `visible` flag
 
-**Decision**: The shared helper, when reading a `FeatureCollection` containing only an `active_storyboard` SystemState feature (today's web-shell-written plots), returns a `SystemStateMap` with `active_storyboard` populated and the other three variants `undefined`. The loader treats `undefined` for migrated variants as "fall back to sidecar" — which for the migrated fields is "fall back to whatever the sidecar said (which is the same as today)".
+**Decision**: Add optional `visible: boolean` to `BaseFeatureProperties` (`common.yaml:330` — verified location; propagates to all feature-props classes via `is_a`). Semantics: **absent or `true` ⇒ visible; `false` ⇒ hidden**. On save, write `visible: false` onto hidden features (omit/clear otherwise). On load, hydrate the store's hidden set from features carrying `visible: false`. This replaces the sidecar's `features.hiddenFeatureIds` denylist.
 
-In other words: existing plots that have `active_storyboard` but not the other three SystemState features are **identical** to today's behaviour for those plots, plus they continue to work for `active_storyboard` because the shared helper inherits #237's read path. Article VI.3 verifies this with a "load an existing fixture" test pinned to a known #237-era plot file.
+**Rationale**: Visibility is intrinsically a property of the feature; it travels with the feature with no separate index to keep in sync. Adding to the single base class covers every feature type at once.
 
-**Rationale**:
-- No code-path divergence between "this plot has a temporal SystemState feature" and "this plot doesn't" — they take the same load path, just hit different branches.
-- No "migration script" needed for old plots — they upgrade naturally on first save under the new code (FR-014).
+**Alternatives**: A `state.visibility` SystemState feature holding a hidden-id list (rejected — re-creates the denylist-out-of-sync problem the per-feature flag avoids; the user explicitly chose push-down). Always writing `visible: true` (rejected — bloats every feature; absent=visible keeps files clean).
 
-**Migration of `activeStoryboardPersistence.ts`**:
-1. Add new shared helper, keep `activeStoryboardPersistence.ts` calling INTO it (delegation).
-2. Re-point existing web-shell call sites at the shared helper directly.
-3. Run the existing #237 Playwright test suite — passes unchanged.
-4. Delete `activeStoryboardPersistence.ts` and its tests.
-
-The migration is **one PR**, in three sequenced commits, so each commit is reviewable in isolation but the deletion happens with all callers already moved over.
+**Accepted cost**: toggling visibility mutates the feature and appends to its provenance (FR-014). Growth is bounded to *saved* states (FR-021 — exploration doesn't persist), so it accrues per save, not per transient toggle. Compaction is a deferred follow-up (NG-003).
 
 ---
 
-## R-008: Provenance shape per write (FR-010, Article III.1) — REVISED per review 2A
+## R-008 — Dirty-tracking model (FR-019/FR-020/FR-021)
 
-**Decision**: Every `SystemState` write appends a single `LogEntry` to the variant's `provenance` array, using **the existing LinkML `LogEntry` shape — no new fields added**.
+**Decision**:
+- View-state changes — pan, zoom, rotate, scrub/seek, select, hide/reveal — update the in-memory store but **never set the dirty flag** (FR-019). No close prompt from exploration.
+- An **explicit save** persists the complete current state into `features.geojson` regardless of dirty (FR-020). Concretely, `apps/vscode/src/commands/saveSession.ts` must drop (or bypass) its `if (!state.dirty) { …return }` early-return (verified — lines ~124–128) for the explicit save command so a looked-at-only view can be committed.
+- Only **substantive content edits** (add/delete/modify features, captured scenes, tool results) set dirty and drive the on-close prompt (FR-021).
 
-Field mapping (verified against `shared/schemas/src/linkml/log-entry.yaml`):
+**Rationale**: With viewport/selection/time now *plot state*, naïvely marking dirty on every pan would make merely viewing a plot prompt to save — user-hostile. Decoupling the dirty flag (close-prompt trigger) from "what an explicit save writes" resolves it cleanly and keeps "user controls when changes commit."
 
-| Concept | LogEntry field | Value at write time |
-|---|---|---|
-| Producing host | `was_generated_by.tool` | `"vscode-extension"` \| `"web-shell-session-state"` |
-| Producing host version | `was_generated_by.tool_version` | `@debrief/session-state` package.json `version` |
-| User-or-agent identity | `agent` | from existing `LogService.getAgent()` infrastructure (per Assumption 3 in spec; #221 will enrich this) |
-| Write action | `activity_type` | `"created"` \| `"updated"` \| `"replaced"` (LinkML `ActivityType` enum gains these if they don't already exist — single value-set extension at most, no new top-level fields) |
-| When | `timestamp` | ISO-8601 UTC at save time |
-| Activity ID | `activity_id` | fresh ULID per write |
-| Required structural fields (per LinkML LogEntry spec) | `used`, `generated`, `execution_duration` | populated with sensible defaults — `used=[]` (no source inputs for state captures), `generated=[<SystemState feature id>]`, `execution_duration="PT0S"` (instantaneous capture) |
-
-The provenance array is *append-only* per Article III.3. The helper never modifies existing entries — it only appends.
-
-**Why this revision**: The original draft of R-008 invented three fields (`host`, `action`, `version`) that don't exist on the LinkML `LogEntry` class. This would have been a silent second schema change, violating Article II.3 (no undocumented schema growth) and Article IV.5 (boundary types must be derived, not rewritten). The fix maps onto the existing typed surface — adding at most enum values to `ActivityType` if needed, but no new fields. See `contracts/system-state-helper.ts.md` `SystemStateWriteContext` for the helper-side shape.
-
-**Open task for `/speckit.tasks`**: confirm `ActivityType` enum already includes (or grows to include) `"created"`, `"updated"`, `"replaced"`. If the enum has different terminology today, adopt it rather than extending. Either way the change is to the value-set, not the structure.
-
-**Alternatives considered**:
-1. **Add `host`/`action`/`version` to LogEntry as a parallel schema delta**. Rejected per review 2A — breadth of blast radius (LogEntry is used everywhere; new fields would force every existing fixture and writer to migrate).
-2. **One LogEntry per migrated field**. Rejected — overflows the provenance array on every save; field-level provenance can be reconstructed from the LogEntry timestamp + the value at that time.
-3. **Provenance only on first write**. Rejected — Article III.1 (provenance always) and III.3 (immutable audit trail) want a continuous lineage, not just genesis.
-4. **Skip provenance for SystemState writes**. Rejected — violates Article III.1.
+**Alternatives**: Mark dirty on any view change (rejected — nag pathology). Debounced auto-save of view-state (rejected — surprising writes; out of scope; left to #250's web-shell save-trigger UX question). An explicit "save view" gesture distinct from save (rejected — unnecessary; the existing save command, with the guard relaxed, already does it).
 
 ---
 
-## R-009: Edge case — what counts as "no SystemState feature" vs "malformed SystemState feature"?
+## R-009 — Sidecar removal: hard cut, no read shim
 
-**Decision**: A FeatureCollection has zero, one, or multiple Features whose `properties.kind === "SYSTEM"`. Each such Feature is a **candidate**. A candidate is "well-formed" if Zod validation against the discriminated union of `SystemStateProperties` variants passes.
+**Decision**: Delete the sidecar with **no** legacy read path.
+- `services/session-state/src/persistence/{load.ts, save.ts}` sidecar file-I/O (`saveSession`/`loadSession`/`extractPersistentState`/`serializeState`, `SessionFile` interface, `schema.ts` version machinery) is removed or repurposed into FeatureCollection hydrate/extract helpers.
+- VS Code: delete `deriveSessionPath`, the `loadSession(session, sessionPath)` block in `openPlot.ts` (lines ~188–208), and the `saveSession(session, savePath)` call in `saveSession.ts`.
+- The `@debrief/session-state` package re-exports change accordingly; consumers (`openPlot.ts`, `saveSession.ts`, `sessionManager.ts`, the standalone MCP server) are updated.
 
-| Candidate state | Outcome |
+**Rationale**: Zero `.debrief-session` files are committed (verified — `git ls-files` returns none); the project is pre-release (Article XIV.5 — fix the data, don't carry a compatibility reader). A shim would be dead weight from day one.
+
+**Alternatives**: One-release read-then-migrate shim (rejected — no real corpus to migrate; pre-release). Leave the package functions but unused (rejected — dead code; knip would flag it).
+
+---
+
+## R-010 — Host wiring
+
+**Decision**:
+- **VS Code load** (`openPlot.ts`): the FeatureCollection is already loaded via `stacService.loadPlotData` (verified — `plotData.features`). After it loads, call `readSystemStateFromFeatureCollection(plotData)` + the visibility reader, and hydrate the store. Remove the sidecar load block.
+- **VS Code save** (`saveSession.ts`): build the SystemState write-input + visibility from the store, call `writeSystemStateIntoFeatureCollection(mapPanel.getCurrentFeatures(), input, ctx)` + apply `visible` flags, then write `features.geojson` via the existing `storeFeatureCollection` path (verified — it already writes `features.geojson`). Remove the sidecar write. Relax the not-dirty guard (R-008).
+- **Web-shell**: on plot open, hydrate from the FeatureCollection (read SystemState + visibility); on FeatureCollection persistence to the IndexedDB plot store (#236), the view-state SystemState features are already present in the FC because view changes funnel through the shared writer (FR-009a). `activeStoryboardPersistence.ts` is folded into the helper; `StoryboardPanelMount.tsx` re-points to `@debrief/session-state`.
+
+**Rationale**: Both hosts already read and write the FeatureCollection; the change is to inject/extract SystemState features into that existing flow rather than maintain a parallel sidecar. Single writer (FR-015).
+
+**Alternatives**: A new persistence path (rejected — Article IV.4; the FC write already routes through the writer abstraction).
+
+---
+
+## R-011 — active_storyboard consolidation sequencing
+
+**Decision**: Three ordered steps within the single branch:
+1. Make the shared helper handle `active_storyboard` with #237's exact wire shape (re-using / absorbing `shared/components/src/storyboard/activeStoryboardSelection.ts` logic).
+2. Re-point web-shell call sites (`StoryboardPanelMount.tsx`, and `storyboardPlayback/service.ts` if it writes) to the helper.
+3. Delete `apps/web-shell/src/services/activeStoryboardPersistence.ts` and re-point/retire its test. Run #237's existing Playwright spec unchanged as the regression gate.
+
+**Rationale**: Sequenced delegation keeps the #237 behaviour green throughout; deleting before re-pointing would break callers.
+
+**Open sub-question for Phase 1**: whether `shared/components/src/storyboard/activeStoryboardSelection.ts` stays the canonical `active_storyboard` implementation that the helper *delegates to* (it lives in `@debrief/components`, consumed by storyboard UI and `storyboardPlayback/service.ts`), or whether the helper becomes canonical and components re-exports it. Leaning: the helper delegates to the existing components function for `active_storyboard` (avoids disturbing storyboard-playback internals) while owning the other three variants. Confirmed in the contract.
+
+---
+
+## R-012 — Provenance for visibility
+
+**Decision**: Visibility transitions use the **existing per-feature provenance mechanism** (`provenance` `LogEntry[]` on the feature's own properties, via the established `LogService`/`buildLogEntry` path). No new schema fields on `LogEntry` (uses `agent`, `was_generated_by.{tool, tool_version}`, `activity_type`, `timestamp`). View-state SystemState features remain lean (no provenance array) per FR-013.
+
+**Rationale**: Reuses shipped provenance infrastructure; consistent with how feature mutations are already logged. The growth is accepted and bounded to saves (R-007).
+
+**Alternatives**: Provenance on the `state.*` features (rejected — they're current-state markers, not transformations; #237 already writes none). New `LogEntry` field for host identity (rejected — existing fields suffice; mirrors prior #261 review resolution 2A).
+
+---
+
+## R-013 — Cross-field invariants + strict-on-import
+
+**Decision**: The helper's load validator (in `validate.ts`, called from `read.ts`) enforces, per variant:
+- temporal: `current_time ∈ [start_time, end_time]` when present; `start_time ≤ end_time`. Violation → `SystemStateLoadError(kind='cross-field-invariant')` with the offending feature id + values.
+- structural: unknown `state_type`, missing discriminator, variant-required field absent, or two features sharing a `state_type` → `SystemStateLoadError` (kinds `unknown-state-type` / `missing-discriminator` / `malformed-feature` / `multiple-features-with-same-state-type`).
+- Absence of a variant feature is **not** an error — it routes to defaults (FR-008).
+
+**Rationale**: Article I.3 / XIV.4 — strict on import, no silent clamping. Distinguishes "absent" (normal) from "present but malformed" (loud failure).
+
+**Alternatives**: Tolerant clamping of out-of-window `current_time` (rejected for now — that's the explicit follow-up #267, triggered only if strict proves user-hostile).
+
+---
+
+## Summary of decisions
+
+| # | Decision |
 |---|---|
-| No candidates with `state_type=X` | `sysStateMap[X]` is `undefined`. Loader falls back to sidecar for migrated fields of variant X. |
-| Exactly one candidate with `state_type=X`, Zod passes | `sysStateMap[X]` is populated with the parsed value. Authoritative. |
-| Exactly one candidate with `state_type=X`, Zod fails | Load error: surfaces feature ID, Zod error message, refuses to proceed. **Strict on import per Article XIV.4.** |
-| Multiple candidates with `state_type=X` | Load error: surfaces ALL candidate feature IDs, refuses to proceed. **At most one per state_type per plot — FR-003.** |
-| Candidate with `properties.kind === "SYSTEM"` but `state_type` is unknown enum value | Load error: surfaces feature ID, unknown enum value. **Article XIV.4 — strict.** |
-| Candidate with `properties.kind === "SYSTEM"` but no `state_type` at all | Load error: surfaces feature ID, missing discriminator. **Article XIV.4 — strict.** |
-
-No "skip and continue" tolerance. Each error halts load and is surfaced to the host with structured detail.
-
----
-
----
-
-## R-010: Spatial shape unification (review resolution 1B)
-
-**Problem surfaced by review**: the LinkML schema contains two parallel representations of "map viewport":
-
-- `ViewportPolygon` (`{ coordinates: Coordinate[]; zoom?: number }`) — consumed by `SpatialSlice.viewport` and the map components.
-- `SystemStateProperties` with `state_type=spatial` — the `bbox: float[4]` + `zoom: float` + `center: float[2]` fields modelled in #215 but never produced.
-
-These purport to model the same concept ("the saved viewport"). They have different field shapes and different field names. This is an Article II.1 (single source of truth) violation in the schema itself, pre-dating this work.
-
-**Decision**: Unify on `ViewportPolygon`. The LinkML delta (`contracts/linkml-delta.md`) **removes** `bbox`, `zoom`, `center` from `SystemStateProperties` and **adds** `viewport: ViewportPolygon`. The slice mapping becomes an identity rather than a transformation. Article XIV.1 (pre-release breaking changes permitted) covers the removal — zero runtime blast radius because no host produces or consumes the old fields today.
-
-**Rationale**:
-
-1. **Article II.1** — collapses two schema representations into one. The schema is now self-consistent.
-2. **Minimal-diff helper** — the helper has no spatial conversion code. `mapping.ts` doesn't carry `polygonToBboxCenter` / `bboxCenterToPolygon` functions, which would have been a maintenance hot-spot and a round-trip-drift risk.
-3. **Zero migration cost for existing plots** — no plot in the wild contains a `SystemState`/`spatial` feature, so no plot needs conversion.
-4. **ViewportPolygon is more expressive** — preserves the exact four corners. Bbox+center is a *projection* (loses orientation if a future iteration wants tilted viewports; even though `rotation` is per-machine today, the wire shape doesn't pre-emptively flatten).
-
-**Alternatives considered**:
-1. **Conversion pair (1A)** — `polygonToBboxCenter` / `bboxCenterToPolygon` round-trip in the helper, both shapes preserved. Rejected — keeps the Article II.1 violation in the schema; adds drift risk; doubles maintenance.
-2. **Defer spatial migration (1C)** — ship temporal + selection only. Rejected — spatial was the *uncontroversial* slice per approval; deferring it would leave the user-visible primary (Story 1) unfinished.
-3. **Unify on bbox+zoom+center (slice changes shape)** — refactor `SpatialSlice.viewport` to drop `ViewportPolygon`. Rejected — far larger blast radius (map components consume `ViewportPolygon`), and `ViewportPolygon` is the more expressive shape anyway.
-
-**Open task for `/speckit.tasks`**: confirm no other consumers of the old `SystemStateProperties.bbox`/`zoom`/`center` fields exist (search `bbox`, `center` against `SystemStateProperties` references). Expected to be zero. If non-zero, treat as additional cleanup — see "Spatial shape cleanup follow-up" backlog item (Q4).
-
----
-
-## R-011: `current_time` bounds validation (review resolution 3A — closes F2)
-
-**Problem surfaced by review**: a colleague's plot could carry `start_time=2024-01-01`, `end_time=2024-01-31`, `current_time=2024-06-01`. The original plan deferred this as "out of scope to validate". Runtime behaviour was undefined — the playhead would render off-screen or wrap to an arbitrary position, silently. Article I.3 (no silent failures) violation.
-
-**Decision**: The helper's `validate.ts` enforces a cross-field invariant: **`current_time ∈ [start_time, end_time]`** when all three are present. Violation triggers `SystemStateLoadError` with `kind: 'cross-field-invariant'`. No silent clamping. Article XIV.4 (strict on import) applies.
-
-A second cross-field rule comes along: **`start_time ≤ end_time`** — a degenerate window is meaningless, and catching it explicitly improves error reporting.
-
-**Behaviour at the host**: The error is surfaced to the user with the offending feature ID, the offending field values, and the violated invariant. The host decides whether to bail the load entirely or offer "open with sidecar defaults" — but the helper does not silently fall back.
-
-**Rationale**:
-- Article I.3 — no silent failures on the new persistence path.
-- Article XIV.4 — strict on import. The data is wrong; we say so, we don't bend the runtime to accommodate it.
-- Article XIV.5 — fix the data, not the consumer. The user (or the producing host) is responsible for fixing the malformed plot.
-
-**Alternatives considered**:
-1. **Clamp `current_time` to `[start_time, end_time]` silently**. Rejected — Article I.3.
-2. **Surface a warning, proceed with `current_time = start_time`**. Rejected — warnings get ignored; the user wouldn't see them. Worse than a hard error for a load-time problem.
-3. **Stay deferred (original plan position)**. Rejected — review identified the silent-failure path as a critical gap.
-
-**Open task for `/speckit.tasks`**: define the exact error-message text the host surfaces to the user. The helper's responsibility ends at the structured error; user-facing copy is host-side.
-
-**Backlog spin-off**: if future UX research wants tolerant behaviour (e.g. "out-of-window playhead → snap to nearest edge with a toast"), the policy can be revisited via a separate backlog item — see Q4 spin-off "Out-of-window current_time policy". This work commits to the strict-on-import default.
-
----
-
-## R-012: VS Code save atomicity (review resolution 3A — closes F1)
-
-**Problem surfaced by review**: `apps/vscode/src/commands/saveSession.ts:163–208` performs the sidecar write at line 163, the FC write at line 178, and **catches FC write failures as non-blocking at line 180**. Pre-this-feature this was tolerable (no SystemState in the FC). Post-this-feature, sidecar saying "I migrated my spatial state" while the FC lacks the spatial SystemState feature creates a silent inconsistency on the next load (the sidecar fallback for spatial is short-circuited because `migration_lineage` says "migrated", but the SystemStateMap is empty). Article I.3 violation.
-
-**Decision**: Reorder and tighten the save flow.
-
-```text
-NEW save flow (VS Code) — replaces saveSession.ts:163–208:
-  1. Compose the desired post-save Zustand store state in memory.
-  2. Call writeSystemStateIntoFeatureCollection(currentFC, input, ctx) → newFC.
-  3. Call prepareSidecarForSave(...) → newSidecar (with version 1.2.0).
-  4. Attempt FC write first:
-       try: await storeFeatureCollection(storePath, plotUri, newFC.features)
-       catch: PROPAGATE — do not write sidecar. User sees a save-failed error.
-                The plot is unchanged. The sidecar is unchanged.
-  5. Then attempt sidecar write:
-       try: await writeSidecar(sidecarPath, newSidecar)
-       catch: PROPAGATE with a recovery hint — "FC was written but sidecar was not;
-                next open may use defaults for per-machine fields. Re-save to recover."
-                The plot is updated (new SystemState features present); the sidecar is stale.
-                This is recoverable on next save and SAFE for the new migrated state
-                (plot-shared fields all live in the FC).
-```
-
-Atomicity model: **FC-first, sidecar-second.** If both succeed, perfect. If FC fails, neither is touched. If FC succeeds but sidecar fails, the plot is in a *forward-compatible* state (new fields persisted; old per-machine fields may use defaults next time) and the user is told.
-
-This deliberately treats the FC write as the primary commit. Rationale:
-1. The FC is where the user's *content* lives. Losing the FC write is the irrecoverable case.
-2. The sidecar is per-machine. Losing it is recoverable (defaults + re-save).
-3. The order matches the data flow direction — content first, metadata second.
-
-**Test coverage** (from review 3A):
-- Mock `storeFeatureCollection` to throw → assert sidecar NOT written, error propagates.
-- Mock sidecar write to throw after FC succeeds → assert FC contains new SystemState features, error propagates with recovery hint, user sees correct error.
-
-**Out of scope** (per review resolution; backlog candidate at Q4): making the broader save flow truly transactional (cross-file, all-or-nothing). The thumbnails step at saveSession.ts:184–203 already has its own non-atomic semantics; this work only addresses the FC↔sidecar pair on the migrated-state path.
-
-**Web-shell parity**: `apps/web-shell/src/services/stacWriterIdb.ts` writes the whole FC blob in a single IndexedDB transaction (verified — lines 487–500). No sidecar exists. Atomic by construction; no host-side work needed.
-
-**Alternatives considered**:
-1. **Sidecar-first, FC-second**. Rejected — sidecar saying "I migrated" before the FC actually carries the new features is the failure mode we're closing.
-2. **Two-phase commit with rollback**. Rejected — file-system rollback in Node.js is non-trivial and the FC-first order makes recovery natural without it.
-3. **Defer the fix**. Rejected per review 3A — ships a known Article I.3 violation.
-
----
-
-## Open items remaining for `/speckit.tasks`
-
-These are not unknowns — they are implementation-tactical choices best made at task-breakdown time, not now:
-
-- Exact Zod schema declarations (idiomatic shape — `z.object` vs `z.strictObject` vs `z.object().strict()` — depends on how strict the helper wants to be about unknown properties).
-- Specific Playwright selector additions to `AnalysisPage` / `CatalogPage` page objects.
-- Fixture corpus content (what bbox values, what timestamps, what selection IDs) — chosen for memorable test failures.
-- VS Code extension Mocha companion file structure (per-variant suites vs single suite with table-driven tests).
-- Migration commit sequence (R-007) commit messages and ordering details.
-
-These will be enumerated as tasks in `/speckit.tasks`.
+| R-001 | Helper at `services/session-state/src/system-state/`, re-exported from `@debrief/session-state` |
+| R-002 | Wire shape = #237 shipped: `state.<type>` id, empty-Point geometry, lean (no provenance) |
+| R-003 | Flat generated interface → Zod discriminated union + exhaustiveness guard (no `Extract<>`) |
+| R-004 | Consolidate shared value types into `common.yaml`; gut `session-state.yaml`; dedup |
+| R-005 | gen-json-schema ViewportPolygon risk → `generate.py` post-processor, else Pydantic-only validation |
+| R-006 | Conversions: temporal epoch↔ISO; selection `FeatureSelection`→`selected_ids`/`selected_primary`; viewport identity |
+| R-007 | Visibility = per-feature `visible` flag on `BaseFeatureProperties` (absent=visible) |
+| R-008 | Exploration never dirty; explicit save persists regardless of dirty; relax saveSession guard |
+| R-009 | Hard cut — delete sidecar I/O, no read shim |
+| R-010 | Host wiring rides the existing FeatureCollection read/write at both hosts |
+| R-011 | active_storyboard consolidation: delegate → re-point → delete, with #237 regression gate |
+| R-012 | Visibility provenance via existing per-feature LogEntry mechanism; view-state features lean |
+| R-013 | Strict-on-import + cross-field invariants → `SystemStateLoadError`; absence ≠ error |

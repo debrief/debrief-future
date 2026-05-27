@@ -301,4 +301,3 @@ Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during 
 ## Recent Changes
 - 223-linkml-stac-catalog: Added Python 3.11 (services, schema-build tooling, + LinkML ≥ 1.7.0 (schema source +
 - 261-session-state-systemstate: Added TypeScript 5.x (strict mode mandatory per Article XV) for shared helper, both hosts, and tests; Python 3.11 for LinkML codegen, Pydantic adherence tests, and schema validation gates. + LinkML ≥1.7.0 (master schema source — extended this work); `@debrief/schemas` (generated types — regenerated); Pydantic v2 (Python schema validation); existing `@debrief/session-state` Zustand store (extended, not replaced); existing writer abstraction (`@debrief/stac-writer` / `FilesystemAdapter`) — SystemState writes route through it per Article IV.4. **No new external runtime dependencies.**
-- 222-linkml-mcp-envelopes: Added LinkML cluster `mcp.yaml` (15 classes + 4 permissible-values enums); no new external dependencies.
