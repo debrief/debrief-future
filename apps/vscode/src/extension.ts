@@ -44,6 +44,8 @@ import {
   exportStoryboardAsBriefingZip,
   createDefaultExportHostDeps,
 } from './commands/exportStoryboardAsBriefingZip';
+import { previewStoryboard } from './commands/previewStoryboard';
+import { BriefingPreviewServer } from './services/briefingPreviewServer';
 import { registerStoryboardEditCommands } from './commands/storyboardEdit';
 import { registerNlSearchCommands } from './commands/nlSearchCommands';
 import { StoryboardEditService } from './services/storyboardEdit';
@@ -1051,6 +1053,43 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         await exportStoryboardAsBriefingZip(
           { storyboardId: args.storyboardId, documentUri },
           deps,
+        );
+      },
+    ),
+  );
+
+  // Spec #273 — live preview of the active Storyboard in a new browser tab.
+  // A single ephemeral loopback server (lazily started on first preview)
+  // serves the bundled renderer + the scoped features; disposed on
+  // deactivation via context.subscriptions.
+  const briefingPreviewServer = new BriefingPreviewServer({
+    staticRoot: vscode.Uri.joinPath(
+      context.extensionUri,
+      'resources',
+      'briefing-renderer-static',
+    ).fsPath,
+  });
+  context.subscriptions.push({ dispose: () => briefingPreviewServer.dispose() });
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'debrief.storyboard.preview',
+      async (args: { storyboardId?: string } | undefined) => {
+        if (!args?.storyboardId) {
+          void vscode.window.showErrorMessage(
+            'No active Storyboard to preview. Select a Storyboard with at least one scene.',
+          );
+          return;
+        }
+        await previewStoryboard(
+          { storyboardId: args.storyboardId },
+          {
+            getPlotFeatures: () => mapPanel?.getCurrentFeatures() ?? [],
+            server: briefingPreviewServer,
+            asExternalUri: async (url) =>
+              (await vscode.env.asExternalUri(vscode.Uri.parse(url))).toString(),
+            openExternal: (url) => Promise.resolve(vscode.env.openExternal(vscode.Uri.parse(url))),
+            showError: (msg) => void vscode.window.showErrorMessage(msg),
+          },
         );
       },
     ),

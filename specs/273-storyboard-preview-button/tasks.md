@@ -108,12 +108,12 @@ basemap) loaded live from a `?features=` URL — no zip step.
 
 ### VS Code preview launch (loopback server — contract host-integration B)
 
-- [ ] T023 Create the ephemeral loopback preview server `apps/vscode/src/services/briefingPreviewServer.ts` (`node:http` bound to `127.0.0.1`, OS-assigned port; serves bundled renderer from `resources/briefing-renderer-static/` at `/` and scoped active-storyboard features at `/features.geojson`; enforces a `Host` header allowlist → `403` for foreign hosts — C-B7; lazy single shared instance, disposed on deactivation — C-B5)
-- [ ] T024 [test] Test the preview server `apps/vscode/src/services/__tests__/briefingPreviewServer.test.ts` (serves renderer at `/` — C-B3; serves scoped features at `/features.geojson` — C-B2; rejects foreign `Host` with 403, accepts `127.0.0.1[:port]` — C-B7)
-- [ ] T025 Create the preview command `apps/vscode/src/commands/previewStoryboard.ts` (scope the active storyboard via shared `scopeStoryboard`; if zero scenes, do not launch and explain why — C-B6; start/reuse the server; open the system browser via `vscode.env.openExternal(await vscode.env.asExternalUri(Uri.parse('http://127.0.0.1:<port>/?features=/features.geojson')))` — C-B4)
-- [ ] T026 Route the webview message in the panel view host `apps/vscode/src/views/storyboardPanelView.ts` (handle `{ type: 'preview-clicked' }` → invoke the preview command — C-B1; compute `canPreview` from active storyboard scene count and pass to the panel)
-- [ ] T027 Wire the panel webview to post the message and pass props `apps/vscode/src/webview/web/storyboardPanel.tsx` (provide `onPreview` → `postMessage({ type: 'preview-clicked' })` and `canPreview`)
-- [ ] T028 Register the preview command in the extension activation `apps/vscode/src/extension.ts` (register `previewStoryboard`; dispose the preview server on deactivation)
+- [x] T023 Create the ephemeral loopback preview server `apps/vscode/src/services/briefingPreviewServer.ts` (`node:http` bound to `127.0.0.1`, OS-assigned port; serves bundled renderer from `resources/briefing-renderer-static/` at `/` and scoped active-storyboard features at `/features.geojson`; enforces a `Host` header allowlist → `403` for foreign hosts — C-B7; lazy single shared instance, disposed on deactivation — C-B5)
+- [x] T024 [test] Test the preview server `apps/vscode/src/services/__tests__/briefingPreviewServer.test.ts` (serves renderer at `/` — C-B3; serves scoped features at `/features.geojson` — C-B2; rejects foreign `Host` with 403, accepts `127.0.0.1[:port]` — C-B7)
+- [x] T025 Create the preview command `apps/vscode/src/commands/previewStoryboard.ts` (scope the active storyboard via shared `scopeStoryboard`; if zero scenes, do not launch and explain why — C-B6; start/reuse the server; open the system browser via `vscode.env.openExternal(await vscode.env.asExternalUri(Uri.parse('http://127.0.0.1:<port>/?features=/features.geojson')))` — C-B4)
+- [x] T026 Route the webview message in the panel view host `apps/vscode/src/views/storyboardPanelView.ts` (handle `{ type: 'preview-clicked' }` → invoke the preview command — C-B1; compute `canPreview` from active storyboard scene count and pass to the panel)
+- [x] T027 Wire the panel webview to post the message and pass props `apps/vscode/src/webview/web/storyboardPanel.tsx` (provide `onPreview` → `postMessage({ type: 'preview-clicked' })` and `canPreview`)
+- [x] T028 Register the preview command in the extension activation `apps/vscode/src/extension.ts` (register `previewStoryboard`; dispose the preview server on deactivation)
 
 ### Web-shell preview launch (blob URL — contract host-integration C)
 
