@@ -42,6 +42,19 @@ interface FeatureLike {
 const DEFAULT_TRACK_COLOR = '#1f77b4';
 const DEFAULT_POINT_COLOR = '#2ca02c';
 
+/** Bundled local-tile template used by the air-gapped inline/zip path. */
+export const BUNDLED_TILE_URL = './tiles/{z}/{x}/{y}.png';
+
+/**
+ * Resolve the basemap tile-URL template. The live-preview URL-boot path
+ * (#273) sets `config.tileLayerUrl` to an online basemap; the inline/zip
+ * path leaves it unset and keeps the bundled local tiles — byte-identical
+ * to pre-#273 behaviour (contract preview-boot Basemap).
+ */
+export function resolveTileUrl(tileLayerUrl: string | undefined | null): string {
+  return tileLayerUrl != null && tileLayerUrl.length > 0 ? tileLayerUrl : BUNDLED_TILE_URL;
+}
+
 /**
  * Linear-interpolate a track's position at a given epoch-ms time.
  * Returns `null` if the time falls outside the track's recorded range
@@ -217,7 +230,7 @@ export const BriefingMap: FC<BriefingMapProps> = ({ onMapReady }) => {
         }}
       >
         <TileLayer
-          url="./tiles/{z}/{x}/{y}.png"
+          url={resolveTileUrl(config?.tileLayerUrl)}
           attribution={config?.tileLayerAttribution ?? ''}
           {...(config?.maxBundledZoom !== undefined ? { maxZoom: config.maxBundledZoom } : {})}
           noWrap

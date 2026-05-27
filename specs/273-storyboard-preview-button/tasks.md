@@ -84,8 +84,8 @@ panel `onPreview`/`canPreview` props and the renderer's optional `tileLayerUrl`.
 
 ### Renderer basemap seam (Decision 2, contract Basemap)
 
-- [ ] T016 Add optional `tileLayerUrl?: string` to the renderer-local config interface `apps/briefing-renderer/src/types.ts` (renderer-local TS only — NOT a LinkML change)
-- [ ] T017 Use the optional tile URL in the map `apps/briefing-renderer/src/components/BriefingMap.tsx` (`config.tileLayerUrl ?? './tiles/{z}/{x}/{y}.png'`; keep `errorTileUrl` placeholder so offline degrades gracefully)
+- [x] T016 Add optional `tileLayerUrl?: string` to the renderer-local config interface `apps/briefing-renderer/src/types.ts` (renderer-local TS only — NOT a LinkML change)
+- [x] T017 Use the optional tile URL in the map `apps/briefing-renderer/src/components/BriefingMap.tsx` (`config.tileLayerUrl ?? './tiles/{z}/{x}/{y}.png'`; keep `errorTileUrl` placeholder so offline degrades gracefully)
 
 
 ## Phase 3: User Story 1 — Preview the current storyboard (Priority: P1)
@@ -100,11 +100,11 @@ basemap) loaded live from a `?features=` URL — no zip step.
 
 ### Renderer URL-boot path (additive; inline path untouched — contract preview-boot G4..G7)
 
-- [ ] T018 [test] Write URL-boot loader tests first `apps/briefing-renderer/src/loaders/__tests__/urlDataLoader.test.ts` (valid URL → fetch once, validate, synth item/config, return `InlineData` shape — G4; unreachable/parse-fail/invalid → `InlineDataLoadError` — G5; one scene → ready, zero → empty — G6; reuses existing validators — G7)
-- [ ] T019 Create the URL data loader `apps/briefing-renderer/src/loaders/urlDataLoader.ts` (`fetchAndValidate(url)`: `fetch` → parse → reuse existing validators from `inlineDataLoader.ts` → synthesise minimal `item` `{type:'Feature', id, properties:{}, assets:{}, links:[]}` and `config` with online `tileLayerUrl` + high `maxBundledZoom`; throw `InlineDataLoadError` on any failure)
-- [ ] T020 Read the `features` query param in the app shell `apps/briefing-renderer/src/App.tsx` (detect `?features=` independently of the existing `?story=` hook)
-- [ ] T021 Add the async URL-boot branch to boot `apps/briefing-renderer/src/boot.ts` (if `features` present → `bootState: loading` → `urlDataLoader.fetchAndValidate` → unchanged `store.seed(...)` → `ready`/`empty`/`error`; otherwise the existing synchronous inline path runs unchanged)
-- [ ] T022 [test] Add boot-path tests for the URL branch `apps/briefing-renderer/src/__tests__/boot.test.ts` (valid `features` → `ready` and playing — G4; bad `features` → `error` with human-readable message, never blank — G5; existing inline/dev-fixture/error cases stay green — G1/G2)
+- [x] T018 [test] Write URL-boot loader tests first `apps/briefing-renderer/src/loaders/__tests__/urlDataLoader.test.ts` (valid URL → fetch once, validate, synth item/config, return `InlineData` shape — G4; unreachable/parse-fail/invalid → `InlineDataLoadError` — G5; one scene → ready, zero → empty — G6; reuses existing validators — G7)
+- [x] T019 Create the URL data loader `apps/briefing-renderer/src/loaders/urlDataLoader.ts` (`fetchAndValidate(url)`: `fetch` → parse → reuse existing validators from `inlineDataLoader.ts` → synthesise minimal `item` `{type:'Feature', id, properties:{}, assets:{}, links:[]}` and `config` with online `tileLayerUrl` + high `maxBundledZoom`; throw `InlineDataLoadError` on any failure)
+- [x] T020 Read the `features` query param in the app shell `apps/briefing-renderer/src/App.tsx` (detect `?features=` independently of the existing `?story=` hook)
+- [x] T021 Add the async URL-boot branch to boot `apps/briefing-renderer/src/boot.ts` (if `features` present → `bootState: loading` → `urlDataLoader.fetchAndValidate` → unchanged `store.seed(...)` → `ready`/`empty`/`error`; otherwise the existing synchronous inline path runs unchanged)
+- [x] T022 [test] Add boot-path tests for the URL branch `apps/briefing-renderer/src/__tests__/boot.test.ts` (valid `features` → `ready` and playing — G4; bad `features` → `error` with human-readable message, never blank — G5; existing inline/dev-fixture/error cases stay green — G1/G2)
 
 ### VS Code preview launch (loopback server — contract host-integration B)
 
@@ -144,9 +144,9 @@ self-contained data with zero network requests for storyboard data.
 **Independent Test**: Open a (pre- or post-feature) briefing zip on a fully offline machine and
 confirm it plays back identically — no new errors, no network calls for storyboard data.
 
-- [ ] T034 [test] Assert the inline-boot path is byte-for-behaviour unchanged `apps/briefing-renderer/src/__tests__/boot.test.ts` (no `features` param + empty slots + `disableDevFixture` → `error` — G1; populated slots → synchronous seed from slots — G2)
-- [ ] T035 [test] Assert zero network for storyboard data on the inline path `apps/briefing-renderer/src/loaders/__tests__/inlineDataLoader.test.ts` (with no `features` param, no `fetch` is issued for storyboard data — G3/FR-011; the two boot paths are cleanly separated — FR-012)
-- [ ] T036 [test] Assert the inline path leaves `tileLayerUrl` unset → bundled local tiles `apps/briefing-renderer/src/components/__tests__/BriefingMap.test.tsx` (inline/zip config has no `tileLayerUrl` → `./tiles/{z}/{x}/{y}.png`, byte-identical to today — contract Basemap)
+- [x] T034 [test] Assert the inline-boot path is byte-for-behaviour unchanged `apps/briefing-renderer/src/__tests__/boot.test.ts` (no `features` param + empty slots + `disableDevFixture` → `error` — G1; populated slots → synchronous seed from slots — G2)
+- [x] T035 [test] Assert zero network for storyboard data on the inline path `apps/briefing-renderer/src/loaders/__tests__/inlineDataLoader.test.ts` (with no `features` param, no `fetch` is issued for storyboard data — G3/FR-011; the two boot paths are cleanly separated — FR-012)
+- [x] T036 [test] Assert the inline path leaves `tileLayerUrl` unset → bundled local tiles `apps/briefing-renderer/src/components/__tests__/BriefingMap.test.tsx` (inline/zip config has no `tileLayerUrl` → `./tiles/{z}/{x}/{y}.png`, byte-identical to today — contract Basemap)
 
 
 ## Phase 6: Polish & Cross-Cutting Concerns

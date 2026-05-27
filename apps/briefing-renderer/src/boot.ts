@@ -20,6 +20,10 @@
 
 import type { BriefingStore } from './store';
 import { loadInlineData, InlineDataLoadError } from './loaders/inlineDataLoader';
+import {
+  fetchAndValidateFeaturesUrl,
+  type UrlLoaderDeps,
+} from './loaders/urlDataLoader';
 import { buildDevFixture } from './fixtures/dev-fixture';
 import type { InlineData, SceneFeature, StoryboardFeature } from './types';
 
@@ -87,6 +91,41 @@ export function bootBriefingRenderer(
       e instanceof InlineDataLoadError
         ? `Briefing data is unreadable: ${e.message}`
         : `Unexpected boot error: ${(e as Error).message}`;
+    return { kind: 'error', message: msg };
+  }
+}
+
+/**
+ * Async URL-boot sequence (#273, live preview). Fetches the storyboard
+ * features from the supplied URL, validates + seeds the store, and returns
+ * the resolved boot state. This path is **only** entered when the launch
+ * URL carries `?features=` (see `App.tsx`); the synchronous inline path
+ * above is never touched by it (contract preview-boot, FR-012).
+ *
+ * On any failure the store transitions to the visible `error` state with a
+ * human-readable message — never a blank screen (FR-008, G5).
+ */
+export async function bootBriefingRendererFromUrl(
+  store: BriefingStore,
+  featuresUrl: string,
+  deps?: UrlLoaderDeps,
+): Promise<BootResult> {
+  store.setBootState('loading');
+  try {
+    const loaded = await fetchAndValidateFeaturesUrl(featuresUrl, deps);
+    store.seed({
+      features: loaded.features,
+      item: loaded.item,
+      config: loaded.config,
+      scenes: loaded.scenes,
+    });
+    return { kind: 'seeded' };
+  } catch (e) {
+    const msg =
+      e instanceof InlineDataLoadError
+        ? `Briefing data is unreadable: ${e.message}`
+        : `Unexpected boot error: ${(e as Error).message}`;
+    store.setBootState('error', msg);
     return { kind: 'error', message: msg };
   }
 }

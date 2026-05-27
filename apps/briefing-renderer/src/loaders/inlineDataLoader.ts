@@ -69,7 +69,7 @@ function parseSlot<T>(raw: string, slot: 'features' | 'item' | 'config'): T {
   }
 }
 
-function validateFeatureCollection(
+export function validateFeatureCollection(
   fc: BriefingFeatureCollection,
 ): { storyboard: StoryboardFeature; scenes: readonly SceneFeature[] } {
   if (fc.type !== 'FeatureCollection') {
@@ -122,7 +122,7 @@ function validateFeatureCollection(
   return { storyboard, scenes: ordered };
 }
 
-function validateItem(item: BriefingItemJson): void {
+export function validateItem(item: BriefingItemJson): void {
   if (item.type !== 'Feature') {
     throw new InlineDataLoadError(
       `Expected item.type === "Feature"; got "${String(item.type)}"`,
@@ -134,7 +134,7 @@ function validateItem(item: BriefingItemJson): void {
   }
 }
 
-function validateConfig(config: BriefingConfig): void {
+export function validateConfig(config: BriefingConfig): void {
   if (typeof config.tileLayerAttribution !== 'string') {
     throw new InlineDataLoadError('config missing required tileLayerAttribution', 'config');
   }
