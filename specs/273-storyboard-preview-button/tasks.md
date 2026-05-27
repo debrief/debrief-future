@@ -48,10 +48,10 @@ surface, achieved by extracting the packing core into a shared `@debrief/briefin
 **Goal**: Scaffold the new shared `@debrief/briefing-export` workspace package so the pure packing
 core can be moved into it in Phase 2. No behaviour change yet.
 
-- [ ] T001 Create package manifest for the shared export package `shared/briefing-export/package.json` (name `@debrief/briefing-export`, type module, `main`/`types` pointing at `src/index.ts`, JSZip as a dependency mirroring the version already pinned in the repo, build/typecheck scripts matching sibling packages like `shared/stac-writer`)
-- [ ] T002 [P] Add TypeScript config `shared/briefing-export/tsconfig.json` (extend the repo base config, strict mode, mirror `shared/stac-writer/tsconfig.json`)
-- [ ] T003 [P] Add package entry point `shared/briefing-export/src/index.ts` (placeholder re-exports — populated in Phase 2)
-- [ ] T004 Verify the pnpm workspace resolves the new package: run `pnpm install` and confirm `@debrief/briefing-export` is linked (workspace glob already covers `shared/*`; add it explicitly only if needed)
+- [x] T001 Create package manifest for the shared export package `shared/briefing-export/package.json` (name `@debrief/briefing-export`, type module, `main`/`types` pointing at `src/index.ts`, JSZip as a dependency mirroring the version already pinned in the repo, build/typecheck scripts matching sibling packages like `shared/stac-writer`)
+- [x] T002 [P] Add TypeScript config `shared/briefing-export/tsconfig.json` (extend the repo base config, strict mode, mirror `shared/stac-writer/tsconfig.json`)
+- [x] T003 [P] Add package entry point `shared/briefing-export/src/index.ts` (placeholder re-exports — populated in Phase 2)
+- [x] T004 Verify the pnpm workspace resolves the new package: run `pnpm install` and confirm `@debrief/briefing-export` is linked (workspace glob already covers `shared/*`; add it explicitly only if needed)
 
 
 ## Phase 2: Foundation (Blocking Prerequisites)
@@ -64,16 +64,16 @@ panel `onPreview`/`canPreview` props and the renderer's optional `tileLayerUrl`.
 
 ### Extract the shared export core (FR-016, C-D1)
 
-- [ ] T005 Move the pure packing modules into the package, preserving their content: `shared/briefing-export/src/core/scopeStoryboard.ts`, `computeTileCoverage.ts`, `injectInlineData.ts`, `zipAssembler.ts`, `buildItemJson.ts` (sourced from `apps/vscode/src/services/briefingZipExport/`; verify zero `node:fs`/`path`/`os` imports per C-D1)
-- [ ] T006 Move the host-dependency interface and orchestrator into the package `shared/briefing-export/src/deps.ts` and `shared/briefing-export/src/core/export.ts` (the `ExportDeps`/`ExportHostDeps` seam + orchestrator from `apps/vscode/src/services/briefingZipExport/export.ts`, with all `fetchTile`/`readPlot`/`writeOrDeliver`/`ui` members host-injected)
-- [ ] T007 Populate the package entry point `shared/briefing-export/src/index.ts` (export orchestrator, `ExportDeps`/`ExportHostDeps` types, and the pure core functions consumers need)
-- [ ] T008 [P] Move the export core unit tests into the package `shared/briefing-export/src/__tests__/` (relocated from any existing `briefingZipExport` tests; adjust imports to the package-relative paths; they must pass unchanged in behaviour)
+- [x] T005 Move the pure packing modules into the package, preserving their content: `shared/briefing-export/src/core/scopeStoryboard.ts`, `computeTileCoverage.ts`, `injectInlineData.ts`, `zipAssembler.ts`, `buildItemJson.ts` (sourced from `apps/vscode/src/services/briefingZipExport/`; verify zero `node:fs`/`path`/`os` imports per C-D1)
+- [x] T006 Move the host-dependency interface and orchestrator into the package `shared/briefing-export/src/deps.ts` and `shared/briefing-export/src/core/export.ts` (the `ExportDeps`/`ExportHostDeps` seam + orchestrator from `apps/vscode/src/services/briefingZipExport/export.ts`, with all `fetchTile`/`readPlot`/`writeOrDeliver`/`ui` members host-injected)
+- [x] T007 Populate the package entry point `shared/briefing-export/src/index.ts` (export orchestrator, `ExportDeps`/`ExportHostDeps` types, and the pure core functions consumers need)
+- [x] T008 [P] Move the export core unit tests into the package `shared/briefing-export/src/__tests__/` (relocated from any existing `briefingZipExport` tests; adjust imports to the package-relative paths; they must pass unchanged in behaviour)
 
 ### Re-point the VS Code host adapter (no behaviour change)
 
-- [ ] T009 Reduce `apps/vscode/src/services/briefingZipExport/` to a host adapter only: keep `fetchTiles.ts` (Node `fetch`) and the disk/save-dialog wiring, delete the now-moved pure modules, and re-export/import the orchestrator + types from `@debrief/briefing-export` via `apps/vscode/src/services/briefingZipExport/index.ts`
-- [ ] T010 Update the VS Code export command `apps/vscode/src/commands/exportStoryboardAsBriefingZip.ts` to construct its `ExportDeps` from the VS Code host adapter and call the shared orchestrator (no functional change to the produced zip)
-- [ ] T011 [test] Confirm the VS Code briefing-zip export behaviour is unchanged: run `pnpm --filter @debrief/vscode test` (existing export tests stay green) `apps/vscode/src/services/briefingZipExport/`
+- [x] T009 Reduce `apps/vscode/src/services/briefingZipExport/` to a host adapter only: keep `fetchTiles.ts` (Node `fetch`) and the disk/save-dialog wiring, delete the now-moved pure modules, and re-export/import the orchestrator + types from `@debrief/briefing-export` via `apps/vscode/src/services/briefingZipExport/index.ts`
+- [x] T010 Update the VS Code export command `apps/vscode/src/commands/exportStoryboardAsBriefingZip.ts` to construct its `ExportDeps` from the VS Code host adapter and call the shared orchestrator (no functional change to the produced zip)
+- [x] T011 [test] Confirm the VS Code briefing-zip export behaviour is unchanged: run `pnpm --filter @debrief/vscode test` (existing export tests stay green) `apps/vscode/src/services/briefingZipExport/`
 
 ### Shared panel Preview control props (C-A1..C-A4)
 

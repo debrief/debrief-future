@@ -34,6 +34,9 @@ export default defineConfig({
       '@debrief/components/storyboardPlayback': path.resolve(__dirname, '../../shared/components/src/storyboardPlayback/index.ts'),
       '@debrief/components': path.resolve(__dirname, '../../shared/components/src/index.ts'),
       '@debrief/schemas': path.resolve(__dirname, '../../shared/schemas/src/generated/typescript/index.ts'),
+      // Briefing-export core (#273) — resolve to source so tests run without a
+      // prior package build and stay off the Leaflet barrel transitively.
+      '@debrief/briefing-export': path.resolve(__dirname, '../../shared/briefing-export/src/index.ts'),
     },
   },
 });

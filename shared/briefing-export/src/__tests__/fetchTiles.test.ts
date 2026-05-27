@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { fetchTiles } from '@/services/briefingZipExport';
+import { fetchTiles } from '../index';
 
 const tiles = [
   { z: 6, x: 32, y: 21 },
