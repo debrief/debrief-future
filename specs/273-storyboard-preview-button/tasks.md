@@ -117,8 +117,8 @@ basemap) loaded live from a `?features=` URL — no zip step.
 
 ### Web-shell preview launch (blob URL — contract host-integration C)
 
-- [ ] T029 Serve the briefing-renderer dist under the web-shell tree at `/briefing-renderer/` `apps/web-shell/vite.config.ts` (static copy / dev-server mount mirroring the GitHub Pages sibling-path layout so the path resolves in dev, `vite preview`, and the static build — C-C3)
-- [ ] T030 Wire `onPreview` in the web-shell panel mount `apps/web-shell/src/StoryboardPanelMount.tsx` (scope the active storyboard from the in-memory `featureCollection`, build a `Blob`, create an object URL, open `<renderer base>/?features=<encodeURIComponent(blobUrl)>` in a new tab keeping the web-shell tab alive — C-C1/C-C2; compute `canPreview` from active storyboard scene count; if the new tab is blocked, surface the reason — C-C4/FR-009)
+- [x] T029 Serve the briefing-renderer dist under the web-shell tree at `/briefing-renderer/` `apps/web-shell/vite.config.ts` (static copy / dev-server mount mirroring the GitHub Pages sibling-path layout so the path resolves in dev, `vite preview`, and the static build — C-C3)
+- [x] T030 Wire `onPreview` in the web-shell panel mount `apps/web-shell/src/StoryboardPanelMount.tsx` (scope the active storyboard from the in-memory `featureCollection`, build a `Blob`, create an object URL, open `<renderer base>/?features=<encodeURIComponent(blobUrl)>` in a new tab keeping the web-shell tab alive — C-C1/C-C2; compute `canPreview` from active storyboard scene count; if the new tab is blocked, surface the reason — C-C4/FR-009)
 
 
 ## Phase 4: User Story 2 — Export a briefing zip from the browser surface (Priority: P2)
