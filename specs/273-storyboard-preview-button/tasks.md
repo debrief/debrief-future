@@ -77,10 +77,10 @@ panel `onPreview`/`canPreview` props and the renderer's optional `tileLayerUrl`.
 
 ### Shared panel Preview control props (C-A1..C-A4)
 
-- [ ] T012 Add `onPreview?: () => void` and `canPreview?: boolean` to the panel prop types `shared/components/src/panels/StoryboardPanel/types.ts` (follow the existing optional-callback pattern used by Capture/Export)
-- [ ] T013 Render the Preview button in the header button row `shared/components/src/panels/StoryboardPanel/StoryboardHeader.tsx` (sibling of Capture; rendered iff `typeof onPreview === 'function'`; disabled with explanatory tooltip when `canPreview === false`; `data-testid="storyboard-preview"`, `aria-*`)
-- [ ] T014 Thread the new props through the panel `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx` (pass-through `onPreview`/`canPreview` to the header)
-- [ ] T015 [test] Cover the header Preview control `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardHeader.test.tsx` (renders iff `onPreview` set — C-A1; disabled+tooltip when `canPreview===false`, does not fire — C-A2; absent `onPreview` renders identically/no layout shift — C-A3; click fires once — C-A4)
+- [x] T012 Add `onPreview?: () => void` and `canPreview?: boolean` to the panel prop types `shared/components/src/panels/StoryboardPanel/types.ts` (follow the existing optional-callback pattern used by Capture/Export)
+- [x] T013 Render the Preview button in the header button row `shared/components/src/panels/StoryboardPanel/StoryboardHeader.tsx` (sibling of Capture; rendered iff `typeof onPreview === 'function'`; disabled with explanatory tooltip when `canPreview === false`; `data-testid="storyboard-preview"`, `aria-*`)
+- [x] T014 Thread the new props through the panel `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx` (pass-through `onPreview`/`canPreview` to the header)
+- [x] T015 [test] Cover the header Preview control `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardHeader.test.tsx` (renders iff `onPreview` set — C-A1; disabled+tooltip when `canPreview===false`, does not fire — C-A2; absent `onPreview` renders identically/no layout shift — C-A3; click fires once — C-A4)
 
 ### Renderer basemap seam (Decision 2, contract Basemap)
 
