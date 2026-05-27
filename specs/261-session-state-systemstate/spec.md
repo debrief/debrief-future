@@ -126,7 +126,7 @@ Both hosts read and write all `SystemState` variants through a single shared hel
 #### Schema and contract
 
 - **FR-001**: Every `SystemState` Feature MUST conform to the corresponding `SystemStateProperties` variant in `shared/schemas/src/linkml/geojson.yaml`, with `kind: "SYSTEM"`, a populated `state_type`, empty-Point geometry, and an id matching `^state\.[a-z]+$` (the deterministic ids `state.spatial` / `state.temporal` / `state.selection` / `state.activestoryboard`).
-- **FR-002**: The LinkML `SystemStateProperties` class MUST be extended to carry every migrated field (see the authoritative table in "State classification"): on the **spatial** variant `viewport` (`ViewportPolygon`) and `rotation`; on the **temporal** variant `start_time`, `end_time`, `current_time`, `time_filter`, `display_mode`, `step_size`, `playback_rate`; on the **selection** variant `selected_ids` and `selected_primary`. The legacy `bbox`/`zoom`/`center` fields MUST be removed (Article XIV.1 — verified zero runtime consumers). Reuse the existing `ViewportPolygon`, `TimeFilter`, `TimeStep`, `DisplayModeEnum` definitions — do not introduce parallel shapes (Article II.1). The `SystemStateTypeEnum.spatial` permissible-value description (currently "(bbox, zoom)") MUST be updated to reflect the `viewport` shape.
+- **FR-002**: The LinkML `SystemStateProperties` class MUST be extended to carry every migrated field (see the authoritative table in "State classification"): on the **spatial** variant `viewport` (`ViewportPolygon`) and `rotation`; on the **temporal** variant `start_time`, `end_time`, `current_time`, `filter_start_time`, `filter_end_time`, `display_mode`, `step_size`, `playback_rate`; on the **selection** variant `selected_ids` and `selected_primary`. The legacy `bbox`/`zoom`/`center` fields MUST be removed (Article XIV.1 — verified zero runtime consumers). Reuse the existing `ViewportPolygon`, `TimeStep`, and `DisplayModeEnum` definitions for `viewport`, `step_size`, and `display_mode` respectively — do not introduce parallel shapes (Article II.1). All timestamps on the temporal feature (`start_time`, `end_time`, `current_time`, `filter_start_time`, `filter_end_time`) MUST be ISO-8601 datetimes; the epoch-based store `TimeFilter` is converted to ISO bounds at the persistence boundary so the feature carries one consistent time representation. The `SystemStateTypeEnum.spatial` permissible-value description (currently "(bbox, zoom)") MUST be updated to reflect the `viewport` shape.
 - **FR-003**: A plot MUST contain at most one `SystemState` Feature per `state_type`. Two is a load-time error, not a silent reconciliation.
 - **FR-004**: Per-variant required fields MUST be enforced by LinkML `rules:` blocks keyed on `state_type` (temporal ⇒ `start_time`+`end_time`; spatial ⇒ `viewport`; selection ⇒ `selected_ids`; active_storyboard ⇒ `active_storyboard_id`). `current_time`, `time_filter`, `display_mode`, `step_size`, `playback_rate`, `rotation`, `selected_primary` remain optional.
 - **FR-005**: The base feature-properties class MUST gain an optional `visible: boolean`. Absent ⇒ visible; `false` ⇒ hidden. This is the schema home for per-feature visibility (replacing the sidecar's `hiddenFeatureIds`).
@@ -166,6 +166,12 @@ Both hosts read and write all `SystemState` variants through a single shared hel
 
 - **FR-018**: The following fields are NOT persisted and MUST default/recompute on load: `playbackState` (→ `stopped`), `drawingMode` (→ `null`), `drawingPaletteIndex` (→ `0`), `viewportLocked` (→ `false`, per spec 260 force-unlock), `styleVersion` (→ `0`), `selection.timestamp` (regenerated), and `featureCollectionUri` (derived from the plot's own URI at load — a self-reference with no value in the file).
 
+#### Dirty-tracking and save triggers
+
+- **FR-019**: View-state changes — viewport, rotation, selection, the temporal window / playhead / filter / display-mode / step / rate, and per-feature visibility (hide/reveal) — are **exploration**. They update the in-memory store but MUST NOT raise the dirty flag, and therefore MUST NOT trigger the unsaved-changes close prompt. Looking around a plot is free.
+- **FR-020**: An explicit user save action MUST persist the complete current state — all `state.*` SystemState features, per-feature `visible` flags, and geographic/storyboard features — into `features.geojson`, **regardless** of the dirty flag. (VS Code's save command today early-returns "no unsaved changes" when not dirty; that guard MUST be relaxed so a user can commit a view they have only explored into. Without this rule, FR-019 would make view-state unsaveable.)
+- **FR-021**: Only substantive content edits (adding / deleting / modifying geographic, annotation, or storyboard/scene features; tool results) set the dirty flag and thus drive the on-close save prompt. Whenever a save runs — explicit (FR-020) or prompted (FR-021) — current view-state and visibility piggyback into the same `features.geojson` write. Provenance for visibility transitions (FR-013) is appended during these writes, so the accepted log growth is bounded to *saved* states, not every transient toggle.
+
 ### Save atomicity (simplified vs prior #261)
 
 With the sidecar gone, all migrated state rides in the single `features.geojson` write. The dual-write (FC↔sidecar) silent-failure class that prior-#261's FR-019 guarded against **no longer exists**. Save remains subject to the broader multi-asset atomicity tech-debt item (#268 — `features.geojson` vs thumbnails vs `item.json`), which is explicitly out of scope here.
@@ -178,7 +184,7 @@ Every field the sidecar persisted today, and its new home. This table is binding
 |---|---|---|---|
 | `temporal.timeRange.{start,end}` (epoch) | sidecar | `state.temporal.{start_time,end_time}` (ISO) | **Plot state** |
 | `temporal.currentTime` (epoch \| null) | sidecar | `state.temporal.current_time` (ISO) | **Plot state** |
-| `temporal.timeFilter` | sidecar | `state.temporal.time_filter` | **Plot state** (relates to the data being replayed) |
+| `temporal.timeFilter` (epoch `{start?,end?}`) | sidecar | `state.temporal.{filter_start_time,filter_end_time}` (ISO) | **Plot state** (relates to the data being replayed) |
 | `temporal.displayMode` | sidecar | `state.temporal.display_mode` | **Plot state** (plot-specific) |
 | `temporal.stepSize` | sidecar | `state.temporal.step_size` | **Plot state** (relates to the data being replayed) |
 | `temporal.playbackRate` | sidecar | `state.temporal.playback_rate` | **Plot state** (relates to the data being replayed) |
@@ -221,7 +227,7 @@ Every field the sidecar persisted today, and its new home. This table is binding
 - **NG-002**: Does NOT change the on-the-wire shape of #237's `active_storyboard` feature — only its writer location (host-private → shared helper).
 - **NG-003**: Does NOT add provenance compaction for the per-feature visibility log (FR-014 accepts the growth; compaction is a follow-up).
 - **NG-004**: Does NOT make the broader VS Code multi-asset save transactional (`features.geojson` vs thumbnails vs `item.json`) — that is #268.
-- **NG-005**: Does NOT change the save-vs-dirty UX contract. Scrubbing the playhead does not mark the plot dirty; state is persisted only on explicit save.
+- **NG-005**: Does NOT change the save-vs-dirty UX contract beyond codifying it for the new state (FR-019–FR-021): no view-state change — pan, zoom, scrub, select, hide/reveal — marks the plot dirty; only substantive content edits do. An explicit save still persists the current view.
 - **NG-006**: Does NOT introduce a tolerant import path for out-of-window `current_time` — that is #267 (revisited only if strict-on-import proves user-hostile).
 
 ## Dependencies
