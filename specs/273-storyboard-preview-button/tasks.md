@@ -153,7 +153,7 @@ confirm it plays back identically — no new errors, no network calls for storyb
 
 ### E2E Tests
 
-- [ ] T037 [test] Extend the Storybook E2E for the Preview control `shared/components/e2e/StoryboardPanel.spec.ts` (Preview renders when `onPreview` set / hidden when absent / disabled+tooltip when `canPreview=false`; hover + click across light/dark/vscode; capture theme screenshots into `specs/273-storyboard-preview-button/evidence/screenshots/`). Run: `cd shared/components && node run-playwright.mjs StoryboardPanel`
+- [x] T037 [test] Extend the Storybook E2E for the Preview control `shared/components/e2e/StoryboardPanel.spec.ts` (Preview renders when `onPreview` set / hidden when absent / disabled+tooltip when `canPreview=false`; hover + click across light/dark/vscode; capture theme screenshots into `specs/273-storyboard-preview-button/evidence/screenshots/`). Run: `cd shared/components && node run-playwright.mjs StoryboardPanel`
 - [ ] T038 [test] Add the web-shell preview + export workflow E2E `apps/web-shell/playwright/tests/storyboard-preview.spec.ts` (load plot → click Preview → assert new tab loads renderer at `/briefing-renderer/?features=blob:` and reaches `ready` with scenes playing; invoke Export → assert a non-empty `.zip` is delivered; capture `preview-playback-webshell.png` + interaction GIF into `evidence/screenshots/`). Run: `cd apps/web-shell && node run-playwright.mjs storyboard-preview`
 - [ ] T039 Extend web-shell page objects for Preview + new-tab handling `apps/web-shell/playwright/pages/` (add Preview selector + `context.waitForEvent('page')` helper; extend, do not duplicate)
 
