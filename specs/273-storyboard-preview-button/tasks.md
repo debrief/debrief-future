@@ -170,7 +170,7 @@ confirm it plays back identically — no new errors, no network calls for storyb
 
 ### Media Content
 
-- [ ] T045 Create feature blog post in `specs/273-storyboard-preview-button/media/shipped-post.md` (Content Specialist agent; first three sections copied verbatim from `evidence/opening-context.md`; remaining sections from evidence)
+- [x] T045 Create feature blog post in `specs/273-storyboard-preview-button/media/shipped-post.md` (Content Specialist agent; first three sections copied verbatim from `evidence/opening-context.md`; remaining sections from evidence)
 
 ### PR Creation
 
