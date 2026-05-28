@@ -72,7 +72,6 @@ import {
   resetSessionStore,
   hydrateStoreFromFeatures,
   mirrorViewStateIntoFeatures,
-  STATE_FEATURE_ID,
   SystemStateLoadError,
 } from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
@@ -228,20 +227,6 @@ function getMimeType(filePath: string): string {
 }
 
 /**
- * Feature 261 (FR-009a) — the deterministic ids of the view-state SystemState
- * features the web-shell mirrors into the in-memory plot FeatureCollection.
- */
-const STATE_FEATURE_IDS: ReadonlySet<string> = new Set(Object.values(STATE_FEATURE_ID));
-
-/** Serialise just the view-state `state.*` features for loop-guard comparison. */
-function stateFeatureSignature(features: ReadonlyArray<{ id?: string | number; properties: unknown }>): string {
-  const stateFeatures = features
-    .filter((f) => f.id !== undefined && STATE_FEATURE_IDS.has(String(f.id)))
-    .map((f) => ({ id: String(f.id), properties: f.properties }))
-    .sort((a, b) => a.id.localeCompare(b.id));
-  return JSON.stringify(stateFeatures);
-}
-
 /**
  * Main application component.
  */
@@ -267,29 +252,6 @@ export default function App() {
     currentPlotRef.current = currentPlot;
   }, [currentPlot]);
 
-  // Feature 261 (FR-009a): mirror the analyst's view-state (viewport, time
-  // window/playhead, selection) into the in-memory plot FeatureCollection as
-  // `state.*` SystemState features, so the plot is self-describing and whatever
-  // persists the FC (scene/overlay writes) captures the current view. This is
-  // what makes the web-shell a *producer* in the SC-003 parity matrix.
-  // Per-feature visibility already rides on `properties.visible` (the
-  // layer:toggleVisibility handler), so this path writes ONLY the state.*
-  // features and never touches `visible`. A content-equality loop guard means
-  // an echoed-but-unchanged view-state never re-triggers a plot update.
-  useEffect(() => {
-    const mirror = (): void => {
-      setCurrentPlot((p) => {
-        if (!p) return p;
-        const current = p.features.features as Feature[];
-        const next = mirrorViewStateIntoFeatures(current, store.getState()) as Feature[];
-        if (stateFeatureSignature(current) === stateFeatureSignature(next)) {
-          return p;
-        }
-        return { ...p, features: { ...p.features, features: next } };
-      });
-    };
-    return store.subscribe(mirror);
-  }, [store]);
   // Result layers now live in session-state store (#109)
   const resultLayers = state.resultLayers;
   /** Maps activityId → original feature snapshots so revert can restore them */
@@ -422,6 +384,34 @@ export default function App() {
     return currentPlot.features.features as DebriefFeature[];
   }, [currentPlot]);
 
+  // Feature 261 (FR-009a): the SELF-DESCRIBING FeatureCollection — the plot's
+  // features plus the analyst's current view-state (viewport / time window /
+  // playhead / selection) materialised as `state.*` SystemState features.
+  // `currentPlot.features` itself stays pure: storyboard capture, the layers
+  // panel, and scene packaging never see view-state SystemState features. This
+  // augmented view is what the persistence / round-trip boundary exposes so the
+  // plot round-trips from features.geojson alone. Per-feature `visible` flags
+  // already ride on the plot features (the layer:toggleVisibility handler), so
+  // this only adds state.* and never rewrites visibility. Recomputed reactively
+  // from the store view-state (the `state` snapshot drives the deps).
+  const selfDescribingFeatures = useMemo<DebriefFeature[]>(() => {
+    const augmented = mirrorViewStateIntoFeatures(plotFeatures, store.getState());
+    // eslint-disable-next-line no-restricted-syntax -- #261 FC boundary cast (mirror of #235 ADR-019): the helper returns the structural PlotFeature shape; the consumers treat it as DebriefFeature.
+    return augmented as unknown as DebriefFeature[];
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- store snapshot fields are the real deps
+  }, [
+    plotFeatures,
+    state.viewport,
+    state.rotation,
+    state.selection,
+    state.currentTime,
+    state.timeRange,
+    state.timeFilter,
+    state.displayMode,
+    state.stepSize,
+    state.playbackRate,
+  ]);
+
   // All features including result layers and drawn features
   const allFeatures = useMemo<DebriefFeature[]>(() => {
     return [...plotFeatures, ...asDebriefFeatures(resultLayers as Feature[]), ...drawnFeatures];
@@ -455,10 +445,11 @@ export default function App() {
     return names;
   }, [allFeatures]);
 
-  // Expose plot features on window for Playwright test introspection
+  // Expose the self-describing plot features (incl. state.* view-state) on
+  // window for Playwright introspection + the round-trip transfer hook.
   useEffect(() => {
-    window.__currentPlotFeatures = plotFeatures as Feature[];
-  }, [plotFeatures]);
+    window.__currentPlotFeatures = selfDescribingFeatures as Feature[];
+  }, [selfDescribingFeatures]);
 
   // #259 — Playwright hook: run validatePlot against an arbitrary FC and
   // drive the same banner state handlePlotSelect would on a real failure.

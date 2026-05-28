@@ -230,17 +230,17 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 - [x] T102 [P] Capture the schema round-trip proof (Article II.2 rubric): Python → JSON → TypeScript → JSON → Python bit-equality across all four variants + a `visible:false` feature, as a markdown table. File: `specs/261-session-state-systemstate/evidence/round-trip-evidence.md`.
 - [x] T103 Run the full Playwright suite (`cd apps/web-shell && node run-playwright.mjs system-state-roundtrip`) to (re)produce `roundtrip-host-a.png`, `roundtrip-host-b.png`, `visibility-host-a.png`, `visibility-host-b.png`, `features-before.json`, `features-after.json` and confirm they land in `specs/261-session-state-systemstate/evidence/`. No file path — verification step.
 - [x] T104 [P] Capture `strict-import-error.png`: load a hand-crafted `features.geojson` with a malformed SystemState feature and screenshot the structured error the user sees (Article XIV.4). File: `specs/261-session-state-systemstate/evidence/screenshots/strict-import-error.png`.
-- [ ] T105 Record the interaction GIF (< 5s, < 2MB): save in host A → reopen `features.geojson` only in host B → same view/time/selection. Use Playwright `recordVideo` + ffmpeg-to-gif. File: `specs/261-session-state-systemstate/evidence/screenshots/interaction.gif`.
+- [x] T105 Record the interaction GIF (< 5s, < 2MB): save in host A → reopen `features.geojson` only in host B → same view/time/selection. Use Playwright `recordVideo` + ffmpeg-to-gif. File: `specs/261-session-state-systemstate/evidence/screenshots/interaction.gif`.
 
 ### Media Content
 
-- [ ] T106 Create the feature post via the Content Specialist agent (`.claude/agents/media/content.md`): title prefixed with `Building `; the `What We're Building` / `How It Fits` / `Key Decisions` sections copied verbatim from `evidence/opening-context.md`; add `Screenshots`, `By the Numbers`, `Lessons Learned`, `What's Next` from the captured evidence. File: `specs/261-session-state-systemstate/media/shipped-post.md`.
+- [x] T106 Create the feature post via the Content Specialist agent (`.claude/agents/media/content.md`): title prefixed with `Building `; the `What We're Building` / `How It Fits` / `Key Decisions` sections copied verbatim from `evidence/opening-context.md`; add `Screenshots`, `By the Numbers`, `Lessons Learned`, `What's Next` from the captured evidence. File: `specs/261-session-state-systemstate/media/shipped-post.md`.
 
 ### Project memory + backlog
 
 - [x] T107 [P] Add ADRs to `docs/project_notes/decisions.md`: (a) sidecar retirement → two-file model; (b) visibility as a per-feature `visible` flag with accepted provenance growth; (c) shared value-type consolidation into `common.yaml`. File: `docs/project_notes/decisions.md`.
 - [x] T108 [P] Log completion in `docs/project_notes/issues.md` with ticket #249, the PR URL, and the evidence directory link. File: `docs/project_notes/issues.md`.
-- [ ] T109 [P] Strike through BACKLOG.md row 249 (status → `complete`). File: `BACKLOG.md`.
+- [x] T109 [P] Strike through BACKLOG.md row 249 (status → `complete`). File: `BACKLOG.md`.
 
 ### Final verification + PR
 

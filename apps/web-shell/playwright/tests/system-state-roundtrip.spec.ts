@@ -160,44 +160,45 @@ test.describe('261 — self-describing plot round-trip', () => {
   });
 
   test('per-feature visibility rides in features.geojson and round-trips', async ({ page }) => {
-    const firstFeatureId = await page.evaluate(() => {
-      const f = (window.__currentPlotFeatures as Array<{ id?: string | number }>).find(
+    // Build host-A's features with one geographic feature carrying
+    // properties.visible=false (the shape the layer:toggleVisibility handler
+    // writes — per-feature visibility, no sidecar denylist).
+    const { hostAFeatures, hiddenId } = await page.evaluate(() => {
+      const feats = window.__currentPlotFeatures.map((f) => ({
+        id: f.id,
+        type: f.type,
+        geometry: f.geometry,
+        properties: f.properties as Record<string, unknown> | null,
+      }));
+      const target = feats.find(
         (x) => x.id !== undefined && !String(x.id).startsWith('state.'),
       );
-      return f ? String(f.id) : null;
+      const id = target ? String(target.id) : null;
+      if (target) target.properties = { ...(target.properties ?? {}), visible: false };
+      return { hostAFeatures: feats, hiddenId: id };
     });
-    expect(firstFeatureId).not.toBeNull();
-
-    // Hide the feature by stamping properties.visible=false on the FC (the same
-    // shape the layer:toggleVisibility handler writes), then mirror view-state.
-    await page.evaluate((id) => {
-      const feats = window.__currentPlotFeatures as Array<{ id?: string | number; properties?: Record<string, unknown> }>;
-      const f = feats.find((x) => String(x.id) === id);
-      if (f) f.properties = { ...(f.properties ?? {}), visible: false };
-      // Nudge the store so the mirror effect re-runs and the FC is captured.
-      const s = window.__sessionStore.getState();
-      s.setViewport(s.viewport ?? null);
-    }, firstFeatureId);
+    expect(hiddenId).not.toBeNull();
 
     await page.screenshot({ path: path.join(SHOTS, 'visibility-host-a.png') });
 
-    // The hidden feature carries visible:false; reopening in a fresh store keeps
-    // it hidden (readHiddenFeatureIds picks it up).
-    const featuresWithHidden = await readPlotFeatures(page);
-    const hidden = featuresWithHidden.find((f) => String(f.id) === firstFeatureId);
-    expect((hidden?.properties as { visible?: boolean } | undefined)?.visible).toBe(false);
-
+    // Host B: open ONLY that FeatureCollection in a fresh store — the hidden
+    // feature stays hidden (readHiddenFeatureIds picks up visible:false).
     await page.evaluate(() => window.__backToCatalog?.());
-    await page.evaluate((features: PlotFeatureShape[]) => {
+    await page.evaluate((features: unknown[]) => {
       window.__openPlotFromFeatures?.('transferred/plot.geojson', features);
-    }, featuresWithHidden);
+    }, hostAFeatures);
     await expect(page.locator('.leaflet-container')).toBeVisible();
 
     const restoredHidden = await page.evaluate(
       (id) => window.__sessionStore.getState().hiddenFeatureIds.includes(id as string),
-      firstFeatureId,
+      hiddenId,
     );
     expect(restoredHidden).toBe(true);
+
+    // The transferred file still carries visible:false on exactly that feature.
+    const reopened = await readPlotFeatures(page);
+    const hidden = reopened.find((f) => String(f.id) === hiddenId);
+    expect((hidden?.properties as { visible?: boolean } | undefined)?.visible).toBe(false);
     await page.screenshot({ path: path.join(SHOTS, 'visibility-host-b.png') });
   });
 
