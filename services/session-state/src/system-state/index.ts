@@ -32,6 +32,13 @@ export {
   activeStoryboardSchema,
   checkTemporalCrossField,
 } from './validate.js';
+export {
+  buildWriteInputFromStore,
+  applyStateToFeatures,
+  mirrorViewStateIntoFeatures,
+  hydrateStoreFromFeatures,
+} from './store-bridge.js';
+export type { FeatureLike, ViewStateStore } from './store-bridge.js';
 export { SystemStateLoadError } from './errors.js';
 export type { SystemStateLoadErrorKind } from './errors.js';
 export { STATE_FEATURE_ID } from './types.js';

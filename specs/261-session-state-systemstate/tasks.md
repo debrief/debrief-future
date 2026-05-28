@@ -170,8 +170,8 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Web-shell load + save wiring (FR-009a)
 
-- [ ] T068 Web-shell plot open: hydrate spatial/temporal/selection from the loaded FeatureCollection via the shared helper. File: `apps/web-shell/src/` (plot-open path — confirm exact module, e.g. the plot loader feeding the session store).
-- [ ] T069 Web-shell save: ensure view-state changes funnel into the FeatureCollection through the shared writer so the existing IndexedDB persistence (#236) captures the `state.*` features (FR-009a). File: `apps/web-shell/src/` (FC-persist path).
+- [x] T068 Web-shell plot open: hydrate spatial/temporal/selection from the loaded FeatureCollection via the shared helper. File: `apps/web-shell/src/` (plot-open path — confirm exact module, e.g. the plot loader feeding the session store).
+- [x] T069 Web-shell save: ensure view-state changes funnel into the FeatureCollection through the shared writer so the existing IndexedDB persistence (#236) captures the `state.*` features (FR-009a). File: `apps/web-shell/src/` (FC-persist path).
 
 ### Tests + cross-host E2E (SC-001/SC-002a/SC-003)
 
@@ -193,7 +193,7 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 - [x] T080 VS Code load: in `openPlot.ts`, hydrate the store's hidden set from `readHiddenFeatureIds(plotData)` (so visibility comes solely from per-feature `visible`, not a sidecar). File: `apps/vscode/src/commands/openPlot.ts`.
 - [x] T081 VS Code save: in `saveSession.ts`, apply the store's hidden set to the FeatureCollection via `applyVisibilityToFeatureCollection(features, hiddenIds)` before writing `features.geojson`. File: `apps/vscode/src/commands/saveSession.ts`.
-- [ ] T082 Web-shell: hydrate the hidden set from the FC on plot open and apply it back through the shared writer on persist (mirrors T068/T069). File: `apps/web-shell/src/` (plot-open / FC-persist path).
+- [x] T082 Web-shell: hydrate the hidden set from the FC on plot open and apply it back through the shared writer on persist (mirrors T068/T069). File: `apps/web-shell/src/` (plot-open / FC-persist path).
 
 ### Visibility provenance (FR-013/FR-014/R-012)
 

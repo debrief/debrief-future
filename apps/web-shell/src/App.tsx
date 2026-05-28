@@ -67,7 +67,14 @@ import type {
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
-import { getSessionStore, resetSessionStore } from '@debrief/session-state';
+import {
+  getSessionStore,
+  resetSessionStore,
+  hydrateStoreFromFeatures,
+  mirrorViewStateIntoFeatures,
+  STATE_FEATURE_ID,
+  SystemStateLoadError,
+} from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
 import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
@@ -217,6 +224,21 @@ function getMimeType(filePath: string): string {
 }
 
 /**
+ * Feature 261 (FR-009a) — the deterministic ids of the view-state SystemState
+ * features the web-shell mirrors into the in-memory plot FeatureCollection.
+ */
+const STATE_FEATURE_IDS: ReadonlySet<string> = new Set(Object.values(STATE_FEATURE_ID));
+
+/** Serialise just the view-state `state.*` features for loop-guard comparison. */
+function stateFeatureSignature(features: ReadonlyArray<{ id?: string | number; properties: unknown }>): string {
+  const stateFeatures = features
+    .filter((f) => f.id !== undefined && STATE_FEATURE_IDS.has(String(f.id)))
+    .map((f) => ({ id: String(f.id), properties: f.properties }))
+    .sort((a, b) => a.id.localeCompare(b.id));
+  return JSON.stringify(stateFeatures);
+}
+
+/**
  * Main application component.
  */
 export default function App() {
@@ -240,6 +262,30 @@ export default function App() {
   useEffect(() => {
     currentPlotRef.current = currentPlot;
   }, [currentPlot]);
+
+  // Feature 261 (FR-009a): mirror the analyst's view-state (viewport, time
+  // window/playhead, selection) into the in-memory plot FeatureCollection as
+  // `state.*` SystemState features, so the plot is self-describing and whatever
+  // persists the FC (scene/overlay writes) captures the current view. This is
+  // what makes the web-shell a *producer* in the SC-003 parity matrix.
+  // Per-feature visibility already rides on `properties.visible` (the
+  // layer:toggleVisibility handler), so this path writes ONLY the state.*
+  // features and never touches `visible`. A content-equality loop guard means
+  // an echoed-but-unchanged view-state never re-triggers a plot update.
+  useEffect(() => {
+    const mirror = (): void => {
+      setCurrentPlot((p) => {
+        if (!p) return p;
+        const current = p.features.features as Feature[];
+        const next = mirrorViewStateIntoFeatures(current, store.getState()) as Feature[];
+        if (stateFeatureSignature(current) === stateFeatureSignature(next)) {
+          return p;
+        }
+        return { ...p, features: { ...p.features, features: next } };
+      });
+    };
+    return store.subscribe(mirror);
+  }, [store]);
   // Result layers now live in session-state store (#109)
   const resultLayers = state.resultLayers;
   /** Maps activityId → original feature snapshots so revert can restore them */
@@ -537,6 +583,23 @@ export default function App() {
           end: extent[1],
         });
         freshStore.getState().setCurrentTime(extent[0]);
+      }
+
+      // Feature 261 (FR-007): hydrate saved view-state (viewport, time window/
+      // playhead, selection) from the plot's SystemState features, overriding
+      // the data-extent defaults above. The plot is self-describing — no
+      // sidecar. Per-feature visibility already rides on `properties.visible`.
+      // Strict-on-import: a malformed/duplicate/cross-field-invalid SystemState
+      // feature surfaces the same error banner as a Storyboard validation
+      // failure (FR-011/FR-012).
+      try {
+        hydrateStoreFromFeatures(freshStore.getState(), plotData.features as DebriefFeature[]);
+      } catch (err) {
+        if (err instanceof SystemStateLoadError) {
+          setPlotLoadError({ code: err.kind, message: err.message });
+          return;
+        }
+        throw err;
       }
 
       // Clear undo history — initialization isn't a user action
