@@ -69,3 +69,29 @@ function serialiseCause(cause: unknown): string | undefined {
     return String(cause);
   }
 }
+
+/**
+ * Thrown when a filesystem-backed STAC store refuses a write because the
+ * underlying disk / mount is read-only (EACCES / EROFS / EPERM, or a read-
+ * only fs override). Mirrors `StacWriterError({ kind: 'read-only-fs' })` for
+ * call sites that prefer an exception class with named identity over the
+ * discriminated `kind` field.
+ *
+ * Re-located here (spec #192 T017) so `@debrief/session-state`'s
+ * `saveSession` catch block can detect it cleanly via `instanceof` without
+ * pulling in the VS Code extension package. Browser-safe — no Node imports.
+ */
+export class ReadOnlyFilesystemError extends Error {
+  override readonly name = 'ReadOnlyFilesystemError' as const;
+  readonly path: string;
+
+  constructor(
+    path: string,
+    message: string = 'Cannot write item.json — filesystem is read-only',
+  ) {
+    super(message);
+    this.path = path;
+    // Restore prototype chain across compilation targets.
+    Object.setPrototypeOf(this, ReadOnlyFilesystemError.prototype);
+  }
+}

@@ -1,4 +1,5 @@
 // AUTO-GENERATED — DO NOT EDIT
+export type VertexMetadataPath = string;
 export type ToolId = string;
 /**
 * Discriminator for GeoJSON feature types
@@ -598,6 +599,28 @@ export interface BaseFeatureProperties {
     tags?: string[],
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
+    /** Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md. */
+    vertex_metadata?: VertexMetadata[],
+}
+
+
+/**
+ * Optional, sparse per-vertex annotation attached to a feature. One entry corresponds to one vertex of the parent feature's geometry, identified by the structured `path` slot following the `selectionPath` convention (research note R-008). Carrying any of label/tags/note triggers persistence; an entry with all three absent MUST be omitted on write (the writer's flush function prunes). Path shape depends on parent geometry:
+  Track       -> "positions/<int>"
+  Polygon     -> "rings/<int>/vertices/<int>"
+  LineString  -> "vertices/<int>"
+  MultiPoint  -> "vertices/<int>"
+  Point       -> "vertex/0"
+ */
+export interface VertexMetadata {
+    /** Structured vertex address following the selectionPath convention. The class-level regex accepts the union of all per-geometry path shapes; the writer additionally checks that the path matches the parent geometry's specific shape at flush time. Acts as the identity for an entry within a feature's `vertex_metadata` list — duplicates MUST be rejected by validators. */
+    path: string,
+    /** Free-text short label. */
+    label?: string,
+    /** Free-text tag list. Order is not significant. */
+    tags?: string[],
+    /** Free-text long note. */
+    note?: string,
 }
 
 

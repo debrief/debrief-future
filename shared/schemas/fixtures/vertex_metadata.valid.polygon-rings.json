@@ -1,0 +1,62 @@
+{
+  "type": "Feature",
+  "id": "poly-with-vertex-meta",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -5.0,
+          50.0
+        ],
+        [
+          -4.0,
+          50.0
+        ],
+        [
+          -4.0,
+          51.0
+        ],
+        [
+          -5.0,
+          51.0
+        ],
+        [
+          -5.0,
+          50.0
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "POLY",
+    "vertex_count": 4,
+    "label": "Patrol Zone Alpha",
+    "symbol": "@A",
+    "style": {
+      "fill": true,
+      "fill_color": "#FF0000",
+      "fill_opacity": 0.2,
+      "stroke": true,
+      "color": "#CC0000",
+      "weight": 2,
+      "opacity": 1.0,
+      "line_cap": "round",
+      "line_join": "miter",
+      "dash_array": null
+    },
+    "vertex_metadata": [
+      {
+        "path": "rings/0/vertices/0",
+        "label": "SW corner",
+        "tags": [
+          "boundary"
+        ]
+      },
+      {
+        "path": "rings/0/vertices/2",
+        "note": "NE corner \u2014 reference point."
+      }
+    ]
+  }
+}

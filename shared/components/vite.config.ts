@@ -30,7 +30,23 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', 'leaflet', 'react-leaflet', 'vega', 'vega-lite', 'vega-embed', 'vscrui'],
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'leaflet',
+        'react-leaflet',
+        'vega',
+        'vega-lite',
+        'vega-embed',
+        'vscrui',
+        // Spec 192 — `@debrief/session-state` exposes `parsePath` (used by
+        // the new mode resolver) and `saveSession` (Node-only fs). Bundling
+        // it pulls fs/promises into the browser bundle and breaks the
+        // build. Workspace consumers already install the package directly,
+        // so externalising is the correct shape.
+        '@debrief/session-state',
+      ],
       output: {
         preserveModules: true,
         preserveModulesRoot: 'src',

@@ -71,16 +71,12 @@ export class SchemaValidationError extends Error {
   }
 }
 
-/** Disk / filesystem refused the write (EACCES / EROFS / read-only mount). */
-export class ReadOnlyFilesystemError extends Error {
-  override readonly name = 'ReadOnlyFilesystemError' as const;
-  constructor(
-    readonly path: string,
-    message: string = 'Cannot write item.json — filesystem is read-only',
-  ) {
-    super(message);
-  }
-}
+// `ReadOnlyFilesystemError` was moved to `@debrief/stac-writer` (spec #192
+// T017) so `@debrief/session-state`'s `saveSession` catch block can detect
+// it cleanly via `instanceof` without depending on this VS Code package.
+// Re-exported here so existing call sites (and tests) keep working.
+export { ReadOnlyFilesystemError } from '@debrief/stac-writer';
+import { ReadOnlyFilesystemError } from '@debrief/stac-writer';
 
 export interface UpdateItemMetadataInput {
   storePath: string;

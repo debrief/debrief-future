@@ -3,6 +3,11 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import type { DebriefFeature, DebriefFeatureCollection } from '../utils/types';
 import { FeatureRow } from './FeatureRow';
 import { flattenFeatures, hasChildSelected } from './flattenFeatures';
+import {
+  applyClickToSelection,
+  isPlatformModifier,
+  type SelectionClickEvent,
+} from '../utils/applyClickToSelection';
 import './FeatureList.css';
 
 export interface FeatureListProps {
@@ -19,6 +24,16 @@ export interface FeatureListProps {
    * Shift-click to select a contiguous range.
    */
   onSelectionChange?: (ids: Set<string>) => void;
+
+  /**
+   * Optional structured-event callback emitted on plain/modifier clicks
+   * (the two branches that route through the shared
+   * `applyClickToSelection` helper). Consumers that need the modifier
+   * bit — e.g. to compute `selection.primary` — should prefer this over
+   * `onSelectionChange`. Not emitted on shift-range clicks (those are
+   * list-only and have no clear single "target"). #192 Phase 5.
+   */
+  onSelectionEvent?: (event: SelectionClickEvent) => void;
 
   /**
    * @deprecated Use onSelectionChange for full multi-select support.
@@ -87,6 +102,7 @@ export function FeatureList({
   selectedIds = new Set(),
   hiddenIds,
   onSelectionChange,
+  onSelectionEvent,
   onSelect,
   onToggleExpand,
   filter,
@@ -138,47 +154,70 @@ export function FeatureList({
   );
 
   const handleRowClick = useCallback(
-    (index: number, event: React.MouseEvent) => {
+    (index: number, mouseEvent: React.MouseEvent) => {
       const item = flattenedItems[index];
       if (!item) return;
 
       const itemId = item.id;
 
-      // Legacy callback
+      // Legacy callback (single-id) — unchanged.
       if (!onSelectionChange) {
         onSelect?.(itemId);
         lastClickedIndex.current = index;
         return;
       }
 
-      const isCtrl = event.ctrlKey || event.metaKey;
-      const isShift = event.shiftKey;
+      const isModifier = isPlatformModifier({
+        ctrlKey: mouseEvent.ctrlKey,
+        metaKey: mouseEvent.metaKey,
+      });
+      const isShift = mouseEvent.shiftKey;
 
       let next: Set<string>;
+      let clickEvent: SelectionClickEvent | null = null;
 
       if (isShift && lastClickedIndex.current !== null) {
+        // Shift-range is local to the list view — `applyClickToSelection`
+        // intentionally reserves shift for future range-select. FeatureList
+        // is row-indexed, so we keep the row-range logic here and only
+        // converge the plain/modifier branches onto the shared helper.
         const start = Math.min(lastClickedIndex.current, index);
         const end = Math.max(lastClickedIndex.current, index);
-        next = new Set(isCtrl ? selectedIds : []);
+        next = new Set(isModifier ? selectedIds : []);
         for (let i = start; i <= end; i++) {
           const it = flattenedItems[i];
           if (it) next.add(it.id);
         }
-      } else if (isCtrl) {
-        next = new Set(selectedIds);
-        if (next.has(itemId)) {
-          next.delete(itemId);
-        } else {
-          next.add(itemId);
-        }
       } else {
-        next = new Set([itemId]);
+        // Plain + modifier clicks route through the shared multi-select
+        // emitter glue so the map and the Layers panel produce identical
+        // selection sets for identical sequences (#192 Phase 5).
+        const result = applyClickToSelection({
+          current: {
+            featureIds: Array.from(selectedIds),
+            primary: null,
+          },
+          event: { target: itemId, modifier: isModifier, shift: isShift },
+        });
+        next = new Set(result.featureIds);
+        clickEvent = { target: itemId, modifier: isModifier, shift: isShift };
       }
 
       lastClickedIndex.current = index;
-      onSelectionChange(next);
+      // When `onSelectionEvent` is provided, it is the authoritative
+      // emit for plain/modifier clicks: the host computes the next
+      // selection (incl. `primary`) via `applyClickToSelection` itself.
+      // `onSelectionChange` would race against that calculation, so we
+      // skip it for plain/modifier branches. Shift-range still emits
+      // `onSelectionChange` because there is no single "target" for
+      // the modifier-aware glue. (#192 Phase 5)
+      if (clickEvent !== null && onSelectionEvent) {
+        onSelectionEvent(clickEvent);
+      } else {
+        onSelectionChange(next);
+      }
     },
-    [flattenedItems, selectedIds, onSelectionChange, onSelect],
+    [flattenedItems, selectedIds, onSelectionChange, onSelectionEvent, onSelect],
   );
 
   // Setup virtualizer

@@ -57,6 +57,9 @@ export {
   type SessionStoreWithUndo,
 } from './store/index.js';
 
+// Plot slice — read-only signal (Feature: 192)
+export { selectIsReadOnly, selectReadOnlyReason } from './store/slices/plot.js';
+
 // Subscriptions
 export {
   subscribeToSlice,

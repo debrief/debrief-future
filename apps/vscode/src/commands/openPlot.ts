@@ -5,6 +5,7 @@
 import * as vscode from 'vscode';
 import { access, readFile } from 'fs/promises';
 import { loadSession, createLogService, createSnapshotService, createTimeInstant, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
+import type { StacWriter } from '@debrief/stac-writer';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
@@ -110,7 +111,13 @@ export function createOpenPlotCommand(
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void,
   resultIdRegistry?: ResultIdRegistry,
-  logPanelProvider?: LogPanelViewProvider
+  logPanelProvider?: LogPanelViewProvider,
+  // Spec #192 T017 — host call site for the read-only signal. After a plot
+  // is opened we ask the writer for its capability and dispatch
+  // `setReadOnly` on the session's plot slice. Optional so existing
+  // wirings (including tests) keep working; when omitted the read-only
+  // signal still escalates correctly from `saveSession` failures.
+  getStacWriter?: (storePath: string) => StacWriter,
 ): (args?: OpenPlotArgs) => Promise<void> {
   return async (args?: OpenPlotArgs) => {
     let storeId: string;
@@ -209,6 +216,32 @@ export function createOpenPlotCommand(
 
     // Set as active document
     sessionManager.setActiveDocument(plotUri);
+
+    // Spec #192 T017 (producer rule 1) — ask the host-agnostic StacWriter
+    // whether storage is persistent, and dispatch the read-only signal on
+    // this session's plot slice. Most-restrictive precedence: any single
+    // producer setting true keeps the plot RO until an openPlot against a
+    // writable host resets it. We *always* dispatch — including resetting
+    // to false — because the same store handle may have been escalated by
+    // a prior `saveSession` failure on a different plot.
+    if (getStacWriter) {
+      try {
+        const writer = getStacWriter(store.path);
+        const capability = await writer.capability();
+        const persistent = capability.persistent === true;
+        session.getState().setReadOnly(
+          !persistent,
+          persistent ? null : 'Storage location is not writable',
+        );
+      } catch (err) {
+        // Capability probing must never block plot opening. Default to
+        // "writable" so the analyst is not surprised by a banner caused by
+        // a probing error; the save-time escalation path will catch real
+        // write failures.
+        console.warn('[debrief] openPlot: writer.capability() probe failed', err);
+        session.getState().setReadOnly(false, null);
+      }
+    }
 
     // Create or get map panel
     let panel = getMapPanel();
