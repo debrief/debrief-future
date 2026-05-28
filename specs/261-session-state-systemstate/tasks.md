@@ -81,22 +81,22 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Golden fixtures (FR-006, SC-005)
 
-- [ ] T016 [P] Create valid spatial fixture (`viewport` + `rotation`). File: `shared/schemas/fixtures/system-state/valid/spatial.json`.
-- [ ] T017 [P] Create valid temporal fixture (all of `start_time`/`end_time`/`current_time`/`filter_start_time`/`filter_end_time`/`display_mode`/`step_size`/`playback_rate`). File: `shared/schemas/fixtures/system-state/valid/temporal.json`.
-- [ ] T018 [P] Create valid selection fixture (`selected_ids` + `selected_primary`). File: `shared/schemas/fixtures/system-state/valid/selection.json`.
-- [ ] T019 [P] Create valid active_storyboard fixture in #237's shipped shape (closes the missing-fixture gap). File: `shared/schemas/fixtures/system-state/valid/active-storyboard.json`.
-- [ ] T020 [P] Create a valid geographic feature carrying `properties.visible: false`. File: `shared/schemas/fixtures/system-state/valid/feature-visible-false.json`.
-- [ ] T021 [P] Create invalid spatial fixture: `state_type: spatial` with no `viewport` (rules violation). File: `shared/schemas/fixtures/system-state/invalid/spatial-missing-viewport.json`.
-- [ ] T022 [P] Create invalid selection fixture: `selected_ids: [1, 2]` (numbers). File: `shared/schemas/fixtures/system-state/invalid/selection-non-string-id.json`.
-- [ ] T023 [P] Create invalid fixture: two features both `state_type: spatial` in one FC. File: `shared/schemas/fixtures/system-state/invalid/multiple-same-state-type.json`.
-- [ ] T024 [P] Create invalid fixture: unknown `state_type` value. File: `shared/schemas/fixtures/system-state/invalid/unknown-state-type.json`.
-- [ ] T025 [P] Create invalid fixture: `kind: SYSTEM` with no `state_type` discriminator. File: `shared/schemas/fixtures/system-state/invalid/missing-discriminator.json`.
-- [ ] T026 [P] Create cross-field fixtures (schema-valid, invariant-violating — classified by the helper, not Pydantic): `current_time` outside `[start_time,end_time]`, and `start_time > end_time`. Files: `shared/schemas/fixtures/system-state/cross-field/temporal-current-time-out-of-window.json`, `shared/schemas/fixtures/system-state/cross-field/temporal-bad-window.json`.
+- [x] T016 [P] Create valid spatial fixture (`viewport` + `rotation`). File: `shared/schemas/fixtures/system-state/valid/spatial.json`.
+- [x] T017 [P] Create valid temporal fixture (all of `start_time`/`end_time`/`current_time`/`filter_start_time`/`filter_end_time`/`display_mode`/`step_size`/`playback_rate`). File: `shared/schemas/fixtures/system-state/valid/temporal.json`.
+- [x] T018 [P] Create valid selection fixture (`selected_ids` + `selected_primary`). File: `shared/schemas/fixtures/system-state/valid/selection.json`.
+- [x] T019 [P] Create valid active_storyboard fixture in #237's shipped shape (closes the missing-fixture gap). File: `shared/schemas/fixtures/system-state/valid/active-storyboard.json`.
+- [x] T020 [P] Create a valid geographic feature carrying `properties.visible: false`. File: `shared/schemas/fixtures/system-state/valid/feature-visible-false.json`.
+- [x] T021 [P] Create invalid spatial fixture: `state_type: spatial` with no `viewport` (rules violation). File: `shared/schemas/fixtures/system-state/invalid/spatial-missing-viewport.json`.
+- [x] T022 [P] Create invalid selection fixture: `selected_ids: [1, 2]` (numbers). File: `shared/schemas/fixtures/system-state/invalid/selection-non-string-id.json`.
+- [x] T023 [P] Create invalid fixture: two features both `state_type: spatial` in one FC. File: `shared/schemas/fixtures/system-state/invalid/multiple-same-state-type.json`.
+- [x] T024 [P] Create invalid fixture: unknown `state_type` value. File: `shared/schemas/fixtures/system-state/invalid/unknown-state-type.json`.
+- [x] T025 [P] Create invalid fixture: `kind: SYSTEM` with no `state_type` discriminator. File: `shared/schemas/fixtures/system-state/invalid/missing-discriminator.json`.
+- [x] T026 [P] Create cross-field fixtures (schema-valid, invariant-violating — classified by the helper, not Pydantic): `current_time` outside `[start_time,end_time]`, and `start_time > end_time`. Files: `shared/schemas/fixtures/system-state/cross-field/temporal-current-time-out-of-window.json`, `shared/schemas/fixtures/system-state/cross-field/temporal-bad-window.json`.
 
 ### Schema adherence tests (FR-006, SC-005/SC-006/SC-008)
 
-- [ ] T027 [test] Pydantic adherence: every `valid/*` parses and round-trips Python→JSON→Python bit-identically; every `invalid/*` is rejected by Pydantic. File: `shared/schemas/tests/test_system_state_adherence.py`.
-- [ ] T028 [test] Cross-language round-trip for all four variants + the `visible:false` feature: Python writes → TypeScript reads → TypeScript writes → Python reads → bit-equal (Article II.2). File: `shared/schemas/tests/test_system_state_round_trip.py`.
+- [x] T027 [test] Pydantic adherence: every `valid/*` parses and round-trips Python→JSON→Python bit-identically; every `invalid/*` is rejected by Pydantic. File: `shared/schemas/tests/test_system_state_adherence.py`.
+- [x] T028 [test] Cross-language round-trip for all four variants + the `visible:false` feature: Python writes → TypeScript reads → TypeScript writes → Python reads → bit-equal (Article II.2). File: `shared/schemas/tests/test_system_state_round_trip.py`.
 
 ### Shared helper — variant-agnostic core (R-002, R-003, R-013)
 
