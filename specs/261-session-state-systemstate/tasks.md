@@ -143,7 +143,7 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 ### Cross-host parity + #237 regression
 
 - [x] T057 [test] VS Code extension test (Mocha): pin a storyboard via the store, save, assert the resulting `features.geojson` contains `state.activestoryboard` with the correct `active_storyboard_id`. File: `apps/vscode/test/system-state-roundtrip.test.ts`.
-- [ ] T058 [test] Run the existing `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts` post-T054 — MUST pass unchanged (the shared helper is now the writer; behaviour preserved). File: `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts` (verify only).
+- [x] T058 [test] Run the existing `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts` post-T054 — MUST pass unchanged (the shared helper is now the writer; behaviour preserved). File: `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts` (verify only).
 
 ## Phase 4: User Story 1 — Self-describing plot: spatial + temporal + selection round-trip (P1)
 
@@ -176,12 +176,12 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 ### Tests + cross-host E2E (SC-001/SC-002a/SC-003)
 
 - [x] T070 [P][test] Unit/integration: an FC with no `state.*` features loads with defaults (no error); an FC with them hydrates the store; saving a populated store yields the three `state.*` features and writes no sidecar. File: `services/session-state/src/system-state/__tests__/host-roundtrip.test.ts`.
-- [ ] T071 [test] Playwright web-shell spec: set a recognisable viewport + time window + playhead + selection → explicit save → reload page (clear in-memory store) → reopen `features.geojson` only → assert viewport/time/selection restored. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
-- [ ] T072 [test] Cross-host parity: a `features.geojson` written by the VS Code Mocha test is opened by the Playwright spec (state restored), and one written by Playwright is read by the Mocha test — via a shared fixture corpus. Files: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`, `apps/vscode/test/system-state-roundtrip.test.ts`.
+- [x] T071 [test] Playwright web-shell spec: set a recognisable viewport + time window + playhead + selection → explicit save → reload page (clear in-memory store) → reopen `features.geojson` only → assert viewport/time/selection restored. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
+- [x] T072 [test] Cross-host parity: a `features.geojson` written by the VS Code Mocha test is opened by the Playwright spec (state restored), and one written by Playwright is read by the Mocha test — via a shared fixture corpus. Files: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`, `apps/vscode/test/system-state-roundtrip.test.ts`.
 
 ### Phase 4 evidence capture
 
-- [ ] T073 The T071 spec writes `roundtrip-host-a.png` (recognisable viewport/time/selection pre-transfer) and `roundtrip-host-b.png` (restored from `features.geojson` only) into `specs/261-session-state-systemstate/evidence/screenshots/`, plus `features-before.json`/`features-after.json` showing the `state.*` features appear. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
+- [x] T073 The T071 spec writes `roundtrip-host-a.png` (recognisable viewport/time/selection pre-transfer) and `roundtrip-host-b.png` (restored from `features.geojson` only) into `specs/261-session-state-systemstate/evidence/screenshots/`, plus `features-before.json`/`features-after.json` showing the `state.*` features appear. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
 
 ## Phase 5: User Story 3 — Feature visibility as a per-feature property (P2)
 
@@ -202,7 +202,7 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 ### Tests + E2E (SC-004)
 
 - [x] T084 [P][test] Visibility round-trip unit/integration: `applyVisibilityToFeatureCollection` then `readHiddenFeatureIds` is identity; absent `visible` ⇒ visible; a revealed feature clears the flag. File: `services/session-state/src/system-state/__tests__/visibility.roundtrip.test.ts`.
-- [ ] T085 [test] Playwright web-shell spec: hide two features → save → reload → reopen `features.geojson` only → same two hidden; assert the file carries `visible: false` on exactly those ids. Writes `visibility-host-a.png` / `visibility-host-b.png` into `specs/261-session-state-systemstate/evidence/screenshots/`. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
+- [x] T085 [test] Playwright web-shell spec: hide two features → save → reload → reopen `features.geojson` only → same two hidden; assert the file carries `visible: false` on exactly those ids. Writes `visibility-host-a.png` / `visibility-host-b.png` into `specs/261-session-state-systemstate/evidence/screenshots/`. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
 
 ## Phase 6: User Story 2 — Delete the sidecar (P1)
 
@@ -214,7 +214,7 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 - [x] T091 Remove the `@debrief/session-state` re-exports of the deleted sidecar functions/types. File: `services/session-state/src/index.ts`.
 - [x] T092 Update remaining consumers identified in T004 so the build is clean (e.g. `apps/vscode/src/services/sessionManager.ts`, `services/session-state/src/standalone.ts`, the MCP server) — none should import the deleted functions. Files: per T004 inventory.
 - [x] T093 [test] Remove or rewrite tests that exercised the deleted sidecar functions (the `persistence` load/save/round-trip suites) — replace assertions with the FC-based hydrate/extract path where still relevant. Files: `services/session-state/src/persistence/__tests__/**` (and any sidecar fixtures).
-- [ ] T094 [test] Two-file-invariant check (SC-002): after a save, assert the item directory contains only `item.json` + `features.geojson` (+ thumbnail assets) and no `*.debrief-session`; capture `dir-listing-after.txt`. Add the repo grep guard (`grep -rn "debrief-session" apps services --include='*.ts' | grep -v generated` ⇒ empty). File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts` (extend) + `specs/261-session-state-systemstate/evidence/dir-listing-after.txt`.
+- [x] T094 [test] Two-file-invariant check (SC-002): after a save, assert the item directory contains only `item.json` + `features.geojson` (+ thumbnail assets) and no `*.debrief-session`; capture `dir-listing-after.txt`. Add the repo grep guard (`grep -rn "debrief-session" apps services --include='*.ts' | grep -v generated` ⇒ empty). File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts` (extend) + `specs/261-session-state-systemstate/evidence/dir-listing-after.txt`.
 - [x] T095 Run `pnpm exec knip` (and `task verify` lint+typecheck) to confirm no dead exports/files remain from the sidecar deletion. No file path.
 
 ## Phase 7: Polish & Cross-Cutting Concerns

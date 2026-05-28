@@ -1,0 +1,759 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "track-hms-defender",
+      "properties": {
+        "id": "track-hms-defender",
+        "kind": "TRACK",
+        "name": "HMS Defender",
+        "platformType": "OWNSHIP",
+        "color": "#2196F3",
+        "times": [
+          1705311000000,
+          1705312200000,
+          1705313400000,
+          1705314600000,
+          1705315800000,
+          1705317000000,
+          1705318200000,
+          1705319400000,
+          1705320600000,
+          1705321800000,
+          1705323000000,
+          1705324200000,
+          1705325400000,
+          1705326600000,
+          1705327200000
+        ],
+        "positions": [
+          {
+            "time": "2024-01-15T09:30:00Z",
+            "course": 330,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T09:50:00Z",
+            "course": 330,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T10:10:00Z",
+            "course": 332,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T10:30:00Z",
+            "course": 332,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T10:50:00Z",
+            "course": 331,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T11:10:00Z",
+            "course": 331,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T11:30:00Z",
+            "course": 330,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T11:50:00Z",
+            "course": 330,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T12:10:00Z",
+            "course": 329,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T12:30:00Z",
+            "course": 329,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T12:50:00Z",
+            "course": 330,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T13:10:00Z",
+            "course": 330,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T13:30:00Z",
+            "course": 331,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T13:50:00Z",
+            "course": 331,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T14:00:00Z",
+            "course": 330,
+            "speed": 5
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1H",
+        "label_interval": "PT2H"
+      }
+    },
+    {
+      "id": "track-uss-freedom",
+      "properties": {
+        "id": "track-uss-freedom",
+        "kind": "TRACK",
+        "name": "USS Freedom",
+        "platformType": "CONTACT",
+        "color": "#4CAF50",
+        "times": [
+          1705311000000,
+          1705312200000,
+          1705313400000,
+          1705314600000,
+          1705315800000,
+          1705317000000,
+          1705318200000,
+          1705319400000,
+          1705320600000,
+          1705321800000,
+          1705323000000,
+          1705324200000,
+          1705325400000,
+          1705326600000,
+          1705327200000
+        ],
+        "positions": [
+          {
+            "time": "2024-01-15T09:30:00Z",
+            "course": 210,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T09:50:00Z",
+            "course": 210,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T10:10:00Z",
+            "course": 212,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T10:30:00Z",
+            "course": 212,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T10:50:00Z",
+            "course": 211,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T11:10:00Z",
+            "course": 211,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T11:30:00Z",
+            "course": 210,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T11:50:00Z",
+            "course": 210,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T12:10:00Z",
+            "course": 209,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T12:30:00Z",
+            "course": 209,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T12:50:00Z",
+            "course": 210,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T13:10:00Z",
+            "course": 210,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T13:30:00Z",
+            "course": 211,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T13:50:00Z",
+            "course": 211,
+            "speed": 5
+          },
+          {
+            "time": "2024-01-15T14:00:00Z",
+            "course": 210,
+            "speed": 5
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1H",
+        "label_interval": "PT2H"
+      }
+    },
+    {
+      "id": "loc-alpha-point",
+      "properties": {
+        "id": "loc-alpha-point",
+        "kind": "POINT",
+        "name": "Alpha Point",
+        "locationType": "WAYPOINT"
+      }
+    },
+    {
+      "id": "loc-bravo-datum",
+      "properties": {
+        "id": "loc-bravo-datum",
+        "kind": "POINT",
+        "name": "Bravo Datum",
+        "locationType": "REFERENCE"
+      }
+    },
+    {
+      "id": "circle-exclusion-zone",
+      "properties": {
+        "id": "circle-exclusion-zone",
+        "kind": "CIRCLE",
+        "center": [
+          -4.11,
+          50.283
+        ],
+        "radius": 500,
+        "label": "Exclusion Zone",
+        "style": {
+          "fill": true,
+          "fill_color": "#F44336",
+          "fill_opacity": 0.2,
+          "stroke": true,
+          "color": "#F44336",
+          "weight": 2,
+          "opacity": 0.8
+        }
+      }
+    },
+    {
+      "id": "rect-exercise-area",
+      "properties": {
+        "id": "rect-exercise-area",
+        "kind": "RECTANGLE",
+        "label": "Weapons-Hold Zone Charlie",
+        "style": {
+          "fill": true,
+          "fill_color": "#2196F3",
+          "fill_opacity": 0.1,
+          "stroke": true,
+          "color": "#2196F3",
+          "weight": 2,
+          "opacity": 0.6,
+          "dash_array": "10, 5"
+        }
+      }
+    },
+    {
+      "id": "line-sector-boundary",
+      "properties": {
+        "id": "line-sector-boundary",
+        "kind": "LINE",
+        "label": "Sector Boundary",
+        "style": {
+          "stroke": true,
+          "color": "#795548",
+          "weight": 3,
+          "opacity": 0.7,
+          "dash_array": "15, 10"
+        }
+      }
+    },
+    {
+      "id": "vector-wind",
+      "properties": {
+        "id": "vector-wind",
+        "kind": "VECTOR",
+        "origin": [
+          -4.12,
+          50.298
+        ],
+        "range": 1200,
+        "bearing": 135,
+        "label": "Wind Direction",
+        "style": {
+          "stroke": true,
+          "color": "#607D8B",
+          "weight": 2,
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "id": "text-nav-warning",
+      "properties": {
+        "id": "text-nav-warning",
+        "kind": "TEXT",
+        "text": "NAV WARNING: Restricted area",
+        "label": "Nav Warning",
+        "style": {
+          "color": "#FF5722",
+          "weight": 1,
+          "opacity": 1
+        }
+      }
+    },
+    {
+      "id": "timetext-contact-report",
+      "properties": {
+        "id": "timetext-contact-report",
+        "kind": "TIMETEXT",
+        "text": "Contact bearing 045",
+        "label": "Contact Report",
+        "time": "2024-01-15T11:00:00Z",
+        "style": {
+          "color": "#9C27B0",
+          "weight": 1,
+          "opacity": 1
+        }
+      }
+    },
+    {
+      "id": "periodtext-exercise-phase",
+      "properties": {
+        "id": "periodtext-exercise-phase",
+        "kind": "PERIODTEXT",
+        "text": "Phase 2: ASW Ops",
+        "label": "Exercise Phase",
+        "start_time": "2024-01-15T11:00:00Z",
+        "end_time": "2024-01-15T13:00:00Z",
+        "style": {
+          "color": "#3F51B5",
+          "weight": 1,
+          "opacity": 1
+        }
+      }
+    },
+    {
+      "id": "poly-minefield",
+      "properties": {
+        "id": "poly-minefield",
+        "kind": "POLY",
+        "label": "Suspected Minefield",
+        "style": {
+          "fill": true,
+          "fill_color": "#FF9800",
+          "fill_opacity": 0.25,
+          "stroke": true,
+          "color": "#FF9800",
+          "weight": 2,
+          "opacity": 0.8,
+          "dash_array": "5, 5"
+        }
+      }
+    },
+    {
+      "id": "polyline-shipping-lane",
+      "properties": {
+        "id": "polyline-shipping-lane",
+        "kind": "POLYLINE",
+        "label": "Shipping Lane Boundary",
+        "style": {
+          "stroke": true,
+          "color": "#009688",
+          "weight": 2,
+          "opacity": 0.7,
+          "dash_array": "8, 4"
+        }
+      }
+    },
+    {
+      "id": "ellipse-uncertainty",
+      "properties": {
+        "id": "ellipse-uncertainty",
+        "kind": "ELLIPSE",
+        "center": [
+          -4.1,
+          50.2645
+        ],
+        "semi_major": 400,
+        "semi_minor": 200,
+        "orientation": 30,
+        "label": "Position Uncertainty",
+        "time": "2024-01-15T11:30:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#E91E63",
+          "fill_opacity": 0.15,
+          "stroke": true,
+          "color": "#E91E63",
+          "weight": 1,
+          "opacity": 0.7
+        }
+      }
+    },
+    {
+      "id": "ellipse2-search-area",
+      "properties": {
+        "id": "ellipse2-search-area",
+        "kind": "ELLIPSE2",
+        "center": [
+          -4.1375,
+          50.2698
+        ],
+        "semi_major": 350,
+        "semi_minor": 180,
+        "orientation": 60,
+        "label": "Search Area Estimate",
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T12:00:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#673AB7",
+          "fill_opacity": 0.15,
+          "stroke": true,
+          "color": "#673AB7",
+          "weight": 1,
+          "opacity": 0.7,
+          "dash_array": "4, 4"
+        }
+      }
+    },
+    {
+      "id": "wheel-sonar",
+      "properties": {
+        "id": "wheel-sonar",
+        "kind": "WHEEL",
+        "label": "Sonar Coverage",
+        "radius": 600,
+        "inner_radius": 200,
+        "spoke_count": 8,
+        "style": {
+          "stroke": true,
+          "color": "#00BCD4",
+          "weight": 1,
+          "opacity": 0.6
+        }
+      }
+    },
+    {
+      "id": "dynrect-patrol-box",
+      "properties": {
+        "id": "dynrect-patrol-box",
+        "kind": "DYNAMIC_RECT",
+        "label": "Patrol Box",
+        "group": "patrol-alpha",
+        "time": "2024-01-15T10:30:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#CDDC39",
+          "fill_opacity": 0.2,
+          "stroke": true,
+          "color": "#CDDC39",
+          "weight": 2,
+          "opacity": 0.8
+        }
+      }
+    },
+    {
+      "id": "dyncircle-guard-zone",
+      "properties": {
+        "id": "dyncircle-guard-zone",
+        "kind": "DYNAMIC_CIRCLE",
+        "center": [
+          -4.1525,
+          50.292
+        ],
+        "radius": 300,
+        "label": "Guard Zone",
+        "group": "guard-bravo",
+        "time": "2024-01-15T11:00:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#FF5722",
+          "fill_opacity": 0.15,
+          "stroke": true,
+          "color": "#FF5722",
+          "weight": 2,
+          "opacity": 0.7
+        }
+      }
+    },
+    {
+      "id": "dynpoly-moving-zone",
+      "properties": {
+        "id": "dynpoly-moving-zone",
+        "kind": "DYNAMIC_POLY",
+        "label": "Moving Exclusion Zone",
+        "group": "exclusion-charlie",
+        "time": "2024-01-15T12:00:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#795548",
+          "fill_opacity": 0.2,
+          "stroke": true,
+          "color": "#795548",
+          "weight": 2,
+          "opacity": 0.8,
+          "dash_array": "6, 3"
+        }
+      }
+    },
+    {
+      "id": "sensor-bearing-1",
+      "properties": {
+        "id": "sensor-bearing-1",
+        "kind": "SENSOR",
+        "label": "Sonar Contact B1",
+        "sensor_type": "SONAR",
+        "bearing": 210,
+        "range": 800,
+        "origin": [
+          -4.115,
+          50.278
+        ],
+        "time": "2024-01-15T11:15:00Z",
+        "style": {
+          "stroke": true,
+          "color": "#E91E63",
+          "weight": 1,
+          "opacity": 0.6,
+          "dash_array": "3, 3"
+        }
+      }
+    },
+    {
+      "id": "sensor2-bearing-only",
+      "properties": {
+        "id": "sensor2-bearing-only",
+        "kind": "SENSOR2",
+        "label": "Passive Bearing B2",
+        "sensor_type": "PASSIVE",
+        "bearing": 225,
+        "origin": [
+          -4.115,
+          50.278
+        ],
+        "time": "2024-01-15T11:20:00Z",
+        "style": {
+          "stroke": true,
+          "color": "#9C27B0",
+          "weight": 1,
+          "opacity": 0.5,
+          "dash_array": "2, 4"
+        }
+      }
+    },
+    {
+      "id": "tma-pos-estimate",
+      "properties": {
+        "id": "tma-pos-estimate",
+        "kind": "TMA_POS",
+        "label": "TMA Solution",
+        "center": [
+          -4.104,
+          50.2705
+        ],
+        "semi_major": 250,
+        "semi_minor": 150,
+        "orientation": 45,
+        "course": 180,
+        "speed": 12,
+        "time": "2024-01-15T11:45:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#FF9800",
+          "fill_opacity": 0.2,
+          "stroke": true,
+          "color": "#FF9800",
+          "weight": 2,
+          "opacity": 0.8
+        }
+      }
+    },
+    {
+      "id": "narrative-entry-1",
+      "properties": {
+        "id": "narrative-entry-1",
+        "kind": "NARRATIVE",
+        "text": "Exercise Alpha commenced. HMS Defender departing Plymouth.",
+        "time": "2024-01-15T09:30:00Z"
+      }
+    },
+    {
+      "id": "narrative-entry-2",
+      "properties": {
+        "id": "narrative-entry-2",
+        "kind": "NARRATIVE",
+        "text": "Sonar contact bearing 210, classified probable submarine.",
+        "time": "2024-01-15T11:15:00Z"
+      }
+    },
+    {
+      "id": "narrative-entry-3",
+      "properties": {
+        "id": "narrative-entry-3",
+        "kind": "NARRATIVE",
+        "text": "Exercise Alpha complete. All units returning to port.",
+        "time": "2024-01-15T14:00:00Z"
+      }
+    },
+    {
+      "id": "stats-7d4fdb4a",
+      "properties": {
+        "source_track": "unknown",
+        "source_name": "USS Freedom",
+        "statistics": {
+          "point_count": 15,
+          "duration_hours": 0,
+          "distance_nm": 2.22,
+          "average_speed_kts": 0
+        },
+        "kind": "track-statistics",
+        "provenance": {
+          "tool": "track-stats",
+          "version": "1.0.0",
+          "timestamp": "2026-02-05T14:08:36.599191Z",
+          "sources": [
+            {
+              "id": "unknown",
+              "kind": "track"
+            }
+          ],
+          "parameters": {}
+        }
+      }
+    },
+    {
+      "id": "multipoint-sonar-contacts",
+      "properties": {
+        "id": "multipoint-sonar-contacts",
+        "kind": "MULTI_POINT",
+        "label": "Sonar Contact Cluster",
+        "style": {
+          "shape": "triangle",
+          "radius": 7,
+          "fill": true,
+          "fill_color": "#E91E63",
+          "fill_opacity": 0.8,
+          "stroke": true,
+          "color": "#880E4F",
+          "weight": 2,
+          "opacity": 1
+        },
+        "source_tool": "sonar-contact-localiser",
+        "source_features": [
+          "track-hms-defender"
+        ],
+        "description": "Sonar contact positions from passive array during ASW phase"
+      }
+    },
+    {
+      "id": "multipolygon-patrol-zones",
+      "properties": {
+        "id": "multipolygon-patrol-zones",
+        "kind": "MULTI_POLYGON",
+        "label": "Assigned Patrol Zones",
+        "style": {
+          "fill": true,
+          "fill_color": "#009688",
+          "fill_opacity": 0.15,
+          "stroke": true,
+          "color": "#00695C",
+          "weight": 2,
+          "opacity": 0.8,
+          "dash_array": "8, 4"
+        },
+        "source_tool": "zone-allocator",
+        "source_features": [
+          "track-hms-defender",
+          "track-uss-freedom"
+        ],
+        "description": "Patrol zones allocated to exercise participants"
+      }
+    },
+    {
+      "id": "state.temporal",
+      "properties": {
+        "kind": "SYSTEM",
+        "state_type": "temporal",
+        "start_time": "2024-01-15T09:30:00.000Z",
+        "end_time": "2024-01-15T14:00:00.000Z",
+        "display_mode": "full",
+        "step_size": {
+          "value": 1,
+          "unit": "minute"
+        },
+        "playback_rate": 1,
+        "current_time": "2024-01-15T11:45:00.000Z"
+      }
+    },
+    {
+      "id": "state.spatial",
+      "properties": {
+        "kind": "SYSTEM",
+        "state_type": "spatial",
+        "viewport": {
+          "coordinates": [
+            {
+              "longitude": -4.5,
+              "latitude": 50.8
+            },
+            {
+              "longitude": -3,
+              "latitude": 50.8
+            },
+            {
+              "longitude": -3,
+              "latitude": 50
+            },
+            {
+              "longitude": -4.5,
+              "latitude": 50
+            }
+          ],
+          "zoom": 9
+        },
+        "rotation": 0
+      }
+    },
+    {
+      "id": "state.selection",
+      "properties": {
+        "kind": "SYSTEM",
+        "state_type": "selection",
+        "selected_ids": [
+          "track-hms-defender"
+        ],
+        "selected_primary": "track-hms-defender"
+      }
+    }
+  ]
+}

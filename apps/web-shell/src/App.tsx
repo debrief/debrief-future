@@ -167,6 +167,10 @@ declare global {
      *  captured without smuggling a pre-#259 fixture through the bundled
      *  catalog's pre-loaded cache. */
     __triggerPlotValidation?: (fc: FeatureCollection) => void;
+    /** #261 — Playwright hook: open a plot from a supplied FeatureCollection
+     *  (a fresh store hydrated from the file alone), simulating "transfer ONLY
+     *  features.geojson to another host" for the self-describing round-trip. */
+    __openPlotFromFeatures?: (itemPath: string, features: unknown[]) => void;
   }
 }
 window.__sessionStore = getSessionStore();
@@ -669,7 +673,38 @@ export default function App() {
   useEffect(() => {
     window.__openPlot = handlePlotSelect;
     window.__backToCatalog = handleBackToCatalog;
-    return () => { delete window.__openPlot; delete window.__backToCatalog; };
+    // Feature 261 test hook: open a plot from a supplied FeatureCollection
+    // (rather than the bundled catalog), simulating "transfer ONLY
+    // features.geojson to another host" — a fresh store hydrated from the file
+    // alone (US1). Drives the same reset + hydrate path handlePlotSelect uses.
+    window.__openPlotFromFeatures = (itemPath: string, features: unknown[]): void => {
+      resetSessionStore();
+      const fresh = getSessionStore();
+      window.__sessionStore = fresh;
+      fresh.getState().setFeatureCollectionUri(itemPath);
+      try {
+        hydrateStoreFromFeatures(fresh.getState(), features as DebriefFeature[]);
+      } catch (err) {
+        if (err instanceof SystemStateLoadError) {
+          setPlotLoadError({ code: err.kind, message: err.message });
+          return;
+        }
+        throw err;
+      }
+      fresh.getState().clearHistory();
+      fresh.getState().markClean();
+      const transferredFc: PlotState['features'] = {
+        type: 'FeatureCollection',
+        features: features as Feature[],
+      };
+      setCurrentPlot({ itemPath, title: itemPath, features: transferredFc });
+      setView('analysis');
+    };
+    return () => {
+      delete window.__openPlot;
+      delete window.__backToCatalog;
+      delete window.__openPlotFromFeatures;
+    };
   }, [handlePlotSelect, handleBackToCatalog]);
 
   // Restore original features for a reverted activity
