@@ -152,9 +152,10 @@ attributes:
     name: href
     description: Relative path to artifact file (REQUIRED for artifacts)
     from_schema: https://debrief.com/schemas/tool-result
-    rank: 1000
     slot_uri: debrief:href
     domain_of:
+    - StacLink
+    - StacAsset
     - ToolResultAnnotations
     - SceneThumbnailAssetEntry
     range: string
@@ -239,11 +240,12 @@ attributes:
     name: href
     description: Relative path to artifact file (REQUIRED for artifacts)
     from_schema: https://debrief.com/schemas/tool-result
-    rank: 1000
     slot_uri: debrief:href
     alias: href
     owner: ToolResultAnnotations
     domain_of:
+    - StacLink
+    - StacAsset
     - ToolResultAnnotations
     - SceneThumbnailAssetEntry
     range: string

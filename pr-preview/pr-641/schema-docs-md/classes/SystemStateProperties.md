@@ -211,6 +211,8 @@ attributes:
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacSpatialExtent
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     range: float
@@ -351,6 +353,8 @@ attributes:
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacSpatialExtent
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     range: float

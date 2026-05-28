@@ -49,6 +49,7 @@ URI: [debrief:class/GeoJSONEmptyPoint](https://debrief.info/schemas/class/GeoJSO
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [SystemState](../classes/SystemState.md) | [geometry](../slots/geometry.md) | range | [GeoJSONEmptyPoint](../classes/GeoJSONEmptyPoint.md) |
+| [StacItem](../classes/StacItem.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONEmptyPoint](../classes/GeoJSONEmptyPoint.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONEmptyPoint](../classes/GeoJSONEmptyPoint.md) |
 
 
@@ -123,6 +124,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -193,6 +200,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata

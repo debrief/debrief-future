@@ -3,7 +3,7 @@
 # Class: Any 
 
 
-_Permissive wildcard class used for free-form JSON object ranges (e.g., RawGeoJSONFeature.properties). Maps to dict[str, object] in Pydantic and Record<string, unknown> in TypeScript after generator post-processing. This is the LinkML idiom for RFC 7946 §3.2 free-form properties and is NOT a violation of Article XV — see docs/project_notes/decisions.md (RawGeoJSONFeature ADR)._
+_Wildcard class used for open-record extension-properties slots (StacItemProperties additional keys, StacAsset additional keys, StacSummaries additional keys). Maps to dict[str, object] in Pydantic and Record<string, unknown> in TypeScript. Article XV.2 exception documented in plan.md Complexity Tracking — see also raw-geojson.yaml `Any` precedent._
 
 
 
@@ -42,6 +42,8 @@ URI: [linkml:Any](https://w3id.org/linkml/Any)
 
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
+| [StacItem](../classes/StacItem.md) | [assets](../slots/assets.md) | range | [Any](../classes/Any.md) |
+| [StacCollection](../classes/StacCollection.md) | [item_assets](../slots/item_assets.md) | range | [Any](../classes/Any.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [properties](../slots/properties.md) | range | [Any](../classes/Any.md) |
 | [MCPRequest](../classes/MCPRequest.md) | [input](../slots/input.md) | range | [Any](../classes/Any.md) |
 | [MCPContentItem](../classes/MCPContentItem.md) | [resource](../slots/resource.md) | range | [Any](../classes/Any.md) |
@@ -103,11 +105,11 @@ URI: [linkml:Any](https://w3id.org/linkml/Any)
 <details>
 ```yaml
 name: Any
-description: Permissive wildcard class used for free-form JSON object ranges (e.g.,
-  RawGeoJSONFeature.properties). Maps to dict[str, object] in Pydantic and Record<string,
-  unknown> in TypeScript after generator post-processing. This is the LinkML idiom
-  for RFC 7946 §3.2 free-form properties and is NOT a violation of Article XV — see
-  docs/project_notes/decisions.md (RawGeoJSONFeature ADR).
+description: Wildcard class used for open-record extension-properties slots (StacItemProperties
+  additional keys, StacAsset additional keys, StacSummaries additional keys). Maps
+  to dict[str, object] in Pydantic and Record<string, unknown> in TypeScript. Article
+  XV.2 exception documented in plan.md Complexity Tracking — see also raw-geojson.yaml
+  `Any` precedent.
 from_schema: https://debrief.info/schemas/debrief
 class_uri: linkml:Any
 
@@ -119,11 +121,11 @@ class_uri: linkml:Any
 <details>
 ```yaml
 name: Any
-description: Permissive wildcard class used for free-form JSON object ranges (e.g.,
-  RawGeoJSONFeature.properties). Maps to dict[str, object] in Pydantic and Record<string,
-  unknown> in TypeScript after generator post-processing. This is the LinkML idiom
-  for RFC 7946 §3.2 free-form properties and is NOT a violation of Article XV — see
-  docs/project_notes/decisions.md (RawGeoJSONFeature ADR).
+description: Wildcard class used for open-record extension-properties slots (StacItemProperties
+  additional keys, StacAsset additional keys, StacSummaries additional keys). Maps
+  to dict[str, object] in Pydantic and Record<string, unknown> in TypeScript. Article
+  XV.2 exception documented in plan.md Complexity Tracking — see also raw-geojson.yaml
+  `Any` precedent.
 from_schema: https://debrief.info/schemas/debrief
 class_uri: linkml:Any
 

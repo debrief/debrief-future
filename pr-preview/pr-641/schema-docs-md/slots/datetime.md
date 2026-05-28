@@ -17,8 +17,9 @@ Alias: datetime
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [PlotSummary](../classes/PlotSummary.md) | Projection of a STAC Item for UI consumption (e |  no  |
+| [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
 | [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
+| [PlotSummary](../classes/PlotSummary.md) | Projection of a STAC Item for UI consumption (e |  no  |
 
 
 
@@ -84,6 +85,7 @@ alias: datetime
 domain_of:
 - PlotSummary
 - StacItemSummary
+- StacItemProperties
 range: string
 
 ```

@@ -157,6 +157,9 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
@@ -172,6 +175,12 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - DatasetEntry
     - SceneProperties
     - SceneThumbnailAssetEntry
@@ -184,6 +193,7 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
     range: string
     required: false
   item_path:
@@ -224,6 +234,8 @@ attributes:
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacSpatialExtent
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     range: float
@@ -238,6 +250,7 @@ attributes:
     rank: 1000
     domain_of:
     - StacItemSummary
+    - StacItemProperties
     range: string
     required: false
   end_datetime:
@@ -247,6 +260,7 @@ attributes:
     rank: 1000
     domain_of:
     - StacItemSummary
+    - StacItemProperties
     range: string
     required: false
   platforms:
@@ -327,6 +341,9 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
@@ -344,6 +361,12 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - DatasetEntry
     - SceneProperties
     - SceneThumbnailAssetEntry
@@ -358,6 +381,7 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
     range: string
     required: false
   item_path:
@@ -406,6 +430,8 @@ attributes:
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacSpatialExtent
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     range: float
@@ -422,6 +448,7 @@ attributes:
     owner: StacItemSummary
     domain_of:
     - StacItemSummary
+    - StacItemProperties
     range: string
     required: false
   end_datetime:
@@ -433,6 +460,7 @@ attributes:
     owner: StacItemSummary
     domain_of:
     - StacItemSummary
+    - StacItemProperties
     range: string
     required: false
   platforms:

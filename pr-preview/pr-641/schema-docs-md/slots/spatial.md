@@ -17,6 +17,7 @@ Alias: spatial
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
+| [StacExtent](../classes/StacExtent.md) | Spatial + temporal extent on a Collection |  no  |
 | [SessionFile](../classes/SessionFile.md) | Persisted session file format (FR-024) |  no  |
 | [SessionState](../classes/SessionState.md) | Root entity containing all session state slices (FR-001, FR-002) |  no  |
 
@@ -57,6 +58,7 @@ Alias: spatial
 name: spatial
 alias: spatial
 domain_of:
+- StacExtent
 - SessionState
 - SessionFile
 range: string

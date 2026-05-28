@@ -148,8 +148,8 @@ attributes:
     name: temporal
     description: Time-related state
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     domain_of:
+    - StacExtent
     - SessionState
     - SessionFile
     range: TemporalSlice
@@ -158,8 +158,8 @@ attributes:
     name: spatial
     description: Geographic view state
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     domain_of:
+    - StacExtent
     - SessionState
     - SessionFile
     range: SpatialSlice
@@ -214,10 +214,10 @@ attributes:
     name: temporal
     description: Time-related state
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     alias: temporal
     owner: SessionState
     domain_of:
+    - StacExtent
     - SessionState
     - SessionFile
     range: TemporalSlice
@@ -226,10 +226,10 @@ attributes:
     name: spatial
     description: Geographic view state
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     alias: spatial
     owner: SessionState
     domain_of:
+    - StacExtent
     - SessionState
     - SessionFile
     range: SpatialSlice

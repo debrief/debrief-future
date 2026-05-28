@@ -160,6 +160,7 @@ attributes:
     description: Temporal state (excluding ephemeral playbackState)
     from_schema: https://debrief.info/schemas/session-state
     domain_of:
+    - StacExtent
     - SessionState
     - SessionFile
     range: TemporalSlice
@@ -169,6 +170,7 @@ attributes:
     description: Spatial state
     from_schema: https://debrief.info/schemas/session-state
     domain_of:
+    - StacExtent
     - SessionState
     - SessionFile
     range: SpatialSlice
@@ -237,6 +239,7 @@ attributes:
     alias: temporal
     owner: SessionFile
     domain_of:
+    - StacExtent
     - SessionState
     - SessionFile
     range: TemporalSlice
@@ -248,6 +251,7 @@ attributes:
     alias: spatial
     owner: SessionFile
     domain_of:
+    - StacExtent
     - SessionState
     - SessionFile
     range: SpatialSlice

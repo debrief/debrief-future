@@ -3,11 +3,6 @@
 # Slot: roles 
 
 
-_Exactly ["thumbnail"]. Storyboarding-derived thumbnails are not declared as overview (which is reserved for plot-level overviews of dimensions 600x800)._
-
-
-
-
 
 URI: [debrief:slot/roles](https://debrief.info/schemas/slot/roles)
 Alias: roles
@@ -22,7 +17,10 @@ Alias: roles
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
+| [StacItemAssetDefinition](../classes/StacItemAssetDefinition.md) | Item Asset Definition Object — declares the shape of an asset that child Item... |  no  |
+| [StacAsset](../classes/StacAsset.md) | A single asset entry within `assets[<key>]` |  no  |
 | [SceneThumbnailAssetEntry](../classes/SceneThumbnailAssetEntry.md) | A single STAC Item asset entry produced by Storyboarding (#216) for one |  no  |
+| [StacProvider](../classes/StacProvider.md) | STAC provider entry |  no  |
 
 
 
@@ -33,10 +31,6 @@ Alias: roles
 
 * Range: [String](../types/String.md)
 
-* Multivalued: True
-
-* Required: True
-
 
 
 
@@ -44,13 +38,6 @@ Alias: roles
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -70,17 +57,13 @@ Alias: roles
 <details>
 ```yaml
 name: roles
-description: Exactly ["thumbnail"]. Storyboarding-derived thumbnails are not declared
-  as overview (which is reserved for plot-level overviews of dimensions 600x800).
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: roles
-owner: SceneThumbnailAssetEntry
 domain_of:
+- StacProvider
+- StacAsset
+- StacItemAssetDefinition
 - SceneThumbnailAssetEntry
 range: string
-required: true
-multivalued: true
 
 ```
 </details>

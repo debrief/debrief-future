@@ -24,6 +24,7 @@ Alias: provenance_log
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
+| [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
 | [StacExtensionProperties](../classes/StacExtensionProperties.md) | Extension properties added to STAC item |  no  |
 
 

@@ -51,6 +51,7 @@ URI: [debrief:class/GeoJSONPolygon](https://debrief.info/schemas/class/GeoJSONPo
 | [CircleAnnotation](../classes/CircleAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [RectangleAnnotation](../classes/RectangleAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [PolyAnnotation](../classes/PolyAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
+| [StacItem](../classes/StacItem.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [StoryboardFeature](../classes/StoryboardFeature.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [SceneFeature](../classes/SceneFeature.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
@@ -127,6 +128,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -196,6 +203,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata

@@ -49,6 +49,7 @@ URI: [debrief:class/GeoJSONMultiPolygon](https://debrief.info/schemas/class/GeoJ
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [MultiPolygonFeature](../classes/MultiPolygonFeature.md) | [geometry](../slots/geometry.md) | range | [GeoJSONMultiPolygon](../classes/GeoJSONMultiPolygon.md) |
+| [StacItem](../classes/StacItem.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiPolygon](../classes/GeoJSONMultiPolygon.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiPolygon](../classes/GeoJSONMultiPolygon.md) |
 
 
@@ -123,6 +124,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -192,6 +199,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata

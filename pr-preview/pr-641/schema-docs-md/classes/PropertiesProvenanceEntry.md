@@ -63,6 +63,7 @@ URI: [debrief:class/PropertiesProvenanceEntry](https://debrief.info/schemas/clas
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [StacExtensionProperties](../classes/StacExtensionProperties.md) | [provenance_log](../slots/provenance_log.md) | range | [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) |
+| [StacItemProperties](../classes/StacItemProperties.md) | [provenance_log](../slots/provenance_log.md) | range | [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) |
 
 
 

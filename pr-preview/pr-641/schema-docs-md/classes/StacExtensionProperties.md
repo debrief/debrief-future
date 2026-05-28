@@ -22,6 +22,9 @@ URI: [debrief:class/StacExtensionProperties](https://debrief.info/schemas/class/
  classDiagram
     class StacExtensionProperties
     click StacExtensionProperties href "../../classes/StacExtensionProperties/"
+      StacExtensionProperties <|-- StacItemProperties
+        click StacItemProperties href "../../classes/StacItemProperties/"
+      
       StacExtensionProperties : feature_tags
         
       StacExtensionProperties : overrides

@@ -76,6 +76,8 @@ URI: [debrief:class/PlatformRecord](https://debrief.info/schemas/class/PlatformR
 | ---  | --- | --- | --- |
 | [StacExtensionProperties](../classes/StacExtensionProperties.md) | [platforms](../slots/platforms.md) | range | [PlatformRecord](../classes/PlatformRecord.md) |
 | [StacItemSummary](../classes/StacItemSummary.md) | [platforms](../slots/platforms.md) | range | [PlatformRecord](../classes/PlatformRecord.md) |
+| [StacItemProperties](../classes/StacItemProperties.md) | [platforms](../slots/platforms.md) | range | [PlatformRecord](../classes/PlatformRecord.md) |
+| [StacSummaries](../classes/StacSummaries.md) | [debrief_platforms](../slots/debrief_platforms.md) | range | [PlatformRecord](../classes/PlatformRecord.md) |
 
 
 
@@ -148,6 +150,9 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
@@ -168,6 +173,7 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
@@ -261,6 +267,9 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
@@ -284,6 +293,7 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties

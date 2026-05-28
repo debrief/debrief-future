@@ -51,6 +51,7 @@ URI: [debrief:class/GeoJSONLineString](https://debrief.info/schemas/class/GeoJSO
 | [TrackFeature](../classes/TrackFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONLineString](../classes/GeoJSONLineString.md) |
 | [LineAnnotation](../classes/LineAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONLineString](../classes/GeoJSONLineString.md) |
 | [VectorAnnotation](../classes/VectorAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONLineString](../classes/GeoJSONLineString.md) |
+| [StacItem](../classes/StacItem.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONLineString](../classes/GeoJSONLineString.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONLineString](../classes/GeoJSONLineString.md) |
 
 
@@ -125,6 +126,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -194,6 +201,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
