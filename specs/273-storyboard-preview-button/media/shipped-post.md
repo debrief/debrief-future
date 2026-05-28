@@ -37,11 +37,32 @@ The briefing renderer is the same player that already ships inside exported zips
 
 ## Screenshots
 
+It starts with one button. The Preview control sits beside Capture in the storyboard panel header — active whenever the storyboard has at least one scene, disabled with an explanatory tooltip when it doesn't.
+
 ![Preview button beside Capture in the StoryboardPanel header, light theme](images/storyboard-preview-light.png)
-*The Preview button sits next to Capture in the panel header. It is active whenever the storyboard contains at least one scene.*
+*The trigger: click Preview in the panel header.*
+
+Clicking it opens the finished-briefing player in a new tab and plays the storyboard back — the same renderer that ships inside an exported zip, here driven live. Below is the Channel Crossing briefing playing scene by scene: two vessels tracking through the English Channel and North Sea, the viewport framing and flying to each captured scene in turn.
+
+![Scene 1 — exercise overview: both vessel tracks across the Channel](images/preview-scene-1-overview.png)
+*Scene 1 — the opening overview frames both tracks.*
+
+![Scene 2 — the viewport flies in to follow the approach](images/preview-scene-2-approach.png)
+*Scene 2 — Preview flies the viewport to the next captured framing.*
+
+![Scene 3 — convergence near the Dover Strait](images/preview-scene-3-convergence.png)
+*Scene 3 — convergence near the Dover Strait.*
+
+![Scene 4 — the time-range scene scrubs the closing phase](images/preview-scene-4-timerange.png)
+*Scene 4 — a time-range scene animates the closing phase, slider-driven, exactly as the exported zip would.*
+
+![Present mode — all chrome hidden, the map fills the screen](images/preview-present-mode.png)
+*Press P for Present mode — chrome hides and the map fills the screen.*
+
+And when there is nothing to preview yet, the button stays out of the way:
 
 ![Preview button disabled with tooltip when storyboard has no scenes](images/preview-disabled-no-scenes.png)
-*When there are no scenes yet, the button is disabled and a tooltip explains why — the same pattern used elsewhere in the panel.*
+*With no scenes captured, the button is disabled and a tooltip explains why.*
 
 ## By the Numbers
 
