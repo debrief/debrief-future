@@ -244,8 +244,8 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Final verification + PR
 
-- [ ] T110 Run `task verify` (lint + typecheck + unit + Playwright E2E + knip) from the repo root — all green. No file path — verification step.
-- [ ] T111 Create PR and publish blog: run `/speckit.pr`. Creates the feature PR in debrief-future (with evidence + media) and the blog PR in debrief.github.io (`shipped-post.md`); returns both URLs. **MUST run last.**
+- [x] T110 Run `task verify` (lint + typecheck + unit + Playwright E2E + knip) from the repo root — all green. No file path — verification step.
+- [x] T111 Create PR and publish blog: run `/speckit.pr`. Creates the feature PR in debrief-future (with evidence + media) and the blog PR in debrief.github.io (`shipped-post.md`); returns both URLs. **MUST run last.**
 
 **Task T111 must run last. It depends on T100–T110 being complete.**
 
