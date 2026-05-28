@@ -52,11 +52,11 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 **Goal**: Confirm the workspace and codegen pipeline are healthy before touching the schema, and inventory the call sites this work will move or delete.
 
-- [ ] T001 Confirm branch + active feature: `git branch --show-current` is `claude/speckit-implement-261-gC93A` and `.specify/.active-feature` contains `261-session-state-systemstate`. No file path.
-- [ ] T002 Verify codegen runs clean on the current schema before changes: `cd shared/schemas && uv run python scripts/generate.py`, then `git diff --quiet -- shared/schemas/src/generated/` (expect no drift). Establishes that any post-T010 drift is genuinely this work's. No file path.
-- [ ] T003 [P] Inventory active_storyboard call sites to retire/repoint in Phase 3 (`readPersistedActiveStoryboardId`, `persistActiveStoryboardId`, `getActiveStoryboardSelection`, `setActiveStoryboardSelection`). Record at `specs/261-session-state-systemstate/research-notes/active-storyboard-call-sites.md`.
-- [ ] T004 [P] Inventory the sidecar surface to delete in Phase 6 (`deriveSessionPath`, package `saveSession`/`loadSession`/`extractPersistentState`/`serializeState`, `SessionFile`/`schema.ts`, and `@debrief/session-state` re-exports of them). Record at `specs/261-session-state-systemstate/research-notes/sidecar-call-sites.md`.
-- [ ] T005 [P] Confirm zero runtime readers of `SystemStateProperties.bbox`/`.zoom`/`.center` and confirm the generated `SessionFile`/`SessionState`/slice classes have no runtime importer (gates the Phase 2 deletions). Record at `specs/261-session-state-systemstate/research-notes/schema-deletion-safety.md`.
+- [x] T001 Confirm branch + active feature: `git branch --show-current` is `claude/speckit-implement-261-gC93A` and `.specify/.active-feature` contains `261-session-state-systemstate`. No file path.
+- [x] T002 Verify codegen runs clean on the current schema before changes: `cd shared/schemas && uv run python scripts/generate.py`, then `git diff --quiet -- shared/schemas/src/generated/` (expect no drift). Establishes that any post-T010 drift is genuinely this work's. No file path.
+- [x] T003 [P] Inventory active_storyboard call sites to retire/repoint in Phase 3 (`readPersistedActiveStoryboardId`, `persistActiveStoryboardId`, `getActiveStoryboardSelection`, `setActiveStoryboardSelection`). Record at `specs/261-session-state-systemstate/research-notes/active-storyboard-call-sites.md`.
+- [x] T004 [P] Inventory the sidecar surface to delete in Phase 6 (`deriveSessionPath`, package `saveSession`/`loadSession`/`extractPersistentState`/`serializeState`, `SessionFile`/`schema.ts`, and `@debrief/session-state` re-exports of them). Record at `specs/261-session-state-systemstate/research-notes/sidecar-call-sites.md`.
+- [x] T005 [P] Confirm zero runtime readers of `SystemStateProperties.bbox`/`.zoom`/`.center` and confirm the generated `SessionFile`/`SessionState`/slice classes have no runtime importer (gates the Phase 2 deletions). Record at `specs/261-session-state-systemstate/research-notes/schema-deletion-safety.md`.
 
 ## Phase 2: Foundation
 
