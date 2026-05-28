@@ -1,0 +1,580 @@
+id: https://debrief.info/schemas/stac
+name: stac
+title: Debrief STAC Catalog Envelopes
+description: >-
+  LinkML schema for STAC 1.0 / 1.1 catalog envelopes persisted to disk
+  by the Debrief Python regeneration pipeline and read by the VS Code
+  extension + web-shell mock. Resolves audit #206 §3.1 cluster
+  attributed to #223 (5 hand-typed sites) and the §3.2 drift clusters
+  for `StacItem` (3 members) and `StacCatalog` (2 members), plus the
+  7 R4-masked siblings in apps/vscode/src/types/stac.ts.
+
+  STAC files are persistent artefacts (Python writes, TypeScript reads
+  next session) — divergence between hand-types and on-disk shape was
+  silently corrupting. This schema is the single source of truth for
+  both languages.
+
+  Authored against STAC 1.1 (destination), accepts STAC 1.0 (current
+  fixtures) via additive optional fields and a string-typed
+  `stac_version` (no enum) — see spec A-001.
+
+  Article XV exception: three open-record slots
+  (`StacItemProperties`, `StacAsset`, `StacSummaries`) retain wildcard
+  extension-properties shapes to preserve the STAC `<namespace>:<key>`
+  extension convention (`debrief:*`, `processing:*`, `file:*`,
+  `proj:*`). Matches the `raw-geojson.yaml` `JsonObject` precedent and
+  the #222 MCP cluster `MCPContentItem.structuredContent` exception.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+  geojson: https://purl.org/geojson/vocab#
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  - geojson           # for GeoJSONPoint, GeoJSONLineString, etc.
+  - stac-extension    # for StacExtensionProperties, PlatformRecord
+
+# ============================================================================
+# Enums
+# ============================================================================
+
+enums:
+
+  StacTypeEnum:
+    description: >-
+      Discriminator for STAC top-level objects. STAC mandates exactly
+      these three values for `type`:
+        - "Feature"     → StacItem
+        - "Catalog"     → StacCatalog
+        - "Collection"  → StacCollection
+      Used with the `equals_string` constraint on each class's `type`
+      slot so the generated TypeScript carries a literal-string
+      discriminator (Research R-001).
+    permissible_values:
+      Feature: {}
+      Catalog: {}
+      Collection: {}
+
+# ============================================================================
+# Group 1 — Envelopes (P1)
+# ============================================================================
+#
+# StacItem and StacCatalog are the audit's flagged drift clusters (5
+# sites). Slot names match the STAC 1.1 spec field names verbatim so
+# the on-disk JSON matches the LinkML slot order; no per-slot aliases
+# required.
+
+classes:
+
+  # --- Wildcard class for open-record extension properties ------------------
+  Any:
+    class_uri: linkml:Any
+    description: >-
+      Wildcard class used for open-record extension-properties slots
+      (StacItemProperties additional keys, StacAsset additional keys,
+      StacSummaries additional keys). Maps to dict[str, object] in
+      Pydantic and Record<string, unknown> in TypeScript. Article XV.2
+      exception documented in plan.md Complexity Tracking — see also
+      raw-geojson.yaml `Any` precedent.
+
+  # --- Provider (used by StacItemProperties.providers and StacCollection.providers) ---
+  StacProvider:
+    description: >-
+      STAC provider entry. Captures organisations involved in producing
+      or hosting the asset. STAC 1.1 spec — present in every live
+      preview/workspace/samples/local-store/ item.json under
+      `properties.providers`. Captured explicitly (rather than as a
+      wildcard) because the shape is stable in the STAC spec.
+    attributes:
+      name:
+        description: Organization or person responsible for providing the data.
+        range: string
+        required: true
+      description:
+        description: Optional human-readable description.
+        range: string
+        required: false
+      roles:
+        description: >-
+          Roles played by this provider — "licensor", "producer",
+          "processor", or "host".
+        range: string
+        multivalued: true
+        required: false
+      url:
+        description: Provider homepage / contact URL.
+        range: string
+        required: false
+
+  # --- StacItemProperties: open-record properties block on every Item ------
+  StacItemProperties:
+    description: >-
+      STAC Item `properties` block. Carries STAC-spec core fields
+      (`datetime`, `start_datetime?`, `end_datetime?`, `title?`,
+      `description?`, `license?`, `providers?`, `created?`, `updated?`)
+      and mixes in `StacExtensionProperties` from stac-extension.yaml
+      for the `debrief:*` extension fields (Research R-003).
+
+      Open-record per Article XV.2 — the generator post-processor at
+      `shared/schemas/scripts/generate.py` adds Pydantic
+      `model_config = ConfigDict(extra='allow', ...)` and TypeScript
+      `[key: string]: unknown` so additional `<extension>:<key>` keys
+      (`processing:*`, `proj:*`, future extensions) pass through
+      without rejection. Consumers narrow per extension via
+      per-extension Zod / type-guard helpers (the pattern already
+      established for `debrief:platforms`).
+    mixins:
+      - StacExtensionProperties
+    attributes:
+      datetime:
+        description: >-
+          Item datetime per STAC spec (ISO 8601). May be null when
+          start_datetime + end_datetime are set; the live fixtures
+          always carry a non-null value so it is modelled as required
+          string.
+        range: string
+        required: true
+      start_datetime:
+        description: ISO 8601 range start. Required when datetime is null.
+        range: string
+        required: false
+      end_datetime:
+        description: ISO 8601 range end. Required when datetime is null.
+        range: string
+        required: false
+      title:
+        description: Human-readable plot title.
+        range: string
+        required: false
+      description:
+        description: Human-readable plot description.
+        range: string
+        required: false
+      license:
+        description: SPDX identifier or "other" (STAC 1.1 addition).
+        range: string
+        required: false
+      providers:
+        description: >-
+          Organisations involved in producing / hosting this plot.
+          STAC 1.1 addition; present on every live preview/workspace/samples
+          item.
+        range: StacProvider
+        multivalued: true
+        required: false
+        inlined_as_list: true
+      created:
+        description: Processing-time creation timestamp (ISO 8601).
+        range: string
+        required: false
+      updated:
+        description: Processing-time last-update timestamp (ISO 8601).
+        range: string
+        required: false
+
+  StacItem:
+    description: >-
+      A STAC 1.1 Item describing one plot. Closes audit §3.1 rows for
+      `apps/vscode/src/types/stac.ts`, `apps/vscode/src/services/sceneThumbnailService.ts`,
+      and `apps/web-shell/src/mocks/stacService.ts`. Persisted to
+      `<store>/<catalog>/<plot-slug>/item.json`.
+    attributes:
+      type:
+        description: STAC discriminator — always "Feature" for Items.
+        range: StacTypeEnum
+        required: true
+        equals_string: Feature
+      stac_version:
+        description: STAC version string — "1.0.0" or "1.1.0" (Research R-005).
+        range: string
+        required: true
+      stac_extensions:
+        description: >-
+          Optional STAC extension schema URIs. Absent on STAC 1.0 fixtures,
+          present on STAC 1.1 fixtures (Research R-005).
+        range: string
+        multivalued: true
+        required: false
+      id:
+        description: Item identifier (slug, UUID, or composite).
+        range: string
+        required: true
+      geometry:
+        description: >-
+          GeoJSON geometry — any_of union over the seven existing
+          geometry classes in geojson.yaml. Reuses the same pattern as
+          RawGeoJSONFeature.geometry.
+        required: true
+        any_of:
+          - range: GeoJSONPoint
+          - range: GeoJSONEmptyPoint
+          - range: GeoJSONLineString
+          - range: GeoJSONPolygon
+          - range: GeoJSONMultiPoint
+          - range: GeoJSONMultiLineString
+          - range: GeoJSONMultiPolygon
+      bbox:
+        description: >-
+          Bounding box — either [west, south, east, north] (4-element
+          2D) or [west, south, min_alt, east, north, max_alt]
+          (6-element 3D). Live fixtures use 4-element 2D
+          (Research R-004).
+        range: float
+        multivalued: true
+        required: true
+        minimum_cardinality: 4
+        maximum_cardinality: 6
+      properties:
+        description: >-
+          STAC Item properties — core fields + debrief: extension +
+          open-record additional keys (Research R-002 / R-003).
+        range: StacItemProperties
+        required: true
+        inlined: true
+      links:
+        description: >-
+          Catalog navigation links (`self`, `root`, `parent`,
+          `derived_from`, etc.). Order is preserved.
+        range: StacLink
+        multivalued: true
+        required: true
+        inlined_as_list: true
+      assets:
+        description: >-
+          Asset map keyed by arbitrary string (`features`, `thumbnail`,
+          `overview`, `source-<id>`, `scene-thumbnail-<id>`). Open-record
+          per Research R-002 — modelled as `range: Any` here because the
+          STAC wire format is a dict, not a list. The generator
+          post-processor rewrites this to `dict[str, StacAsset]`
+          (Pydantic) and `Record<string, StacAsset>` (TypeScript).
+        range: Any
+        required: true
+      collection:
+        description: >-
+          Parent Collection ID, when the Item belongs to a Collection
+          (STAC 1.1 optional field).
+        range: string
+        required: false
+
+  StacCatalog:
+    description: >-
+      A flat STAC Catalog (no extent, no summaries). Closes audit §3.1
+      rows for `apps/vscode/src/types/stac.ts` and
+      `apps/web-shell/src/mocks/stacService.ts`. Persisted to
+      `<store>/<catalog>/catalog.json` for stores not upgraded to STAC
+      1.1 Collection.
+    attributes:
+      type:
+        description: STAC discriminator — always "Catalog" for flat Catalogs.
+        range: StacTypeEnum
+        required: true
+        equals_string: Catalog
+      stac_version:
+        description: STAC version string ("1.0.0" or "1.1.0").
+        range: string
+        required: true
+      stac_extensions:
+        description: Optional STAC extension schema URIs.
+        range: string
+        multivalued: true
+        required: false
+      id:
+        description: Catalog identifier.
+        range: string
+        required: true
+      title:
+        description: Human-readable catalog title.
+        range: string
+        required: false
+      description:
+        description: STAC-mandated catalog description.
+        range: string
+        required: true
+      links:
+        description: >-
+          Catalog navigation links — `self`, `root`, `parent`, and one
+          `item` per child Item.
+        range: StacLink
+        multivalued: true
+        required: true
+        inlined_as_list: true
+
+# ============================================================================
+# Group 2 — Members (P2)
+# ============================================================================
+#
+# StacLink and StacAsset are members of every Item / Catalog / Collection.
+# They are R4-masked in the audit (the file imports PlatformRecord from
+# @debrief/schemas, masking the hand-typed sibling rule) but still
+# hand-written and carry the same drift risk.
+
+  StacLink:
+    description: >-
+      A single link entry within `links[]`. Used by StacItem, StacCatalog,
+      and StacCollection. Closes R4-masked audit row for
+      `apps/vscode/src/types/stac.ts`.
+    attributes:
+      rel:
+        description: >-
+          Link relation (`self`, `root`, `parent`, `item`, `child`,
+          `derived_from`, etc.).
+        range: string
+        required: true
+      href:
+        description: URI (relative or absolute) to the linked resource.
+        range: string
+        required: true
+      type:
+        description: IANA media type of the linked resource.
+        range: string
+        required: false
+      title:
+        description: Human-readable link title.
+        range: string
+        required: false
+
+  StacAsset:
+    description: >-
+      A single asset entry within `assets[<key>]`. Closes R4-masked
+      audit row for `apps/vscode/src/types/stac.ts` and the inline
+      `StacItemAssets` alias at
+      `apps/vscode/src/services/sceneThumbnailService.ts`.
+
+      Open-record per Article XV.2 — accepts arbitrary extension keys
+      (`file:checksum`, `file:size`, `processing:datetime`,
+      `processing:software`, `proj:shape`, `debrief:provenance`,
+      `debrief:toolId`, `debrief:sourceFeatures`) observed in the live
+      fixtures. The generator post-processes this into Pydantic
+      `extra='allow'` and TypeScript `[key: string]: unknown`.
+    attributes:
+      href:
+        description: >-
+          URI to the asset. Required on `StacItem.assets[<key>]` —
+          STAC 1.1 mandates a concrete URI on Item assets. The
+          declaration-only shape on `StacCollection.item_assets[<key>]`
+          (no `href`) is covered by the sibling `StacItemAssetDefinition`
+          class.
+        range: string
+        required: true
+      type:
+        description: IANA media type.
+        range: string
+        required: false
+      title:
+        description: Human-readable asset title.
+        range: string
+        required: false
+      description:
+        description: Asset description (STAC 1.1 addition).
+        range: string
+        required: false
+      roles:
+        description: >-
+          Asset roles — "data", "thumbnail", "overview", "source",
+          "result", etc.
+        range: string
+        multivalued: true
+        required: false
+
+  StacItemAssetDefinition:
+    description: >-
+      Item Asset Definition Object — declares the shape of an asset that
+      child Items in a Collection are expected to carry. Distinct from
+      `StacAsset` because it does NOT carry an `href`; the asset URI
+      lives on the concrete Item assets that conform to this template
+      (see STAC 1.1 Item Asset Definition spec).
+
+      Open-record per Article XV.2 — same boundary-loose semantics as
+      `StacAsset` so item-asset declarations may carry extension keys.
+      The generator post-processes this class with Pydantic `extra='allow'`
+      and TypeScript `[key: string]: unknown`.
+    attributes:
+      type:
+        description: IANA media type expected on child Item assets.
+        range: string
+        required: false
+      title:
+        description: Human-readable asset title.
+        range: string
+        required: false
+      description:
+        description: Asset description.
+        range: string
+        required: false
+      roles:
+        description: Asset roles expected on child Item assets.
+        range: string
+        multivalued: true
+        required: false
+
+# ============================================================================
+# Group 3 — Collection family (P3)
+# ============================================================================
+
+  StacSpatialExtent:
+    description: >-
+      Spatial extent on a Collection. The wire shape is
+      `{ "bbox": [[west, south, east, north], ...] }` — a list of
+      bounding-box arrays. LinkML emits a flat `list[float]` /
+      `number[]` which the post-processor in
+      `shared/schemas/scripts/generate.py` rewrites to nested
+      list-of-lists per Research R-011 (same precedent as GeoJSON
+      coordinates).
+    attributes:
+      bbox:
+        description: >-
+          List of bounding-box arrays `[[w, s, e, n], ...]`. Each inner
+          array is 4-element 2D or 6-element 3D.
+        range: float
+        multivalued: true
+        required: true
+
+  StacTemporalExtent:
+    description: >-
+      Temporal extent on a Collection. The wire shape is
+      `{ "interval": [[start, end], ...] }` — a list of
+      `[start_iso, end_iso]` pairs (either side may be null per STAC
+      spec). LinkML emits a flat `list[string]` which the
+      post-processor rewrites to nested list-of-lists per Research
+      R-011.
+    attributes:
+      interval:
+        description: >-
+          List of `[start_datetime, end_datetime]` pairs. Either side
+          may be null (unbounded).
+        range: string
+        multivalued: true
+        required: true
+
+  StacExtent:
+    description: >-
+      Spatial + temporal extent on a Collection. Closes R4-masked
+      audit row for `apps/vscode/src/types/stac.ts`.
+    attributes:
+      spatial:
+        description: Spatial extent — one or more bounding boxes.
+        range: StacSpatialExtent
+        required: true
+        inlined: true
+      temporal:
+        description: Temporal extent — one or more start/end intervals.
+        range: StacTemporalExtent
+        required: true
+        inlined: true
+
+  StacSummaries:
+    description: >-
+      Pre-aggregated extension summaries on a Collection. Closes
+      R4-masked audit row for `apps/vscode/src/types/stac.ts`. Carries
+      the debrief: extension summary fields plus open-record
+      additional keys (Article XV.2 exception).
+    attributes:
+      debrief_platforms:
+        description: >-
+          Aggregated per-platform metadata across all Items in the
+          Collection. Same shape as StacExtensionProperties.platforms.
+          Disk key is `debrief:platforms` (colon syntax preserved via
+          slot_uri).
+        range: PlatformRecord
+        multivalued: true
+        required: false
+        inlined_as_list: true
+        slot_uri: debrief:platforms
+      debrief_tags:
+        description: >-
+          Aggregated plot-level tags across all Items in the Collection.
+          Disk key is `debrief:tags`.
+        range: string
+        multivalued: true
+        required: false
+        slot_uri: debrief:tags
+      debrief_feature_tags:
+        description: >-
+          Aggregated feature-level tags across all Items in the
+          Collection. Disk key is `debrief:feature_tags`.
+        range: string
+        multivalued: true
+        required: false
+        slot_uri: debrief:feature_tags
+
+  StacCollection:
+    description: >-
+      A STAC 1.1 Collection — flat Catalog plus license, extent,
+      optional summaries, optional providers, optional item_assets.
+      Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`.
+      Persisted to `<store>/<catalog>/catalog.json` for stores upgraded
+      to STAC 1.1.
+    attributes:
+      type:
+        description: STAC discriminator — always "Collection".
+        range: StacTypeEnum
+        required: true
+        equals_string: Collection
+      stac_version:
+        description: STAC version string (always "1.1.0" in current fixtures).
+        range: string
+        required: true
+      stac_extensions:
+        description: Optional STAC extension schema URIs.
+        range: string
+        multivalued: true
+        required: false
+      id:
+        description: Collection identifier.
+        range: string
+        required: true
+      title:
+        description: Human-readable collection title.
+        range: string
+        required: false
+      description:
+        description: STAC-mandated collection description.
+        range: string
+        required: true
+      license:
+        description: SPDX identifier or "other" (STAC 1.1 mandates this).
+        range: string
+        required: true
+      extent:
+        description: Spatial + temporal extent.
+        range: StacExtent
+        required: true
+        inlined: true
+      summaries:
+        description: >-
+          Optional pre-aggregated extension summaries (open-record per
+          Research R-002).
+        range: StacSummaries
+        required: false
+        inlined: true
+      providers:
+        description: >-
+          Organisations involved in producing / hosting this collection
+          (STAC 1.1 addition).
+        range: StacProvider
+        multivalued: true
+        required: false
+        inlined_as_list: true
+      item_assets:
+        description: >-
+          Optional Item-asset declarations (STAC 1.1 addition). Each
+          entry is a `StacItemAssetDefinition` (no `href`) — distinct
+          from the concrete `StacAsset` shape used by
+          `StacItem.assets[<key>]`. The generator post-processor
+          rewrites this to `dict[str, StacItemAssetDefinition]`
+          (Pydantic) / `Record<string, StacItemAssetDefinition>`
+          (TypeScript) so the call site narrows correctly.
+        range: Any
+        required: false
+      links:
+        description: >-
+          Collection navigation links — `self`, `root`, `parent`,
+          `item` entries pointing at child Items.
+        range: StacLink
+        multivalued: true
+        required: true
+        inlined_as_list: true

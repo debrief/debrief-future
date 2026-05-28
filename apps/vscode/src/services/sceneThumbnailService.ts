@@ -32,6 +32,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import type { StacAsset, StacItem } from '@debrief/schemas';
 import { SceneThumbnailError } from './sceneThumbnailError';
 
 const ULID_PATTERN = /^[0-9A-HJKMNP-TV-Z]{26}$/;
@@ -60,20 +61,10 @@ export type FsLike = Pick<
 
 const DEFAULT_DEPS: SceneThumbnailServiceDeps = { fs: fs.promises };
 
-interface StacItemAssets {
-  [key: string]: {
-    href: string;
-    type?: string;
-    title?: string;
-    roles?: string[];
-    [k: string]: unknown;
-  };
-}
-
-interface StacItem {
-  assets?: StacItemAssets;
-  [k: string]: unknown;
-}
+// Local alias for the asset map shape — derived from the schema's
+// StacItem.assets via Pick to keep this file's intent self-documenting.
+// Schema-rooted per #223; previously a hand-typed interface.
+type StacItemAssets = Record<string, StacAsset>;
 
 function assetKeyFor(sceneId: string): string {
   return `scene-thumbnail-${sceneId}`;

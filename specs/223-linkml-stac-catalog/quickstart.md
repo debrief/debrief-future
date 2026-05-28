@@ -126,6 +126,21 @@ git grep -n "JSON.parse(JSON.stringify" apps/web-shell/src/mocks/stacService.ts
 # expected: no matches (or matches only on lines not related to stac-writer projection)
 ```
 
+```sh
+# No runtime Zod parsers / .parse() / is*() guards on imported STAC
+# types — TypeScript adoption is types-only per data-model.md
+# "TypeScript adoption is types-only" (Decision 4A).
+git grep -nE "(z\.object|\.parse\(|is(StacItem|StacCatalog|StacCollection|StacLink|StacAsset|StacExtent|StacSummaries)\b)" \
+  -- apps/ shared/components/ \
+  | grep -v "@debrief/schemas" \
+  | grep -v "shared/schemas/" \
+  || echo "PASS — no runtime validators on the imported types"
+# expected: PASS branch triggers (pre-existing per-extension narrows on
+# the StacItem.properties subfields — e.g. debrief:platforms — are
+# excluded from this scan because they don't touch the imported STAC
+# types themselves).
+```
+
 ## Step 5 — Run full project verify (SC-005)
 
 ```sh

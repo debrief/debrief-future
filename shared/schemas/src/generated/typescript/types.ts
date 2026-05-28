@@ -420,6 +420,19 @@ export enum FileProvDirectionEnum {
     target = "target",
 };
 /**
+* Discriminator for STAC top-level objects. STAC mandates exactly these three values for `type`:
+  - "Feature"     → StacItem
+  - "Catalog"     → StacCatalog
+  - "Collection"  → StacCollection
+Used with the `equals_string` constraint on each class's `type` slot so the generated TypeScript carries a literal-string discriminator (Research R-001).
+*/
+export enum StacTypeEnum {
+    
+    Feature = "Feature",
+    Catalog = "Catalog",
+    Collection = "Collection",
+};
+/**
 * Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
 */
 export enum PlaybackStateEnum {
@@ -1807,6 +1820,221 @@ export interface StacItemSummary {
     tags?: string[],
     /** Feature-level tags from debrief:feature_tags */
     feature_tags?: string[],
+}
+
+
+/**
+ * STAC provider entry. Captures organisations involved in producing or hosting the asset. STAC 1.1 spec — present in every live preview/workspace/samples/local-store/ item.json under `properties.providers`. Captured explicitly (rather than as a wildcard) because the shape is stable in the STAC spec.
+ */
+export interface StacProvider {
+    /** Organization or person responsible for providing the data. */
+    name: string,
+    /** Optional human-readable description. */
+    description?: string,
+    /** Roles played by this provider — "licensor", "producer", "processor", or "host". */
+    roles?: string[],
+    /** Provider homepage / contact URL. */
+    url?: string,
+}
+
+
+/**
+ * STAC Item `properties` block. Carries STAC-spec core fields (`datetime`, `start_datetime?`, `end_datetime?`, `title?`, `description?`, `license?`, `providers?`, `created?`, `updated?`) and mixes in `StacExtensionProperties` from stac-extension.yaml for the `debrief:*` extension fields (Research R-003).
+Open-record per Article XV.2 — the generator post-processor at `shared/schemas/scripts/generate.py` adds Pydantic `model_config = ConfigDict(extra='allow', ...)` and TypeScript `[key: string]: unknown` so additional `<extension>:<key>` keys (`processing:*`, `proj:*`, future extensions) pass through without rejection. Consumers narrow per extension via per-extension Zod / type-guard helpers (the pattern already established for `debrief:platforms`).
+ */
+export interface StacItemProperties extends StacExtensionProperties {
+    /** Item datetime per STAC spec (ISO 8601). May be null when start_datetime + end_datetime are set; the live fixtures always carry a non-null value so it is modelled as required string. */
+    datetime: string,
+    /** ISO 8601 range start. Required when datetime is null. */
+    start_datetime?: string,
+    /** ISO 8601 range end. Required when datetime is null. */
+    end_datetime?: string,
+    /** Human-readable plot title. */
+    title?: string,
+    /** Human-readable plot description. */
+    description?: string,
+    /** SPDX identifier or "other" (STAC 1.1 addition). */
+    license?: string,
+    /** Organisations involved in producing / hosting this plot. STAC 1.1 addition; present on every live preview/workspace/samples item. */
+    providers?: StacProvider[],
+    /** Processing-time creation timestamp (ISO 8601). */
+    created?: string,
+    /** Processing-time last-update timestamp (ISO 8601). */
+    updated?: string,
+    [key: string]: unknown,
+}
+
+
+/**
+ * A STAC 1.1 Item describing one plot. Closes audit §3.1 rows for `apps/vscode/src/types/stac.ts`, `apps/vscode/src/services/sceneThumbnailService.ts`, and `apps/web-shell/src/mocks/stacService.ts`. Persisted to `<store>/<catalog>/<plot-slug>/item.json`.
+ */
+export interface StacItem {
+    /** STAC discriminator — always "Feature" for Items. */
+    type: "Feature",
+    /** STAC version string — "1.0.0" or "1.1.0" (Research R-005). */
+    stac_version: string,
+    /** Optional STAC extension schema URIs. Absent on STAC 1.0 fixtures, present on STAC 1.1 fixtures (Research R-005). */
+    stac_extensions?: string[],
+    /** Item identifier (slug, UUID, or composite). */
+    id: string,
+    /** GeoJSON geometry — any_of union over the seven existing geometry classes in geojson.yaml. Reuses the same pattern as RawGeoJSONFeature.geometry. */
+    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | GeoJSONMultiPolygon,
+    /** Bounding box — either [west, south, east, north] (4-element 2D) or [west, south, min_alt, east, north, max_alt] (6-element 3D). Live fixtures use 4-element 2D (Research R-004). */
+    bbox: number[],
+    /** STAC Item properties — core fields + debrief: extension + open-record additional keys (Research R-002 / R-003). */
+    properties: StacItemProperties,
+    /** Catalog navigation links (`self`, `root`, `parent`, `derived_from`, etc.). Order is preserved. */
+    links: StacLink[],
+    /** Asset map keyed by arbitrary string (`features`, `thumbnail`, `overview`, `source-<id>`, `scene-thumbnail-<id>`). Open-record per Research R-002 — modelled as `range: unknown` here because the STAC wire format is a dict, not a list. The generator post-processor rewrites this to `dict[str, StacAsset]` (Pydantic) and `Record<string, StacAsset>` (TypeScript). */
+    assets: Record<string, StacAsset>,
+    /** Parent Collection ID, when the Item belongs to a Collection (STAC 1.1 optional field). */
+    collection?: string,
+}
+
+
+/**
+ * A flat STAC Catalog (no extent, no summaries). Closes audit §3.1 rows for `apps/vscode/src/types/stac.ts` and `apps/web-shell/src/mocks/stacService.ts`. Persisted to `<store>/<catalog>/catalog.json` for stores not upgraded to STAC 1.1 Collection.
+ */
+export interface StacCatalog {
+    /** STAC discriminator — always "Catalog" for flat Catalogs. */
+    type: "Catalog",
+    /** STAC version string ("1.0.0" or "1.1.0"). */
+    stac_version: string,
+    /** Optional STAC extension schema URIs. */
+    stac_extensions?: string[],
+    /** Catalog identifier. */
+    id: string,
+    /** Human-readable catalog title. */
+    title?: string,
+    /** STAC-mandated catalog description. */
+    description: string,
+    /** Catalog navigation links — `self`, `root`, `parent`, and one `item` per child Item. */
+    links: StacLink[],
+}
+
+
+/**
+ * A single link entry within `links[]`. Used by StacItem, StacCatalog, and StacCollection. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`.
+ */
+export interface StacLink {
+    /** Link relation (`self`, `root`, `parent`, `item`, `child`, `derived_from`, etc.). */
+    rel: string,
+    /** URI (relative or absolute) to the linked resource. */
+    href: string,
+    /** IANA media type of the linked resource. */
+    type?: string,
+    /** Human-readable link title. */
+    title?: string,
+}
+
+
+/**
+ * A single asset entry within `assets[<key>]`. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts` and the inline `StacItemAssets` alias at `apps/vscode/src/services/sceneThumbnailService.ts`.
+Open-record per Article XV.2 — accepts arbitrary extension keys (`file:checksum`, `file:size`, `processing:datetime`, `processing:software`, `proj:shape`, `debrief:provenance`, `debrief:toolId`, `debrief:sourceFeatures`) observed in the live fixtures. The generator post-processes this into Pydantic `extra='allow'` and TypeScript `[key: string]: unknown`.
+ */
+export interface StacAsset {
+    /** URI to the asset. Required on `StacItem.assets[<key>]` — STAC 1.1 mandates a concrete URI on Item assets. The declaration-only shape on `StacCollection.item_assets[<key>]` (no `href`) is covered by the sibling `StacItemAssetDefinition` class. */
+    href: string,
+    /** IANA media type. */
+    type?: string,
+    /** Human-readable asset title. */
+    title?: string,
+    /** Asset description (STAC 1.1 addition). */
+    description?: string,
+    /** Asset roles — "data", "thumbnail", "overview", "source", "result", etc. */
+    roles?: string[],
+    [key: string]: unknown,
+}
+
+
+/**
+ * Item Asset Definition Object — declares the shape of an asset that child Items in a Collection are expected to carry. Distinct from `StacAsset` because it does NOT carry an `href`; the asset URI lives on the concrete Item assets that conform to this template (see STAC 1.1 Item Asset Definition spec).
+Open-record per Article XV.2 — same boundary-loose semantics as `StacAsset` so item-asset declarations may carry extension keys. The generator post-processes this class with Pydantic `extra='allow'` and TypeScript `[key: string]: unknown`.
+ */
+export interface StacItemAssetDefinition {
+    /** IANA media type expected on child Item assets. */
+    type?: string,
+    /** Human-readable asset title. */
+    title?: string,
+    /** Asset description. */
+    description?: string,
+    /** Asset roles expected on child Item assets. */
+    roles?: string[],
+    [key: string]: unknown,
+}
+
+
+/**
+ * Spatial extent on a Collection. The wire shape is `{ "bbox": [[west, south, east, north], ...] }` — a list of bounding-box arrays. LinkML emits a flat `list[float]` / `number[]` which the post-processor in `shared/schemas/scripts/generate.py` rewrites to nested list-of-lists per Research R-011 (same precedent as GeoJSON coordinates).
+ */
+export interface StacSpatialExtent {
+    /** List of bounding-box arrays `[[w, s, e, n], ...]`. Each inner array is 4-element 2D or 6-element 3D. */
+    bbox: number[][],
+}
+
+
+/**
+ * Temporal extent on a Collection. The wire shape is `{ "interval": [[start, end], ...] }` — a list of `[start_iso, end_iso]` pairs (either side may be null per STAC spec). LinkML emits a flat `list[string]` which the post-processor rewrites to nested list-of-lists per Research R-011.
+ */
+export interface StacTemporalExtent {
+    /** List of `[start_datetime, end_datetime]` pairs. Either side may be null (unbounded). */
+    interval: (string | null)[][],
+}
+
+
+/**
+ * Spatial + temporal extent on a Collection. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`.
+ */
+export interface StacExtent {
+    /** Spatial extent — one or more bounding boxes. */
+    spatial: StacSpatialExtent,
+    /** Temporal extent — one or more start/end intervals. */
+    temporal: StacTemporalExtent,
+}
+
+
+/**
+ * Pre-aggregated extension summaries on a Collection. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`. Carries the debrief: extension summary fields plus open-record additional keys (Article XV.2 exception).
+ */
+export interface StacSummaries {
+    /** Aggregated per-platform metadata across all Items in the Collection. Same shape as StacExtensionProperties.platforms. Disk key is `debrief:platforms` (colon syntax preserved via slot_uri). */
+    debrief_platforms?: PlatformRecord[],
+    /** Aggregated plot-level tags across all Items in the Collection. Disk key is `debrief:tags`. */
+    debrief_tags?: string[],
+    /** Aggregated feature-level tags across all Items in the Collection. Disk key is `debrief:feature_tags`. */
+    debrief_feature_tags?: string[],
+    [key: string]: unknown,
+}
+
+
+/**
+ * A STAC 1.1 Collection — flat Catalog plus license, extent, optional summaries, optional providers, optional item_assets. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`. Persisted to `<store>/<catalog>/catalog.json` for stores upgraded to STAC 1.1.
+ */
+export interface StacCollection {
+    /** STAC discriminator — always "Collection". */
+    type: "Collection",
+    /** STAC version string (always "1.1.0" in current fixtures). */
+    stac_version: string,
+    /** Optional STAC extension schema URIs. */
+    stac_extensions?: string[],
+    /** Collection identifier. */
+    id: string,
+    /** Human-readable collection title. */
+    title?: string,
+    /** STAC-mandated collection description. */
+    description: string,
+    /** SPDX identifier or "other" (STAC 1.1 mandates this). */
+    license: string,
+    /** Spatial + temporal extent. */
+    extent: StacExtent,
+    /** Optional pre-aggregated extension summaries (open-record per Research R-002). */
+    summaries?: StacSummaries,
+    /** Organisations involved in producing / hosting this collection (STAC 1.1 addition). */
+    providers?: StacProvider[],
+    /** Optional Item-asset declarations (STAC 1.1 addition). Each entry is a `StacItemAssetDefinition` (no `href`) — distinct from the concrete `StacAsset` shape used by `StacItem.assets[<key>]`. The generator post-processor rewrites this to `dict[str, StacItemAssetDefinition]` (Pydantic) / `Record<string, StacItemAssetDefinition>` (TypeScript) so the call site narrows correctly. */
+    item_assets?: Record<string, StacItemAssetDefinition>,
+    /** Collection navigation links — `self`, `root`, `parent`, `item` entries pointing at child Items. */
+    links: StacLink[],
 }
 
 

@@ -10,6 +10,11 @@
 // PropertiesProvenanceEntry is LinkML-derived (spec 240). Imported here for
 // local use in PatchItemInput; re-exported below for downstream consumers.
 import type { PropertiesProvenanceEntry } from '@debrief/components/PropertiesPanel/provenanceTypes';
+// StacItem and StacAsset are LinkML-derived (spec 223). Both ends of the
+// persistence boundary (web-shell mock, VS Code stacService) now reference
+// the same generated class, closing spec 223 Decision 1B / A-009 (no
+// projection cast at call sites).
+import type { StacAsset, StacItem } from '@debrief/schemas';
 
 // ─── Core context ──────────────────────────────────────────────────────────
 
@@ -22,26 +27,15 @@ export interface StoreContext {
   readonly randomId: () => string;
 }
 
-// ─── STAC item shape (opaque-with-known-keys) ──────────────────────────────
+// ─── STAC item shape (re-exported from @debrief/schemas) ──────────────────
+//
+// Both `StacItem` and `StacAsset` are LinkML-rooted at
+// shared/schemas/src/linkml/stac.yaml and exposed through
+// @debrief/schemas. Re-export from this package preserves the
+// previously-published API surface so existing consumers do not
+// have to update their import paths.
 
-export interface StacAsset {
-  /** Always relative to the item directory. The web-shell adaptor
-   *  synthesises `idb:` pseudo-hrefs at read time for IndexedDB-backed
-   *  assets — see contracts/indexeddb-schema.md. */
-  readonly href: string;
-  readonly type?: string;
-  readonly roles?: ReadonlyArray<string>;
-  readonly title?: string;
-  readonly [k: string]: unknown;
-}
-
-export interface StacItem {
-  readonly id: string;
-  readonly properties: Record<string, unknown>;
-  readonly assets?: Record<string, StacAsset>;
-  readonly links?: ReadonlyArray<{ readonly rel: string; readonly href: string }>;
-  readonly [k: string]: unknown;
-}
+export type { StacAsset, StacItem };
 
 // Re-export the LinkML-derived PropertiesProvenanceEntry so downstream
 // consumers see no change — same name, same import path, plus the schema

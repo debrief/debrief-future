@@ -13,8 +13,30 @@ from __future__ import annotations
 
 import json
 import random
+import sys
 from pathlib import Path
 from typing import Any
+
+# ---------------------------------------------------------------------------
+# Schema validation (#223 / FR-012) — every dict construction at the wire
+# boundary validates against the generated Pydantic model so any field
+# typo or shape drift surfaces loudly at script-run time instead of
+# corrupting the on-disk catalog.
+# ---------------------------------------------------------------------------
+_SCHEMAS_PY_DIR = (
+    Path(__file__).resolve().parent.parent / "shared" / "schemas" / "src" / "generated" / "python"
+)
+if str(_SCHEMAS_PY_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCHEMAS_PY_DIR))
+
+from pydantic import TypeAdapter  # noqa: E402
+
+from debrief_schemas import StacItem  # noqa: E402
+from debrief_schemas.unions import StacCatalogOrCollection  # noqa: E402
+
+_CATALOG_OR_COLLECTION_ADAPTER: TypeAdapter[StacCatalogOrCollection] = TypeAdapter(
+    StacCatalogOrCollection
+)
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -610,6 +632,11 @@ def enrich_item(
     item["properties"]["debrief:tags"] = tags
     item["properties"]["debrief:feature_tags"] = feature_tags
 
+    # #223 FR-012 — validate the enriched dict against the generated
+    # Pydantic model before persisting. Surfaces any field-name typo or
+    # type drift loudly here rather than at next-session read time.
+    StacItem.model_validate(item)
+
     # Write back
     with open(item_path, "w") as f:
         json.dump(item, f, indent=2)
@@ -643,6 +670,12 @@ def update_catalog_summaries(catalog_path: Path, all_items: list[dict[str, Any]]
         "debrief:tags": sorted(all_tags),
         "debrief:feature_tags": sorted(all_feature_tags),
     }
+
+    # #223 FR-012 — validate against the catalog/collection discriminated
+    # union. The preview store ships a STAC 1.1 Collection root; flat
+    # Catalogs are accepted via the same union so the script remains
+    # forward-compatible if the store is downgraded.
+    _CATALOG_OR_COLLECTION_ADAPTER.validate_python(catalog)
 
     with open(catalog_file, "w") as f:
         json.dump(catalog, f, indent=2)
