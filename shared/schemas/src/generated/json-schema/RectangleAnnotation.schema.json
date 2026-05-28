@@ -404,6 +404,13 @@
             "array",
             "null"
           ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [

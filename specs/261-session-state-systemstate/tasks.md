@@ -66,18 +66,18 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Schema cluster consolidation (FR-002a, R-004)
 
-- [ ] T010 Move the shared value types into `common.yaml` as their single definition — `ViewportPolygon`, `TimeStep` + `TimeUnitEnum`, `DisplayModeEnum`, `PlaybackStateEnum`, `TimeInstant`, `TimeRange`, `TimeFilter` — and delete the `session-state.yaml` copies; dedup `Coordinate` (keep `common.yaml`'s) and delete the `storyboard.yaml` `DisplayModeEnum` duplicate. File: `shared/schemas/src/linkml/common.yaml`.
-- [ ] T011 Remove the now-vestigial `SessionFile` and `SessionState` classes from `session-state.yaml`, plus any slice classes confirmed unused by runtime (per T005); if the file is left empty, remove it from the `debrief.yaml` imports list. Files: `shared/schemas/src/linkml/session-state.yaml`, `shared/schemas/src/linkml/debrief.yaml`.
-- [ ] T012 Add optional `visible: boolean` to `BaseFeatureProperties` (absent/true ⇒ visible) per `contracts/linkml-delta.md` §1. File: `shared/schemas/src/linkml/common.yaml`.
+- [x] T010 Move the shared value types into `common.yaml` as their single definition — `ViewportPolygon`, `TimeStep` + `TimeUnitEnum`, `DisplayModeEnum`, `PlaybackStateEnum`, `TimeInstant`, `TimeRange`, `TimeFilter` — and delete the `session-state.yaml` copies; dedup `Coordinate` (keep `common.yaml`'s) and delete the `storyboard.yaml` `DisplayModeEnum` duplicate. File: `shared/schemas/src/linkml/common.yaml`.
+- [x] T011 Remove the now-vestigial `SessionFile` and `SessionState` classes from `session-state.yaml`, plus any slice classes confirmed unused by runtime (per T005); if the file is left empty, remove it from the `debrief.yaml` imports list. Files: `shared/schemas/src/linkml/session-state.yaml`, `shared/schemas/src/linkml/debrief.yaml`.
+- [x] T012 Add optional `visible: boolean` to `BaseFeatureProperties` (absent/true ⇒ visible) per `contracts/linkml-delta.md` §1. File: `shared/schemas/src/linkml/common.yaml`.
 
 ### SystemStateProperties delta (FR-001/FR-002/FR-004)
 
-- [ ] T013 Apply the `SystemStateProperties` delta per `contracts/linkml-delta.md` §3: remove `bbox`/`zoom`/`center`; add `viewport`, `rotation`, `current_time`, `filter_start_time`, `filter_end_time`, `display_mode`, `step_size`, `playback_rate`, `selected_primary`; add the four per-variant `rules:` blocks; update the `SystemStateTypeEnum.spatial` description. Files: `shared/schemas/src/linkml/geojson.yaml`, `shared/schemas/src/linkml/common.yaml`.
+- [x] T013 Apply the `SystemStateProperties` delta per `contracts/linkml-delta.md` §3: remove `bbox`/`zoom`/`center`; add `viewport`, `rotation`, `current_time`, `filter_start_time`, `filter_end_time`, `display_mode`, `step_size`, `playback_rate`, `selected_primary`; add the four per-variant `rules:` blocks; update the `SystemStateTypeEnum.spatial` description. Files: `shared/schemas/src/linkml/geojson.yaml`, `shared/schemas/src/linkml/common.yaml`.
 
 ### Codegen (FR-002, FR-006a)
 
-- [ ] T014 Regenerate all bindings: `cd shared/schemas && uv run python scripts/generate.py`. Verify generated `SystemStateProperties` gains the new fields and loses `bbox`/`zoom`/`center`, and that `BaseFeatureProperties` children gain `visible?: boolean`. Files: `shared/schemas/src/generated/**`.
-- [ ] T015 Resolve the `gen-json-schema` `ViewportPolygon.coordinates` multivalued-class-range risk (FR-006a / R-005): add a targeted post-processor in `scripts/generate.py` mirroring the existing GeoJSON-coordinate fixes, or — if brittle — exclude the SystemState `viewport` slot from the JSON Schema build and document Pydantic-only validation. File: `shared/schemas/scripts/generate.py`.
+- [x] T014 Regenerate all bindings: `cd shared/schemas && uv run python scripts/generate.py`. Verify generated `SystemStateProperties` gains the new fields and loses `bbox`/`zoom`/`center`, and that `BaseFeatureProperties` children gain `visible?: boolean`. Files: `shared/schemas/src/generated/**`.
+- [x] T015 Resolve the `gen-json-schema` `ViewportPolygon.coordinates` multivalued-class-range risk (FR-006a / R-005): add a targeted post-processor in `scripts/generate.py` mirroring the existing GeoJSON-coordinate fixes, or — if brittle — exclude the SystemState `viewport` slot from the JSON Schema build and document Pydantic-only validation. File: `shared/schemas/scripts/generate.py`.
 
 ### Golden fixtures (FR-006, SC-005)
 
