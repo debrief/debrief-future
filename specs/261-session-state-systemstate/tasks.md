@@ -210,12 +210,12 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 **Independent test**: `grep -rn "debrief-session"` over `apps`/`services` (excluding generated/docs) returns no runtime read/write code; a save produces no third file.
 
-- [ ] T090 Delete the package-level sidecar I/O — `saveSession`, `loadSession`, `extractPersistentState`, `serializeState`, `parseSessionJson`, the local `SessionFile` interface, and the version machinery — or reduce `load.ts`/`save.ts` to thin FC hydrate/extract wrappers only if a caller still needs them. Files: `services/session-state/src/persistence/load.ts`, `services/session-state/src/persistence/save.ts`, `services/session-state/src/persistence/schema.ts`, `services/session-state/src/persistence/index.ts`.
-- [ ] T091 Remove the `@debrief/session-state` re-exports of the deleted sidecar functions/types. File: `services/session-state/src/index.ts`.
-- [ ] T092 Update remaining consumers identified in T004 so the build is clean (e.g. `apps/vscode/src/services/sessionManager.ts`, `services/session-state/src/standalone.ts`, the MCP server) — none should import the deleted functions. Files: per T004 inventory.
-- [ ] T093 [test] Remove or rewrite tests that exercised the deleted sidecar functions (the `persistence` load/save/round-trip suites) — replace assertions with the FC-based hydrate/extract path where still relevant. Files: `services/session-state/src/persistence/__tests__/**` (and any sidecar fixtures).
+- [x] T090 Delete the package-level sidecar I/O — `saveSession`, `loadSession`, `extractPersistentState`, `serializeState`, `parseSessionJson`, the local `SessionFile` interface, and the version machinery — or reduce `load.ts`/`save.ts` to thin FC hydrate/extract wrappers only if a caller still needs them. Files: `services/session-state/src/persistence/load.ts`, `services/session-state/src/persistence/save.ts`, `services/session-state/src/persistence/schema.ts`, `services/session-state/src/persistence/index.ts`.
+- [x] T091 Remove the `@debrief/session-state` re-exports of the deleted sidecar functions/types. File: `services/session-state/src/index.ts`.
+- [x] T092 Update remaining consumers identified in T004 so the build is clean (e.g. `apps/vscode/src/services/sessionManager.ts`, `services/session-state/src/standalone.ts`, the MCP server) — none should import the deleted functions. Files: per T004 inventory.
+- [x] T093 [test] Remove or rewrite tests that exercised the deleted sidecar functions (the `persistence` load/save/round-trip suites) — replace assertions with the FC-based hydrate/extract path where still relevant. Files: `services/session-state/src/persistence/__tests__/**` (and any sidecar fixtures).
 - [ ] T094 [test] Two-file-invariant check (SC-002): after a save, assert the item directory contains only `item.json` + `features.geojson` (+ thumbnail assets) and no `*.debrief-session`; capture `dir-listing-after.txt`. Add the repo grep guard (`grep -rn "debrief-session" apps services --include='*.ts' | grep -v generated` ⇒ empty). File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts` (extend) + `specs/261-session-state-systemstate/evidence/dir-listing-after.txt`.
-- [ ] T095 Run `pnpm exec knip` (and `task verify` lint+typecheck) to confirm no dead exports/files remain from the sidecar deletion. No file path.
+- [x] T095 Run `pnpm exec knip` (and `task verify` lint+typecheck) to confirm no dead exports/files remain from the sidecar deletion. No file path.
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 

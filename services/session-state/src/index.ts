@@ -86,19 +86,11 @@ export {
   hasUnsavedChangesSelector,
 } from './store/middleware/selector.js';
 
-// Persistence
-export {
-  saveSession,
-  serializeState,
-  extractPersistentState,
-  loadSession,
-  parseSessionJson,
-  isVersionCompatible,
-  isFutureVersion,
-  SCHEMA_VERSIONS,
-  type SaveResult,
-  type LoadResult,
-} from './persistence/index.js';
+// Persistence: the `.debrief-session` sidecar I/O (saveSession / loadSession /
+// extractPersistentState / serializeState / parseSessionJson + the SessionFile
+// version machinery) was REMOVED in feature 261. All plot state now lives in
+// features.geojson as SystemState features + per-feature `visible` flags,
+// read/written through the SystemState helper below.
 
 // SystemState helper (Feature 261) — FeatureCollection-based plot-state
 // read/write for all four variants + per-feature visibility. The shared,

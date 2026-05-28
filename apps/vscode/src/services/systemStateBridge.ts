@@ -8,7 +8,6 @@
  */
 export {
   applyStateToFeatures,
-  buildWriteInputFromStore,
   hydrateStoreFromFeatures,
   SystemStateLoadError,
   type FeatureLike,
