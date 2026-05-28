@@ -64,6 +64,10 @@ This is the payoff of two principles the project has held from the start: schema
 
 ## Screenshots
 
+The whole round-trip in one loop — host A sets a view, only `features.geojson` is carried across, and host B rebuilds the same view (then the visibility round-trip):
+
+![Animated round-trip: host A's viewport + selection, the same view restored on host B from features.geojson alone, then a hidden feature surviving the transfer.](../evidence/screenshots/interaction.gif)
+
 The headline test is a round-trip across two hosts. Host A gets a recognisable viewport, a scoped time window, a scrubbed playhead, and a feature selection — the kind of state the sidecar used to strand on the machine that created it.
 
 ![Host A before transfer: a recognisable map viewport with a scoped analytical time window and a feature selection active.](../evidence/screenshots/roundtrip-host-a.png)
