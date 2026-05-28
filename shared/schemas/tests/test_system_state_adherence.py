@@ -52,6 +52,7 @@ def _load(rel: str) -> dict:
 
 # ── Valid SystemState variants: parse + round-trip ────────────────────
 
+
 @pytest.mark.parametrize(
     "name",
     ["spatial", "temporal", "selection", "active-storyboard"],
@@ -87,6 +88,7 @@ def test_absent_visible_means_visible() -> None:
 
 # ── Invalid: rejected by Pydantic (structural / type / enum / required) ─
 
+
 @pytest.mark.parametrize(
     "name",
     [
@@ -102,6 +104,7 @@ def test_invalid_rejected_by_pydantic(name: str) -> None:
 
 
 # ── Invalid: rejected by JSON-Schema rules (if/then), not Pydantic ────
+
 
 def test_spatial_missing_viewport_rejected_by_json_schema() -> None:
     """The `state_type == spatial` rule requires `viewport`. LinkML lowers
@@ -123,6 +126,7 @@ def test_valid_spatial_passes_json_schema() -> None:
 
 
 # ── FC-level + cross-field invariants: documented as helper-enforced ──
+
 
 def test_each_duplicate_state_type_feature_is_individually_valid() -> None:
     """Both features in multiple-same-state-type.json are individually valid;
