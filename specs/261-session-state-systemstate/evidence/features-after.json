@@ -704,15 +704,15 @@
       "properties": {
         "kind": "SYSTEM",
         "state_type": "temporal",
-        "start_time": "2024-01-15T09:30:00.000Z",
-        "end_time": "2024-01-15T14:00:00.000Z",
+        "start_time": "2024-01-01T00:00:00.000Z",
+        "end_time": "2024-01-07T00:00:00.000Z",
         "display_mode": "full",
         "step_size": {
           "value": 1,
           "unit": "minute"
         },
         "playback_rate": 1,
-        "current_time": "2024-01-15T11:45:00.000Z"
+        "current_time": "2024-01-04T00:00:00.000Z"
       }
     },
     {

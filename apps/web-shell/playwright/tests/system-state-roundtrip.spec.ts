@@ -85,17 +85,28 @@ test.describe('261 — self-describing plot round-trip', () => {
     });
     expect(firstFeatureId).not.toBeNull();
 
-    // Drive the session store to a recognisable view-state (host A).
+    // Drive the session store to a recognisable view-state (host A). Set an
+    // explicit time window so state.temporal is always produced regardless of
+    // whether the loaded exercise carries temporal data.
+    const RANGE_START = Date.parse('2024-01-01T00:00:00Z');
+    const RANGE_END = Date.parse('2024-01-07T00:00:00Z');
+    const PLAYHEAD = Date.parse('2024-01-04T00:00:00Z');
     await page.evaluate(
-      ({ viewport, selId }) => {
+      ({ viewport, selId, start, end, playhead }) => {
         const s = window.__sessionStore.getState();
         s.setViewport(viewport);
         s.setRotation(0);
-        const range = s.timeRange ?? { start: 0, end: 1000 };
-        s.setCurrentTime(Math.round((range.start + range.end) / 2));
+        s.setTimeRange({ start, end });
+        s.setCurrentTime(playhead);
         if (selId) s.setSelection([selId], selId);
       },
-      { viewport: RECOGNISABLE_VIEWPORT, selId: firstFeatureId },
+      {
+        viewport: RECOGNISABLE_VIEWPORT,
+        selId: firstFeatureId,
+        start: RANGE_START,
+        end: RANGE_END,
+        playhead: PLAYHEAD,
+      },
     );
 
     // The mirror effect folds state.* into the in-memory FC.
@@ -188,6 +199,27 @@ test.describe('261 — self-describing plot round-trip', () => {
     );
     expect(restoredHidden).toBe(true);
     await page.screenshot({ path: path.join(SHOTS, 'visibility-host-b.png') });
+  });
+
+  test('strict-on-import: a malformed SystemState feature fails load loudly (FR-012)', async ({ page }) => {
+    // A hand-crafted FeatureCollection with a spatial SystemState feature that
+    // omits its required `viewport` — the helper rejects it on load with a
+    // structured error naming the offending feature id (Article XIV.4).
+    const malformed: PlotFeatureShape[] = [
+      {
+        id: 'state.spatial',
+        properties: { kind: 'SYSTEM', state_type: 'spatial' },
+      },
+    ];
+    await page.evaluate(() => window.__backToCatalog?.());
+    await page.evaluate((features: PlotFeatureShape[]) => {
+      window.__openPlotFromFeatures?.('malformed/plot.geojson', features);
+    }, malformed);
+
+    const banner = page.locator('[data-testid="plot-load-error-banner"]');
+    await expect(banner).toBeVisible();
+    await expect(banner).toContainText(/state\.spatial/);
+    await page.screenshot({ path: path.join(SHOTS, 'strict-import-error.png') });
   });
 
   test('no sidecar file concept — the plot is a single self-describing FeatureCollection', async ({ page }) => {

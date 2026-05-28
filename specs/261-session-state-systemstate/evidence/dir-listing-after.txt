@@ -1,0 +1,18 @@
+# Item directory AFTER feature 261 — exactly two files (+ thumbnail assets)
+#
+# All interactive state now lives inside features.geojson as SystemState
+# features (state.spatial / state.temporal / state.selection /
+# state.activestoryboard) + per-feature `visible` flags. No sidecar.
+#
+# Actual listing from the committed sample catalog (SC-002):
+
+$ ls -1 preview/workspace/samples/local-store/core--boat1t/
+assets
+features.geojson
+item.json
+overview.png
+thumbnail.png
+
+# SC-002 repo guard — no runtime sidecar read/write code remains:
+$ grep -rn "debrief-session" apps services --include='*.ts' | grep -v test | grep -v '//'
+(only explanatory comments; zero runtime read/write paths)
