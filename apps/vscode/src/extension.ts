@@ -63,7 +63,7 @@ import {
   type PlaybackPanelView,
   type PlaybackTimeRangeView,
 } from './services/storyboardPlayback';
-import { formatDtg } from '@debrief/components';
+import { formatDtg, getPlotFeatureId } from '@debrief/components';
 import { calculateViewportCenter } from '@debrief/utils';
 import type { DebriefFeature } from '@debrief/components';
 
@@ -372,9 +372,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       const hiddenIds = new Set(state?.hiddenFeatureIds ?? []);
       const visibleFeatureIds: string[] = [];
       for (const f of features) {
-        const props = f.properties as { id?: string | null } | null;
-        const id = props?.id;
-        if (typeof id !== 'string' || id.length === 0) {continue;}
+        // ADR-035: canonical identity is the top-level GeoJSON `id`.
+        const id = getPlotFeatureId(f);
+        if (id === undefined) {continue;}
         if (hiddenIds.has(id)) {continue;}
         visibleFeatureIds.push(id);
       }

@@ -26,6 +26,7 @@ import {
   createStoryboard,
   createScene,
   getActiveStoryboardDefault,
+  getPlotFeatureId,
   DuplicateStoryboardNameError,
   type StoryboardPlot,
   type SceneFeature,
@@ -379,9 +380,11 @@ async function captureSceneWebInner(
   // the createStoryboard call above).
   const visibleIds: string[] = [];
   for (const f of plot.features) {
-    const props = f.properties as { id?: string | number | null } | null;
-    const rawId = props?.id;
-    if (typeof rawId !== 'string' || rawId.length === 0) continue;
+    // ADR-035: canonical identity is the top-level GeoJSON `id`.
+    // `properties.id` is absent on data features (Tracks), so reading it
+    // here silently dropped every Track from `visible_feature_ids`.
+    const rawId = getPlotFeatureId(f);
+    if (rawId === undefined) continue;
     if (latestHiddenIds.has(rawId)) continue;
     if (hiddenIds.has(rawId)) continue;
     visibleIds.push(rawId);

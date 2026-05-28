@@ -37,27 +37,27 @@ The briefing renderer is the same player that already ships inside exported zips
 
 ## Screenshots
 
-It starts with one button. The Preview control sits beside Capture in the storyboard panel header — active whenever the storyboard has at least one scene, disabled with an explanatory tooltip when it doesn't.
+It starts in the authoring surface. Here is the *Saxon Warrior — Twin CPA* exercise open in the browser (web-shell): two vessel tracks (HMS Richmond and Contact Alpha) crossing at a closest-point-of-approach, four scenes captured, and the **Preview** control sitting beside Capture in the storyboard panel header — active because the storyboard has scenes.
 
-![Preview button beside Capture in the StoryboardPanel header, light theme](images/storyboard-preview-light.png)
-*The trigger: click Preview in the panel header.*
+![Web-shell authoring surface: the Saxon Warrior storyboard with four captured scenes and the Preview button in the panel header](images/preview-trigger-webshell.png)
+*The trigger: a storyboard with four captured scenes, Preview live in the panel header. Every screenshot below was produced by a Playwright run that clicked this exact button.*
 
-Clicking it opens the finished-briefing player in a new tab and plays the storyboard back — the same renderer that ships inside an exported zip, here driven live. Below is the Channel Crossing briefing playing scene by scene: two vessels tracking through the English Channel and North Sea, the viewport framing and flying to each captured scene in turn.
+One click opens the finished-briefing player in a new tab and plays the storyboard back — the same renderer that ships inside an exported zip, here driven live from a `?features=` blob URL. The player flies the viewport to each captured scene in turn over a live OpenStreetMap basemap. Below is the briefing playing scene by scene, progressively closing on the two vessels' converging tracks.
 
-![Scene 1 — exercise overview: both vessel tracks across the Channel](images/preview-scene-1-overview.png)
-*Scene 1 — the opening overview frames both tracks.*
+![Scene 1 — opening overview: both vessel tracks in frame, the two paths crossing](images/preview-scene-1-overview.png)
+*Scene 1 — the opening overview frames both tracks; the transport reads 1 / 4.*
 
-![Scene 2 — the viewport flies in to follow the approach](images/preview-scene-2-approach.png)
-*Scene 2 — Preview flies the viewport to the next captured framing.*
+![Scene 2 — the viewport flies in toward the approach](images/preview-scene-2-approach.png)
+*Scene 2 — Preview flies the viewport in to the next captured framing.*
 
-![Scene 3 — convergence near the Dover Strait](images/preview-scene-3-convergence.png)
-*Scene 3 — convergence near the Dover Strait.*
+![Scene 3 — closer on the closest-point-of-approach where the tracks meet](images/preview-scene-3-convergence.png)
+*Scene 3 — tighter still on the CPA, where the two tracks converge.*
 
-![Scene 4 — the time-range scene scrubs the closing phase](images/preview-scene-4-timerange.png)
-*Scene 4 — a time-range scene animates the closing phase, slider-driven, exactly as the exported zip would.*
+![Scene 4 — the closing geometry near the end of the timeline, Replay now offered](images/preview-scene-4-closing.png)
+*Scene 4 — the closing geometry; at the final scene the transport offers Replay.*
 
 ![Present mode — all chrome hidden, the map fills the screen](images/preview-present-mode.png)
-*Press P for Present mode — chrome hides and the map fills the screen.*
+*Press P for Present mode — chrome hides and the map fills the screen, exactly as the distributed briefing plays.*
 
 And when there is nothing to preview yet, the button stays out of the way:
 
@@ -77,6 +77,10 @@ The test suites covering this work:
 These are pass/fail suites; the numbers are test counts, not coverage percentages.
 
 ## Lessons Learned
+
+The most expensive lesson surfaced while capturing these very screenshots: the first live previews came up with an *empty map* — no vessel tracks. The cause was a latent defect the preview inherited from the capture pipeline. When a scene records which features it shows (`visible_feature_ids`), the code read each feature's `properties.id`. But a Debrief data feature carries its identity at the **top-level GeoJSON `id`** — `properties.id` exists only on Storyboard and Scene features. So for real tracks the id came back `undefined`, the scene recorded an empty visibility set, and the scoping step dropped every track on the way into the briefing. The export had quietly had the same hole all along.
+
+Why did strong typing not catch it? Because the feature was iterated as a deliberately-loose boundary type whose `properties` carried an index signature (`{ kind?: string; [k: string]: unknown }`), and the call site then *cast* it (`feature.properties as { id?: string }`). The index signature makes `.id` type-check as `unknown`; the cast fabricates a field the schema never defines. An unchecked assertion is exactly where the type system stops helping — the project already had the correctly-derived `DebriefFeature` union + guards that would have made this a compile error. The fix (ADR-035) routes every identity read through one typed accessor that reads the canonical top-level id, and a new lint rule now flags inline-object casts (`x as { … }`) so the same shortcut can't reappear. The broader principle: validate at the boundary with the type system, and never reach for an unchecked cast inside it.
 
 The additive second boot path turned out to be the right framing from the start. Because the live path activates only on the presence of `?features=`, the inline offline path is structurally untouched — it imports no `fetch` at all. "Zero network for storyboard data" in the offline case is enforced by what the code doesn't import, not by an assertion in a test. That made it straightforward to keep both paths green simultaneously and meant the offline guarantee didn't need re-proving after every change to the live path.
 

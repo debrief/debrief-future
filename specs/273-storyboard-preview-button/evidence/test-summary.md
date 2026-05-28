@@ -1,12 +1,22 @@
 ---
 feature: "273-storyboard-preview-button"
-captured_at: "2026-05-27T06:56:35Z"
-git_sha: "b13fcec"
+captured_at: "2026-05-28T20:35:00Z"
+git_sha: "dbb91cf"
 tests_passed: 173
 tests_failed: 0
 tests_skipped: 0
 coverage_pct: null
 ---
+
+> **Continuation update (2026-05-28).** While capturing live-preview evidence,
+> the preview map came up empty — root-caused to a latent identity defect
+> (ADR-035): capture read the non-existent `properties.id` on data features, so
+> tracks were dropped from `visible_feature_ids` and the briefing rendered no
+> vessels. Fixed by routing identity through `getPlotFeatureId` (top-level
+> GeoJSON `id`) at all five collection/resolution sites, plus a lint ban on
+> inline-object casts. The web-shell preview workflow E2E (T038/T039) now exists
+> and **passes**, producing the real playback screenshots. See the
+> "Continuation" section at the foot of this file.
 
 # Test Summary: Storyboard live Preview button + web-shell briefing-zip export parity
 
@@ -112,14 +122,51 @@ Screenshots written to `evidence/screenshots/`:
   directory listing) — a renderer-asset-manifest addition beyond this pass. The
   reusable mechanism (shared core + adapter seam) is in place; only the
   web-shell wiring + button remain. US2 is P2.
-- **Web-shell preview Playwright workflow (T038/T039)** — deferred. The web-shell
-  preview launcher is covered by unit tests (`previewStoryboardWeb`) and the
-  Vite serving plugin is in place; a full new-tab Playwright workflow against a
-  served renderer is the remaining E2E.
+- **Web-shell preview Playwright workflow (T038/T039)** — ✅ **done** (2026-05-28).
+  `apps/web-shell/playwright/tests/storyboard-preview.spec.ts` drives the real
+  flow end-to-end and passes; see the Continuation section.
 - **Storybook E2E pre-existing failures** — 6 unrelated `Empty` / `WithOneScene`
   assertions fail in the cloud Storybook run (e.g. a `role="listitem"`
   expectation on `SceneRow`, which #273 did not touch). All #273 Preview tests
   pass and all four evidence screenshots were captured.
+
+## Continuation (2026-05-28) — ADR-035 fix + real preview workflow E2E
+
+### Canonical-identity regression (ADR-035)
+
+| Area | Status |
+|------|--------|
+| `getPlotFeatureId` reads the top-level `id`; ignores `properties.id` even when both exist; coerces numeric id; returns undefined for empty/missing (`shared/components/.../featureId.test.ts`, 5 tests) | Pass |
+| `@debrief/components` full suite after the change (2165 tests) | Pass |
+| `debrief-vscode` full suite after the change (808 tests; the slow briefing-zip happy-path test had its timeout raised from the 5 s default to de-flake under full-suite load) | Pass |
+
+The fix routes identity through `getPlotFeatureId` at all five sites: VS Code +
+web-shell capture, web-shell update-to-current, the extension host-deps
+collector, and the missing-data resolver (`collectResolvableFeatureIds`).
+
+### Web-shell live-preview workflow E2E (T038 / T039) — Playwright, passes
+
+`apps/web-shell/playwright/tests/storyboard-preview.spec.ts` (cloud Chromium):
+
+| Step | Status |
+|------|--------|
+| Open *Saxon Warrior — Twin CPA* (two tracks) via quick-search + double-click | Pass |
+| Capture four Scenes at progressively tighter framings + advancing time | Pass |
+| Click **Preview** → new tab opens at `/briefing-renderer/?features=blob%3A…` | Pass |
+| Renderer reaches `ready`, transport reads `1 / 4`, OSM basemap paints | Pass |
+| **ADR-035 guard:** every captured Scene references both tracks (`visible_feature_ids ≥ 2`) | Pass |
+| **ADR-035 guard:** renderer draws the vessel-track SVG paths (preview not empty) | Pass |
+| Step transport through all four Scenes; `P` enters Present mode (chrome hidden) | Pass |
+
+Screenshots written to `evidence/screenshots/` (also mirrored to `media/images/`):
+`preview-trigger-webshell.png` (the authoring surface + Preview button),
+`preview-playback-webshell.png` (headline), `preview-scene-{1-overview,2-approach,3-convergence,4-closing}.png`,
+`preview-present-mode.png`.
+
+> Note: the cloud test env routes egress through a TLS-intercepting proxy whose
+> CA the bundled Chromium doesn't trust, so the spec uses a context with
+> `ignoreHTTPSErrors: true` purely so the OSM basemap paints for the
+> screenshots. Real users reach OSM directly; no product code is affected.
 
 ## Environment
 

@@ -25,6 +25,7 @@ export class StoryboardPanelPage {
   readonly namingConfirm: Locator;
   readonly storyboardName: Locator;
   readonly sceneCount: Locator;
+  readonly previewButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -40,6 +41,26 @@ export class StoryboardPanelPage {
     );
     this.storyboardName = page.locator('[data-testid="storyboard-name"]');
     this.sceneCount = page.locator('[data-testid="storyboard-scene-count"]');
+    // #273 — the live Preview control in the panel header.
+    this.previewButton = page.locator('[data-testid="storyboard-preview"]');
+  }
+
+  /**
+   * #273 — click Preview and return the briefing-renderer tab it opens.
+   *
+   * The web-shell launches the renderer via `window.open(url, name)`, which
+   * Playwright surfaces as a `popup` event on the opener page. The opener
+   * tab is left alive so the renderer can fetch the features blob URL it was
+   * handed (C-C2). Returns the popup `Page` so callers can drive playback.
+   */
+  async openPreview(): Promise<Page> {
+    await this.previewButton.waitFor({ state: 'visible', timeout: 10_000 });
+    const [popup] = await Promise.all([
+      this.page.waitForEvent('popup'),
+      this.previewButton.click(),
+    ]);
+    await popup.waitForLoadState('domcontentloaded');
+    return popup;
   }
 
   /**
