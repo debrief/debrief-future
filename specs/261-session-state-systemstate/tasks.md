@@ -160,8 +160,8 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Dirty-tracking contract (FR-019/FR-020/FR-021)
 
-- [ ] T064 Ensure view-state store mutations do NOT set the dirty flag — `setViewport`, `setRotation`, `setSelection`, `setCurrentTime`, `setTimeRange`, `setTimeFilter`, `setDisplayMode`, `setStepSize`, `setPlaybackRate` — while substantive content edits still do (FR-019/FR-021). File: `services/session-state/src/store/middleware/dirty.ts` (and/or the relevant slice setters).
-- [ ] T065 [P][test] Behaviour test: each view-state action leaves `dirty` false; a content edit sets it true. File: `services/session-state/src/store/middleware/__tests__/dirty.systemstate.test.ts`.
+- [x] T064 Ensure view-state store mutations do NOT set the dirty flag — `setViewport`, `setRotation`, `setSelection`, `setCurrentTime`, `setTimeRange`, `setTimeFilter`, `setDisplayMode`, `setStepSize`, `setPlaybackRate` — while substantive content edits still do (FR-019/FR-021). File: `services/session-state/src/store/middleware/dirty.ts` (and/or the relevant slice setters).
+- [x] T065 [P][test] Behaviour test: each view-state action leaves `dirty` false; a content edit sets it true. File: `services/session-state/src/store/middleware/__tests__/dirty.systemstate.test.ts`.
 
 ### VS Code load + save wiring (remove the sidecar calls)
 
