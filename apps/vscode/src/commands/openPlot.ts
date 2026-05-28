@@ -3,8 +3,9 @@
  */
 
 import * as vscode from 'vscode';
-import { access, readFile } from 'fs/promises';
-import { loadSession, createLogService, createSnapshotService, createTimeInstant, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
+import { readFile } from 'fs/promises';
+import { createLogService, createSnapshotService, createTimeInstant, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
+import { hydrateStoreFromFeatures, SystemStateLoadError } from '../services/systemStateBridge';
 import type { StacWriter } from '@debrief/stac-writer';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
@@ -63,29 +64,6 @@ function toSafeFC(fc: { type: string; features: Array<{ type: string; geometry: 
 
 interface OpenPlotArgs {
   uri?: string;
-}
-
-/**
- * Derive session file path from store path and item path.
- * Converts item.json to item.debrief-session.
- */
-function deriveSessionPath(storePath: string, itemPath: string): string {
-  const sessionItemPath = itemPath.replace(/\.json$/, '.debrief-session');
-  // Normalize path separators
-  const normalizedStorePath = storePath.replace(/\\/g, '/');
-  return `${normalizedStorePath}/${sessionItemPath}`;
-}
-
-/**
- * Check if a file exists.
- */
-async function fileExists(path: string): Promise<boolean> {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 interface PlotQuickPickItem extends vscode.QuickPickItem {
@@ -192,25 +170,21 @@ export function createOpenPlotCommand(
       featureCollectionUri: plotUri,
     });
 
-    // Check for existing session file and load it (Feature: 029 - T053-T055)
-    const sessionPath = deriveSessionPath(store.path, itemPath);
-    if (await fileExists(sessionPath)) {
-      const loadResult = await loadSession(session, sessionPath);
-      if (loadResult.success) {
-        // Session loaded successfully
-        void vscode.window.showInformationMessage(
-          `Restored session from ${sessionPath.split('/').pop()}`
+    // Feature 261 (FR-007): hydrate view-state (viewport, time window/playhead,
+    // selection) and per-feature visibility from the SystemState features inside
+    // the loaded features.geojson. The `.debrief-session` sidecar is gone — the
+    // plot is self-describing. Absence of a SystemState variant leaves the store
+    // at its defaults (FR-008). Malformed / duplicate / cross-field-invalid
+    // SystemState features fail loudly (strict-on-import, FR-011/FR-012).
+    try {
+      hydrateStoreFromFeatures(session.getState(), plotData.features);
+    } catch (err) {
+      if (err instanceof SystemStateLoadError) {
+        void vscode.window.showErrorMessage(
+          `Could not restore plot view-state: ${err.message}`,
         );
-      } else if (loadResult.error?.includes('newer than supported')) {
-        // Future version - warn user (T055)
-        void vscode.window.showWarningMessage(
-          `Session file was created with a newer version of Debrief. Some settings may not be restored. ${loadResult.error}`
-        );
-      } else if (loadResult.error) {
-        // Other error - warn but continue
-        void vscode.window.showWarningMessage(
-          `Could not restore session: ${loadResult.error}`
-        );
+      } else {
+        throw err;
       }
     }
 

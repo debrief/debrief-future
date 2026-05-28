@@ -137,12 +137,12 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Wire active_storyboard into VS Code (read + write via the helper)
 
-- [ ] T055 In `openPlot.ts`, after `stacService.loadPlotData`, call `readSystemStateFromFeatureCollection(plotData)` and apply the `active_storyboard` pin via the existing storyboard-selection store action. (Leave the sidecar load block intact for now — it carries temporal/spatial/selection until Phase 4.) File: `apps/vscode/src/commands/openPlot.ts`.
-- [ ] T056 In `saveSession.ts`, populate `active_storyboard` into `writeSystemStateIntoFeatureCollection(mapPanel.getCurrentFeatures(), input)` before the `storeFeatureCollection` write. (Leave the sidecar write intact for now.) File: `apps/vscode/src/commands/saveSession.ts`.
+- [x] T055 In `openPlot.ts`, after `stacService.loadPlotData`, call `readSystemStateFromFeatureCollection(plotData)` and apply the `active_storyboard` pin via the existing storyboard-selection store action. (Leave the sidecar load block intact for now — it carries temporal/spatial/selection until Phase 4.) File: `apps/vscode/src/commands/openPlot.ts`.
+- [x] T056 In `saveSession.ts`, populate `active_storyboard` into `writeSystemStateIntoFeatureCollection(mapPanel.getCurrentFeatures(), input)` before the `storeFeatureCollection` write. (Leave the sidecar write intact for now.) File: `apps/vscode/src/commands/saveSession.ts`.
 
 ### Cross-host parity + #237 regression
 
-- [ ] T057 [test] VS Code extension test (Mocha): pin a storyboard via the store, save, assert the resulting `features.geojson` contains `state.activestoryboard` with the correct `active_storyboard_id`. File: `apps/vscode/test/system-state-roundtrip.test.ts`.
+- [x] T057 [test] VS Code extension test (Mocha): pin a storyboard via the store, save, assert the resulting `features.geojson` contains `state.activestoryboard` with the correct `active_storyboard_id`. File: `apps/vscode/test/system-state-roundtrip.test.ts`.
 - [ ] T058 [test] Run the existing `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts` post-T054 — MUST pass unchanged (the shared helper is now the writer; behaviour preserved). File: `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts` (verify only).
 
 ## Phase 4: User Story 1 — Self-describing plot: spatial + temporal + selection round-trip (P1)
@@ -165,8 +165,8 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### VS Code load + save wiring (remove the sidecar calls)
 
-- [ ] T066 In `openPlot.ts`, extend the SystemState read (from T055) to hydrate spatial/temporal/selection into the store via the converters, then **delete** the sidecar load block (≈ lines 188–208) and the `deriveSessionPath` import there. File: `apps/vscode/src/commands/openPlot.ts`.
-- [ ] T067 In `saveSession.ts`, add spatial/temporal/selection to the `writeSystemStateIntoFeatureCollection` input; **delete** the `saveSession(session, savePath)` sidecar call and `deriveSessionPath`; relax the `if (!state.dirty) {…return}` early-return so an explicit save persists a looked-at-only view (FR-020). File: `apps/vscode/src/commands/saveSession.ts`.
+- [x] T066 In `openPlot.ts`, extend the SystemState read (from T055) to hydrate spatial/temporal/selection into the store via the converters, then **delete** the sidecar load block (≈ lines 188–208) and the `deriveSessionPath` import there. File: `apps/vscode/src/commands/openPlot.ts`.
+- [x] T067 In `saveSession.ts`, add spatial/temporal/selection to the `writeSystemStateIntoFeatureCollection` input; **delete** the `saveSession(session, savePath)` sidecar call and `deriveSessionPath`; relax the `if (!state.dirty) {…return}` early-return so an explicit save persists a looked-at-only view (FR-020). File: `apps/vscode/src/commands/saveSession.ts`.
 
 ### Web-shell load + save wiring (FR-009a)
 
@@ -175,7 +175,7 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Tests + cross-host E2E (SC-001/SC-002a/SC-003)
 
-- [ ] T070 [P][test] Unit/integration: an FC with no `state.*` features loads with defaults (no error); an FC with them hydrates the store; saving a populated store yields the three `state.*` features and writes no sidecar. File: `services/session-state/src/system-state/__tests__/host-roundtrip.test.ts`.
+- [x] T070 [P][test] Unit/integration: an FC with no `state.*` features loads with defaults (no error); an FC with them hydrates the store; saving a populated store yields the three `state.*` features and writes no sidecar. File: `services/session-state/src/system-state/__tests__/host-roundtrip.test.ts`.
 - [ ] T071 [test] Playwright web-shell spec: set a recognisable viewport + time window + playhead + selection → explicit save → reload page (clear in-memory store) → reopen `features.geojson` only → assert viewport/time/selection restored. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
 - [ ] T072 [test] Cross-host parity: a `features.geojson` written by the VS Code Mocha test is opened by the Playwright spec (state restored), and one written by Playwright is read by the Mocha test — via a shared fixture corpus. Files: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`, `apps/vscode/test/system-state-roundtrip.test.ts`.
 
@@ -191,8 +191,8 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Host wiring (both hosts, via the helper from T035)
 
-- [ ] T080 VS Code load: in `openPlot.ts`, hydrate the store's hidden set from `readHiddenFeatureIds(plotData)` (so visibility comes solely from per-feature `visible`, not a sidecar). File: `apps/vscode/src/commands/openPlot.ts`.
-- [ ] T081 VS Code save: in `saveSession.ts`, apply the store's hidden set to the FeatureCollection via `applyVisibilityToFeatureCollection(features, hiddenIds)` before writing `features.geojson`. File: `apps/vscode/src/commands/saveSession.ts`.
+- [x] T080 VS Code load: in `openPlot.ts`, hydrate the store's hidden set from `readHiddenFeatureIds(plotData)` (so visibility comes solely from per-feature `visible`, not a sidecar). File: `apps/vscode/src/commands/openPlot.ts`.
+- [x] T081 VS Code save: in `saveSession.ts`, apply the store's hidden set to the FeatureCollection via `applyVisibilityToFeatureCollection(features, hiddenIds)` before writing `features.geojson`. File: `apps/vscode/src/commands/saveSession.ts`.
 - [ ] T082 Web-shell: hydrate the hidden set from the FC on plot open and apply it back through the shared writer on persist (mirrors T068/T069). File: `apps/web-shell/src/` (plot-open / FC-persist path).
 
 ### Visibility provenance (FR-013/FR-014/R-012)

@@ -1,47 +1,28 @@
 /**
- * Save Session Command - Persist session state to a .debrief-session file
+ * Save Session Command - Persist the plot to features.geojson
  *
  * Feature: 029-session-state-vscode (Phase 7)
  * Feature: 174-thumbnail-capture (thumbnail generation on save)
+ * Feature: 261-session-state-systemstate (sidecar retired — all view-state now
+ *   rides in features.geojson as SystemState features + per-feature `visible`
+ *   flags; the `.debrief-session` sidecar write is gone).
  *
- * Saves the current session state (viewport, selection, time, visibility)
- * to a file adjacent to the plot data file. After saving, captures map
+ * Saves the current plot — geographic/storyboard features plus the analyst's
+ * view-state (viewport, time window/playhead, selection) and per-feature
+ * visibility — into `features.geojson`. An explicit save persists the current
+ * view regardless of the dirty flag (FR-020). After saving, captures map
  * thumbnails and stores them as STAC assets.
  */
 
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { saveSession, type SessionStoreWithUndo } from '@debrief/session-state';
-import type { DebriefFeature } from '@debrief/components';
 import type { StacWriter } from '@debrief/stac-writer';
 import { StacWriterError } from '@debrief/stac-writer';
 import type { SessionManager } from '../services/sessionManager';
 import type { MapPanel } from '../webview/mapPanel';
 import { parseStacUri } from '../types/stac';
-
-/**
- * Derive a session file path from a plot URI.
- *
- * For a plot at stac://store/catalog/item.json,
- * creates path like: /path/to/store/catalog/item.debrief-session
- *
- * @param plotUri - The stac:// URI
- * @param storePath - The filesystem path of the STAC store
- * @returns The session file path, or null if unable to derive
- */
-function deriveSessionPath(plotUri: string, storePath: string): string | null {
-  const parsed = parseStacUri(plotUri);
-  if (!parsed) {
-    return null;
-  }
-
-  // Replace .json with .debrief-session
-  const itemPath = parsed.itemPath.replace(/\.json$/, '.debrief-session');
-
-  // Combine with store path
-  return `${storePath}/${itemPath}`;
-}
+import { applyStateToFeatures, type FeatureLike } from '../services/systemStateBridge';
 
 /**
  * Write the in-memory FeatureCollection back to `<item-dir>/features.geojson`.
@@ -54,7 +35,7 @@ function deriveSessionPath(plotUri: string, storePath: string): string | null {
 export function storeFeatureCollection(
   storePath: string,
   plotUri: string,
-  features: DebriefFeature[],
+  features: ReadonlyArray<FeatureLike>,
 ): void {
   const parsed = parseStacUri(plotUri);
   if (!parsed) {
@@ -116,95 +97,59 @@ export function createSaveSessionCommand(
     const plotUri = sessionManager.getActiveDocumentUri();
 
     if (!session || !plotUri) {
-      void vscode.window.showWarningMessage('No plot open to save session for');
+      void vscode.window.showWarningMessage('No plot open to save');
       return;
     }
 
-    // Check if session is dirty
-    const state: SessionStoreWithUndo = session.getState();
-    if (!state.dirty) {
-      void vscode.window.showInformationMessage('Session has no unsaved changes');
+    const state = session.getState();
+    const parsed = parseStacUri(plotUri);
+    const storePath = parsed ? getStorePath(parsed.storeId) : undefined;
+    const mapPanel = getMapPanel?.();
+
+    // Feature 261 (FR-020): an explicit save persists the current view
+    // REGARDLESS of the dirty flag — view-state changes (pan/zoom/scrub/select/
+    // hide) are exploration and never raise dirty (FR-019), but the analyst can
+    // still commit a view they have only looked at. No early-return on !dirty.
+    if (!mapPanel || !parsed || !storePath) {
+      void vscode.window.showWarningMessage('Cannot save: no writable plot context');
       return;
     }
 
-    // Get or derive save path
-    let savePath = state.savePath;
-
-    if (!savePath) {
-      // Try to derive from plot URI
-      const parsed = parseStacUri(plotUri);
-      if (parsed) {
-        const storePath = getStorePath(parsed.storeId);
-        if (storePath) {
-          savePath = deriveSessionPath(plotUri, storePath);
-        }
-      }
-
-      // If still no path, ask user
-      if (!savePath) {
-        const result = await vscode.window.showSaveDialog({
-          defaultUri: vscode.Uri.file('session.debrief-session'),
-          filters: {
-            'Debrief Session': ['debrief-session'],
-          },
-          saveLabel: 'Save Session',
-          title: 'Save Debrief Session',
-        });
-
-        if (!result) {
-          return; // User cancelled
-        }
-
-        savePath = result.fsPath;
-      }
-    }
-
-    // Save the session
-    const result = await saveSession(session, savePath);
-
-    if (result.success) {
-      void vscode.window.showInformationMessage(
-        `Session saved to ${result.path}`
-      );
-
-      const mapPanel = getMapPanel?.();
-      const parsed = parseStacUri(plotUri);
-      const storePath = parsed ? getStorePath(parsed.storeId) : undefined;
-
-      // Persist in-memory features back to features.geojson so captured
-      // Storyboard/Scene features (and any other mutations) survive reload.
-      if (mapPanel && parsed && storePath) {
-        try {
-          storeFeatureCollection(storePath, plotUri, mapPanel.getCurrentFeatures());
-        } catch (err) {
-          console.warn('[debrief] features.geojson write failed (non-blocking):', err);
-        }
-      }
-
-      // Capture thumbnails after successful save (#174)
-      if (mapPanel && parsed && storePath && getStacWriter) {
-        try {
-          const { largePngBase64, smallPngBase64 } = await mapPanel.requestThumbnailCapture(5000);
-          if (largePngBase64 && smallPngBase64) {
-            const writer = getStacWriter(storePath);
-            await storeThumbnails(writer, plotUri, largePngBase64, smallPngBase64);
-          }
-        } catch (err) {
-          // Article I.3 — service-write failures must surface; capture
-          // failures (non-StacWriterError) remain best-effort.
-          if (err instanceof StacWriterError) {
-            void vscode.window.showErrorMessage(
-              `Thumbnail save failed: ${err.message}`,
-            );
-          } else {
-            console.warn('[debrief] Thumbnail capture failed (non-blocking):', err);
-          }
-        }
-      }
-    } else {
+    // Feature 261 (FR-009/FR-010): write exactly features.geojson. The current
+    // view-state (viewport, time window/playhead, selection) is upserted as
+    // SystemState features and per-feature visibility is set, then the whole
+    // FeatureCollection is written. NO `.debrief-session` sidecar is written.
+    try {
+      const features = applyStateToFeatures(mapPanel.getCurrentFeatures(), state);
+      storeFeatureCollection(storePath, plotUri, features);
+    } catch (err) {
       void vscode.window.showErrorMessage(
-        `Failed to save session: ${result.error}`
+        `Failed to save plot: ${err instanceof Error ? err.message : String(err)}`,
       );
+      return;
+    }
+
+    // The plot is now persisted; clear the dirty flag.
+    session.getState().markClean();
+    void vscode.window.showInformationMessage('Plot saved');
+
+    // Capture thumbnails after successful save (#174)
+    if (getStacWriter) {
+      try {
+        const { largePngBase64, smallPngBase64 } = await mapPanel.requestThumbnailCapture(5000);
+        if (largePngBase64 && smallPngBase64) {
+          const writer = getStacWriter(storePath);
+          await storeThumbnails(writer, plotUri, largePngBase64, smallPngBase64);
+        }
+      } catch (err) {
+        // Article I.3 — service-write failures must surface; capture
+        // failures (non-StacWriterError) remain best-effort.
+        if (err instanceof StacWriterError) {
+          void vscode.window.showErrorMessage(`Thumbnail save failed: ${err.message}`);
+        } else {
+          console.warn('[debrief] Thumbnail capture failed (non-blocking):', err);
+        }
+      }
     }
   };
 }
