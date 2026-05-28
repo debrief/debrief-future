@@ -26,6 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { mkdirSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
 import { StoryboardPanelPage } from '../pages/StoryboardPanelPage';
+import { openCapturablePlot } from '../helpers/openCapturablePlot';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SHOTS = resolve(
@@ -155,56 +156,24 @@ test.describe('#273 — Storyboard live Preview (web-shell)', () => {
     const page = await context.newPage();
     const panel = new StoryboardPanelPage(page);
 
-    // ── Load the Saxon Warrior plot with the rail enabled ──────────────
-    await page.goto('/?storyboardPanel=1');
-    await expect(page.locator('.web-shell--welcome')).toBeVisible({
-      timeout: 20_000,
-    });
-    // Quick-search the catalog down to the twin-track exercise, then open it
-    // through the real selection path (double-click → handlePlotSelect).
-    const search = page.getByTestId('quick-search-input');
-    await search.waitFor({ state: 'visible', timeout: 20_000 });
-    await search.fill('Twin Cpa');
-    const twinRow = page
-      .locator('[data-testid="exercise-list-item-row"]')
-      .filter({ hasText: 'Twin Cpa' });
-    await twinRow.first().waitFor({ state: 'visible', timeout: 15_000 });
-    await twinRow.first().dblclick();
-
-    await expect(page.locator('.web-shell--analysis')).toBeVisible({
-      timeout: 30_000,
-    });
-    await expect(page.locator('.leaflet-container')).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(
-      page.locator('[data-testid="time-controller"]'),
-    ).toBeVisible({ timeout: 15_000 });
-    await expect(
-      page.locator('[data-testid="storyboard-panel-rail"]'),
-    ).toBeVisible({ timeout: 15_000 });
-    // Let the basemap tiles paint so captured thumbnails are meaningful.
+    // ── Load the Saxon Warrior (Twin CPA) plot with the rail enabled ───
+    // Deterministic ?plot= deep-link to a track-bearing, temporal plot;
+    // also waits for viewport && currentTime (see helpers/openCapturablePlot).
+    await openCapturablePlot(page);
+    // Let the basemap tiles paint (best-effort) so captured thumbnails + the
+    // trigger screenshot show the map.
     await page
       .locator('.leaflet-tile-loaded')
       .first()
-      .waitFor({ state: 'visible', timeout: 20_000 })
+      .waitFor({ state: 'visible', timeout: 15_000 })
       .catch(() => undefined);
-    await page.waitForTimeout(1_000);
-
     // Tracks must be rendered before we can frame on them.
     await page
       .locator('.leaflet-overlay-pane path')
       .first()
       .waitFor({ state: 'attached', timeout: 20_000 });
-
-    // Seed an initial (framed) viewport into the store before capture #1.
+    // Frame both tracks before capture #1.
     await centreTracks(page);
-    await page.waitForFunction(
-      () =>
-        window.__sessionStore?.getState().viewport !== null &&
-        window.__sessionStore?.getState().currentTime !== null,
-      { timeout: 60_000 },
-    );
 
     // ── Capture four Scenes: progressively closing on the CPA over time ─
     // Scene 1 — opening overview, both tracks in frame, start of the run.
