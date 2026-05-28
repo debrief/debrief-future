@@ -2,14 +2,22 @@ import { Map as LeafletMap } from 'leaflet';
 import { DebriefFeature, DebriefFeatureCollection, Bounds, DisplayMode } from '../utils/types';
 import { DrawingMode } from './LeafletToolbar';
 import { SceneRectangleLayerProps } from './SceneRectangleLayer';
+import { SelectionClickEvent } from '../utils/applyClickToSelection';
 
 export interface MapViewProps {
     /** GeoJSON features to display */
     features: DebriefFeatureCollection | DebriefFeature[];
     /** Set of selected feature IDs */
     selectedIds?: Set<string>;
-    /** Callback when a feature is clicked */
-    onSelect?: (featureId: string, event: React.MouseEvent) => void;
+    /**
+     * Callback when a feature is clicked.
+     *
+     * **Breaking change (#192 Phase 5)**: the payload is now a
+     * `SelectionClickEvent` (`{ target, modifier, shift }`) rather than
+     * `(featureId, event)`. Pair with `applyClickToSelection` from
+     * `@debrief/components` to derive the next selection set.
+     */
+    onSelect?: (event: SelectionClickEvent) => void;
     /** Callback when clicking empty space (for clearing selection) */
     onBackgroundClick?: () => void;
     /** Callback when zoom level changes */

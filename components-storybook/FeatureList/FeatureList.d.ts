@@ -1,5 +1,6 @@
 import { default as React, CSSProperties } from '../../../../node_modules/.pnpm/react@18.3.1/node_modules/react';
 import { DebriefFeature, DebriefFeatureCollection } from '../utils/types';
+import { SelectionClickEvent } from '../utils/applyClickToSelection';
 
 export interface FeatureListProps {
     /** Features to display - either FeatureCollection or array */
@@ -13,6 +14,15 @@ export interface FeatureListProps {
      * Shift-click to select a contiguous range.
      */
     onSelectionChange?: (ids: Set<string>) => void;
+    /**
+     * Optional structured-event callback emitted on plain/modifier clicks
+     * (the two branches that route through the shared
+     * `applyClickToSelection` helper). Consumers that need the modifier
+     * bit — e.g. to compute `selection.primary` — should prefer this over
+     * `onSelectionChange`. Not emitted on shift-range clicks (those are
+     * list-only and have no clear single "target"). #192 Phase 5.
+     */
+    onSelectionEvent?: (event: SelectionClickEvent) => void;
     /**
      * @deprecated Use onSelectionChange for full multi-select support.
      * Simple callback when a feature is clicked (id only).
@@ -49,5 +59,5 @@ export interface FeatureListProps {
  * FeatureList displays a virtualized list of features with expand/collapse
  * support for viewing child elements (positions, points, polygons).
  */
-export declare function FeatureList({ features, selectedIds, hiddenIds, onSelectionChange, onSelect, onToggleExpand, filter, height, rowHeight, className, style, showFormatIcon, onFormatClick, onChildFormatClick, showInfoIcon, onInfoClick, onChildInfoClick, }: FeatureListProps): import("react/jsx-runtime").JSX.Element;
+export declare function FeatureList({ features, selectedIds, hiddenIds, onSelectionChange, onSelectionEvent, onSelect, onToggleExpand, filter, height, rowHeight, className, style, showFormatIcon, onFormatClick, onChildFormatClick, showInfoIcon, onInfoClick, onChildInfoClick, }: FeatureListProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=FeatureList.d.ts.map
