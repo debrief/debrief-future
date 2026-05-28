@@ -1,270 +1,193 @@
 # Contract: Shared SystemState helper API
 
 **Feature**: `261-session-state-systemstate`
-**Module path**: `services/session-state/src/system-state/`
+**Module**: `services/session-state/src/system-state/`
 **Public barrel**: `services/session-state/src/system-state/index.ts`
-**Re-exported from**: `@debrief/session-state` (so hosts import as `import { readSystemStateFromFeatureCollection, writeSystemStateIntoFeatureCollection } from '@debrief/session-state'`).
+**Re-exported from**: `@debrief/session-state`
 
-This contract pins the helper's public TypeScript surface. The internal modules (`read.ts`, `write.ts`, `mapping.ts`, `validate.ts`, `exhaustive.ts`) may be refactored freely as long as the public exports below maintain their signatures and observable behaviour.
+Pins the helper's public TypeScript surface. Internal modules (`read`, `write`, `visibility`, `mapping`, `validate`, `errors`, `exhaustive`) may be refactored freely as long as these exports keep their signatures and observable behaviour. The helper is **pure** — no I/O, no mutation of inputs.
+
+> **Typing note (R-003)**: the generated `SystemStateProperties` is a flat interface (`kind: string`, `state_type: string`). The per-variant value types below are produced by `z.infer` of the Zod schemas in `validate.ts` — they are NOT `Extract<SystemStateProperties, …>` (which resolves to `never` against the flat interface). The Zod schemas are structurally checked against the generated interface so drift fails the build.
 
 ---
 
-## Type exports
+## Types
 
 ```typescript
-import type {
-  FeatureCollection,
-  Feature,
-} from 'geojson';
-import type {
-  SystemStateProperties,
-  SystemStateTypeEnum,
-  LogEntry,
-} from '@debrief/schemas';
+import type { FeatureCollection } from 'geojson';
+import type { LogEntry } from '@debrief/schemas';
 
-/**
- * A typed map from state_type to the corresponding variant of SystemStateProperties.
- * Each key is independently present-or-absent; an absent key means the FeatureCollection
- * contained no SystemState feature with that state_type.
- */
+export type SystemStateType =
+  | 'temporal' | 'spatial' | 'selection' | 'active_storyboard';
+
+// z.infer outputs — fully validated, fully typed per variant.
+export type TemporalVariant = {
+  kind: 'SYSTEM'; state_type: 'temporal';
+  start_time: string; end_time: string;
+  current_time?: string;
+  filter_start_time?: string; filter_end_time?: string;
+  display_mode?: 'full' | 'trail';
+  step_size?: { value: number; unit: 'millisecond'|'second'|'minute'|'hour'|'day' };
+  playback_rate?: number;
+};
+export type SpatialVariant = {
+  kind: 'SYSTEM'; state_type: 'spatial';
+  viewport: ViewportPolygon; rotation?: number;
+};
+export type SelectionVariant = {
+  kind: 'SYSTEM'; state_type: 'selection';
+  selected_ids: string[]; selected_primary?: string;
+};
+export type ActiveStoryboardVariant = {
+  kind: 'SYSTEM'; state_type: 'active_storyboard';
+  active_storyboard_id: string;
+};
+
 export interface SystemStateMap {
-  temporal?: Extract<SystemStateProperties, { state_type: 'temporal' }>;
-  spatial?: Extract<SystemStateProperties, { state_type: 'spatial' }>;
-  selection?: Extract<SystemStateProperties, { state_type: 'selection' }>;
-  active_storyboard?: Extract<SystemStateProperties, { state_type: 'active_storyboard' }>;
+  temporal?: TemporalVariant;
+  spatial?: SpatialVariant;
+  selection?: SelectionVariant;
+  active_storyboard?: ActiveStoryboardVariant;
 }
 
-/**
- * Discriminated context object passed to writeSystemStateIntoFeatureCollection().
- * The caller assembles this from current Zustand store state via the slice mappings
- * in mapping.ts. Each key is optional — only provided variants are written.
- */
+/** Variant payloads to write — kind/state_type are supplied by the helper. */
 export interface SystemStateWriteInput {
-  temporal?: Omit<Extract<SystemStateProperties, { state_type: 'temporal' }>, 'kind' | 'state_type' | 'provenance'>;
-  spatial?:  Omit<Extract<SystemStateProperties, { state_type: 'spatial' }>,  'kind' | 'state_type' | 'provenance'>;
-  selection?: Omit<Extract<SystemStateProperties, { state_type: 'selection' }>, 'kind' | 'state_type' | 'provenance'>;
-  active_storyboard?: Omit<Extract<SystemStateProperties, { state_type: 'active_storyboard' }>, 'kind' | 'state_type' | 'provenance'>;
+  temporal?: Omit<TemporalVariant, 'kind' | 'state_type'>;
+  spatial?: Omit<SpatialVariant, 'kind' | 'state_type'>;
+  selection?: Omit<SelectionVariant, 'kind' | 'state_type'>;
+  active_storyboard?: Omit<ActiveStoryboardVariant, 'kind' | 'state_type'>;
 }
 
-/**
- * Identity of the calling host — encoded into the LogEntry's `was_generated_by.tool`
- * field per review resolution 2A (no new LogEntry schema fields).
- */
-export type SystemStateTool =
-  | 'vscode-extension'
-  | 'web-shell-session-state';
+export type SystemStateTool = 'vscode-extension' | 'web-shell-session-state';
 
-/**
- * Provenance enrichment supplied at write time. Fields map onto the existing LinkML
- * LogEntry shape (Article II.1 — single source of truth, no parallel schema):
- *   - tool, toolVersion        → LogEntry.was_generated_by.{tool, tool_version}
- *   - agent                    → LogEntry.agent
- *   - activityType (computed)  → LogEntry.activity_type
- *   - timestamp (computed)     → LogEntry.timestamp
- * The helper fills timestamp and activityType itself; the caller supplies the rest.
- */
-export interface SystemStateWriteContext {
-  tool: SystemStateTool;     // typically derived from a host-constant
-  toolVersion: string;       // typically @debrief/session-state package.json version
-  agent: string;             // typically from LogService.getAgent()
-}
-
-/**
- * Structured load error for callers to surface to users.
- * The helper throws this (subclass of Error) on Article XIV.4 strict-on-import violations.
- */
 export class SystemStateLoadError extends Error {
   readonly kind:
     | 'multiple-features-with-same-state-type'
     | 'malformed-feature'
     | 'unknown-state-type'
     | 'missing-discriminator'
-    | 'cross-field-invariant';        // NEW per review resolution 3A (e.g. current_time outside window)
-  readonly featureIds: string[];   // IDs of offending Features
-  readonly details?: unknown;      // e.g. Zod error issues, or the violated invariant text
-  constructor(opts: {
-    kind: SystemStateLoadError['kind'];
-    featureIds: string[];
-    details?: unknown;
-    message: string;
-  });
+    | 'cross-field-invariant';
+  readonly featureIds: string[];
+  readonly details?: unknown;
+  constructor(opts: { kind: SystemStateLoadError['kind']; featureIds: string[]; details?: unknown; message: string });
 }
 ```
 
 ---
 
-## Function exports
+## Functions
 
 ### `readSystemStateFromFeatureCollection`
 
 ```typescript
-/**
- * Extract a SystemStateMap from a plot's FeatureCollection.
- *
- * Scans `fc.features` for Features whose `properties.kind === "SYSTEM"`. Each such
- * Feature is validated against the appropriate variant of SystemStateProperties via
- * Zod (or equivalent generated runtime validator).
- *
- * Strict on import (Article XIV.4):
- *   - Throws SystemStateLoadError on any malformed candidate.
- *   - Throws SystemStateLoadError on multiple candidates with the same state_type.
- *   - Does NOT silently skip or fall back.
- *
- * @returns SystemStateMap — keys for state_types found, undefined for those not found.
- * @throws  SystemStateLoadError when any SystemState-shaped Feature is malformed.
- */
-export function readSystemStateFromFeatureCollection(
-  fc: FeatureCollection
-): SystemStateMap;
+export function readSystemStateFromFeatureCollection(fc: FeatureCollection): SystemStateMap;
 ```
 
-**Observable behaviour invariants**:
-- Pure function. No I/O. No mutation of `fc`.
-- Order-independent: shuffling `fc.features` produces an identical `SystemStateMap`.
-- Returns `{}` (all keys undefined) when `fc` has no `properties.kind === "SYSTEM"` Features.
-- Returns a `SystemStateMap` with exactly one populated key when `fc` has one well-formed SystemState Feature.
+Scans `fc.features` for `properties.kind === "SYSTEM"`, validates each via the Zod variant schema, runs cross-field invariants, returns the map.
+
+**Invariants**:
+- Pure; no I/O; no mutation of `fc`; order-independent.
+- `{}` when no SYSTEM features.
+- Throws `SystemStateLoadError` on: malformed feature (`malformed-feature`), unknown `state_type` (`unknown-state-type`), missing discriminator (`missing-discriminator`), two features with the same `state_type` (`multiple-features-with-same-state-type`), or temporal cross-field violation (`cross-field-invariant`).
+- Absence of a variant is **not** an error.
 
 ### `writeSystemStateIntoFeatureCollection`
 
 ```typescript
-/**
- * Produce a new FeatureCollection with SystemState features upserted to match `input`.
- *
- * For each populated key in `input`:
- *   - If a Feature with the corresponding state_type exists in fc.features:
- *       UPDATE: replace its properties, preserving its `id`, append a LogEntry
- *               to its provenance.
- *   - Else:
- *       CREATE: insert a new Feature with a fresh ULID-based id and a single
- *               LogEntry in provenance.
- *
- * For each absent key in `input`:
- *   - LEAVE unchanged. (This function does NOT delete SystemState features.
- *     If a caller wants "wipe spatial state", they pass `input.spatial = undefined`
- *     — not the same as "spatial absent from input".)
- *
- * Returns a NEW FeatureCollection — does not mutate `fc`.
- *
- * @param fc       The source FeatureCollection.
- * @param input    The desired SystemState values to upsert.
- * @param ctx      Provenance context (host + agent + version).
- * @returns        A new FeatureCollection with upserted SystemState features.
- */
 export function writeSystemStateIntoFeatureCollection(
   fc: FeatureCollection,
   input: SystemStateWriteInput,
-  ctx: SystemStateWriteContext
 ): FeatureCollection;
 ```
 
-**Observable behaviour invariants**:
-- Pure function. No I/O. Returns a new FeatureCollection — `fc` is not mutated.
-- Idempotent up to provenance — calling `write(fc, sameInput, ctx)` twice produces FeatureCollections whose only difference is two LogEntry appends to each upserted variant's provenance array.
-- Cardinality preserved: post-write, FC contains at most one Feature per `state_type` (FR-003).
-- Geographic features in `fc.features` are passed through untouched — only SystemState features are added/updated.
+For each populated key in `input`, upsert the `state.<type>` Feature (replace `properties` in place if it exists by id/state_type, else insert with id `state.<type>` and empty-Point geometry). Absent keys are left unchanged (no delete API). Returns a **new** FeatureCollection (geographic features passed through untouched).
 
-### `applyReconciliation` (per-slice helpers)
+**Invariants**:
+- Pure; returns a new FC; `fc` not mutated.
+- Cardinality preserved: ≤1 feature per `state_type` post-write.
+- **No `provenance` written** on `state.*` features (FR-013).
+- No `ctx`/provenance parameter (contrast prior #261 contract) — view features are lean.
+
+### Visibility helpers
 
 ```typescript
-/**
- * Per-slice reconciliation helpers. Given the SystemStateMap value (possibly undefined)
- * for a variant AND the sidecar's corresponding slice, return the hydrated Zustand
- * slice shape with the FR-007 reconciliation rule applied: SystemState wins for
- * migrated fields, sidecar wins for non-migrated fields.
- *
- * These are pure mapping functions, individually unit-testable. They make the
- * "what counts as migrated" decision explicit per field — and that decision is
- * pinned by the const `MIGRATION_SCOPE` in mapping.ts.
- */
-export function applyTemporalReconciliation(
-  fromPlot: SystemStateMap['temporal'] | undefined,
-  fromSidecar: SidecarTemporalSlice | undefined
-): HydratedTemporalSlice;
+/** Feature ids carrying properties.visible === false. */
+export function readHiddenFeatureIds(fc: FeatureCollection): string[];
 
-export function applySpatialReconciliation(
-  fromPlot: SystemStateMap['spatial'] | undefined,
-  fromSidecar: SidecarSpatialSlice | undefined
-): HydratedSpatialSlice;
-
-export function applySelectionReconciliation(
-  fromPlot: SystemStateMap['selection'] | undefined,
-  fromSidecar: SidecarFeaturesSlice | undefined
-): HydratedFeaturesSlice;
+/** Return a new FC with properties.visible set to false on `hiddenIds`,
+ *  and the flag cleared/omitted on all others. Pure. */
+export function applyVisibilityToFeatureCollection(
+  fc: FeatureCollection,
+  hiddenIds: string[],
+): FeatureCollection;
 ```
 
-The `SidecarXxxSlice` and `HydratedXxxSlice` types are derived from the existing slice interfaces in `services/session-state/src/store/slices/` via the boundary-types-derived rule (Article IV.5).
+(Provenance for visibility transitions is appended by the **host** action via the existing `LogService`, not by this pure helper — R-012.)
 
-### `prepareSidecarForSave` (drop-migrated-keys helper)
+### Reconciliation (store ↔ variant) — `mapping.ts`
 
 ```typescript
-/**
- * Given the current Zustand store slice values, return the shape that the sidecar
- * should be written with — i.e. the slice values with migrated keys omitted.
- *
- * The set of "migrated keys" comes from MIGRATION_SCOPE in mapping.ts — the single
- * source of truth for what moves and what stays.
- */
-export function prepareSidecarForSave(args: {
-  temporal: TemporalSlice;
-  spatial: SpatialSlice;
-  features: FeaturesSlice;
-}): {
-  temporal: PartialOmit<TemporalSlice, MigratedTemporalKeys>;
-  spatial: PartialOmit<SpatialSlice, MigratedSpatialKeys>;
-  features: PartialOmit<FeaturesSlice, MigratedSelectionKeys>;
-};
+import type { TemporalSlice, SpatialSlice, FeaturesSlice } from '../store/...';
+
+// Variant → store-slice fragment, applying epoch↔ISO and FeatureSelection conversions (R-006).
+export function temporalVariantToSlice(v: TemporalVariant | undefined): Partial<TemporalSlice>;
+export function spatialVariantToSlice(v: SpatialVariant | undefined): Partial<SpatialSlice>;
+export function selectionVariantToSlice(v: SelectionVariant | undefined): Partial<Pick<FeaturesSlice, 'selection'>>;
+
+// Store-slice → write-input fragment (inverse conversions). null/empty ⇒ omit the variant.
+export function temporalSliceToInput(s: TemporalSlice): SystemStateWriteInput['temporal'] | undefined;
+export function spatialSliceToInput(s: SpatialSlice): SystemStateWriteInput['spatial'] | undefined;
+export function selectionSliceToInput(s: FeaturesSlice): SystemStateWriteInput['selection'] | undefined;
 ```
 
----
+The conversions are the single source for "what migrates"; `read.ts`/`write.ts` never duplicate field lists. Epoch↔ISO uses the existing `epochToISO`/`isoToEpoch`/`timeRangeToISO`/`timeRangeFromISO`. Selection maps `FeatureSelection.featureIds ↔ selected_ids`, `FeatureSelection.primary ↔ selected_primary`; `timestamp` is regenerated on read.
 
-## Compile-time exhaustiveness guards
+### active_storyboard delegation (R-011)
 
 ```typescript
-// exhaustive.ts — fails the build if LinkML adds a new SystemStateTypeEnum value and
-// any of the helper modules hasn't been updated to handle it.
+// The helper owns temporal/spatial/selection. For active_storyboard it delegates
+// to the existing #237 logic in @debrief/components to avoid disturbing
+// storyboard-playback internals — same wire shape (NG-002).
+```
 
+### Exhaustiveness guard — `exhaustive.ts`
+
+```typescript
 import type { SystemStateTypeEnum } from '@debrief/schemas';
-
-type HandledStateTypes = 'temporal' | 'spatial' | 'selection' | 'active_storyboard';
-type UnhandledStateTypes = Exclude<SystemStateTypeEnum, HandledStateTypes>;
-type _ExhaustivenessGuard = [UnhandledStateTypes] extends [never] ? true : never;
-const _assertExhaustive: _ExhaustivenessGuard = true;
+type Handled = 'temporal' | 'spatial' | 'selection' | 'active_storyboard';
+type _Guard = [Exclude<`${SystemStateTypeEnum}`, Handled>] extends [never] ? true : never;
+const _assert: _Guard = true;
 ```
 
-This is Article IV.5's exhaustiveness mechanism applied to the helper.
+Adding a LinkML variant fails `tsc` until the helper handles it.
 
 ---
 
-## Cross-field validation (per review resolution 3A)
+## Cross-field validation (`validate.ts`)
 
-The helper's `validate.ts` runs **cross-field** checks beyond per-field Zod validation, surfacing violations as `SystemStateLoadError` with `kind: 'cross-field-invariant'`:
-
-| Invariant | Variant | Behaviour on violation |
+| Invariant | Variant | On violation |
 |---|---|---|
-| `current_time ∈ [start_time, end_time]` (when `current_time` present) | `temporal` | Load fails with structured error. No silent clamping. See `research.md` § R-011 for rationale (Article XIV.4 — strict on import). |
-| `start_time ≤ end_time` | `temporal` | Load fails — degenerate window is meaningless. |
+| `current_time ∈ [start_time, end_time]` (when present) | temporal | `SystemStateLoadError(kind='cross-field-invariant')`, feature id + values |
+| `start_time ≤ end_time` | temporal | `SystemStateLoadError(kind='cross-field-invariant')` |
 
-This is the smallest cross-field rule set that closes the F2 failure mode flagged in the review. Hosts surface the error message; users see "this plot's saved time-cursor (Jun 2024) is outside its analytical window (Jan 2024) — re-open after deleting the SystemState/temporal feature, or fix the source data".
+No silent clamping (Article XIV.4). Hosts surface the message.
 
-## What the helper does NOT do (out-of-scope clarifications)
+## What the helper does NOT do
 
-- **Does not perform I/O.** Reading the plot file and the sidecar, writing them back — those happen in `load.ts` / `save.ts`. The helper is a pure transformation layer.
-- **Does not own the writer abstraction.** The host's existing `setFeatureCollection` (web-shell) or VS Code STAC writer is the persistence boundary. The helper produces the desired FeatureCollection; the caller hands it to the writer.
-- **Does not validate non-SystemState features.** Tracks, points, etc. are passed through untouched. Their validation is upstream of this work.
-- **Does not delete SystemState features.** There is no `delete` API. Writes are upserts only. Out of scope; can be added later if "reset SystemState" becomes a user-visible command.
-- **Does not migrate sidecar versions.** The `SessionFile` version bump (R-004) is in `load.ts` / `save.ts`, not the helper.
-- **Does not enforce save atomicity across sidecar + FC writes.** That sequencing concern is owned by the host's save command (per review resolution 3A and research.md § R-012). The helper is a pure transformation — it doesn't see the writes.
-
----
+- No I/O (read/write the plot file ↔ host load/save commands).
+- No persistence-writer ownership (the host's FC write does that).
+- No validation of non-SYSTEM features (passed through).
+- No delete of SystemState features (upsert only).
+- No dirty-flag management (host concern — FR-019/FR-020/FR-021).
+- No visibility provenance (host action via `LogService`).
 
 ## Testing expectations
 
-| Module | Coverage target |
+| Module | Coverage |
 |---|---|
-| `read.ts` | Every error path in `SystemStateLoadError.kind` enum hit at least once. Round-trip with `write.ts` passes for all four variants. |
-| `write.ts` | Idempotent (modulo provenance) — verified. Cardinality invariant — verified. No mutation of input `fc` — verified by deep-equality after call. |
-| `mapping.ts` | Each `MIGRATION_SCOPE` field-level mapping verified with a fixture pair (pre / post). |
-| `validate.ts` | Every variant accepts a happy-path fixture; rejects a "wrong field" fixture; rejects a "wrong state_type" fixture. |
-| `exhaustive.ts` | Compile test — type-only file. Verified by running `tsc --noEmit`. No runtime assertion needed beyond the constant declaration. |
-
-All test files live in `services/session-state/src/system-state/__tests__/`.
+| `read.ts` | every `SystemStateLoadError.kind` hit; round-trip with `write.ts` for all variants |
+| `write.ts` | no input mutation (deep-equal after call); cardinality ≤1/type; no provenance on `state.*` |
+| `visibility.ts` | absent=visible; hidden round-trip; clearing on reveal |
+| `mapping.ts` | epoch↔ISO bit-equality (tolerance per SC-001); FeatureSelection split; null/empty ⇒ omit |
+| `validate.ts` | each variant accepts happy fixture, rejects wrong-shape, cross-field fires |
+| `exhaustive.ts` | type-only; verified by `tsc --noEmit` |
