@@ -101,3 +101,11 @@ Each entry should include:
 - **Spec**: `specs/260-viewport-lock/spec.md`
 - **Evidence**: `specs/260-viewport-lock/evidence/`
 - **Follow-ups**: backlog #261 (map keyboard-shortcut convention — first single-letter map binding); backlog #262 (cross-host viewport-mutation guard layer for non-MCP surfaces).
+
+### 2026-05-28 - #249: Retire the sidecar — all plot state lives in features.geojson
+- **Status**: Implementation complete (PR pending)
+- **Description**: Deleted the `.debrief-session` sidecar. Every field it persisted is reclassified into a `SystemState` Feature inside `features.geojson` (`state.spatial`/`state.temporal`/`state.selection`/`state.activestoryboard`), a per-feature `properties.visible` flag, or ephemeral runtime (defaulted on load). A plot is now exactly two files (`item.json` + `features.geojson`). A single pure helper in `@debrief/session-state` (`system-state/`) is the sole producer/consumer of SystemState read/write for both hosts, with a host-agnostic store-bridge (hydrate-from-FC on open, extract-to-FC on save). LinkML: consolidated `ViewportPolygon`/`Coordinate`/`TimeStep`/`TimeInstant`/`TimeRange`/`TimeFilter` + `DisplayModeEnum`/`PlaybackStateEnum`/`TimeUnitEnum` into `common.yaml`; `SystemStateProperties` gains viewport/rotation/current_time/filter_*/display_mode/step_size/playback_rate/selected_primary (drops bbox/zoom/center) + four per-variant `rules:`; `BaseFeatureProperties` gains `visible`. Strict-on-import (FR-011/FR-012). Exploration (pan/zoom/scrub/select/hide) no longer marks the plot dirty (FR-019); an explicit save persists the current view regardless of dirty (FR-020). Package-level sidecar I/O deleted with no read shim (SC-002).
+- **Spec**: `specs/261-session-state-systemstate/spec.md`
+- **ADR**: ADR-034 / ADR-035 / ADR-036 in `docs/project_notes/decisions.md`
+- **Evidence**: `specs/261-session-state-systemstate/evidence/`
+- **Follow-ups**: #250 (web-shell durable auto-commit-trigger UX — the FR-009a in-memory mirror lands here, IDB durability is the residual); #266 (purge stale bbox/center references); #267 (out-of-window current_time policy); #268 (broader multi-asset save atomicity); tasks T052–T054 (active_storyboard interactive path kept on @debrief/components per R-011, documented in ADR-036).

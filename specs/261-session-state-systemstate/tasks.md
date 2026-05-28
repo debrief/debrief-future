@@ -238,8 +238,8 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Project memory + backlog
 
-- [ ] T107 [P] Add ADRs to `docs/project_notes/decisions.md`: (a) sidecar retirement → two-file model; (b) visibility as a per-feature `visible` flag with accepted provenance growth; (c) shared value-type consolidation into `common.yaml`. File: `docs/project_notes/decisions.md`.
-- [ ] T108 [P] Log completion in `docs/project_notes/issues.md` with ticket #249, the PR URL, and the evidence directory link. File: `docs/project_notes/issues.md`.
+- [x] T107 [P] Add ADRs to `docs/project_notes/decisions.md`: (a) sidecar retirement → two-file model; (b) visibility as a per-feature `visible` flag with accepted provenance growth; (c) shared value-type consolidation into `common.yaml`. File: `docs/project_notes/decisions.md`.
+- [x] T108 [P] Log completion in `docs/project_notes/issues.md` with ticket #249, the PR URL, and the evidence directory link. File: `docs/project_notes/issues.md`.
 - [ ] T109 [P] Strike through BACKLOG.md row 249 (status → `complete`). File: `BACKLOG.md`.
 
 ### Final verification + PR
