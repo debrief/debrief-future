@@ -100,21 +100,21 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Shared helper — variant-agnostic core (R-002, R-003, R-013)
 
-- [ ] T030 Implement `SystemStateLoadError` with the five `kind`s per `contracts/system-state-helper.ts.md`. File: `services/session-state/src/system-state/errors.ts`.
-- [ ] T031 [P] Implement the compile-time exhaustiveness guard over `SystemStateTypeEnum`. File: `services/session-state/src/system-state/exhaustive.ts`.
-- [ ] T032 Implement Zod discriminated-union validators (one schema per variant, keyed on `state_type`) plus the temporal cross-field invariants (`current_time ∈ [start,end]`; `start ≤ end`). Structurally check `z.infer` against the generated flat `SystemStateProperties` so drift fails the build (R-003). File: `services/session-state/src/system-state/validate.ts`.
-- [ ] T033 Implement `readSystemStateFromFeatureCollection(fc)` → `SystemStateMap` per contract: empty FC ⇒ `{}`; one well-formed ⇒ populate; malformed/unknown/missing-discriminator/duplicate-state_type/cross-field ⇒ throw `SystemStateLoadError`. Pure, order-independent, no mutation. File: `services/session-state/src/system-state/read.ts`.
-- [ ] T034 Implement `writeSystemStateIntoFeatureCollection(fc, input)` → new FC per contract: upsert by `state.<type>` id with empty-Point geometry; **no** `provenance` written (FR-013); absent keys unchanged; input not mutated; cardinality ≤1 per `state_type`. File: `services/session-state/src/system-state/write.ts`.
-- [ ] T035 Implement visibility helpers `readHiddenFeatureIds(fc)` and `applyVisibilityToFeatureCollection(fc, hiddenIds)` (absent/`true` ⇒ visible; `false` ⇒ hidden; pure). File: `services/session-state/src/system-state/visibility.ts`.
-- [ ] T036 Implement the `mapping.ts` skeleton: declare the six store↔variant converter signatures from the contract; implement the conversion utilities (epoch↔ISO via existing `epochToISO`/`isoToEpoch`/`timeRange*`; `FeatureSelection`↔`selected_ids`/`selected_primary`). Per-variant converter bodies are completed in Phases 3–4. File: `services/session-state/src/system-state/mapping.ts`.
-- [ ] T037 Create the public barrel and re-export the helper surface from `@debrief/session-state`. Files: `services/session-state/src/system-state/index.ts`, `services/session-state/src/index.ts`.
+- [x] T030 Implement `SystemStateLoadError` with the five `kind`s per `contracts/system-state-helper.ts.md`. File: `services/session-state/src/system-state/errors.ts`.
+- [x] T031 [P] Implement the compile-time exhaustiveness guard over `SystemStateTypeEnum`. File: `services/session-state/src/system-state/exhaustive.ts`.
+- [x] T032 Implement Zod discriminated-union validators (one schema per variant, keyed on `state_type`) plus the temporal cross-field invariants (`current_time ∈ [start,end]`; `start ≤ end`). Structurally check `z.infer` against the generated flat `SystemStateProperties` so drift fails the build (R-003). File: `services/session-state/src/system-state/validate.ts`.
+- [x] T033 Implement `readSystemStateFromFeatureCollection(fc)` → `SystemStateMap` per contract: empty FC ⇒ `{}`; one well-formed ⇒ populate; malformed/unknown/missing-discriminator/duplicate-state_type/cross-field ⇒ throw `SystemStateLoadError`. Pure, order-independent, no mutation. File: `services/session-state/src/system-state/read.ts`.
+- [x] T034 Implement `writeSystemStateIntoFeatureCollection(fc, input)` → new FC per contract: upsert by `state.<type>` id with empty-Point geometry; **no** `provenance` written (FR-013); absent keys unchanged; input not mutated; cardinality ≤1 per `state_type`. File: `services/session-state/src/system-state/write.ts`.
+- [x] T035 Implement visibility helpers `readHiddenFeatureIds(fc)` and `applyVisibilityToFeatureCollection(fc, hiddenIds)` (absent/`true` ⇒ visible; `false` ⇒ hidden; pure). File: `services/session-state/src/system-state/visibility.ts`.
+- [x] T036 Implement the `mapping.ts` skeleton: declare the six store↔variant converter signatures from the contract; implement the conversion utilities (epoch↔ISO via existing `epochToISO`/`isoToEpoch`/`timeRange*`; `FeatureSelection`↔`selected_ids`/`selected_primary`). Per-variant converter bodies are completed in Phases 3–4. File: `services/session-state/src/system-state/mapping.ts`.
+- [x] T037 Create the public barrel and re-export the helper surface from `@debrief/session-state`. Files: `services/session-state/src/system-state/index.ts`, `services/session-state/src/index.ts`.
 
 ### Helper unit tests (variant-agnostic)
 
-- [ ] T038 [test] `read.ts` tests: every `SystemStateLoadError.kind` branch hit (using the Phase 2 invalid/cross-field fixtures); empty FC ⇒ `{}`. File: `services/session-state/src/system-state/__tests__/read.test.ts`.
-- [ ] T039 [P][test] `write.ts` tests: input `fc` not mutated (deep-equal after call); cardinality ≤1 per `state_type`; no `provenance` on `state.*`; absent keys untouched. File: `services/session-state/src/system-state/__tests__/write.test.ts`.
-- [ ] T040 [P][test] `validate.ts` tests: each variant accepts its happy fixture, rejects a wrong-shape one; cross-field invariants fire with `kind='cross-field-invariant'`. File: `services/session-state/src/system-state/__tests__/validate.test.ts`.
-- [ ] T041 [P][test] `visibility.ts` + round-trip tests: `write(read(fc))` is structurally equal for valid fixtures; visibility absent=visible and round-trips. File: `services/session-state/src/system-state/__tests__/round-trip.test.ts`.
+- [x] T038 [test] `read.ts` tests: every `SystemStateLoadError.kind` branch hit (using the Phase 2 invalid/cross-field fixtures); empty FC ⇒ `{}`. File: `services/session-state/src/system-state/__tests__/read.test.ts`.
+- [x] T039 [P][test] `write.ts` tests: input `fc` not mutated (deep-equal after call); cardinality ≤1 per `state_type`; no `provenance` on `state.*`; absent keys untouched. File: `services/session-state/src/system-state/__tests__/write.test.ts`.
+- [x] T040 [P][test] `validate.ts` tests: each variant accepts its happy fixture, rejects a wrong-shape one; cross-field invariants fire with `kind='cross-field-invariant'`. File: `services/session-state/src/system-state/__tests__/validate.test.ts`.
+- [x] T041 [P][test] `visibility.ts` + round-trip tests: `write(read(fc))` is structurally equal for valid fixtures; visibility absent=visible and round-trips. File: `services/session-state/src/system-state/__tests__/round-trip.test.ts`.
 
 ## Phase 3: User Story 4 — Host parity via one shared writer + active_storyboard consolidation (P1)
 
@@ -126,8 +126,8 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Wire active_storyboard into the shared helper (delegating to #237 — R-011)
 
-- [ ] T050 Complete the `active_storyboard` converter in `mapping.ts`: `activeStoryboardId ↔ active_storyboard_id`, delegating the FC read/write to `@debrief/components` `getActiveStoryboardSelection`/`setActiveStoryboardSelection` so the wire shape is unchanged (NG-002). File: `services/session-state/src/system-state/mapping.ts`.
-- [ ] T051 [P][test] Unit test the active_storyboard converter + that `read`/`write` surface the same shape #237 produces. File: `services/session-state/src/system-state/__tests__/active-storyboard.test.ts`.
+- [x] T050 Complete the `active_storyboard` converter in `mapping.ts`: `activeStoryboardId ↔ active_storyboard_id`, delegating the FC read/write to `@debrief/components` `getActiveStoryboardSelection`/`setActiveStoryboardSelection` so the wire shape is unchanged (NG-002). File: `services/session-state/src/system-state/mapping.ts`.
+- [x] T051 [P][test] Unit test the active_storyboard converter + that `read`/`write` surface the same shape #237 produces. File: `services/session-state/src/system-state/__tests__/active-storyboard.test.ts`.
 
 ### Consolidate #237's writer (sequenced — three commits)
 
@@ -153,10 +153,10 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Complete the per-variant converters (mapping.ts)
 
-- [ ] T060 Complete the spatial converter: `viewport` identity (both `ViewportPolygon`); `rotation` identity; `viewport === null` ⇒ omit `state.spatial`. File: `services/session-state/src/system-state/mapping.ts`.
-- [ ] T061 Complete the temporal converter: `timeRange.{start,end}` epoch→ISO `start_time`/`end_time`; `currentTime` epoch→ISO `current_time` (null ⇒ omit); `timeFilter.{start,end}` epoch→ISO `filter_start_time`/`filter_end_time` (absent ⇒ omit); `displayMode`/`stepSize`/`playbackRate` identity; `timeRange === null` ⇒ omit `state.temporal`. File: `services/session-state/src/system-state/mapping.ts`.
-- [ ] T062 Complete the selection converter: `selection.featureIds → selected_ids`, `selection.primary → selected_primary` (null ⇒ omit); empty selection ⇒ omit `state.selection`; on load regenerate `selection.timestamp`. File: `services/session-state/src/system-state/mapping.ts`.
-- [ ] T063 [P][test] Unit tests for the three converters: epoch↔ISO bit-equality within SC-001/SC-002 tolerance; `FeatureSelection` split; null/empty ⇒ omit; defaults on absence. File: `services/session-state/src/system-state/__tests__/mapping.test.ts`.
+- [x] T060 Complete the spatial converter: `viewport` identity (both `ViewportPolygon`); `rotation` identity; `viewport === null` ⇒ omit `state.spatial`. File: `services/session-state/src/system-state/mapping.ts`.
+- [x] T061 Complete the temporal converter: `timeRange.{start,end}` epoch→ISO `start_time`/`end_time`; `currentTime` epoch→ISO `current_time` (null ⇒ omit); `timeFilter.{start,end}` epoch→ISO `filter_start_time`/`filter_end_time` (absent ⇒ omit); `displayMode`/`stepSize`/`playbackRate` identity; `timeRange === null` ⇒ omit `state.temporal`. File: `services/session-state/src/system-state/mapping.ts`.
+- [x] T062 Complete the selection converter: `selection.featureIds → selected_ids`, `selection.primary → selected_primary` (null ⇒ omit); empty selection ⇒ omit `state.selection`; on load regenerate `selection.timestamp`. File: `services/session-state/src/system-state/mapping.ts`.
+- [x] T063 [P][test] Unit tests for the three converters: epoch↔ISO bit-equality within SC-001/SC-002 tolerance; `FeatureSelection` split; null/empty ⇒ omit; defaults on absence. File: `services/session-state/src/system-state/__tests__/mapping.test.ts`.
 
 ### Dirty-tracking contract (FR-019/FR-020/FR-021)
 
@@ -201,7 +201,7 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Tests + E2E (SC-004)
 
-- [ ] T084 [P][test] Visibility round-trip unit/integration: `applyVisibilityToFeatureCollection` then `readHiddenFeatureIds` is identity; absent `visible` ⇒ visible; a revealed feature clears the flag. File: `services/session-state/src/system-state/__tests__/visibility.roundtrip.test.ts`.
+- [x] T084 [P][test] Visibility round-trip unit/integration: `applyVisibilityToFeatureCollection` then `readHiddenFeatureIds` is identity; absent `visible` ⇒ visible; a revealed feature clears the flag. File: `services/session-state/src/system-state/__tests__/visibility.roundtrip.test.ts`.
 - [ ] T085 [test] Playwright web-shell spec: hide two features → save → reload → reopen `features.geojson` only → same two hidden; assert the file carries `visible: false` on exactly those ids. Writes `visibility-host-a.png` / `visibility-host-b.png` into `specs/261-session-state-systemstate/evidence/screenshots/`. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
 
 ## Phase 6: User Story 2 — Delete the sidecar (P1)

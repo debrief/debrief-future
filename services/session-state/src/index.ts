@@ -100,6 +100,37 @@ export {
   type LoadResult,
 } from './persistence/index.js';
 
+// SystemState helper (Feature 261) — FeatureCollection-based plot-state
+// read/write for all four variants + per-feature visibility. The shared,
+// pure transformation layer that replaces the sidecar persistence path.
+export {
+  readSystemStateFromFeatureCollection,
+  writeSystemStateIntoFeatureCollection,
+  readHiddenFeatureIds,
+  applyVisibilityToFeatureCollection,
+  temporalSliceToInput,
+  temporalVariantToSlice,
+  spatialSliceToInput,
+  spatialVariantToSlice,
+  selectionSliceToInput,
+  selectionVariantToSlice,
+  activeStoryboardIdToInput,
+  activeStoryboardVariantToId,
+  checkTemporalCrossField,
+  SystemStateLoadError,
+  STATE_FEATURE_ID,
+  type SystemStateLoadErrorKind,
+  type PlotFeature as SystemStatePlotFeature,
+  type PlotFeatureCollection as SystemStatePlotFeatureCollection,
+  type SystemStateType,
+  type TemporalVariant,
+  type SpatialVariant,
+  type SelectionVariant,
+  type ActiveStoryboardVariant,
+  type SystemStateMap,
+  type SystemStateWriteInput,
+} from './system-state/index.js';
+
 // Log Service (Feature: 071)
 export {
   buildLogEntry,
