@@ -116,14 +116,18 @@ async function waitRendererReady(popup: Page): Promise<void> {
     const detail = await error.textContent();
     throw new Error(`Briefing renderer reported an error state: ${detail ?? ''}`);
   }
-  // Wait for the OSM basemap to actually paint, then let the Scene-0 flyTo
-  // (1s) settle. (The browser context ignores HTTPS errors so the cloud
-  // env's TLS-intercepting proxy doesn't block the tiles — real users hit
-  // OSM directly.)
+  // Best-effort wait for the OSM basemap to paint (nicer screenshots), then
+  // let the Scene-0 flyTo (1s) settle. The basemap is deliberately NOT an
+  // assertion: OSM rate-limits datacenter IPs (e.g. GitHub Actions runners),
+  // so tiles may never load in CI. Playback fidelity — vessel tracks, scene
+  // framing, transport, Present mode — does not depend on the basemap, so a
+  // missing basemap must not fail the test. (The committed screenshots are
+  // captured in a cloud session where the proxy reaches OSM.)
   await popup
     .locator('.leaflet-tile-loaded')
     .first()
-    .waitFor({ state: 'visible', timeout: 20_000 });
+    .waitFor({ state: 'visible', timeout: 15_000 })
+    .catch(() => undefined);
   await popup.waitForTimeout(2_500);
 }
 
