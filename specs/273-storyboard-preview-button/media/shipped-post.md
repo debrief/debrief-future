@@ -37,10 +37,10 @@ The briefing renderer is the same player that already ships inside exported zips
 
 ## Screenshots
 
-![Preview button beside Capture in the StoryboardPanel header, light theme](screenshots/storyboard-preview-light.png)
+![Preview button beside Capture in the StoryboardPanel header, light theme](images/storyboard-preview-light.png)
 *The Preview button sits next to Capture in the panel header. It is active whenever the storyboard contains at least one scene.*
 
-![Preview button disabled with tooltip when storyboard has no scenes](screenshots/preview-disabled-no-scenes.png)
+![Preview button disabled with tooltip when storyboard has no scenes](images/preview-disabled-no-scenes.png)
 *When there are no scenes yet, the button is disabled and a tooltip explains why — the same pattern used elsewhere in the panel.*
 
 ## By the Numbers
