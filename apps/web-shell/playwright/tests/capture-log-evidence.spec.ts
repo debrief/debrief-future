@@ -12,6 +12,7 @@
 
 import { test, expect } from '@playwright/test';
 import { CatalogPage, AnalysisPage } from '../pages';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -67,6 +68,7 @@ test.describe('Evidence screenshots: LogPanel states', () => {
     await catalogPage.waitForLoad();
     analysisPage = await catalogPage.openFirstItem();
     await analysisPage.waitForLoad();
+    await collapsePropertiesSection(page);
   });
 
   // ── 1. Empty log ──────────────────────────────────────────────────────────

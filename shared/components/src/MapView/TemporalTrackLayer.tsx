@@ -16,6 +16,7 @@ import { TrackHighlightMarker } from './TrackHighlightMarker';
 import type { HighlightMarkerStyle } from './TrackHighlightMarker';
 import { getFeatureColor } from '../utils/labels';
 import { PositionSymbolsLayer } from './PositionSymbolsLayer';
+import { isPlatformModifier, type SelectionClickEvent } from '../utils/applyClickToSelection';
 
 export interface TemporalTrackLayerProps {
   feature: DebriefFeature;
@@ -25,7 +26,12 @@ export interface TemporalTrackLayerProps {
   /** Full set of selected IDs — forwarded to PositionSymbolsLayer for per-position highlighting */
   selectedIds?: Set<string>;
   markerStyle?: Partial<HighlightMarkerStyle>;
-  onClick?: (featureId: string, event: React.MouseEvent) => void;
+  /**
+   * Click callback — uses the same `SelectionClickEvent` shape as
+   * `MapView.onSelect` so the multi-select emitter stays consistent
+   * between static and temporal track layers (#192 Phase 5).
+   */
+  onClick?: (event: SelectionClickEvent) => void;
 }
 
 export function TemporalTrackLayer({
@@ -84,9 +90,16 @@ export function TemporalTrackLayer({
       if (onClick) {
         layer.on('click', (e) => {
           const leafletEvent = e as L.LeafletMouseEvent;
-          leafletEvent.originalEvent?.stopPropagation();
-          // eslint-disable-next-line no-restricted-syntax
-          onClick(String(feature.id), leafletEvent.originalEvent as unknown as React.MouseEvent);
+          const original = leafletEvent.originalEvent;
+          original?.stopPropagation();
+          onClick({
+            target: String(feature.id),
+            modifier: isPlatformModifier({
+              ctrlKey: original?.ctrlKey ?? false,
+              metaKey: original?.metaKey ?? false,
+            }),
+            shift: original?.shiftKey === true,
+          });
         });
       }
     };

@@ -22,13 +22,31 @@ import {
 // ─── getLevelRegistry (T016) ────────────────────────────────────────
 
 describe('getLevelRegistry', () => {
-  it('should return a map with positions, segments, points, and polygons', () => {
+  it('should return a map with positions, segments, points, polygons, rings, vertices, and vertex', () => {
     const registry = getLevelRegistry();
-    expect(registry.size).toBe(4);
+    expect(registry.size).toBe(7);
     expect(registry.has('positions')).toBe(true);
     expect(registry.has('segments')).toBe(true);
     expect(registry.has('points')).toBe(true);
     expect(registry.has('polygons')).toBe(true);
+    expect(registry.has('rings')).toBe(true);
+    expect(registry.has('vertices')).toBe(true);
+    expect(registry.has('vertex')).toBe(true);
+  });
+
+  it('should define rings as index-based (spec 192)', () => {
+    const registry = getLevelRegistry();
+    expect(registry.get('rings')?.addressingMode).toBe('index');
+  });
+
+  it('should define vertices as index-based (spec 192)', () => {
+    const registry = getLevelRegistry();
+    expect(registry.get('vertices')?.addressingMode).toBe('index');
+  });
+
+  it('should define vertex as index-based (spec 192)', () => {
+    const registry = getLevelRegistry();
+    expect(registry.get('vertex')?.addressingMode).toBe('index');
   });
 
   it('should define points as index-based', () => {
@@ -446,6 +464,80 @@ describe('validatePathSemantics', () => {
     ]);
     const result = validatePathSemantics('root/items/abc', customRegistry);
     expect(result.valid).toBe(true);
+  });
+});
+
+// ─── Vertex-bearing levels (Spec 192 — T011a) ───────────────────────
+
+describe('vertex-bearing levels (spec 192)', () => {
+  describe('parsePath', () => {
+    it('should parse rings/0/vertices/3 (Polygon vertex path)', () => {
+      const result = parsePath('poly-1/rings/0/vertices/3');
+      expect(result.root).toBe('poly-1');
+      expect(result.levels).toEqual([
+        { levelName: 'rings', address: '0' },
+        { levelName: 'vertices', address: '3' },
+      ]);
+      expect(result.depth).toBe(2);
+    });
+
+    it('should parse vertices/2 (LineString / MultiPoint vertex path)', () => {
+      const result = parsePath('line-1/vertices/2');
+      expect(result.root).toBe('line-1');
+      expect(result.levels).toEqual([{ levelName: 'vertices', address: '2' }]);
+      expect(result.depth).toBe(1);
+    });
+
+    it('should parse vertex/0 (single-Point vertex path)', () => {
+      const result = parsePath('point-1/vertex/0');
+      expect(result.root).toBe('point-1');
+      expect(result.levels).toEqual([{ levelName: 'vertex', address: '0' }]);
+      expect(result.depth).toBe(1);
+    });
+  });
+
+  describe('validatePathSemantics', () => {
+    it('should accept rings/0/vertices/3', () => {
+      const result = validatePathSemantics('poly-1/rings/0/vertices/3');
+      expect(result.valid).toBe(true);
+      expect(result.errors).toEqual([]);
+    });
+
+    it('should accept vertices/2', () => {
+      const result = validatePathSemantics('line-1/vertices/2');
+      expect(result.valid).toBe(true);
+      expect(result.errors).toEqual([]);
+    });
+
+    it('should accept vertex/0', () => {
+      const result = validatePathSemantics('point-1/vertex/0');
+      expect(result.valid).toBe(true);
+      expect(result.errors).toEqual([]);
+    });
+
+    it('should reject vertex/1 (address must be 0)', () => {
+      const result = validatePathSemantics('point-1/vertex/1');
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContainEqual(expect.stringMatching(/vertex.*0/i));
+    });
+
+    it('should reject rings/0 without trailing vertices', () => {
+      const result = validatePathSemantics('poly-1/rings/0');
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContainEqual(expect.stringMatching(/rings.*followed by.*vertices/i));
+    });
+
+    it('should reject rings/0/vertices/-1 (negative index)', () => {
+      const result = validatePathSemantics('poly-1/rings/0/vertices/-1');
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContainEqual(expect.stringMatching(/numeric index/i));
+    });
+
+    it('should reject rings/0/vertices/foo (non-integer)', () => {
+      const result = validatePathSemantics('poly-1/rings/0/vertices/foo');
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContainEqual(expect.stringMatching(/numeric index/i));
+    });
   });
 });
 

@@ -28,7 +28,7 @@ export type {
   WriteSceneThumbnailPairResult,
 } from './interface.js';
 
-export { StacWriterError } from './errors.js';
+export { StacWriterError, ReadOnlyFilesystemError } from './errors.js';
 export type { StacWriterErrorKind, StacWriterErrorOptions } from './errors.js';
 
 export { mergeOverlay } from './overlay.js';
