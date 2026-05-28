@@ -167,7 +167,7 @@ describe('Cross-Component Selection Sync', () => {
             <MapView
               features={mockFeatures}
               selectedIds={selectedIds}
-              onSelect={handleSelect}
+              onSelect={(e) => handleSelect(e.target)}
             />
             <FeatureList
               features={mockFeatures}
@@ -208,7 +208,7 @@ describe('Cross-Component Selection Sync', () => {
             <MapView
               features={mockFeatures}
               selectedIds={selectedIds}
-              onSelect={handleSelect}
+              onSelect={(e) => handleSelect(e.target)}
             />
             <FeatureList
               features={mockFeatures}
@@ -247,7 +247,7 @@ describe('Cross-Component Selection Sync', () => {
             <MapView
               features={mockFeatures}
               selectedIds={selectedIds}
-              onSelect={handleSelect}
+              onSelect={(e) => handleSelect(e.target)}
             />
             <FeatureList
               features={mockFeatures}
@@ -363,7 +363,7 @@ describe('Cross-Component Selection Sync', () => {
             <MapView
               features={mockFeatures}
               selectedIds={selectedIds}
-              onSelect={handleSelect}
+              onSelect={(e) => handleSelect(e.target)}
             />
             <FeatureList
               features={mockFeatures}

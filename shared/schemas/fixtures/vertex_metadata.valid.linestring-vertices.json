@@ -1,0 +1,45 @@
+{
+  "type": "Feature",
+  "id": "line-with-vertex-meta",
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [
+      [
+        -5.0,
+        50.0
+      ],
+      [
+        -4.5,
+        50.5
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "LINE",
+    "label": "Datum line",
+    "symbol": "@L",
+    "style": {
+      "stroke": true,
+      "color": "#0000FF",
+      "weight": 2,
+      "opacity": 1.0,
+      "line_cap": "round",
+      "line_join": "round",
+      "dash_array": null
+    },
+    "vertex_metadata": [
+      {
+        "path": "vertices/0",
+        "label": "start",
+        "tags": [
+          "origin"
+        ]
+      },
+      {
+        "path": "vertices/1",
+        "label": "end",
+        "note": "Far end of datum."
+      }
+    ]
+  }
+}

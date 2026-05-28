@@ -19,6 +19,7 @@
 
 import { test, expect } from '@playwright/test';
 import { CatalogPage, AnalysisPage } from '../pages';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 
 /** Helper: select the Weapons-Hold Zone Charlie rectangle via the feature list. */
 async function selectRectangleViaFeatureList(page: import('@playwright/test').Page) {
@@ -101,6 +102,7 @@ test.describe('Event Log Propagation', () => {
     // Open Exercise Alpha
     analysisPage = await catalogPage.openFirstItem();
     await analysisPage.waitForLoad();
+    await collapsePropertiesSection(page);
   });
 
   test('amending first move event re-applies subsequent move events', async ({ page }) => {

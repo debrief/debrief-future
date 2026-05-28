@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 
 /**
  * Helper: select a track feature via the feature list (more reliable than map clicks
@@ -23,6 +24,7 @@ test.describe('Tool Execution', () => {
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     // Wait for map to render
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
+    await collapsePropertiesSection(page);
   });
 
   test('tools panel shows available tools', async ({ page }) => {

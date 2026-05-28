@@ -11,6 +11,11 @@ import type { MatchResult, ToolParameter } from '../ToolMatch/types';
 import type { AssociatedFile } from '../LayersToolbar/types';
 import type { PropertiesCommitMessage } from '../PropertiesPanel/messageTypes';
 import type { PropertiesFormField } from '../PropertiesPanel/types';
+import type {
+  SaveWriter,
+  AppendProvenanceFn,
+  SaveStagedEditsResult,
+} from '../PropertiesPanel/saveStagedEdits';
 
 /**
  * Collapse state for each section of the ActivityPanel.
@@ -78,6 +83,19 @@ export type ActivityPanelMessage =
   | { type: 'layer:toggleVisibility'; payload: { featureIds: string[] } }
   | { type: 'layer:delete'; payload: { featureIds: string[] } }
   | { type: 'layer:select'; payload: { featureIds: string[] } }
+  | {
+      /**
+       * Structured click-event payload (mirrors `SelectionClickEvent`),
+       * emitted alongside `layer:select` whenever a user clicks a row
+       * in the Layers panel via plain/modifier click (#192 Phase 5).
+       * Hosts that need to recompute `selection.primary` deterministic-
+       * ally — e.g. via `applyClickToSelection` — listen for this
+       * variant; hosts that only care about the resulting feature-id
+       * set can continue to use `layer:select`.
+       */
+      type: 'layer:selectEvent';
+      payload: { target: string; modifier: boolean; shift: boolean };
+    }
   | { type: 'layer:format'; payload: { featureIds: string[]; property: string; value: string | number | boolean; isPointOverride?: boolean; positionIndex?: number; childType?: string } }
   | { type: 'file:action'; payload: { file: AssociatedFile; action: 'open' | 'openWith' | 'reveal' | 'delete' } }
   | PropertiesCommitMessage;
@@ -143,6 +161,43 @@ export interface ActivityPanelProps {
   openItemStorePath?: string;
   /** Relative path (from storePath) to the item.json for the open plot. */
   openItemPath?: string;
+
+  // Spec 192 — Properties Panel mode dispatcher (Phase 2, T019/T025).
+  /**
+   * The current feature selection. Used to drive `resolveEditingMode`, which
+   * decides whether the Properties pane renders the plot form (default), the
+   * feature editor, the sub-feature editor, or the multi-select summary.
+   * When omitted the panel falls back to plot mode (zero regression to #447).
+   */
+  selection?: {
+    featureIds: string[];
+    primary: string | null;
+  };
+  /** True iff the plot slice's `isReadOnly` selector returns true. */
+  isPlotReadOnly?: boolean;
+  /** Human-readable reason from the plot slice's `readOnlyReason` selector. */
+  plotReadOnlyReason?: string | null;
+  /**
+   * Writer surface used by the integrated save path (Spec 192 T025). When
+   * absent the dispatcher omits the save action wiring; the existing
+   * direct-write `onCommitField` path remains in place for plot mode.
+   */
+  onSavePropertiesPanel?: SaveWriter;
+  /**
+   * Provenance appender invoked once per affected feature on successful
+   * save. Required when `onSavePropertiesPanel` is provided.
+   */
+  appendPropertiesPanelProvenance?: AppendProvenanceFn;
+  /**
+   * Package version pin embedded in the provenance entry's `method` field
+   * (e.g. `properties-panel@1.0.0`). Defaults to `'0.0.0'`.
+   */
+  propertiesPanelPackageVersion?: string;
+  /**
+   * Notified when a staged-edits save completes (success or failure). Host
+   * surfaces the result as an info banner / dirty indicator. Optional.
+   */
+  onPropertiesPanelSaveResult?: (result: SaveStagedEditsResult) => void;
 
   // Message callback for host communication
   /** Callback for messages sent to the host */

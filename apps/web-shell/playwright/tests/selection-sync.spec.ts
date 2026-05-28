@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 
 // Selection sync tests — verifies map/panel selection synchronization.
 test.describe('Selection Sync', () => {
@@ -9,6 +10,9 @@ test.describe('Selection Sync', () => {
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     // Wait for map to render tracks
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
+    // #192 — keep the Layers FeatureList rendered after selection (see
+    // `fixtures/properties-collapse.ts` for the rationale).
+    await collapsePropertiesSection(page);
   });
 
   test('clicking track on map selects it', async ({ page }) => {

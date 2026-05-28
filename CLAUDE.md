@@ -217,6 +217,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Plot file `*.plot.geojson` (GeoJSON `FeatureCollection`) — the destination for migrated state, accessed through the existing writer abstraction. Sidecar `*.debrief-session` (JSON sibling file) — continues to exist for non-migrated per-machine fields. Web-shell continues to use the existing IndexedDB-backed plot store from #236; no new browser-storage adapter is introduced. (261-session-state-systemstate)
 - Python 3.11 (services, schema-build tooling, + LinkML ≥ 1.7.0 (schema source + (223-linkml-stac-catalog)
 - TypeScript 5.x (strict mode) — no new technology; amends spec-261's `@debrief/session-state` `SystemState` load layer (`validate.ts`, reconciliation, `load.ts`) + host notification surfaces. No schema change, no new dependency. (267-tolerant-playhead-import)
+- TypeScript 5.x (strict), Node 20 runtime (VS Code extension host); React 18.x (renderer + panel) + `@debrief/components` (StoryboardPanel), `@debrief/stac-writer` (web-shell reads), `@debrief/schemas` (LinkML types — consumed, not changed), JSZip 3.10.1 (already present), VS Code Extension API ^1.85.0, `react-leaflet`/Leaflet (renderer map), Vite 5.x (web-shell + renderer) (273-storyboard-preview-button)
 
 ## Before Pushing
 
@@ -301,5 +302,6 @@ Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during 
 
 ## Recent Changes
 - 267-tolerant-playhead-import: Relaxes spec-261 FR-018 strict-on-import for one recoverable case — orphaned playhead (out-of-window `current_time`) clamps to nearest window edge + non-blocking notification; incoherent window (`start>end`) still hard-fails. No schema change, no new dependency.
+- 273-storyboard-preview-button: Added TypeScript 5.x (strict), Node 20 runtime (VS Code extension host); React 18.x (renderer + panel) + `@debrief/components` (StoryboardPanel), `@debrief/stac-writer` (web-shell reads), `@debrief/schemas` (LinkML types — consumed, not changed), JSZip 3.10.1 (already present), VS Code Extension API ^1.85.0, `react-leaflet`/Leaflet (renderer map), Vite 5.x (web-shell + renderer)
 - 223-linkml-stac-catalog: Added Python 3.11 (services, schema-build tooling, + LinkML ≥ 1.7.0 (schema source +
 - 261-session-state-systemstate: Added TypeScript 5.x (strict mode mandatory per Article XV) for shared helper, both hosts, and tests; Python 3.11 for LinkML codegen, Pydantic adherence tests, and schema validation gates. + LinkML ≥1.7.0 (master schema source — extended this work); `@debrief/schemas` (generated types — regenerated); Pydantic v2 (Python schema validation); existing `@debrief/session-state` Zustand store (extended, not replaced); existing writer abstraction (`@debrief/stac-writer` / `FilesystemAdapter`) — SystemState writes route through it per Article IV.4. **No new external runtime dependencies.**

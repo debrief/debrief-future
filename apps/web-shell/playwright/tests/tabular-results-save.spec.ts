@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 
 /**
  * E2E test for the tabular results save flow (#177).
@@ -27,6 +28,7 @@ test.describe('Tabular Results Save Flow (#177)', () => {
     await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
+    await collapsePropertiesSection(page);
   });
 
   test('Range Bearing result saved via Save As appears in Layers dropdown', async ({ page }) => {

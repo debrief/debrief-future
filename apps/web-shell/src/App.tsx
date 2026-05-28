@@ -40,10 +40,12 @@ import {
   PropertiesForm,
   validatePlot,
   StoryboardError,
+  applyClickToSelection,
 } from '@debrief/components';
 import type {
   PropertiesFormField,
   PropertiesFormProps,
+  SelectionClickEvent,
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance, AssociatedFile } from '@debrief/components';
 import type {
@@ -127,6 +129,7 @@ import { mockFsAdapter } from './mocks/fsAdapter';
 import { createStacWriterIdb } from './services/stacWriterIdb';
 import { probeIndexedDbCapability } from './services/stacWriterCapability';
 import {
+  getActiveCapability,
   setActiveStacItemPath,
   setActiveStacWriter,
 } from './services/stacWriterRegistry';
@@ -544,6 +547,19 @@ export default function App() {
       // the invariant survives a future refactor that, say, copies a slice
       // across the boundary.
       freshStore.getState().setViewportLocked(false);
+      // Spec #192 T017 (producer rule 1) — dispatch the read-only signal
+      // from the IDB writer's capability. `getActiveCapability()` is
+      // populated by the writer-init effect above; if it hasn't resolved
+      // yet (race), we default to writable and rely on the save-time
+      // escalation path to catch real write failures.
+      {
+        const capability = getActiveCapability();
+        const persistent = capability.persistent === true;
+        freshStore.getState().setReadOnly(
+          !persistent,
+          persistent ? null : 'Storage location is not writable',
+        );
+      }
 
       setCurrentPlot({
         itemPath,
@@ -924,20 +940,21 @@ export default function App() {
     []
   );
 
-  // Handle map feature selection (goes through session-state)
-  const handleMapSelect = useCallback((featureId: string, event: React.MouseEvent) => {
+  // Handle map feature selection (goes through session-state).
+  //
+  // #192 Phase 5: routes the new `SelectionClickEvent` through the shared
+  // `applyClickToSelection` helper so the map and the Layers panel
+  // produce identical selection sets for identical sequences.
+  const handleMapSelect = useCallback((event: SelectionClickEvent) => {
     const s = store.getState();
-    if (event.ctrlKey || event.metaKey) {
-      // Toggle: add or remove
-      const current = s.selection.featureIds;
-      if (current.includes(featureId)) {
-        s.removeFromSelection([featureId]);
-      } else {
-        s.addToSelection([featureId]);
-      }
-    } else {
-      s.setSelection([featureId], featureId);
-    }
+    const next = applyClickToSelection({
+      current: {
+        featureIds: s.selection.featureIds,
+        primary: s.selection.primary ?? null,
+      },
+      event,
+    });
+    s.setSelection(next.featureIds, next.primary ?? undefined);
   }, [store]);
 
   // Handle background click (clear selection via session-state)
@@ -1278,6 +1295,23 @@ export default function App() {
       case 'layer:select':
         store.getState().setSelection(message.payload.featureIds);
         break;
+      case 'layer:selectEvent': {
+        // #192 Phase 5: emitted right after `layer:select` by FeatureList
+        // for plain/modifier clicks. Re-route through the shared
+        // `applyClickToSelection` helper so `selection.primary` follows
+        // the modifier-aware "most recent action" rule, matching the
+        // map-click path.
+        const s = store.getState();
+        const next = applyClickToSelection({
+          current: {
+            featureIds: s.selection.featureIds,
+            primary: s.selection.primary ?? null,
+          },
+          event: message.payload,
+        });
+        s.setSelection(next.featureIds, next.primary ?? undefined);
+        break;
+      }
       case 'layer:toggleVisibility': {
         const targetIds = new Set(message.payload.featureIds);
 
@@ -1492,6 +1526,15 @@ export default function App() {
       selectedFeatureIds: state.selection.featureIds,
       hiddenIds: hiddenFeatureIds,
       resultFiles: savedResultFiles,
+      // #192 Phase 6 (T048) — plumb the plot slice's read-only signal
+      // through to the Properties panel so every mode renders the banner
+      // + disabled inputs (FR-018 / FR-019 / FR-020). The signal itself
+      // is producer-rule-driven by `setReadOnly` calls from openPlot
+      // (capability probe) and `saveSession` (EACCES / EPERM / RO error).
+      // PlotSlice fields are flat on `SessionStoreWithUndo` (no `.plot`
+      // namespace — the Zustand store flattens every slice).
+      isPlotReadOnly: state.isReadOnly,
+      plotReadOnlyReason: state.readOnlyReason,
       onMessage: handleActivityMessage,
     } : null,
     mapViewProps: currentPlot ? {
@@ -1554,6 +1597,8 @@ export default function App() {
     playback.playbackState, playback.speed, state.displayMode,
     tools, toolMatches, allFeatures, visibleFeatures, state.selection.featureIds,
     hiddenFeatureIds, handleActivityMessage,
+    // #192 Phase 6 — read-only signal threading (flat slice fields)
+    state.isReadOnly, state.readOnlyReason,
     selectedIds, handleMapSelect, handleBackgroundClick,
     handleMapZoomChange, handleMapBoundsChange, storyboardPanelEnabled,
     drawingMode, handleDrawingModeChange,
