@@ -83,4 +83,6 @@ export {
   type ActiveStoryboardVariant,
   type SystemStateMap,
   type SystemStateWriteInput,
+  // spec 267 — tolerant playhead-clamp diagnostic returned by the load path.
+  type PlayheadClampDiagnostic,
 } from '../../../services/session-state/src/system-state/index.js';

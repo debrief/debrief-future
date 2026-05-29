@@ -115,4 +115,25 @@ describe('systemStateBridge', () => {
     };
     expect(() => hydrateStoreFromFeatures(store.getState(), [bad])).toThrow(SystemStateLoadError);
   });
+
+  // ── spec 267 (review 3A) — tolerant playhead clamp does NOT throw ───────────
+  it('does not throw and returns a clamp for an orphaned playhead (spec 267)', () => {
+    const orphaned: FeatureLike = {
+      type: 'Feature',
+      id: 'state.temporal',
+      geometry: { type: 'Point', coordinates: [] },
+      properties: {
+        kind: 'SYSTEM',
+        state_type: 'temporal',
+        start_time: '2024-01-01T00:00:00Z',
+        end_time: '2024-01-07T00:00:00Z',
+        current_time: '2024-02-01T00:00:00Z', // after end_time → clamp to end
+      },
+    };
+    const clamps = hydrateStoreFromFeatures(store.getState(), [orphaned]);
+    expect(clamps).toHaveLength(1);
+    expect(clamps[0]?.edge).toBe('end');
+    // The store playhead landed on the window edge (epoch ms), not the orphan.
+    expect(store.getState().currentTime).toBe(Date.parse('2024-01-07T00:00:00Z'));
+  });
 });

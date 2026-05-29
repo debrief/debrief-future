@@ -73,10 +73,12 @@ import {
   hydrateStoreFromFeatures,
   mirrorViewStateIntoFeatures,
   SystemStateLoadError,
+  type PlayheadClampDiagnostic,
 } from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
 import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
+import { buildPlayheadClampMessage, PLAYHEAD_CLAMP_NOTICE_MS } from './playheadClampMessage';
 import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
 import {
   StoryboardEditHarness,
@@ -587,14 +589,26 @@ export default function App() {
       // Strict-on-import: a malformed/duplicate/cross-field-invalid SystemState
       // feature surfaces the same error banner as a Storyboard validation
       // failure (FR-011/FR-012).
+      let playheadClamps: PlayheadClampDiagnostic[] = [];
       try {
-        hydrateStoreFromFeatures(freshStore.getState(), plotData.features as DebriefFeature[]);
+        playheadClamps = hydrateStoreFromFeatures(
+          freshStore.getState(),
+          plotData.features as DebriefFeature[],
+        );
       } catch (err) {
         if (err instanceof SystemStateLoadError) {
           setPlotLoadError({ code: err.kind, message: err.message });
           return;
         }
         throw err;
+      }
+      // spec 267 (FR-003): an orphaned playhead was clamped to the window edge
+      // on load — surface a non-blocking transient (reusing the LogPanel
+      // notification, NOT the #259 error banner). Never silent (Article I.3).
+      const clampMsg = buildPlayheadClampMessage(playheadClamps);
+      if (clampMsg !== null) {
+        setLogNotification(clampMsg);
+        setTimeout(() => setLogNotification(null), PLAYHEAD_CLAMP_NOTICE_MS);
       }
 
       // Clear undo history — initialization isn't a user action
@@ -673,14 +687,21 @@ export default function App() {
       const fresh = getSessionStore();
       window.__sessionStore = fresh;
       fresh.getState().setFeatureCollectionUri(itemPath);
+      let playheadClamps: PlayheadClampDiagnostic[] = [];
       try {
-        hydrateStoreFromFeatures(fresh.getState(), features as DebriefFeature[]);
+        playheadClamps = hydrateStoreFromFeatures(fresh.getState(), features as DebriefFeature[]);
       } catch (err) {
         if (err instanceof SystemStateLoadError) {
           setPlotLoadError({ code: err.kind, message: err.message });
           return;
         }
         throw err;
+      }
+      // spec 267 (FR-003): non-blocking clamp notice on the transfer/test path too.
+      const clampMsg = buildPlayheadClampMessage(playheadClamps);
+      if (clampMsg !== null) {
+        setLogNotification(clampMsg);
+        setTimeout(() => setLogNotification(null), PLAYHEAD_CLAMP_NOTICE_MS);
       }
       fresh.getState().clearHistory();
       fresh.getState().markClean();
