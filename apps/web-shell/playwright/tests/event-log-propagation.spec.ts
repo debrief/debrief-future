@@ -88,10 +88,7 @@ async function getRectangleFirstCoord(page: import('@playwright/test').Page): Pr
   });
 }
 
-// QUARANTINED #278: every test here needs a move-shape log entry, but the
-// Move-Shape Run button is disabled after #261 (sidecar retirement). Whole
-// suite fixme'd until #278 restores selection-driven tool enablement. (cf. #274)
-test.describe.fixme('Event Log Propagation', () => {
+test.describe('Event Log Propagation', () => {
   let catalogPage: CatalogPage;
   let analysisPage: AnalysisPage;
 

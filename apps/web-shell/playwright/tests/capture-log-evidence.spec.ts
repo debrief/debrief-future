@@ -114,11 +114,7 @@ test.describe('Evidence screenshots: LogPanel states', () => {
   });
 
   // ── 3. Log entry with tunable parameters ──────────────────────────────────
-  // QUARANTINED #278: these four captures need a move-shape log entry, but the
-  // Move-Shape Run button is disabled after #261 (sidecar retirement), so the
-  // setup (runMoveShape) never produces an entry. Un-fixme each when #278
-  // restores selection-driven tool enablement. (mirrors viewport-lock / #274)
-  test.fixme('capture: tunable parameters on move-shape entry', async ({ page }) => {
+  test('capture: tunable parameters on move-shape entry', async ({ page }) => {
     await selectRectangle(page);
     await runMoveShape(page);
     await analysisPage.switchToLogTab();
@@ -138,8 +134,7 @@ test.describe('Evidence screenshots: LogPanel states', () => {
   });
 
   // ── 4. Edit card (flip-card back face) ────────────────────────────────────
-  // QUARANTINED #278 (Move-Shape Run disabled post-#261).
-  test.fixme('capture: edit card (flip-card back face)', async ({ page }) => {
+  test('capture: edit card (flip-card back face)', async ({ page }) => {
     await selectRectangle(page);
     await runMoveShape(page);
     await analysisPage.switchToLogTab();
@@ -173,8 +168,7 @@ test.describe('Evidence screenshots: LogPanel states', () => {
   });
 
   // ── 5. Tuned entry with badge ─────────────────────────────────────────────
-  // QUARANTINED #278 (Move-Shape Run disabled post-#261).
-  test.fixme('capture: tuned entry with badge', async ({ page }) => {
+  test('capture: tuned entry with badge', async ({ page }) => {
     await selectRectangle(page);
     await runMoveShape(page);
     await analysisPage.switchToLogTab();
@@ -215,8 +209,7 @@ test.describe('Evidence screenshots: LogPanel states', () => {
   });
 
   // ── 6. Full page: map + log panel side by side ────────────────────────────
-  // QUARANTINED #278 (Move-Shape Run disabled post-#261).
-  test.fixme('capture: full page with map and log panel', async ({ page }) => {
+  test('capture: full page with map and log panel', async ({ page }) => {
     // Run multiple tools to show a rich log
     await selectTrack(page);
     const activeTools = page.locator('.debrief-tools-panel__item--active');
