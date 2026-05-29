@@ -1,144 +1,126 @@
 # Data Model: Tolerant import for out-of-window saved playhead
 
 **Feature**: `267-tolerant-playhead-import`
-**Phase**: 1 (design)
-**Date**: 2026-05-26
+**Phase**: 1 (design) — **reconciled to spec-261 as merged (2026-05-29)**
 
-This feature introduces **no schema (LinkML) change** — `current_time` already exists on the temporal `SystemStateProperties` variant (spec-261 FR-016). It introduces **one new runtime type** (a load diagnostic) and **amends one cross-field validation rule**. Everything below lives in TypeScript inside `services/session-state/src/system-state/`.
+This feature introduces **no schema (LinkML) change** and **no new runtime dependency**. It adds **one new runtime type** (`PlayheadClampDiagnostic`) and **amends one cross-field check** plus its caller. Everything lives in TypeScript inside `services/session-state/src/system-state/`.
+
+> **Reconciliation**: written against spec-261's *shipped* code, not its planned contract. There is no `reconcile.ts`, no `persistence/load.ts`, and no `provenance` on view-state SystemState features. See `contracts/system-state-helper-delta.md`.
 
 ---
 
-## Entity 1: `PlayheadClampDiagnostic` (NEW — runtime only)
+## Entity 1: `PlayheadClampDiagnostic` (NEW — runtime only, in `system-state/types.ts`)
 
-The structured record emitted when an out-of-window saved playhead is clamped on load. It is data, not UI — the host consumes it to render a notification (Article IV.1) and, on next save, to enrich the provenance `LogEntry`.
+The structured record emitted when an out-of-window saved playhead is clamped on load. It is data, not UI — the host consumes it to render a notification (Article IV.1).
 
 ```typescript
-/**
- * Emitted by applyTemporalReconciliation when a coherent-window temporal SystemState
- * has a current_time outside [start_time, end_time]. Carried in session memory until
- * (a) surfaced as a non-blocking notification and (b) recorded as provenance on next save.
- */
 export interface PlayheadClampDiagnostic {
   readonly kind: 'playhead-clamped';
-  /** id of the offending temporal SystemState Feature (for provenance + message detail). */
-  readonly featureId: string;
-  /** Which edge the playhead was clamped to. */
-  readonly edge: 'start' | 'end';
-  /** The original out-of-window saved playhead, as an ISO-8601 timestamp (verbatim from the file). */
-  readonly originalCurrentTime: string;
-  /** The resulting in-window value the playhead was set to, as an ISO-8601 timestamp. */
-  readonly clampedCurrentTime: string;
+  readonly featureId: string;          // id of the offending temporal SystemState feature
+  readonly edge: 'start' | 'end';      // which window edge the playhead was clamped to
+  readonly originalCurrentTime: string; // ISO-8601, verbatim from the file
+  readonly clampedCurrentTime: string;  // ISO-8601 — exactly start_time (edge:'start') or end_time (edge:'end')
 }
 ```
-
-**Field notes**
-- `kind` is a literal discriminator so the diagnostics channel can carry future recoverable-load kinds without a breaking change.
-- `edge` lets the notification say "moved to the start/end of the time range" without the host re-deriving direction.
-- `originalCurrentTime` / `clampedCurrentTime` are kept as ISO strings (the wire form) so they can be written verbatim into the provenance `LogEntry` at save time (R-002) and shown in the message; the *comparison/clamp* happens in epoch-ms (R-004) but the diagnostic reports the human-facing ISO form.
 
 **Invariants**
-- Emitted **only** for a coherent window (`start_time ≤ end_time`) where `current_time` is strictly outside `[start_time, end_time]`. Never emitted for in-range/absent `current_time` (FR-009) or for an incoherent window (FR-005 — that path throws before reconciliation).
-- At most one per temporal `SystemState` per load (there is at most one temporal feature per plot).
+- Emitted **only** for a coherent window (`start ≤ end`) where `current_time` is strictly outside `[start_time, end_time]`. Never for in-range/boundary/absent `current_time` (FR-009), never for an incoherent window (FR-005 — that throws).
+- `clampedCurrentTime` is a window boundary's *verbatim* ISO string (no reformatting / no float drift).
+- At most one per plot (at most one temporal SystemState feature per plot — 261 FR-003).
 
 ---
 
-## Entity 2: Amended cross-field validation rule (`validate.ts`)
+## Entity 2: Amended cross-field check `checkTemporalCrossField` (`validate.ts`)
 
-Spec-261's `data-model.md` validation table has two temporal cross-field rows. This feature **splits their severity**:
+**As shipped (261)**: `checkTemporalCrossField(v: TemporalVariant): string | null` — returns a single violation string for *any* temporal cross-field problem (both `start>end` and `current_time` out-of-window), or `null`. `read.ts` throws `SystemStateLoadError(kind='cross-field-invariant')` whenever it's non-null.
 
-| Invariant | Variant | Spec-261 behaviour (before) | This feature (after) |
-|---|---|---|---|
-| `start_time ≤ end_time` | `temporal` | Throws `SystemStateLoadError(kind='cross-field-invariant')` | **Unchanged** — still throws. The incoherent-window guard rail (FR-004). |
-| `current_time ∈ [start_time, end_time]` (when present) | `temporal` | Throws `SystemStateLoadError(kind='cross-field-invariant')` | **Recoverable** — no longer throws. Detected during reconciliation; clamps to nearest edge and emits `PlayheadClampDiagnostic` (FR-001, FR-002). |
-
-The first rule stays in `validate.ts` (evaluated before reconciliation, so the plot fails to open before any store hydration). The second rule's *detection + action* moves into `applyTemporalReconciliation`.
-
----
-
-## Entity 3: `clampPlayheadToWindow` (NEW — pure function)
+**After this feature**: returns a severity-split discriminated result:
 
 ```typescript
-/**
- * Pure clamp in epoch-ms space (matches the store's stepForward/stepBackward arithmetic).
- * Precondition: start <= end (incoherent windows are rejected upstream in validate.ts).
- *
- * Returns the in-window value and, when a clamp occurred, the edge it was clamped to.
- */
-export function clampPlayheadToWindow(args: {
-  currentMs: number;
-  startMs: number;
-  endMs: number;
-}): { valueMs: number; clampedTo: 'start' | 'end' | null };
+export type TemporalCrossFieldResult =
+  | { status: 'ok' }
+  | { status: 'fatal'; message: string }
+  | { status: 'recoverable-playhead'; edge: 'start' | 'end'; clampedCurrentTime: string; message: string };
 ```
 
-- `currentMs < startMs` → `{ valueMs: startMs, clampedTo: 'start' }`
-- `currentMs > endMs`   → `{ valueMs: endMs,   clampedTo: 'end' }`
-- otherwise (in range, incl. boundary)`→ `{ valueMs: currentMs, clampedTo: null }`
-- Degenerate single instant (`startMs === endMs`): any out-of-range value clamps to that instant; `clampedTo` reflects the direction it came from.
+| Condition | Result |
+|---|---|
+| `start_time`/`end_time` unparseable | `fatal` |
+| `start_time > end_time` | `fatal` (the incoherent-window guard rail — FR-004) |
+| `current_time` present but unparseable | `fatal` |
+| coherent window, `current_time < start_time` | `recoverable-playhead` { edge:'start', clampedCurrentTime: `start_time` } |
+| coherent window, `current_time > end_time` | `recoverable-playhead` { edge:'end', clampedCurrentTime: `end_time` } |
+| `current_time` in `[start,end]` or absent | `ok` |
+
+The clamp *decision* (which edge, what value) is computed here — no separate clamp helper module is needed (the value is a verbatim boundary string).
 
 ---
 
-## Entity 4: `applyTemporalReconciliation` return shape (AMENDED)
+## Entity 3: `read.ts` recoverable handling (`readSystemStateFromFeatureCollection`)
 
-Spec-261's contract: `applyTemporalReconciliation(fromPlot, fromSidecar): HydratedTemporalSlice`. This feature changes the return so the clamp diagnostic can flow to the host:
+`read.ts` is the throw site. It gains an **optional diagnostics sink** (so existing callers compile unchanged):
 
 ```typescript
-export function applyTemporalReconciliation(
-  fromPlot: SystemStateMap['temporal'] | undefined,
-  fromSidecar: SidecarTemporalSlice | undefined
-): { slice: HydratedTemporalSlice; clamp: PlayheadClampDiagnostic | null };
+export function readSystemStateFromFeatureCollection(
+  fc: PlotFeatureCollection,
+  playheadClamps?: PlayheadClampDiagnostic[],
+): SystemStateMap;
 ```
 
-- `clamp` is non-null only in the FR-001 case. The `slice.currentTime` reflects the clamped epoch-ms value.
-- When `fromPlot` is absent or `current_time` is in range/absent, `clamp` is `null` and `slice` is byte-identical to spec-261's behaviour (FR-009).
+At the temporal branch it switches on `checkTemporalCrossField`:
+- `fatal` → `throw new SystemStateLoadError({ kind: 'cross-field-invariant', … })` (as today).
+- `recoverable-playhead` → set the parsed variant's `current_time` to `clampedCurrentTime` (so the value in the returned `SystemStateMap` is already in-window), then `playheadClamps?.push({...})`.
+- `ok` → unchanged.
 
-(Spec-261 is unshipped, so this is a contract refinement of 261, not a breaking change to released code — see `contracts/system-state-helper-delta.md`.)
+**Why the clamp lands here**: `read.ts` is the one place holding the `featureId`, the parsed `TemporalVariant`, and the cross-field verdict together. Clamping the value before it enters the `SystemStateMap` means the downstream `temporalVariantToSlice` (ISO→epoch) needs **no change** — it converts the already-clamped value.
 
 ---
 
-## Entity 5: Load result diagnostics channel (`persistence/load.ts`, AMENDED)
+## Entity 4: `hydrateStoreFromFeatures` return (`store-bridge.ts`)
 
-Spec-261's `load.ts` orchestrates: read FC → `readSystemStateFromFeatureCollection` → `applyXReconciliation` → hydrate store (+ read sidecar). This feature has `load.ts` **collect** any `PlayheadClampDiagnostic` produced by `applyTemporalReconciliation` and expose it to the caller so the host can render it.
+**As shipped**: `hydrateStoreFromFeatures(state, features): void` — both hosts' single load entry; calls `read` then applies the temporal/spatial/selection slices to the store.
+
+**After this feature**: returns the clamps so the host can notify:
 
 ```typescript
-// Illustrative — exact shape pinned in the helper delta contract.
-interface LoadSessionResult {
-  // ...existing spec-261 load result fields...
-  /** Non-fatal recoverable-load diagnostics surfaced to the host for notification. Empty when none. */
-  clampDiagnostics: PlayheadClampDiagnostic[];
-}
+export function hydrateStoreFromFeatures(
+  state: ViewStateStore,
+  features: ReadonlyArray<FeatureLike>,
+): PlayheadClampDiagnostic[];
 ```
 
-- Hard errors (`SystemStateLoadError`, incl. `start>end`) still **throw** out of `load.ts` — they are not added to this array (FR-004, FR-005).
-- The array carries diagnostics across **all** plots loaded in one operation (session restore), enabling host coalescing (FR-006).
+It owns a local sink, passes it to `read`, hydrates the store as today, and returns the sink (`[]` when no clamp). Still throws `SystemStateLoadError` for fatal cases (callers' `try/catch` is unchanged).
+
+---
+
+## Entity 5: Temporal slice / variant (existing — for reference, NOT changed by this feature)
+
+- Store `TemporalSlice`: `currentTime: number | null` (epoch ms), `timeRange: { start: number; end: number } | null` (epoch ms). The clamp comparison/decision is epoch-equivalent; the store receives the clamped value via the unchanged `temporalVariantToSlice` (`isoToEpoch`).
+- Wire `TemporalVariant` (as migrated by 261, more fields than 261's data-model predicted): `start_time`, `end_time`, `current_time?`, `filter_start_time?`, `filter_end_time?`, `display_mode?`, `step_size?`, `playback_rate?`. **Only `current_time` is touched by this feature.**
 
 ---
 
 ## Relationships
 
 ```text
-  temporal SystemState (wire)        validate.ts
-  ┌───────────────────────┐        ┌──────────────────────────────┐
-  │ start_time            │───────▶│ start>end?  ── yes ──▶ throw   │  (FR-004 hard fail, unchanged)
-  │ end_time              │        │   no                          │
-  │ current_time (maybe   │        └───────────────┬───────────────┘
-  │   out of window)      │                        │ (coherent window)
-  └───────────────────────┘                        ▼
-                                   applyTemporalReconciliation
-                                   ┌──────────────────────────────┐
-                                   │ clampPlayheadToWindow()       │
-                                   │   in range  → slice, clamp=null│
-                                   │   out range → slice(clamped),  │
-                                   │               clamp=Diagnostic │ (FR-001/002)
-                                   └───────────────┬───────────────┘
-                                                   ▼
-                                   load.ts collects clampDiagnostics[]
-                                                   ▼
-                          host (VS Code / web-shell) renders coalesced
-                          non-blocking notification (FR-003/006)
-                                                   ▼
-                          (next explicit save) write path appends a
-                          provenance LogEntry recording original→clamped (FR-007)
+  temporal SystemState (wire)        validate.checkTemporalCrossField()
+  ┌───────────────────────┐        ┌───────────────────────────────────────┐
+  │ start_time            │───────▶│ fatal (start>end / unparseable) ──▶ read throws  │ (FR-004)
+  │ end_time              │        │ recoverable-playhead {edge, clampedISO}          │
+  │ current_time (maybe   │        │ ok                                                │
+  │   out of window)      │        └───────────────────┬───────────────────┘
+  └───────────────────────┘                            │
+                                   read.ts: set current_time = clampedISO;
+                                            playheadClamps.push(diagnostic)   (FR-001/002)
+                                                        ▼
+                                   store-bridge.hydrateStoreFromFeatures → returns PlayheadClampDiagnostic[]
+                                            (store.setCurrentTime gets the in-window value via temporalVariantToSlice)
+                                                        ▼
+                                   host (openPlot.ts / App.tsx): ONE coalesced non-blocking
+                                            warning/toast (FR-003/006). Repeats on every load
+                                                        ▼
+                                   (next explicit save) write.ts persists the in-window current_time;
+                                            re-open → ok, no clamp, no notification (FR-008, SC-005)
 ```
 
 ---
@@ -147,10 +129,10 @@ interface LoadSessionResult {
 
 | Rule | Enforcement point | Article / FR |
 |---|---|---|
-| `start_time ≤ end_time` still throws on violation | `validate.ts` (before reconciliation) | I.3, XIV.4, FR-004/005 |
-| Coherent-window `current_time` out of range → clamp, do not throw | `applyTemporalReconciliation` | FR-001/002 (XIV.4 sanctioned relaxation) |
-| A clamp MUST emit exactly one `PlayheadClampDiagnostic` | `applyTemporalReconciliation` | FR-003, SC-003 |
-| In-range/absent `current_time` emits no diagnostic and is byte-identical to spec-261 | `applyTemporalReconciliation` | FR-009, SC-006 |
-| Clamp never marks dirty / never auto-saves | host load path (no save triggered) | FR-008, spec-261 FR-017 |
-| Heal recorded as provenance LogEntry on next save | spec-261 write path, enriched | III.1, FR-007 (R-002) |
-| Same clamp rule on both hosts (no host-private logic) | shared helper (`session-state`) | FR-010, SC-007 |
+| `start_time > end_time` (or unparseable) still throws | `validate.ts` `fatal` → `read.ts` throw | I.3, XIV.4, FR-004/005 |
+| Coherent-window `current_time` out of range → clamp to boundary, no throw | `validate.ts` `recoverable-playhead` → `read.ts` | FR-001/002 (XIV.4 sanctioned relaxation) |
+| A clamp emits exactly one `PlayheadClampDiagnostic` (when a sink is supplied) | `read.ts` | FR-003, SC-003 |
+| In-range/absent `current_time` → no diagnostic, behaviour byte-identical to 261 | `validate.ts` `ok` path | FR-009, SC-006 |
+| Clamp never marks dirty / never auto-saves | host load path (no save triggered) | FR-008, 261 FR-017 |
+| The clamp is surfaced on **every** load until the analyst saves the healed value | host notification (repeats; no in-plot provenance — 261 FR-013) | I.3, FR-003 (revised FR-007) |
+| Same clamp rule on both hosts | shared `read.ts`/`store-bridge.ts` | FR-010, SC-007 |
