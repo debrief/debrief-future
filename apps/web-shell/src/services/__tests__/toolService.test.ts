@@ -22,6 +22,7 @@ const EXPECTED_TOOL_IDS = [
   'track-stats',
   'range-bearing',
   'area-summary',
+  'point-in-zone-classifier',
 ];
 
 describe('toolService.listTools (T041)', () => {
