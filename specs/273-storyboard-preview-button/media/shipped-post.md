@@ -42,6 +42,11 @@ It starts in the authoring surface. Here is the *Saxon Warrior — Twin CPA* exe
 ![Web-shell authoring surface: the Saxon Warrior storyboard with four captured scenes and the Preview button in the panel header](images/preview-trigger-webshell.png)
 *The trigger: a storyboard with four captured scenes, Preview live in the panel header. Every screenshot below was produced by a Playwright run that clicked this exact button.*
 
+The same control lives on the **desktop (VS Code) surface** — the Preview button sits in the Debrief storyboard panel beside Capture, exactly as it does in the browser. Here the *Exercise Alpha* brief is open in the VS Code extension, three scenes over the HMS Defender / USS Freedom tracks:
+
+![VS Code extension: the Debrief storyboard panel with captured scenes and the Preview button, beside the map with the exercise tracks](images/vscode-preview-panel.png)
+*The desktop surface: the storyboard panel + Preview control inside real VS Code, beside the map. Clicking Preview opens the same finished-briefing player — in VS Code via an ephemeral loopback server rather than a blob URL.*
+
 One click opens the finished-briefing player in a new tab and plays the storyboard back — the same renderer that ships inside an exported zip, here driven live from a `?features=` blob URL. The player flies the viewport to each captured scene in turn over a live OpenStreetMap basemap. Below is the briefing playing scene by scene, progressively closing on the two vessels' converging tracks.
 
 ![Scene 1 — opening overview: both vessel tracks in frame, the two paths crossing](images/preview-scene-1-overview.png)
