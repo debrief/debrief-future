@@ -72,6 +72,32 @@ export interface SystemStateMap {
   active_storyboard?: ActiveStoryboardVariant;
 }
 
+/**
+ * Structured record emitted when a temporal `SystemState`'s saved playhead
+ * (`current_time`) falls outside an otherwise-coherent `[start_time, end_time]`
+ * window and is clamped to the nearest edge on load (spec 267, FR-001/002/003).
+ *
+ * It is *data*, not UI: the shared load helper produces it and the host renders
+ * a non-blocking notification (Article IV.1). The `kind` discriminator
+ * deliberately reserves room for further recoverable-load diagnostics (backlog
+ * #276) without widening this interface.
+ *
+ * Invariants:
+ *  - Emitted ONLY for a coherent window where `current_time` is strictly outside
+ *    `[start_time, end_time]`. Never for in-range/boundary/absent `current_time`
+ *    (FR-009), never for an incoherent window (FR-005 — that throws).
+ *  - `clampedCurrentTime` is a window boundary's *verbatim* ISO string — exactly
+ *    `start_time` (edge `'start'`) or `end_time` (edge `'end'`); no reformatting,
+ *    no float drift.
+ */
+export interface PlayheadClampDiagnostic {
+  readonly kind: 'playhead-clamped';
+  readonly featureId: string;
+  readonly edge: 'start' | 'end';
+  readonly originalCurrentTime: string;
+  readonly clampedCurrentTime: string;
+}
+
 /** Variant payloads to write — kind/state_type are supplied by the helper. */
 export interface SystemStateWriteInput {
   temporal?: Omit<TemporalVariant, 'kind' | 'state_type'>;

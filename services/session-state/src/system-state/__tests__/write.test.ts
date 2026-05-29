@@ -74,7 +74,7 @@ describe('writeSystemStateIntoFeatureCollection', () => {
 
   it('round-trips read(write(fc)) for all populated variants', () => {
     const out = writeSystemStateIntoFeatureCollection(baseFc(), INPUT);
-    const map = readSystemStateFromFeatureCollection(out);
+    const { map } = readSystemStateFromFeatureCollection(out);
     expect(map.spatial?.viewport.coordinates).toHaveLength(4);
     expect(map.spatial?.rotation).toBe(10);
     expect(map.selection?.selected_ids).toEqual(['track-1']);

@@ -88,28 +88,73 @@ export const VARIANT_SCHEMAS = {
 } as const;
 
 /**
- * Temporal cross-field invariants (FR-011). Returns a human-readable violation
- * message, or `null` when the variant is internally consistent. No clamping.
+ * Severity-split result of the temporal cross-field check (spec 267).
+ *
+ * Spec-261 collapsed every temporal cross-field problem into a single violation
+ * string that `read.ts` turned into a hard `SystemStateLoadError`. Spec 267
+ * splits the verdict by recoverability:
+ *  - `fatal` — a structural defect with no valid playhead to recover to
+ *    (`start_time > end_time`, or any unparseable timestamp). Still throws.
+ *  - `recoverable-playhead` — a coherent window with an out-of-range
+ *    `current_time`. The saved playhead is clamped to the nearest edge and the
+ *    load succeeds (the sanctioned Article XIV.4 relaxation).
+ *  - `ok` — the variant is internally consistent.
  */
-export function checkTemporalCrossField(v: TemporalVariant): string | null {
+export type TemporalCrossFieldResult =
+  | { status: 'ok' }
+  | { status: 'fatal'; message: string }
+  | {
+      status: 'recoverable-playhead';
+      edge: 'start' | 'end';
+      clampedCurrentTime: string;
+      message: string;
+    };
+
+/**
+ * Temporal cross-field invariants (FR-011, amended by spec 267 FR-001/004/005).
+ *
+ * The clamp *decision* (which edge, what value) is computed here: because the
+ * target is always a window boundary, `clampedCurrentTime` is `start_time` or
+ * `end_time` verbatim — no epoch→ISO reformatting, no drift, so no separate
+ * clamp helper is needed.
+ */
+export function checkTemporalCrossField(v: TemporalVariant): TemporalCrossFieldResult {
   const start = Date.parse(v.start_time);
   const end = Date.parse(v.end_time);
   if (Number.isNaN(start) || Number.isNaN(end)) {
-    return `start_time/end_time must be parseable ISO-8601 datetimes`;
+    return { status: 'fatal', message: `start_time/end_time must be parseable ISO-8601 datetimes` };
   }
+  // Incoherent window takes precedence over any playhead concern (FR-005): a
+  // window with no valid interval has no edge to clamp to.
   if (start > end) {
-    return `start_time (${v.start_time}) must be <= end_time (${v.end_time})`;
+    return {
+      status: 'fatal',
+      message: `start_time (${v.start_time}) must be <= end_time (${v.end_time})`,
+    };
   }
   if (v.current_time !== undefined) {
     const current = Date.parse(v.current_time);
     if (Number.isNaN(current)) {
-      return `current_time must be a parseable ISO-8601 datetime`;
+      return { status: 'fatal', message: `current_time must be a parseable ISO-8601 datetime` };
     }
-    if (current < start || current > end) {
-      return `current_time (${v.current_time}) must lie within [${v.start_time}, ${v.end_time}]`;
+    if (current < start) {
+      return {
+        status: 'recoverable-playhead',
+        edge: 'start',
+        clampedCurrentTime: v.start_time,
+        message: `current_time (${v.current_time}) was before start_time (${v.start_time}); clamped to the window start`,
+      };
+    }
+    if (current > end) {
+      return {
+        status: 'recoverable-playhead',
+        edge: 'end',
+        clampedCurrentTime: v.end_time,
+        message: `current_time (${v.current_time}) was after end_time (${v.end_time}); clamped to the window end`,
+      };
     }
   }
-  return null;
+  return { status: 'ok' };
 }
 
 // ---------------------------------------------------------------------------

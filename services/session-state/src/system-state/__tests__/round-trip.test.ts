@@ -39,7 +39,7 @@ describe('write/read structural round-trip', () => {
     };
     const fc: PlotFeatureCollection = { type: 'FeatureCollection', features: [track('t1')] };
     const once = writeSystemStateIntoFeatureCollection(fc, input);
-    const map = readSystemStateFromFeatureCollection(once);
+    const { map } = readSystemStateFromFeatureCollection(once);
     const twice = writeSystemStateIntoFeatureCollection(fc, {
       temporal: { ...map.temporal! },
       spatial: { ...map.spatial! },
