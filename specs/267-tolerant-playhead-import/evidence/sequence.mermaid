@@ -1,0 +1,42 @@
+sequenceDiagram
+    autonumber
+    actor Analyst
+    participant Host as Host (openPlot.ts / App.tsx)
+    participant Bridge as store-bridge.hydrateStoreFromFeatures
+    participant Read as read.readSystemStateFromFeatureCollection
+    participant Validate as validate.checkTemporalCrossField
+    participant Store as Session store (Zustand)
+    participant Write as write.ts (next save)
+
+    Analyst->>Host: Open a plot (features.geojson)
+    Host->>Bridge: hydrateStoreFromFeatures(state, features)
+    Bridge->>Read: readSystemStateFromFeatureCollection(fc)
+
+    loop each SYSTEM feature
+        Read->>Validate: checkTemporalCrossField(temporal)
+        alt start_time > end_time OR unparseable
+            Validate-->>Read: { status: 'fatal', message }
+            Read-->>Bridge: throw SystemStateLoadError(cross-field-invariant)
+            Bridge-->>Host: throw
+            Host-->>Analyst: error surface (plot does NOT open)
+        else current_time outside [start,end] (coherent window)
+            Validate-->>Read: { status: 'recoverable-playhead', edge, clampedCurrentTime }
+            Read->>Read: temporal = { ...v, current_time: clampedCurrentTime }
+            Read->>Read: playheadClamps.push({ kind:'playhead-clamped', feature_id, edge, ... })
+        else in-range / boundary / absent
+            Validate-->>Read: { status: 'ok' }
+        end
+    end
+
+    Read-->>Bridge: { map (clamped), playheadClamps }
+    Bridge->>Store: setCurrentTime(clamped edge), setTimeRange, setViewport, ...
+    Bridge-->>Host: PlayheadClampDiagnostic[]
+
+    opt playheadClamps.length > 0
+        Host-->>Analyst: non-blocking notification ("moved to window start/end")
+        Note over Host,Analyst: never silent (Article I.3); repeats on every load until healed
+    end
+
+    Analyst->>Host: (later) explicit Save
+    Host->>Write: writeSystemStateIntoFeatureCollection(store)
+    Write-->>Analyst: stored current_time now in-window (healed; re-open → no clamp)

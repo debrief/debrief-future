@@ -16,7 +16,7 @@ The structured record emitted when an out-of-window saved playhead is clamped on
 ```typescript
 export interface PlayheadClampDiagnostic {
   readonly kind: 'playhead-clamped';
-  readonly featureId: string;          // id of the offending temporal SystemState feature
+  readonly feature_id: string;         // id of the offending temporal SystemState feature (snake_case per ADR-010)
   readonly edge: 'start' | 'end';      // which window edge the playhead was clamped to
   readonly originalCurrentTime: string; // ISO-8601, verbatim from the file
   readonly clampedCurrentTime: string;  // ISO-8601 — exactly start_time (edge:'start') or end_time (edge:'end')

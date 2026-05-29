@@ -29,7 +29,7 @@ Host call sites: `apps/vscode/src/commands/openPlot.ts:180` (+ wrapper `apps/vsc
 ```typescript
 export interface PlayheadClampDiagnostic {
   readonly kind: 'playhead-clamped';
-  readonly featureId: string;
+  readonly feature_id: string;             // snake_case per ADR-010 (lint-enforced)
   readonly edge: 'start' | 'end';
   readonly originalCurrentTime: string;   // ISO-8601, verbatim from the file
   readonly clampedCurrentTime: string;    // ISO-8601 — exactly start_time (edge:'start') or end_time (edge:'end')
@@ -90,7 +90,7 @@ if (res.status === 'recoverable-playhead') {
   temporal = { ...v, current_time: res.clampedCurrentTime };   // typed copy, in-window before it enters the map
   playheadClamps.push({
     kind: 'playhead-clamped',
-    featureId: featureId(f),
+    feature_id: featureId(f),
     edge: res.edge,
     originalCurrentTime: v.current_time as string,
     clampedCurrentTime: res.clampedCurrentTime,
