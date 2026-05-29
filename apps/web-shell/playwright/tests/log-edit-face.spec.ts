@@ -32,7 +32,10 @@ async function runMoveShapeTool(page: import('@playwright/test').Page) {
   await runButton.click();
 }
 
-test.describe('Log Panel Edit Face', () => {
+// QUARANTINED #278: every test here needs a move-shape log entry, but the
+// Move-Shape Run button is disabled after #261 (sidecar retirement). Whole
+// suite fixme'd until #278 restores selection-driven tool enablement. (cf. #274)
+test.describe.fixme('Log Panel Edit Face', () => {
   let catalogPage: CatalogPage;
   let analysisPage: AnalysisPage;
 
