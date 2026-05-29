@@ -46,6 +46,12 @@ const LEVEL_REGISTRY: ReadonlyMap<string, LevelDefinition> = new Map([
   ['segments', { name: 'segments', addressingMode: 'id', description: 'Named track segment' }],
   ['points', { name: 'points', addressingMode: 'index', description: 'Individual point within a MultiPoint geometry' }],
   ['polygons', { name: 'polygons', addressingMode: 'index', description: 'Individual polygon within a MultiPolygon geometry' }],
+  // Spec 192 (Phase 2 — Selection-Mode Resolver): vertex-bearing levels for
+  // Polygon (rings/R/vertices/V), LineString and MultiPoint (vertices/V), and
+  // single-Point (vertex/0) paths used by the sub-feature editor.
+  ['rings', { name: 'rings', addressingMode: 'index', description: 'Linear ring within a Polygon geometry' }],
+  ['vertices', { name: 'vertices', addressingMode: 'index', description: 'Vertex within a LineString, MultiPoint, or Polygon ring' }],
+  ['vertex', { name: 'vertex', addressingMode: 'index', description: 'The single vertex of a Point geometry (always 0)' }],
 ]);
 
 /**
@@ -275,6 +281,25 @@ export function validatePathSemantics(
       }
     }
     // For 'id' mode, any non-empty string is valid (already checked by parsePath)
+  }
+
+  // Spec 192: structural constraints on the vertex-bearing levels.
+  // - `rings/R` MUST be followed by `vertices/V` (Polygon path is two levels).
+  // - `vertex` is only valid as a single-level path with the literal address `0`
+  //   (single-vertex Point geometry).
+  for (let i = 0; i < parsed.levels.length; i++) {
+    const level = parsed.levels[i]!;
+    if (level.levelName === 'rings') {
+      const next = parsed.levels[i + 1];
+      if (!next || next.levelName !== 'vertices') {
+        errors.push('Level "rings" must be followed by "vertices/<index>"');
+      }
+    }
+    if (level.levelName === 'vertex') {
+      if (level.address !== '0') {
+        errors.push(`Level "vertex" only accepts address "0", got "${level.address}"`);
+      }
+    }
   }
 
   return { valid: errors.length === 0, errors };

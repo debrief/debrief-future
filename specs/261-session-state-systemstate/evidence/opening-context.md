@@ -1,69 +1,65 @@
 <!--
-Hook form chosen: paired mermaid flowcharts (before/after) showing where
-plot state lives today vs. after this work. The feature has no UI surface
-and no screenshot worth showing — the architectural change IS the story,
-and a topological diagram makes "fragmented across two files" vs. "lives
-in the plot" visible at a glance in a way prose can't. A before/after
-table was the runner-up but loses the spatial intuition of "things move
-into the plot file"; capability bullets were rejected because the user-
-visible payoff (a colleague's bbox/playhead/selection restoring on your
-machine) reads as one thing, not many.
+Hook form chosen: paired before/after mermaid flowcharts of the on-disk
+layout. This is a backend/persistence feature with no UI surface, so the
+architectural change IS the story. A topological diagram makes the whole
+point land at a glance — three files collapsing to two, and the state that
+used to be stranded in the sidecar now sitting inside the FeatureCollection
+that actually travels. A before/after table was the runner-up but loses the
+"the sidecar disappears" punch; capability bullets were rejected because the
+payoff reads as a single thing ("the plot file finally carries its own
+state"), not a list of separate wins. No screenshot exists or would help.
 -->
 
 ## Hook
 
-**Today** — plot state is split across two files, and three of the four schema-defined SystemState variants have no runtime producer at all:
+**Today** — a plot is three files on disk, and the one that holds your interactive state is the one that doesn't travel:
 
 ```mermaid
 flowchart LR
-  subgraph Plot["foo.plot.geojson"]
-    Features["Geographic features"]
-    SS_AS["SystemState: active_storyboard"]
+  subgraph PlotDir["a plot on disk (three files)"]
+    Item["item.json — catalog metadata"]
+    Features["features.geojson — tracks, points, annotations"]
+    Sidecar["item.debrief-session — viewport, time window, playhead, selection, hidden features"]
   end
-  subgraph Sidecar["foo.debrief-session"]
-    Spatial["spatial: bbox, zoom, center, ..."]
-    Temporal["temporal: timeRange, currentTime, ..."]
-    Selection["features.selection, ..."]
-  end
-  Plot -. travels with the plot .-> Colleague1["Colleague's machine"]
-  Sidecar -. lost on export .-x Colleague1
+  Features -. emailed / committed / copied .-> Colleague["Colleague's machine"]
+  Sidecar -. left behind .-x Colleague
 ```
 
-**After** — three of the four variants the schema already models start being written. Colleagues' bbox, time window, playhead, and selection ride inside the plot file itself:
+**After** — the sidecar is gone. A plot is two files, and the entire interactive view rebuilds from `features.geojson` alone:
 
 ```mermaid
 flowchart LR
-  subgraph Plot["foo.plot.geojson"]
-    Features["Geographic features"]
-    SS_AS["SystemState: active_storyboard"]
-    SS_SP["SystemState: spatial"]
-    SS_TM["SystemState: temporal (+ current_time)"]
-    SS_SE["SystemState: selection"]
+  subgraph PlotDir["a plot on disk (two files)"]
+    Item["item.json — catalog metadata"]
+    subgraph Features["features.geojson"]
+      Geo["tracks, points, annotations (with visible flags)"]
+      SS_SP["SystemState: state.spatial"]
+      SS_TM["SystemState: state.temporal"]
+      SS_SE["SystemState: state.selection"]
+      SS_AS["SystemState: state.activestoryboard"]
+    end
   end
-  subgraph Sidecar["foo.debrief-session (smaller)"]
-    Playback["playback rate / state / step"]
-    Drawing["drawing mode, viewport lock"]
-    Rotation["rotation, hidden features"]
-  end
-  Plot -. travels with the plot .-> Colleague2["Colleague's machine"]
+  Features -. emailed / committed / copied .-> Colleague["Colleague's machine — same view, time, selection"]
 ```
 
 ## What We're Building
 
-When you save a plot today, three things you'd expect to travel with it don't. The map view your colleague was looking at, the time window they had scoped, and the features they had selected all live in a sibling file — the `.debrief-session` sidecar — that gets stripped on email export, on publication to a STAC catalog, on `git add`, on a USB hand-off. Open the same plot on another machine and you land at the default global view, a default time window, and an empty selection. The plot file itself carries none of this, even though the schema has had a place for it since #215.
+When you save a plot today, the part of it you were actually looking at gets left behind. The map viewport, the analytical time window, the playhead position, the feature selection, which features you'd hidden — all of it lives in a sibling file, the `item.debrief-session` sidecar, that gets stripped the moment the plot leaves your machine. Email a colleague the GeoJSON, pull it from a STAC catalogue, check it out of git, copy it to a USB stick, and they open it on the default global view, a default time window, and an empty selection. The portable artefact — `features.geojson` — carries none of the state that makes the plot *yours*.
 
-This work moves those three things — spatial viewport, temporal viewport, and selection — out of the sidecar and into the plot file as `SystemState` Features, using the same shape that #237 introduced for the active Storyboard pin. The schema gains exactly one new field along the way (`current_time`, so the playhead position rides too), and the sidecar shrinks to just the per-machine concerns it should always have been about: playback rate, drawing mode, viewport lock, and so on. The user-visible payoff is small but pointed: a colleague hands you a plot file and you open it on the bbox, the time window, the playhead, and the selection they were last looking at — no second file required.
+This work deletes the sidecar entirely. Every field it held is given a proper home: plot state (viewport, time window, playhead, selection, active storyboard) becomes a handful of `SystemState` Features written directly into the FeatureCollection, addressed by deterministic ids like `state.spatial` and `state.temporal`; per-feature state — visibility — becomes a `visible` flag on the individual feature it describes, so hiding a track travels with that track; and genuinely ephemeral runtime — whether you're currently playing, transient drawing mode, a viewport lock — simply isn't persisted, and defaults cleanly on load. After this, a plot is exactly two files, `item.json` and `features.geojson`, and the whole interactive state is reconstructable from the GeoJSON alone. Hand a colleague a single file and they open it exactly where you left it.
 
 ## How It Fits
 
-#237 was the first time a non-spatial bit of state was deliberately persisted *inside* a plot file rather than alongside it — the active Storyboard pin became a `SystemState` Feature, web-shell wrote it, and the precedent was set. The LinkML schema had already modelled four variants of `SystemState` (`active_storyboard`, `spatial`, `temporal`, `selection`) since #215, but only the first one had a runtime producer. This work activates the other three: same pattern, same shape on disk, both hosts (VS Code and web-shell) producing and consuming, and #237's host-private writer in web-shell folded into a single shared helper that owns all four variants. Constitution Article II.1 (single source of truth) gets tighter — the schema is finally telling the truth about what lives where.
-
-It also narrows the scope of #250 (web-shell session-state parity) as a side effect: once the plot-shared half of session state lives in the plot file, web-shell already has the read/write surface for it via the existing plot file pipeline, and #250 collapses to "what per-user state, if any, does a browser tab need to remember?" #251 — the per-user-within-a-shared-plot question, where the strongest candidate is selection — remains on the horizon as a future override layer that would sit *on top of* this migration, not replace it.
+This is the payoff of two principles the project has held from the start: schema-first single source of truth, and the plot file as the one portable, canonical artefact. Until now those principles were quietly contradicted by the sidecar — a second persistence path that split plot state across two files, only one of which travelled. The fix generalises a pattern that already shipped for a single case: #237 introduced the `SystemState` Feature for the active-storyboard pin, and this work makes that the general home for *all* non-spatial plot state. The same shape on disk, the same deterministic addressing, now covering spatial, temporal, and selection too. It also substantially narrows a separate planned piece of work — web-shell session persistence — because the VS Code extension and the browser web-shell now read and write the same FeatureCollection through one shared helper, rather than each carrying its own persistence path.
 
 ## Key Decisions
 
-- **Selection migrates as plot-shared, now.** The approval question on selection (Q1) resolved to Option B — ship it as plot-shared rather than defer behind #251. If #251 later commissions a per-user override, it will layer on top of this migration, not revert it. Maximises the single-source-of-truth payoff today.
-- **The schema grows by exactly one field — `current_time` on the temporal variant.** The approval question on temporal (Q2) resolved to Option B — the playhead position rides with the plot, so a colleague opening the plot lands at the moment you were scrubbed to. The new field is optional, so older fixtures and #237's already-shipped `active_storyboard` plots stay valid against the bumped schema.
-- **Scrubbing the playhead does NOT mark the plot dirty.** The conservative read of "save vs. modified" is preserved (FR-017). `current_time` is captured in memory as you explore, but only persisted into the plot file when you take an explicit save action — same as every other plot-level change. No "every drag of the slider marks the file modified" pathology.
-- **The sidecar is not being retired.** Per-machine concerns — playback rate, drawing mode, viewport lock, map rotation, the hidden-features set — have no schema home and stay in the sidecar. Sidecar retirement is a separate decision that depends on resolving every remaining per-user-vs-shared question, and this work deliberately doesn't try to land both at once.
-- **One shared SystemState helper, not one per host.** #237's writer lived inside `apps/web-shell/`, which was fine when only one host produced one variant. With four variants × two hosts, that shape would have meant either duplicated code or unmaintainable drift. The shared helper lives in `services/session-state/` (the package both hosts already depend on for the in-memory store), and #237's host-private writer is folded into it as part of this work. Plot-load and plot-save become the only two places SystemState reads and writes happen, regardless of which host you're in.
+- **Everything that looked like "session state" is actually plot state.** The earlier assumption that playback speed, step size, the time filter, and display mode were *per-user* preferences turned out to be wrong: they describe the data being replayed, not the person replaying it, so they belong to the plot. Once that lands, the design collapses — there is no residual per-user bucket left for the sidecar to hold, which is precisely why the sidecar can be deleted outright rather than merely shrunk. No replacement store.
+
+- **One shared read/write helper, not one per host.** Both frontends — the VS Code extension and the web-shell — go through a single helper that owns reading and writing every `SystemState` variant. #237's host-private writer is folded into it. Plot-load and plot-save become the only two places this state is touched, so the two hosts can never drift into divergent persistence behaviour.
+
+- **Exploration never marks the plot dirty.** Panning, zooming, scrubbing the time cursor, changing the selection — none of these flag unsaved changes. Merely *looking* at a plot should never nag you to save. An explicit Save still commits the current view; only substantive content edits drive the unsaved-changes prompt. The state is captured in memory as you explore and persisted only when you choose to save.
+
+- **Visibility lives on the feature, not in a separate list.** Hiding a track sets `visible: false` on that track and records it in the track's own provenance log. We accept that the provenance grows a little as the price of visibility travelling *with* the feature it describes — a hidden track stays hidden when the plot moves, with no separate hidden-list to keep in sync.
+
+- **Strict on import.** A malformed or self-contradictory saved state — a playhead sitting outside its own time window, say — fails loudly with a clear error that names the offending feature. Never a silent default, never a quiet clamp. If the plot file claims something impossible, you find out immediately and you find out where.

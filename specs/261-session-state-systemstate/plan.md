@@ -1,52 +1,48 @@
-# Implementation Plan: Migrate session-state slices into in-plot SystemState features
+# Implementation Plan: Retire the sidecar — all plot state in the FeatureCollection
 
-**Branch**: `claude/start-speckit-249-wFYtR` (active feature: `261-session-state-systemstate`)
-**Date**: 2026-05-19
-**Spec**: [spec.md](./spec.md)
+**Branch**: `claude/speckit-implement-261-gC93A` (active feature: `261-session-state-systemstate`) | **Date**: 2026-05-27 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `specs/261-session-state-systemstate/spec.md`
 
 ## Summary
 
-Migrate three Zustand session-state slices (`temporal`, `spatial`, `selection` — today stored entirely in the `.debrief-session` sidecar) into the plot file as `SystemState` GeoJSON Features, mirroring the #237 precedent that shipped `active_storyboard` runtime in web-shell. Per Q1/Q2 resolutions in the spec, the migration includes `selected_ids` as plot-shared (Q1=B) and grows the LinkML `temporal` variant by one optional field, `current_time` (Q2=B).
+Delete the `.debrief-session` sidecar. Every field it persisted is reclassified (per the spec's authoritative State-classification table) into one of three homes: a `SystemState` GeoJSON Feature inside `features.geojson` (viewport/rotation, time window/playhead/filter/display-mode/step/rate, selection, active-storyboard); a per-feature `visible` flag (visibility); or nothing (ephemeral — defaulted on load). A plot becomes exactly two files: `item.json` + `features.geojson`.
 
-**Technical approach**: Single shared TypeScript helper (`services/session-state/src/system-state/`) reads and writes all four `SystemState` variants against a plot's `FeatureCollection`. Both hosts (`apps/vscode/`, `apps/web-shell/`) consume the helper through their existing load/save commands. #237's host-private writer (`apps/web-shell/src/services/activeStoryboardPersistence.ts`) is folded into the helper. The LinkML schema grows `current_time` additively on the temporal variant **and** unifies the spatial variant onto `viewport: ViewportPolygon` (review resolution 1B — replaces parallel `bbox`/`zoom`/`center` fields under Article XIV.1, zero runtime blast radius). Generated TS + Python bindings regenerate; golden fixtures land for all four variants (closing the gap that #237 left for `active_storyboard`). Provenance writes use existing LinkML `LogEntry` fields (review resolution 2A — no new fields added to LogEntry). VS Code save sequences FC-first/sidecar-second to close the silent-failure path (review resolution 3A, FR-019); the helper's cross-field validator rejects out-of-window `current_time` and degenerate temporal windows (FR-018). The sidecar continues to exist for non-migrated per-machine fields (playback control, drawing mode, viewport lock); only migrated fields are dropped from it on save. Schema-version bump on the sidecar header marks the migration boundary for forward/backward compatibility.
+**Technical approach**: A single shared, pure-TypeScript helper (`services/session-state/src/system-state/`, re-exported from `@debrief/session-state`) reads and writes all four `SystemState` variants against a `FeatureCollection`. Both hosts consume it — VS Code's `openPlot`/`saveSession` commands and web-shell's IndexedDB-backed plot store — replacing the sidecar I/O that `services/session-state/src/persistence/{load,save}.ts` performs today. #237's runtime (`shared/components/src/storyboard/activeStoryboardSelection.ts`, wrapped by `apps/web-shell/src/services/activeStoryboardPersistence.ts`) is folded into the helper as the `active_storyboard` variant, its wire shape unchanged. The LinkML schema gains the migrated fields on `SystemStateProperties`, a `visible` flag on `BaseFeatureProperties`, and four per-variant `rules:` blocks; the shared value types (`ViewportPolygon`/`TimeStep`/`DisplayModeEnum`/…) are consolidated into `common.yaml` so `geojson.yaml` can reference them, paying down a pre-existing Article II.1 duplication. Exploration never marks the plot dirty; an explicit save persists the current view regardless of dirty state.
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x (strict mode mandatory per Article XV) for shared helper, both hosts, and tests; Python 3.11 for LinkML codegen, Pydantic adherence tests, and schema validation gates.
+**Language/Version**: TypeScript 5.x strict (shared helper, both hosts, tests); Python 3.11 (LinkML codegen, Pydantic adherence tests).
 
-**Primary Dependencies**: LinkML ≥1.7.0 (master schema source — extended this work); `@debrief/schemas` (generated types — regenerated); Pydantic v2 (Python schema validation); existing `@debrief/session-state` Zustand store (extended, not replaced); existing writer abstraction (`@debrief/stac-writer` / `FilesystemAdapter`) — SystemState writes route through it per Article IV.4. **No new external runtime dependencies.**
+**Primary Dependencies**: LinkML ≥1.7.0 (master schema — extended); `@debrief/schemas` (generated types — regenerated); Pydantic v2 (Python validation); Zod (runtime narrowing at the JSON boundary — already used elsewhere); existing `@debrief/session-state` Zustand store (unchanged shape); the existing writer abstraction (`@debrief/stac-writer` / web-shell IndexedDB plot store) — SystemState writes ride the FeatureCollection write that already routes through it (Article IV.4). **No new external runtime dependencies.**
 
-**Storage**: Plot file `*.plot.geojson` (GeoJSON `FeatureCollection`) — the destination for migrated state, accessed through the existing writer abstraction. Sidecar `*.debrief-session` (JSON sibling file) — continues to exist for non-migrated per-machine fields. Web-shell continues to use the existing IndexedDB-backed plot store from #236; no new browser-storage adapter is introduced.
+**Storage**: Plot directory = `item.json` (STAC) + `features.geojson` (FeatureCollection). The FeatureCollection is the sole source of truth for plot state. No sidecar. Web-shell persists the FeatureCollection to its per-origin IndexedDB plot store (#236); VS Code writes `features.geojson` on the filesystem via the STAC writer.
 
-**Testing**: LinkML schema adherence tests (golden fixtures + round-trip + structural comparison per Article II.2); Vitest unit tests for the shared helper + slice-to-variant field mappings; Playwright E2E for the cross-host parity matrix (web-shell `run-playwright.mjs`, VS Code `apps/vscode/test/`).
+**Testing**: LinkML schema-adherence (golden fixtures + cross-language round-trip per Article II.2); Vitest unit tests for the shared helper and the slice↔variant mappings; Playwright web-shell E2E for the round-trip + parity matrix; a small VS Code extension-host test for the host-cross-product diagonal.
 
-**Target Platform**: VS Code Extension API ≥1.85 (Node.js extension host); web-shell (modern evergreen browsers — Chromium ≥120 via `@sparticuz/chromium` in CI); Python 3.11 (schema + CI only — no runtime Python touched by this work).
+**Target Platform**: VS Code Extension API ≥1.85 (Node host); web-shell (evergreen browsers; Chromium via `@sparticuz/chromium` in CI); Python 3.11 (schema/CI only).
 
-**Project Type**: Monorepo with multiple frontends sharing a TypeScript services layer (web app architecture — VS Code extension host + browser-hosted web-shell + Python services + shared component/schema/state packages).
+**Project Type**: Monorepo — TypeScript services + two frontends (VS Code extension host, browser web-shell) + Python schema layer.
 
-**Performance Goals**: Adding three additional `SystemState` Features to a typical plot's `FeatureCollection` (≤4 features total, ≤2 KB serialised) must not materially affect load or save latency. Target: SystemState read/write overhead < 5 ms per plot operation, measured against an existing baseline plot load. Per-save SystemState write path must be O(1) in features (lookup-by-`state_type`, not scan-then-reconstruct).
+**Performance Goals**: Reading/writing ≤4 SystemState features + per-feature `visible` flags adds negligible overhead to plot load/save (target < 5 ms per op; lookup-by-`state_type`, not scan-and-rebuild). FeatureCollection size grows by ≤4 small features + at most one boolean per hidden feature.
 
 **Constraints**:
-- Article I.3 (no silent failures): malformed `SystemState` features fail loudly at load with a user-visible error.
-- Article II.1 (single source of truth): all `SystemState` types in runtime code come from the generated TS/Python bindings, not hand-rolled.
-- Article II.2 (schema tests mandatory): all four variants get golden fixtures (valid + invalid) before runtime merges.
-- Article III.1 (provenance always): every `SystemState` write records a `LogEntry` identifying host and save action.
-- Article IV.2 + IV.4 (frontends never persist directly; persistence via writer abstraction): SystemState writes compose with the existing writer, do not bypass it.
-- Article IV.5 (boundary types derived, not rewritten): the shared helper consumes generated `SystemStateProperties` types directly; any "DTO for a variant subset" uses `Pick<>` / discriminated narrowing, not hand-rewritten field lists.
-- Article XIV.4 (strict on import): loading a `SystemState` feature with state_type=temporal but missing `current_time` is a strict validation failure, not a tolerant fallback. (Pre-migration plots have NO `SystemState` feature, which is a separate code path — not the same as a malformed one.)
-- Article XV (strict type safety): no `any`/`Any` anywhere; generated types are canonical; runtime narrows at the schema boundary (parsing the JSON `properties` blob into a discriminated `SystemStateProperties` union).
+- Article I.3 (no silent failures): malformed SystemState features and cross-field-invariant violations fail load loudly with the offending feature id.
+- Article II.1 (single source of truth): all SystemState/visibility types come from the generated bindings; the value-type consolidation (FR-002a) removes the existing parallel definitions.
+- Article II.2 (schema tests mandatory): all four variants + a `visible:false` fixture get golden fixtures before runtime merges.
+- Article III.1/III.3 (provenance): view-state features are lean (no provenance); visibility transitions append to the *affected feature's own* provenance log (FR-013/FR-014).
+- Article IV.2/IV.4 (frontends persist only via the writer abstraction): the helper is pure (no I/O); persistence rides the existing FeatureCollection write.
+- Article IV.5 (boundary types derived, not rewritten): the helper narrows the generated `SystemStateProperties` via `state_type`; a compile-time exhaustiveness guard over `SystemStateTypeEnum` fails the build if a variant is unhandled.
+- Article XIV.1/XIV.5 (pre-release breaking changes; fix the data, don't relax the schema): `bbox`/`zoom`/`center` removed; no legacy-sidecar read shim.
+- Article XV (strict types): no `any`/`Any`; runtime narrows at the JSON `properties` boundary.
 
 **Scale/Scope**:
-- 4 `SystemState` variants (3 newly produced by this work + `active_storyboard` from #237, now consolidated under the shared helper).
-- 2 hosts: VS Code, web-shell. Both gain symmetric SystemState read+write.
-- 1 LinkML schema edit (additive: `current_time` on `temporal` variant).
-- 3 slice files touched in `services/session-state/src/store/slices/` (no shape change — only persistence wiring).
-- 2 persistence boundary files in `services/session-state/src/persistence/` (`load.ts`, `save.ts`).
-- 1 new shared module: `services/session-state/src/system-state/` (~3–5 source files).
-- ~16 new golden fixtures: 4 variants × 2 polarities (valid/invalid) × ≥ 2 examples each.
-- ~16 cross-host parity tests (4 variants × 2 producers × 2 readers).
-- Migration of 1 existing file: `apps/web-shell/src/services/activeStoryboardPersistence.ts` → shared helper (deleted, callers re-pointed).
+- 4 SystemState variants (3 newly produced + `active_storyboard` consolidated).
+- 2 hosts gain symmetric SystemState read+write.
+- 1 LinkML schema cluster file gains fields (`geojson.yaml`); 1 base class gains `visible` (`common.yaml`); shared value types consolidate into `common.yaml`; `session-state.yaml` shrinks (vestigial `SessionFile`/`SessionState` removed).
+- ~3–5 source files in the new `system-state/` helper module + tests.
+- `services/session-state/src/persistence/{load,save}.ts` sidecar I/O deleted/repurposed.
+- VS Code `openPlot.ts` / `saveSession.ts` rewired; web-shell `activeStoryboardPersistence.ts` deleted (folded into helper) with call sites re-pointed.
+- ~16 golden fixtures (4 variants × valid/invalid) + visibility fixture; ~16 cross-host parity assertions.
 
 ## Constitution Check
 
@@ -54,35 +50,23 @@ Migrate three Zustand session-state slices (`temporal`, `spatial`, `selection` �
 
 | Article / Clause | Status | How this work satisfies it |
 |---|---|---|
-| **I.1** Offline by default | ✅ PASS | All state lives in the plot file (already local). No new network calls. |
-| **I.3** No silent failures | ✅ PASS | Edge cases in spec (malformed SystemState feature, two features sharing state_type, missing required fields under Article XIV.4) all surface as load errors with feature IDs. |
-| **II.1** Single source of truth | ✅ PASS | All `SystemState` types consumed by runtime are imports from `@debrief/schemas` (LinkML-generated). No hand-rolled subset types. |
-| **II.2** Schema tests mandatory | ✅ PASS contingent | FR-002 mandates golden fixtures for all four variants (today: 0/4). Phase 1 produces them in `shared/schemas/fixtures/system-state-*/` before runtime code lands. |
-| **II.3** Schema versioning | ✅ PASS | `current_time` addition is **additive only** — no existing fields renamed, retyped, or removed. Existing `active_storyboard` fixtures from #237's runtime remain valid against the bumped schema. Sidecar `SessionFile.version` bumps minor (additive). |
-| **III.1** Provenance always | ✅ PASS | FR-010 mandates `LogEntry` on every `SystemState` write. Helper enforces this — writes without provenance are a programming error, not a runtime tolerance. |
-| **III.3** Audit trail immutable | ✅ PASS | Provenance entries append to the variant's `provenance` array; never modify existing entries. |
-| **IV.1** Services never touch UI | ✅ PASS | The shared helper is a pure TS module returning data. No UI imports. Hosts handle display. |
-| **IV.2** Frontends never persist directly | ✅ PASS | The helper does not write to disk/IndexedDB directly — it transforms a `FeatureCollection` and returns it. The existing writer abstraction owns the actual persistence step. |
-| **IV.4** Persistence-host abstraction | ✅ PASS | SystemState writes compose with `setFeatureCollection` (web-shell) / VS Code's STAC writer (extension host) — both already route through the writer abstraction. No new persistence path. |
-| **IV.5** Boundary types derived, not rewritten | ✅ PASS | Inter-module boundaries (helper ↔ slices, helper ↔ host) consume generated `SystemStateProperties` types. Variant-subset usage employs discriminated narrowing on `state_type`, never hand-rewritten field lists. Helper exports include compile-time exhaustiveness guards on the `state_type` enum so adding a new variant in LinkML fails the build until the helper handles it. |
-| **VI.1** Schema tests gate merges | ✅ PASS | Phase 1 fixtures + adherence tests are gating; runtime PR can't merge until they pass. |
-| **VI.2** Services require unit tests | ✅ PASS | Shared helper gets dedicated Vitest suite; slice-to-variant mapping functions tested per-mapping. |
-| **VI.3** Integration tests for workflows | ✅ PASS | Cross-host parity matrix (web-shell ↔ VS Code, 16 test cases) is integration-level coverage of the round-trip. |
-| **VII** Tests before implementation | ✅ PASS contingent | Phase 1 generates fixtures + contract tests before Phase 2 (tasks) generates runtime code; SC-008 makes the order explicit. |
-| **VIII.1** Specs before code | ✅ PASS | Spec ratified; this plan precedes implementation. |
-| **VIII.3** ADRs for significant choices | ✅ PASS contingent | Two decisions reach ADR threshold: (a) shared-helper location; (b) plot-shared `current_time` with the Q2 dirty-on-scrub UX contract (FR-017). Both noted for ADR capture during implementation. |
-| **IX.1** Minimal, vetted dependencies | ✅ PASS | No new external runtime dependencies introduced. |
-| **XIV.4** Strict on import | ✅ PASS | Pre-migration plots (no SystemState features) are a known-shape input — they load via the sidecar fallback path. Malformed SystemState features fail load — no tolerant defaults. |
-| **XIV.5** Fix the data, never relax the schema | ✅ PASS | The `current_time` field is added cleanly via LinkML edit + regen + new fixtures. No validators are loosened to tolerate "old" plots — old plots simply lack the SystemState feature and route through the sidecar fallback. |
-| **XV.1–7** Strict type safety | ✅ PASS contingent | All new code in TS strict mode; no `any`; generated bindings are canonical; runtime narrows via Zod validators (or Pydantic equivalents) at the JSON parsing boundary. ESLint rule `no-direct-persistence-in-frontend` continues to gate frontend code. |
+| **I.1** Offline by default | ✅ PASS | All state lives in the local plot file; no network. Removing the sidecar removes a file, adds no calls. |
+| **I.3** No silent failures | ✅ PASS | Malformed/duplicate/out-of-window SystemState features fail load with structured errors naming feature ids (FR-011/FR-012). |
+| **II.1** Single source of truth | ✅ PASS (improves) | One persistence file (FeatureCollection) instead of two. Value-type consolidation (FR-002a) deletes the `ViewportPolygon`/`DisplayModeEnum`/`Coordinate` duplications. SystemState types are generated, not hand-rolled. |
+| **II.2** Schema tests mandatory | ✅ PASS contingent | FR-006 mandates golden fixtures for all four variants + visibility; gating before runtime lands. |
+| **II.3** Schema versioning | ✅ N/A (pre-release) | Article XIV.1 applies — `bbox`/`zoom`/`center` removal is a permitted pre-release breaking change (zero runtime consumers, verified). |
+| **III.1** Provenance always | ✅ PASS | Visibility transitions log to the feature's own provenance. View-state markers are explicitly lean (FR-013) — a deliberate, documented choice consistent with #237. |
+| **III.3** Audit trail immutable | ✅ PASS | Visibility provenance appends only. |
+| **IV.1** Services never touch UI | ✅ PASS | The helper is a pure transformation returning data; no UI imports. |
+| **IV.2/IV.4** Frontends persist only via the writer abstraction | ✅ PASS | The helper performs no I/O; it transforms a FeatureCollection that the existing writer (STAC writer / IndexedDB plot store) persists. No new write path. |
+| **IV.5** Boundary types derived | ✅ PASS | Helper narrows generated `SystemStateProperties` by `state_type`; exhaustiveness guard over `SystemStateTypeEnum`. Sidecar-omit types use `Pick`/`Omit`, not re-listed fields. |
+| **VI.1/VI.2/VI.3** Testing | ✅ PASS contingent | Schema fixtures gate; helper unit tests; cross-host round-trip integration (web-shell E2E + VS Code host test). |
+| **VII** Tests before implementation | ✅ PASS contingent | Phase 1 fixtures + contract tests precede runtime (SC-008). |
+| **VIII.1/VIII.3** Specs + ADRs | ✅ PASS contingent | Spec ratified; ADRs to capture: (a) sidecar retirement + two-file model; (b) visibility-as-feature-property with accepted provenance growth; (c) value-type consolidation into common.yaml. |
+| **IX.1** Minimal dependencies | ✅ PASS | No new runtime dependencies. |
+| **XV** Strict types | ✅ PASS contingent | All new code strict; Zod narrows at the JSON boundary; no `any`. |
 
-**Verdict**: All gates passable. No exceptions requiring "Complexity Tracking" entries.
-
-**Notable defences in plan** (including review-driven adjustments):
-1. Consolidates #237's host-private `activeStoryboardPersistence.ts` into the shared helper — prerequisite for FR-011/FR-012 (single producer of SystemState writes) and Article II.1.
-2. **Per review resolution 1B** — replaces the LinkML `SystemStateProperties.spatial` `bbox`/`zoom`/`center` fields with `viewport: ViewportPolygon` (identity-mapped to the slice). Resolves a pre-existing Article II.1 violation in the schema. Article XIV.1 covers the field removal (zero runtime blast radius — no producers today).
-3. **Per review resolution 2A** — provenance writes use existing LinkML LogEntry fields (`agent`, `was_generated_by.{tool, tool_version}`, `activity_type`, `timestamp`, etc.) verbatim. No `host` field added. No silent second schema change.
-4. **Per review resolution 3A** — adds (a) cross-field validation for `current_time` bounds + degenerate window (FR-018, closes F2 silent failure), (b) FC-first/sidecar-second save sequencing in VS Code (FR-019, closes F1 silent failure), (c) a legacy-plot integration fixture corpus that exercises real file I/O (closes the SC-005 false-confidence gap).
+**Verdict**: All gates passable. No Complexity Tracking entries required.
 
 ## Project Structure
 
@@ -90,147 +74,119 @@ Migrate three Zustand session-state slices (`temporal`, `spatial`, `selection` �
 
 ```text
 specs/261-session-state-systemstate/
-├── spec.md                   # Feature specification (already exists)
-├── plan.md                   # This file
-├── research.md               # Phase 0 output — open design questions resolved
-├── data-model.md             # Phase 1 output — entity shapes, field mappings
-├── contracts/                # Phase 1 output — helper API + schema deltas
-│   ├── linkml-delta.md       # The current_time addition to geojson.yaml
-│   ├── system-state-helper.ts.md  # Shared helper API contract
-│   └── slice-mappings.md     # Sidecar ↔ SystemState field mapping per slice
-├── quickstart.md             # Phase 1 output — verification walkthrough
-├── checklists/
-│   └── requirements.md       # Spec quality checklist (already exists)
+├── spec.md                 # Rewritten — full sidecar retirement
+├── plan.md                 # This file
+├── research.md             # Phase 0 — decisions (regenerated)
+├── data-model.md           # Phase 1 — entity shapes + field mappings (regenerated)
+├── contracts/              # Phase 1 (regenerated)
+│   ├── linkml-delta.md         # SystemStateProperties + BaseFeatureProperties + consolidation
+│   ├── system-state-helper.ts.md   # Shared helper public API
+│   └── slice-mappings.md       # Store-slice ↔ variant field mappings (epoch↔ISO, FeatureSelection split)
+├── quickstart.md           # Phase 1 — verification walkthrough (regenerated)
 ├── evidence/
-│   ├── opening-context.md    # Phase 2 output — cached opener for the blog post
-│   └── screenshots/          # Populated by Playwright during /speckit.implement
-└── tasks.md                  # NOT created by /speckit.plan — /speckit.tasks output
+│   └── opening-context.md  # Phase 2 — cached blog opener
+└── tasks.md                # /speckit.tasks output (regenerated separately)
 ```
 
 ### Source Code (repository root)
 
 ```text
-shared/
-└── schemas/
-    ├── src/
-    │   ├── linkml/
-    │   │   └── geojson.yaml          # MODIFIED — add current_time to SystemStateProperties (temporal variant)
-    │   ├── generated/
-    │   │   ├── typescript/types.ts   # REGENERATED via codegen
-    │   │   └── python/debrief_schemas/...  # REGENERATED via codegen
-    │   └── linkml/common.yaml        # UNCHANGED — SystemStateTypeEnum already lists temporal/spatial/selection/active_storyboard
-    └── fixtures/
-        └── system-state/             # NEW directory
-            ├── valid/
-            │   ├── active-storyboard.json
-            │   ├── temporal.json
-            │   ├── spatial.json
-            │   └── selection.json
-            └── invalid/
-                ├── temporal-missing-current-time.json
-                ├── spatial-bad-bbox.json
-                ├── selection-non-string-id.json
-                ├── multiple-same-state-type.json
-                └── unknown-state-type.json
+shared/schemas/
+├── src/linkml/
+│   ├── common.yaml         # MODIFIED — add `visible` to BaseFeatureProperties; absorb consolidated
+│   │                       #            value types (ViewportPolygon, Coordinate dedup, TimeStep,
+│   │                       #            TimeUnitEnum, DisplayModeEnum, PlaybackStateEnum, temporal types)
+│   ├── geojson.yaml        # MODIFIED — SystemStateProperties: drop bbox/zoom/center; add viewport,
+│   │                       #            rotation, current_time, filter_start_time, filter_end_time,
+│   │                       #            display_mode, step_size, playback_rate, selected_primary;
+│   │                       #            four per-variant rules: blocks
+│   ├── session-state.yaml  # MODIFIED — value types removed (moved to common); SessionFile/SessionState
+│   │                       #            root classes deleted (sidecar retired); slices kept only if a
+│   │                       #            runtime consumer remains
+│   ├── storyboard.yaml     # MODIFIED — delete duplicate DisplayModeEnum (now in common)
+│   └── debrief-jsonschema.yaml  # REVIEW — may need viewport handling (FR-006a)
+├── scripts/generate.py     # MAYBE MODIFIED — gen-json-schema post-processor for ViewportPolygon.coordinates (FR-006a)
+└── fixtures/system-state/  # NEW — golden fixtures (valid/ + invalid/) + a visible:false feature fixture
 
-services/
-└── session-state/
-    └── src/
-        ├── index.ts                   # MODIFIED — export new system-state helpers (typed boundary, no `any`)
-        ├── system-state/              # NEW shared helper module
-        │   ├── index.ts               # Public API barrel
-        │   ├── read.ts                # readSystemStateFromFeatureCollection(fc) -> SystemStateMap
-        │   ├── write.ts               # writeSystemStateIntoFeatureCollection(fc, state) -> FeatureCollection
-        │   ├── mapping.ts             # slice↔variant field mapping tables (typed; one source per slice)
-        │   ├── validate.ts            # Runtime narrowing (Zod / discriminated narrow on state_type)
-        │   ├── exhaustive.ts          # Compile-time exhaustiveness guards over SystemStateTypeEnum
-        │   └── __tests__/             # Vitest unit tests
-        │       ├── read.test.ts
-        │       ├── write.test.ts
-        │       ├── mapping.test.ts
-        │       └── validate.test.ts
-        ├── persistence/
-        │   ├── load.ts                # MODIFIED — read SystemState features BEFORE sidecar (FR-004); reconcile per FR-007
-        │   └── save.ts                # MODIFIED — write SystemState features + drop migrated keys from sidecar (FR-008/FR-009); bump SessionFile.version (FR-015)
-        └── store/slices/
-            ├── temporal.ts            # UNCHANGED shape — same Zustand state, different persistence wiring
-            ├── spatial.ts             # UNCHANGED shape
-            └── features.ts            # UNCHANGED shape
-
-apps/
-├── vscode/
-│   └── src/commands/
-│       ├── saveSession.ts             # MODIFIED — call shared helper before/around sidecar write
-│       └── loadSession.ts             # MODIFIED — call shared helper before sidecar read; reconcile per FR-007
-└── web-shell/
-    ├── src/services/
-    │   ├── activeStoryboardPersistence.ts   # DELETED — logic folded into services/session-state/src/system-state/
-    │   └── __tests__/
-    │       └── activeStoryboardPersistence.test.ts  # DELETED or REPOINTED at shared helper
-    └── playwright/tests/
-        ├── active-storyboard-persistence.spec.ts   # PRESERVED — still runs via shared helper
-        └── system-state-roundtrip.spec.ts          # NEW — cross-variant round-trip in web-shell
+services/session-state/
+├── src/
+│   ├── index.ts            # MODIFIED — export the system-state helper surface
+│   ├── system-state/       # NEW shared helper
+│   │   ├── index.ts            # public barrel
+│   │   ├── read.ts             # readSystemStateFromFeatureCollection(fc) → SystemStateMap
+│   │   ├── write.ts            # writeSystemStateIntoFeatureCollection(fc, input, ctx) → FeatureCollection
+│   │   ├── visibility.ts       # read/apply per-feature `visible` flags ↔ store hidden set
+│   │   ├── mapping.ts          # slice↔variant field maps + reconciliation (epoch↔ISO, FeatureSelection split)
+│   │   ├── validate.ts         # Zod variant validators + cross-field invariants
+│   │   ├── errors.ts           # SystemStateLoadError (5 kinds)
+│   │   ├── exhaustive.ts       # compile-time guard over SystemStateTypeEnum
+│   │   └── __tests__/          # Vitest
+│   ├── persistence/
+│   │   ├── load.ts         # MODIFIED/REPURPOSED — sidecar file-I/O removed; hydrate-from-FC helper or deleted
+│   │   ├── save.ts         # MODIFIED/REPURPOSED — sidecar file-I/O removed; extract-to-FC helper or deleted
+│   │   └── schema.ts       # MODIFIED/DELETED — SessionFile version machinery no longer needed
+│   └── store/slices/{temporal,spatial,features}.ts   # UNCHANGED shape
+apps/vscode/src/commands/
+├── openPlot.ts             # MODIFIED — read SystemState + visibility from loaded FC; delete sidecar load block (188–208)
+└── saveSession.ts          # MODIFIED — write SystemState + visibility into FC before features.geojson;
+                            #            delete deriveSessionPath + the saveSession() sidecar call;
+                            #            relax the not-dirty early-return so explicit save persists view (FR-020)
+apps/web-shell/src/
+├── services/activeStoryboardPersistence.ts  # DELETED — folded into shared helper
+├── services/__tests__/activeStoryboardPersistence.test.ts  # DELETED/REPOINTED
+└── StoryboardPanelMount.tsx                  # MODIFIED — re-point to @debrief/session-state; hydrate + persist view-state
+shared/components/src/storyboard/
+└── activeStoryboardSelection.ts  # REVIEW — #237 logic; either re-exported by the helper or the helper supersedes it
 ```
 
-**Structure Decision**: Shared helper lives at `services/session-state/src/system-state/` rather than as a separate package. Rationale:
-
-1. **Tight coupling to the store** — the helper exists to read/write SystemState features as the persistence layer for the existing session-state slices. It is not a general-purpose utility.
-2. **Single import surface** — both hosts already import from `@debrief/session-state` (via `services/session-state/`). Adding a new sub-export keeps the dependency graph flat.
-3. **Avoids package proliferation** — `Article IX.1` (minimal, vetted dependencies) implies "minimal, vetted *packages*" too. A new workspace package would need a new build/test pipeline for ~5 files.
-4. **Forward compatibility** — if a future feature genuinely needs SystemState read/write *outside* the session-state context, the module can be promoted to its own package via `git mv` without behavioural change.
-
-This decision will be recorded as an ADR alongside the implementation PR (per Article VIII.3 — see Constitution Check note).
+**Structure Decision**: The shared helper lives at `services/session-state/src/system-state/` (re-exported from `@debrief/session-state`), not a new package — it is tightly coupled to the store it hydrates, both hosts already import `@debrief/session-state`, and a 5-file module does not warrant its own build/test pipeline (Article IX.1). Captured as an ADR.
 
 ## Media Components
 
-None — backend/infrastructure feature. This work changes the persistence wiring of three Zustand slices; the on-screen behaviour (map view, time slider, selection chrome) is unchanged in look and feel. There are no new visual components, no significant visual changes, and no interactive demo that would add narrative value beyond what existing component stories already cover.
+None — backend/infrastructure feature. This changes where plot state is persisted; the on-screen behaviour (map view, time controller, selection, layer visibility) is unchanged in look and feel. No new visual components, no story to bundle.
 
 **Inclusion Criteria Applied**:
 - [ ] New visual component — none
 - [ ] Significant visual change — none
 - [ ] Interactive demo adds narrative value — N/A
 
-**Bundleability Verified**: N/A (nothing to bundle)
+**Bundleability Verified**: N/A
 
 ## Storybook E2E Testing
 
-None — no interactive UI components.
-
-The visible behaviour change (a colleague's plot loading at the saver's bbox/playhead/selection) is a workflow concern, not a component concern. It's covered under "Web-Shell E2E Testing" below.
+None — no interactive UI components. The visible behaviour change (a transferred plot file restoring the saver's view/selection/visibility) is a workflow concern, covered under Web-Shell E2E.
 
 ## Web-Shell E2E Testing
 
-This feature's user-visible behaviour is **end-to-end by nature** — "save in one host, transfer plot file only, open in another host, state survives". Playwright E2E is therefore the primary verification path for Stories 1–5 (SC-001 through SC-004).
+The user-visible payoff is end-to-end by nature: "save in host A, transfer ONLY `features.geojson`, open in host B, state survives." Playwright web-shell E2E is the primary verification path and the source of record for blog/PR screenshots.
 
 | Workflow | Panels/Components Involved | Key Selectors | Interactions |
 |---|---|---|---|
-| Spatial round-trip (Story 1, SC-001) | MapView, plot-load lifecycle | `.leaflet-container`, `[data-testid="map"]` | Open plot, pan/zoom to a known bbox, save, reload page (clear in-memory store), reopen plot, assert bbox restored from plot file (not sidecar). |
-| Temporal round-trip (Story 2, SC-002) | TimeController, MapView | `[data-testid="time-controller"]`, `[data-testid="playhead-input"]` | Open plot, scrub playhead, set time window via the controller, save, reload, reopen, assert start_time/end_time and current_time all restored. |
-| Selection round-trip (Story 3, SC-002a) | FeatureList, MapView | `[data-testid="feature-list-item"]`, `.leaflet-marker-icon` (selected variant) | Open plot, select N features (click row, shift-click range), save, reload, reopen, assert same N features pre-selected. |
-| Host parity for active_storyboard (Story 4, SC-003) | Storyboard panel | `[data-testid="storyboard-select"]` | Pin a storyboard in web-shell, verify in-plot SystemState feature; reload, assert pin survives (regression — this is #237's existing test, now running against the shared helper). |
-| Sidecar shrinkage (Story 5, SC-004) | (no UI) — directly inspect file outputs | N/A | Save a plot pre- and post-migration; assert sidecar JSON omits the migrated keys; assert plot file contains the SystemState features. |
-| **Save atomicity (FR-019, R-012 — added per review 3A)** | VS Code save command, FC writer (mocked to fail) | N/A | Mock `storeFeatureCollection` to throw → assert sidecar NOT written, error propagates with clear message. Mock sidecar write to throw AFTER FC succeeds → assert FC contains new SystemState features, user sees recovery hint. Covers F1 silent-failure gap. |
-| **`current_time` bounds (FR-018, R-011 — added per review 3A)** | Helper validator | N/A | Hand-craft fixtures: (a) `current_time` outside `[start_time, end_time]`, (b) `start_time > end_time`. Assert `SystemStateLoadError(kind='cross-field-invariant')` thrown with offending feature ID + field values. Host surfaces error to user. Covers F2 silent-failure gap. |
-| **Legacy plot fixtures (review 3A — closes SC-005 gap)** | Real file I/O round-trip | N/A | A corpus at `services/session-state/tests/integration/legacy-plot-fixtures/` of representative pre-migration plot+sidecar pairs (#237-era plots with active_storyboard only, plus pre-#237 plots with no SystemState features at all). Load each via `loadSession()`, verify in-memory state, save via `saveSession()`, verify upgrade (sidecar bumped to 1.2.0, SystemState features appear in FC). |
+| Self-describing round-trip (US1, SC-001) | MapView, TimeController, FeatureList | `.leaflet-container`, `[data-testid="time-controller"]`, `[data-testid="feature-list-item"]` | set viewport + time window + playhead + selection + hide a feature → explicit save → reload (clear store) → reopen `features.geojson` only → assert all restored |
+| Two-file invariant (US2, SC-002) | file outputs | N/A | after save, assert the item dir has `item.json` + `features.geojson` and **no** `*.debrief-session` |
+| Visibility round-trip (US3, SC-004) | FeatureList, MapView | `[data-testid="feature-list-item"]`, layer toggle | hide two features → save → reload → reopen → same two hidden; file shows `visible:false` on exactly those |
+| active_storyboard regression (US4, SC-003) | Storyboard panel | `[data-testid="storyboard-select"]` | #237's existing spec runs unchanged against the shared helper |
+| Cross-field invariant (FR-011) | helper validator | N/A | hand-crafted fixtures (`current_time` out of window; `start_time > end_time`) → `SystemStateLoadError(kind='cross-field-invariant')` surfaced |
+| Strict-on-import (FR-012) | helper validator | N/A | malformed SystemState feature (missing discriminator / unknown state_type / two same state_type) → structured error naming feature id |
 
 **Testing Strategy**:
-- [x] Workflow runs end-to-end in the web-shell (`apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts` — new).
-- [x] Page objects extended on existing `AnalysisPage` / `CatalogPage` — no new page object class, just selector methods for time controller + selection-set inspection.
-- [x] Screenshots captured for evidence: bbox-before / bbox-after-restored (proves visual identity), selection-before / selection-after-restored, sidecar-before / sidecar-after (file diff).
+- [x] Round-trip runs end-to-end in the web-shell (`apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts` — new).
+- [x] Page objects extended on existing `AnalysisPage`/`CatalogPage` (time-controller + selection + visibility selectors) — no new page-object class.
+- [x] Screenshots captured into `specs/261-session-state-systemstate/evidence/screenshots/` from the spec (viewport before/after, selection before/after, two-file directory listing, interaction GIF of the headline flow).
 
 **Test File Location**:
 - New: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`
-- Preserved (refactored to import from shared helper): `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts`
-- VS Code-side companion: `apps/vscode/test/system-state-roundtrip.test.ts` (extension-host Mocha, not Playwright) — exercises the same helper path under the VS Code runtime to close the cross-host matrix.
+- Preserved (re-pointed to the shared helper): `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts`
+- VS Code companion (extension-host, closes the cross-product diagonal): `apps/vscode/test/system-state-roundtrip.test.ts`
 
 **Run Commands**:
-- Cloud: `cd apps/web-shell && node run-playwright.mjs system-state-roundtrip` (auto-provisions `@sparticuz/chromium`).
-- Local: `pnpm --filter @debrief/web-shell test system-state-roundtrip`.
+- Cloud: `cd apps/web-shell && node run-playwright.mjs system-state-roundtrip`
+- Local: `pnpm --filter @debrief/web-shell test system-state-roundtrip`
 
-**Optional — chrome-level VS Code Webview tests**: Not needed. SystemState read/write is a host-extension concern, not a webview concern. Covered by the extension-host test above.
+**Optional — chrome-level VS Code Webview tests**: Not needed. SystemState read/write is a host-extension concern, covered by the extension-host test.
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+> Fill ONLY if Constitution Check has violations that must be justified.
 
 (Empty — Constitution Check passes for all gates.)

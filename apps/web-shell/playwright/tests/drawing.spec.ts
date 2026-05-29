@@ -5,6 +5,7 @@
  * After drawing, a naming dialog prompts the user — cancelling discards the shape.
  */
 import { test, expect } from '@playwright/test';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 
 test.describe('Drawing — Feature 094', () => {
   test.beforeEach(async ({ page }) => {
@@ -14,6 +15,8 @@ test.describe('Drawing — Feature 094', () => {
     await expect(page.locator('.web-shell--analysis')).toBeVisible({ timeout: 10000 });
     // Wait for map to be ready (Leaflet interactive elements)
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 10000 });
+    // #192 — keep Layers FeatureList rendered after selection.
+    await collapsePropertiesSection(page);
   });
 
   test('drawing toolbar is present', async ({ page }) => {

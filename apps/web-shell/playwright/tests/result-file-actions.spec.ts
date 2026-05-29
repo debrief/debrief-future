@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 
 /**
  * E2E tests for file actions on saved Result items in the Associated
@@ -21,6 +22,8 @@ test.describe('Result file actions (#177)', () => {
     await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
+    // #192 — keep Layers FeatureList rendered after multi-select.
+    await collapsePropertiesSection(page);
 
     // Multi-select two tracks via the session store
     await page.evaluate(([a, b]) => {

@@ -104,25 +104,35 @@ describe('MapView Selection', () => {
   });
 
   describe('click selection', () => {
-    it('calls onSelect when feature is clicked', () => {
+    // #192 Phase 5: onSelect now emits `SelectionClickEvent`
+    // ({ target, modifier, shift }) rather than (featureId, MouseEvent).
+    it('calls onSelect with a SelectionClickEvent when feature is clicked', () => {
       const onSelect = vi.fn();
       render(<MapView features={mockFeatures} onSelect={onSelect} />);
 
       const feature = screen.getByTestId('feature-track-001');
       fireEvent.click(feature);
 
-      expect(onSelect).toHaveBeenCalledWith('track-001', expect.any(Object));
+      expect(onSelect).toHaveBeenCalledWith({
+        target: 'track-001',
+        modifier: false,
+        shift: false,
+      });
     });
 
-    it('calls onSelect with correct feature id for each feature', () => {
+    it('emits the correct target for each feature', () => {
       const onSelect = vi.fn();
       render(<MapView features={mockFeatures} onSelect={onSelect} />);
 
       fireEvent.click(screen.getByTestId('feature-track-002'));
-      expect(onSelect).toHaveBeenCalledWith('track-002', expect.any(Object));
+      expect(onSelect).toHaveBeenLastCalledWith(
+        expect.objectContaining({ target: 'track-002' }),
+      );
 
       fireEvent.click(screen.getByTestId('feature-track-003'));
-      expect(onSelect).toHaveBeenCalledWith('track-003', expect.any(Object));
+      expect(onSelect).toHaveBeenLastCalledWith(
+        expect.objectContaining({ target: 'track-003' }),
+      );
     });
 
     it('does not call onSelect when no handler provided', () => {
@@ -133,17 +143,18 @@ describe('MapView Selection', () => {
       expect(() => fireEvent.click(feature)).not.toThrow();
     });
 
-    it('provides event object in onSelect callback', () => {
+    it('emits `modifier: false` and `shift: false` for an unmodified click', () => {
       const onSelect = vi.fn();
       render(<MapView features={mockFeatures} onSelect={onSelect} />);
 
       fireEvent.click(screen.getByTestId('feature-track-001'));
 
       expect(onSelect).toHaveBeenCalledWith(
-        'track-001',
         expect.objectContaining({
-          type: 'click',
-        })
+          target: 'track-001',
+          modifier: false,
+          shift: false,
+        }),
       );
     });
   });
@@ -268,7 +279,8 @@ describe('MapView Multi-Select', () => {
 
   it('allows toggling selection in callback', () => {
     let selectedIds = new Set<string>();
-    const onSelect = vi.fn((id: string) => {
+    const onSelect = vi.fn((evt: { target: string }) => {
+      const id = evt.target;
       if (selectedIds.has(id)) {
         selectedIds = new Set([...selectedIds].filter((s) => s !== id));
       } else {
@@ -286,7 +298,9 @@ describe('MapView Multi-Select', () => {
 
     // Select first feature
     fireEvent.click(screen.getByTestId('feature-track-001'));
-    expect(onSelect).toHaveBeenCalledWith('track-001', expect.any(Object));
+    expect(onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ target: 'track-001' }),
+    );
     expect(selectedIds.has('track-001')).toBe(true);
 
     rerender(

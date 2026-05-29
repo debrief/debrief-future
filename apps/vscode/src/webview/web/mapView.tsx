@@ -13,7 +13,7 @@ import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { createRoot } from 'react-dom/client';
 import type { Map as LeafletMap } from 'leaflet';
 import { MapView, createDrawnFeature, getPaletteStyleOverrides, captureMapAsDataUrl, downscaleDataUrl } from '@debrief/components';
-import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProvenance, FlyToTarget, SceneRectangleLayerProps } from '@debrief/components';
+import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProvenance, FlyToTarget, SceneRectangleLayerProps, SelectionClickEvent } from '@debrief/components';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
@@ -303,12 +303,17 @@ function MapViewApp(): React.ReactElement {
     return () => window.removeEventListener('message', handler);
   }, []);
 
-  // Selection callback
-  const handleSelect = useCallback((featureId: string) => {
+  // Selection callback — Phase 5 (#192) switched MapView's `onSelect` to
+  // emit a `SelectionClickEvent` (`{ target, modifier, shift }`). For now
+  // the VS Code host still routes selection through the single-feature
+  // `selectionChanged` message; modifier-aware multi-select wiring will
+  // follow once the host slice mirrors `selection.featureIds` back to the
+  // webview. Re-introduce `applyClickToSelection` then.
+  const handleSelect = useCallback((event: SelectionClickEvent) => {
     vscode.postMessage({
       type: 'selectionChanged',
       selection: {
-        featureIds: [featureId],
+        featureIds: [event.target],
       },
     });
   }, []);

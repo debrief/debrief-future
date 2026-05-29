@@ -1,6 +1,8 @@
 /**
  * Session save logic.
  * Feature: 024-document-session-state
+ * Extended (Feature: 192) — escalate read-only filesystem errors to the
+ * plot slice's `isReadOnly` signal so panel UIs can react.
  */
 
 import { writeFile } from 'fs/promises';
@@ -8,6 +10,47 @@ import type { SessionStoreApi } from '../store/index.js';
 import type { PersistentSessionState } from '../types/index.js';
 import { SCHEMA_VERSION } from '../types/index.js';
 import { createSchemaHeader } from './schema.js';
+
+/**
+ * Detect Node fs read-only / permission errors by `.code`.
+ * EACCES = permission denied; EPERM = operation not permitted;
+ * EROFS = read-only filesystem.
+ */
+function isReadOnlyNodeError(
+  err: unknown,
+): err is NodeJS.ErrnoException {
+  if (typeof err !== 'object' || err === null) return false;
+  const code = (err as { code?: unknown }).code;
+  return code === 'EACCES' || code === 'EPERM' || code === 'EROFS';
+}
+
+/**
+ * Detect `ReadOnlyFilesystemError` from `@debrief/stac-writer` (re-exported
+ * by `apps/vscode/src/services/stacService.ts`) without taking a runtime
+ * dependency on that package — `@debrief/components` (transitively imported
+ * by `@debrief/stac-writer`) depends on `@debrief/session-state`, so an
+ * `import` here would form a workspace cycle. The `name` field is `as const`
+ * on both class declarations, so a string check is precise.
+ */
+function isReadOnlyFilesystemError(err: unknown): err is Error {
+  if (!(err instanceof Error)) return false;
+  return err.name === 'ReadOnlyFilesystemError';
+}
+
+/**
+ * Derive a human-readable read-only reason from a thrown error.
+ * Mirrors the producer rule in `contracts/read-only-signal.md`.
+ */
+function deriveReadOnlyReason(err: unknown): string | null {
+  if (isReadOnlyFilesystemError(err)) {
+    return err.message || 'Storage location is read-only';
+  }
+  if (isReadOnlyNodeError(err)) {
+    const code = err.code ?? 'EACCES';
+    return `Save failed (${code}) — permission denied writing to the storage location`;
+  }
+  return null;
+}
 
 /**
  * Save result.
@@ -92,6 +135,15 @@ export async function saveSession(
       savedAt: header.savedAt,
     };
   } catch (err) {
+    // Spec #192 R-009 — escalate read-only filesystem errors to the plot
+    // slice's isReadOnly signal so consumers (PropertiesPanel etc.) can
+    // disable editing surfaces immediately. The staging buffer in the
+    // panel is NOT cleared (US-5 AS-3); we only flip the signal.
+    const readOnlyReason = deriveReadOnlyReason(err);
+    if (readOnlyReason !== null) {
+      store.getState().setReadOnly(true, readOnlyReason);
+    }
+
     return {
       success: false,
       error: err instanceof Error ? err.message : 'Unknown error',

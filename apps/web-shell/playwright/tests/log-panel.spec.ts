@@ -12,6 +12,7 @@
 
 import { test, expect } from '@playwright/test';
 import { CatalogPage, AnalysisPage } from '../pages';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 
 /**
  * Helper: select a track feature via the feature list sidebar.
@@ -42,6 +43,7 @@ test.describe('Log Panel', () => {
     // Open a plot to get to the analysis view
     analysisPage = await catalogPage.openFirstItem();
     await analysisPage.waitForLoad();
+    await collapsePropertiesSection(page);
   });
 
   test('panel workspace shows Activity and Log tabs', async () => {

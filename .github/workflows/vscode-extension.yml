@@ -42,11 +42,14 @@ jobs:
           ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
       - name: Build shared packages
-        # #273: lint + tsc of exportStoryboardAsBriefingZip resolve types from
-        # @debrief/briefing-export (dist); `pnpm run build` builds the
-        # briefing-renderer via sync-briefing-renderer, which needs schemas +
-        # session-state declarations present.
-        run: pnpm --filter @debrief/utils --filter @debrief/schemas --filter @debrief/session-state --filter @debrief/stac-writer --filter @debrief/components --filter @debrief/briefing-export build
+        # #192: @debrief/session-state must build BEFORE @debrief/components
+        # (the latter imports @debrief/session-state/browser; tsc's exports-map
+        # resolution needs its dist). #273: also build @debrief/briefing-export
+        # — imported by exportStoryboardAsBriefingZip, resolved to dist — AFTER
+        # @debrief/components (it imports the storyboard subpath); schemas is
+        # source-resolved but built here for parity. The && chain keeps the
+        # order explicit.
+        run: pnpm --filter @debrief/utils build && pnpm --filter @debrief/session-state build && pnpm --filter @debrief/schemas build && pnpm --filter @debrief/stac-writer build && pnpm --filter @debrief/components build && pnpm --filter @debrief/briefing-export build
         working-directory: .
 
       - name: Lint

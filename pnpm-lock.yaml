@@ -737,6 +737,9 @@ importers:
       '@debrief/schemas':
         specifier: workspace:*
         version: link:../schemas
+      '@debrief/session-state':
+        specifier: workspace:*
+        version: link:../../services/session-state
       '@debrief/utils':
         specifier: workspace:*
         version: link:../utils

@@ -7,6 +7,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 
 const STYLING_TOOL_NAMES = [
   'Set Track Color',
@@ -41,6 +42,7 @@ test.describe('Styling Tools Integration', () => {
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({
       timeout: 5000,
     });
+    await collapsePropertiesSection(page);
   });
 
   test('tools panel lists all 14 tools (2 built-in + 4 styling + 1 shape + 2 reference + 1 sensor + 1 track-manipulation + 3 analysis)', async ({ page }) => {

@@ -1,0 +1,46 @@
+{
+  "type": "Feature",
+  "id": "mp-with-vertex-meta",
+  "geometry": {
+    "type": "MultiPoint",
+    "coordinates": [
+      [
+        -4.1234,
+        50.3456
+      ],
+      [
+        -4.2345,
+        50.4567
+      ],
+      [
+        -4.3456,
+        50.5678
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "MULTI_POINT",
+    "label": "Intercept Points",
+    "style": {
+      "shape": "circle",
+      "radius": 6,
+      "fill": true,
+      "fill_color": "#FF0000",
+      "fill_opacity": 0.8,
+      "stroke": true,
+      "color": "#CC0000",
+      "weight": 2,
+      "opacity": 1.0
+    },
+    "vertex_metadata": [
+      {
+        "path": "vertices/1",
+        "label": "primary intercept",
+        "tags": [
+          "recurring-fix",
+          "high-confidence"
+        ]
+      }
+    ]
+  }
+}
