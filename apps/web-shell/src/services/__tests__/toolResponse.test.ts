@@ -212,9 +212,14 @@ describe('executeTool response structure (T042)', () => {
       expect(() => executeTool('unknown-tool', [feature], {})).toThrow('Unknown tool: unknown-tool');
     });
 
-    it('throws on Python-only tool IDs', () => {
+    it('former Python-only analysis tools are now executable in the web-shell (no "Unknown tool")', () => {
+      // track-stats / range-bearing / area-summary gained TypeScript
+      // implementations and are now registered in toolService, so executeTool
+      // no longer rejects them as unknown. (The empty-params call may still
+      // throw a tool-specific validation error — we only assert it is NOT the
+      // "Unknown tool" rejection.)
       const feature = makeTrackFeature();
-      expect(() => executeTool('track-stats', [feature], {})).toThrow('Unknown tool: track-stats');
+      expect(() => executeTool('track-stats', [feature], {})).not.toThrow('Unknown tool');
     });
 
     it('propagates tool execution errors', () => {

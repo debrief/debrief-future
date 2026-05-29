@@ -86,10 +86,11 @@ module.exports = {
       },
     },
     {
-      // Vitest test files run in Node, not the browser — they may read
-      // golden fixtures via Node fs. The IV.4 ban on `fs` imports protects
-      // the production browser bundle, not Node-side test harnesses.
-      files: ['src/**/__tests__/**/*.test.ts', 'src/**/*.test.ts'],
+      // Vitest test files AND Playwright specs run in Node, not the browser —
+      // they may read golden fixtures and write evidence (screenshots / JSON)
+      // via Node fs. The IV.4 ban on `fs` imports protects the production
+      // browser bundle, not Node-side test harnesses.
+      files: ['src/**/__tests__/**/*.test.ts', 'src/**/*.test.ts', 'playwright/**/*.spec.ts'],
       rules: {
         'no-restricted-imports': 'off',
       },

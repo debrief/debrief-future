@@ -42,8 +42,9 @@ describe('Selective Subscriptions (SC-006)', () => {
       expect(timeListener).toHaveBeenCalledTimes(1);
       expect(viewportListener).not.toHaveBeenCalled();
       expect(selectionListener).not.toHaveBeenCalled();
-      // Dirty listener IS called because currentTime is a persistent field
-      expect(dirtyListener).toHaveBeenCalledTimes(1);
+      // Feature 261 (FR-019): currentTime (playhead) is view-state exploration —
+      // it does NOT mark the plot dirty, so the dirty listener is not called.
+      expect(dirtyListener).not.toHaveBeenCalled();
     });
 
     it('should not trigger unrelated subscriptions when spatial state changes', () => {
@@ -71,8 +72,9 @@ describe('Selective Subscriptions (SC-006)', () => {
       expect(timeListener).not.toHaveBeenCalled();
       expect(viewportListener).toHaveBeenCalledTimes(1);
       expect(selectionListener).not.toHaveBeenCalled();
-      // Dirty listener IS called because viewport is a persistent field
-      expect(dirtyListener).toHaveBeenCalledTimes(1);
+      // Feature 261 (FR-019): viewport is view-state exploration — it does NOT
+      // mark the plot dirty, so the dirty listener is not called.
+      expect(dirtyListener).not.toHaveBeenCalled();
     });
 
     it('should not trigger unrelated subscriptions when features state changes', () => {
@@ -92,8 +94,9 @@ describe('Selective Subscriptions (SC-006)', () => {
       expect(timeListener).not.toHaveBeenCalled();
       expect(viewportListener).not.toHaveBeenCalled();
       expect(selectionListener).toHaveBeenCalledTimes(1);
-      // Dirty listener IS called because selection is a persistent field
-      expect(dirtyListener).toHaveBeenCalledTimes(1);
+      // Feature 261 (FR-019): selection is view-state exploration — it does NOT
+      // mark the plot dirty, so the dirty listener is not called.
+      expect(dirtyListener).not.toHaveBeenCalled();
     });
 
     it('should not trigger unrelated subscriptions when document state changes', () => {

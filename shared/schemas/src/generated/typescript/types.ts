@@ -269,7 +269,7 @@ export enum SystemStateTypeEnum {
     
     /** Time viewport state (start/end times) */
     temporal = "temporal",
-    /** Map viewport state (bbox, zoom) */
+    /** Map viewport state (ViewportPolygon) */
     spatial = "spatial",
     /** Feature selection state (selected IDs) */
     selection = "selection",
@@ -325,6 +325,58 @@ export enum LineLabelPositionEnum {
     MIDDLE = "MIDDLE",
     /** At the far end of the bearing line */
     END = "END",
+};
+/**
+* Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
+*/
+export enum PlaybackStateEnum {
+    
+    /** Playback is stopped */
+    stopped = "stopped",
+    /** Playback is running */
+    playing = "playing",
+    /** Playback is paused */
+    paused = "paused",
+};
+/**
+* Template-literal derivation of the permissible playback states from
+* PlaybackStateEnum. Narrows the `playbackState` field on TemporalSlice
+* so TypeScript rejects an unknown state at compile time (Feature 205 /
+* FR-007).
+*/
+export type PlaybackState = `${PlaybackStateEnum}`;
+/**
+* Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.
+*/
+export enum DisplayModeEnum {
+    
+    /** Render the entire track regardless of current time */
+    full = "full",
+    /** Render a snail-trail from track start up to current time */
+    trail = "trail",
+};
+/**
+* Template-literal derivation of the permissible display modes from
+* DisplayModeEnum. Narrows the `displayMode` field on TemporalSlice so
+* TypeScript rejects an unknown mode at compile time (Feature 205 /
+* FR-007).
+*/
+export type DisplayMode = `${DisplayModeEnum}`;
+/**
+* Units for time step navigation
+*/
+export enum TimeUnitEnum {
+    
+    /** Milliseconds */
+    millisecond = "millisecond",
+    /** Seconds */
+    second = "second",
+    /** Minutes */
+    minute = "minute",
+    /** Hours */
+    hour = "hour",
+    /** Days */
+    day = "day",
 };
 /**
 * Semantic discriminator for provenance records. Consumers use this field to choose rendering or handling behaviour independently of visual tool-category grouping. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading tool-category.
@@ -433,58 +485,6 @@ export enum StacTypeEnum {
     Collection = "Collection",
 };
 /**
-* Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
-*/
-export enum PlaybackStateEnum {
-    
-    /** Playback is stopped */
-    stopped = "stopped",
-    /** Playback is running */
-    playing = "playing",
-    /** Playback is paused */
-    paused = "paused",
-};
-/**
-* Template-literal derivation of the permissible playback states from
-* PlaybackStateEnum. Narrows the `playbackState` field on TemporalSlice
-* so TypeScript rejects an unknown state at compile time (Feature 205 /
-* FR-007).
-*/
-export type PlaybackState = `${PlaybackStateEnum}`;
-/**
-* Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time. Mirrors session-state.yaml — see comment above.
-*/
-export enum DisplayModeEnum {
-    
-    /** Render the entire track regardless of current time */
-    full = "full",
-    /** Render a snail-trail from track start up to current time */
-    trail = "trail",
-};
-/**
-* Template-literal derivation of the permissible display modes from
-* DisplayModeEnum. Narrows the `displayMode` field on TemporalSlice so
-* TypeScript rejects an unknown mode at compile time (Feature 205 /
-* FR-007).
-*/
-export type DisplayMode = `${DisplayModeEnum}`;
-/**
-* Units for time step navigation
-*/
-export enum TimeUnitEnum {
-    
-    /** Milliseconds */
-    millisecond = "millisecond",
-    /** Seconds */
-    second = "second",
-    /** Minutes */
-    minute = "minute",
-    /** Hours */
-    hour = "hour",
-    /** Days */
-    day = "day",
-};
-/**
 * How addresses in a selection path level are interpreted (Feature 053)
 */
 export enum AddressingMode {
@@ -590,6 +590,72 @@ export enum ReplayStatusEnum {
 
 
 /**
+ * A geographic coordinate [longitude, latitude]
+ */
+export interface Coordinate {
+    /** Longitude in degrees (-180 to 180) */
+    longitude: number,
+    /** Latitude in degrees (-90 to 90) */
+    latitude: number,
+}
+
+
+/**
+ * Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)
+ */
+export interface ViewportPolygon {
+    /** Four corners in clockwise order [NW, NE, SE, SW] */
+    coordinates: Coordinate[],
+    /** Map zoom level for restoring the view (optional) */
+    zoom?: number,
+}
+
+
+/**
+ * A point in time with dual representations (FR-032, FR-033)
+ */
+export interface TimeInstant {
+    /** Milliseconds since Unix epoch */
+    epoch: number,
+    /** ISO 8601 UTC format string */
+    iso: string,
+}
+
+
+/**
+ * Time interval for a time-range Scene (#263). The interval is closed on both ends. `end` MUST be strictly greater than `start`. Introduced by Spec #263 to make `SceneProperties.time_range` a first-class slot.
+ */
+export interface TimeRange {
+    /** ISO-8601 instant; the slider position at the first capture action. By convention CRUD writes the owning Scene's `timestamp` into this slot, but the system does not depend on the two being equal — ordering reads `time_range?.start ?? timestamp`. */
+    start: string,
+    /** ISO-8601 instant; the slider position at the second (confirm) capture action. MUST be strictly greater than `start`. */
+    end: string,
+}
+
+
+/**
+ * Constraints on the visible time window (epoch milliseconds; null = unbounded)
+ */
+export interface TimeFilter {
+    /** Filter start as epoch milliseconds (null/missing = unbounded on the start) */
+    start?: number,
+    /** Filter end as epoch milliseconds (null/missing = unbounded on the end) */
+    end?: number,
+}
+
+
+/**
+ * Step size for discrete time navigation (FR-008)
+ */
+export interface TimeStep {
+    /** Numeric step value */
+    value: number,
+    /** Unit of the step */
+    unit: string,
+}
+
+
+/**
  * Abstract base for all GeoJSON feature properties classes. Provides shared attributes inherited by every concrete properties type.
  */
 export interface BaseFeatureProperties {
@@ -597,6 +663,8 @@ export interface BaseFeatureProperties {
     kind: string,
     /** Free-text labels assigned to this feature by the analyst */
     tags?: string[],
+    /** Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson. */
+    visible?: boolean,
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
     /** Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md. */
@@ -1115,18 +1183,30 @@ export interface SystemStateProperties {
     kind: string,
     /** Discriminator for state variant (temporal, spatial, selection, active_storyboard) */
     state_type: string,
-    /** Viewport start time (ISO8601) - for temporal state */
+    /** Analytical window start (ISO8601) - for temporal state */
     start_time?: string,
-    /** Viewport end time (ISO8601) - for temporal state */
+    /** Analytical window end (ISO8601) - for temporal state */
     end_time?: string,
-    /** Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state */
-    bbox?: number[],
-    /** Map zoom level - for spatial state */
-    zoom?: number,
-    /** Map center [longitude, latitude] - for spatial state */
-    center?: number[],
+    /** Playhead position at save (ISO-8601). When present, must lie within [start_time, end_time] (enforced by the load validator, not the schema). */
+    current_time?: string,
+    /** Visible-window filter start (ISO-8601). Absent = unbounded start. */
+    filter_start_time?: string,
+    /** Visible-window filter end (ISO-8601). Absent = unbounded end. */
+    filter_end_time?: string,
+    /** Track visualization mode for this plot. */
+    display_mode?: string,
+    /** Playback step granularity for this plot. */
+    step_size?: TimeStep,
+    /** Playback speed multiplier for this plot (0.1-100). */
+    playback_rate?: number,
+    /** Saved map viewport (ViewportPolygon). Identity-mapped to SpatialSlice.viewport. */
+    viewport?: ViewportPolygon,
+    /** Map rotation in degrees (0-360). */
+    rotation?: number,
     /** Array of selected feature IDs - for selection state */
     selected_ids?: string[],
+    /** Primary selection path for properties display. */
+    selected_primary?: string,
     /** Storyboard properties.id the analyst last pinned for this plot (#237) */
     active_storyboard_id?: string,
     /** PROV-aligned provenance records (append-only log of tool operations) */
@@ -2069,72 +2149,6 @@ export interface RawGeoJSONFeatureCollection {
 
 
 /**
- * A point in time with dual representations (FR-032, FR-033)
- */
-export interface TimeInstant {
-    /** Milliseconds since Unix epoch */
-    epoch: number,
-    /** ISO 8601 UTC format string */
-    iso: string,
-}
-
-
-/**
- * Time interval for a time-range Scene (#263). The interval is closed on both ends. `end` MUST be strictly greater than `start`. Introduced by Spec #263 to make `SceneProperties.time_range` a first-class slot.
- */
-export interface TimeRange {
-    /** ISO-8601 instant; the slider position at the first capture action. By convention CRUD writes the owning Scene's `timestamp` into this slot, but the system does not depend on the two being equal — ordering reads `time_range?.start ?? timestamp`. */
-    start: string,
-    /** ISO-8601 instant; the slider position at the second (confirm) capture action. MUST be strictly greater than `start`. */
-    end: string,
-}
-
-
-/**
- * Constraints on the visible time window (epoch milliseconds; null = unbounded)
- */
-export interface TimeFilter {
-    /** Filter start as epoch milliseconds (null/missing = unbounded on the start) */
-    start?: number,
-    /** Filter end as epoch milliseconds (null/missing = unbounded on the end) */
-    end?: number,
-}
-
-
-/**
- * Step size for discrete time navigation (FR-008)
- */
-export interface TimeStep {
-    /** Numeric step value */
-    value: number,
-    /** Unit of the step */
-    unit: string,
-}
-
-
-/**
- * A geographic coordinate [longitude, latitude]
- */
-export interface Coordinate {
-    /** Longitude in degrees (-180 to 180) */
-    longitude: number,
-    /** Latitude in degrees (-90 to 90) */
-    latitude: number,
-}
-
-
-/**
- * Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)
- */
-export interface ViewportPolygon {
-    /** Four corners in clockwise order [NW, NE, SE, SW] */
-    coordinates: Coordinate[],
-    /** Map zoom level for restoring the view (optional) */
-    zoom?: number,
-}
-
-
-/**
  * Named nesting level within a feature hierarchy (Feature 053, FR-010). Defines how addresses at this level are interpreted.
  */
 export interface LevelDefinition {
@@ -2257,42 +2271,6 @@ export interface BrowserFilterSlice {
     spatial_filter_active: boolean,
     /** Whether the timeline range is used as a temporal filter */
     temporal_filter_active: boolean,
-}
-
-
-/**
- * Root entity containing all session state slices (FR-001, FR-002)
- */
-export interface SessionState {
-    /** Schema version for persistence compatibility (FR-026) */
-    schemaVersion: string,
-    /** Time-related state */
-    temporal: TemporalSlice,
-    /** Geographic view state */
-    spatial: SpatialSlice,
-    /** Feature-related state */
-    features: FeaturesSlice,
-    /** Editor state */
-    document: DocumentSlice,
-}
-
-
-/**
- * Persisted session file format (FR-024)
- */
-export interface SessionFile {
-    /** JSON Schema URI */
-    $schema?: string,
-    /** Schema version */
-    version: string,
-    /** When the session was saved (ISO 8601) */
-    savedAt: string,
-    /** Temporal state (excluding ephemeral playbackState) */
-    temporal: TemporalSlice,
-    /** Spatial state */
-    spatial: SpatialSlice,
-    /** Features state */
-    features: FeaturesSlice,
 }
 
 

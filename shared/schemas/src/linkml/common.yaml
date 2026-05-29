@@ -260,7 +260,7 @@ enums:
       temporal:
         description: Time viewport state (start/end times)
       spatial:
-        description: Map viewport state (bbox, zoom)
+        description: Map viewport state (ViewportPolygon)
       selection:
         description: Feature selection state (selected IDs)
       active_storyboard:
@@ -308,15 +308,61 @@ enums:
       END:
         description: At the far end of the bearing line
 
+  # --------------------------------------------------------------------------
+  # Time / playback / display value enums (consolidated from session-state.yaml
+  # and storyboard.yaml — feature 261, FR-002a). common.yaml is imported by
+  # geojson.yaml AND debrief-jsonschema.yaml, so SystemStateProperties and
+  # SceneProperties can reference these from a single source of truth.
+  # --------------------------------------------------------------------------
+  PlaybackStateEnum:
+    description: >-
+      Current state of time playback. Component consumers treat
+      `stopped` as equivalent to `paused`. See ADR-022 in
+      docs/project_notes/decisions.md.
+    permissible_values:
+      stopped:
+        description: Playback is stopped
+      playing:
+        description: Playback is running
+      paused:
+        description: Playback is paused
+
+  DisplayModeEnum:
+    description: >-
+      Track visualization display mode. `full` renders the entire track
+      regardless of current time; `trail` renders a snail-trail from
+      track start up to current time.
+    permissible_values:
+      full:
+        description: Render the entire track regardless of current time
+      trail:
+        description: Render a snail-trail from track start up to current time
+
+  TimeUnitEnum:
+    description: Units for time step navigation
+    permissible_values:
+      millisecond:
+        description: Milliseconds
+      second:
+        description: Seconds
+      minute:
+        description: Minutes
+      hour:
+        description: Hours
+      day:
+        description: Days
+
 # ============================================================================
 # Types
 # ============================================================================
 
 types:
-  Coordinate:
-    typeof: float
-    description: A geographic coordinate value (longitude or latitude in degrees)
-
+  # NB: the geographic coordinate is modelled as the `Coordinate` *class*
+  # (longitude + latitude) in the Value Types section below — consolidated
+  # from session-state.yaml (feature 261, FR-002a). The earlier scalar
+  # `Coordinate` type (typeof: float) was shadowed by that class in every
+  # generated artefact and had zero `range: Coordinate` consumers, so it is
+  # removed to leave a single source of truth.
   CSSColor:
     typeof: string
     description: A CSS color string (e.g., "#FF5733", "red", "rgb(255, 87, 51)")
@@ -327,6 +373,101 @@ types:
 # ============================================================================
 
 classes:
+
+  # ==========================================================================
+  # Value types (consolidated from session-state.yaml — feature 261, FR-002a)
+  # These are referenced by SystemStateProperties (geojson.yaml), the
+  # SpatialSlice/TemporalSlice/FeaturesSlice store types (session-state.yaml),
+  # and SceneProperties (storyboard.yaml). common.yaml is imported by every
+  # cluster that needs them, including debrief-jsonschema.yaml, so they have a
+  # single authoring home (Article II.1).
+  # ==========================================================================
+
+  Coordinate:
+    description: A geographic coordinate [longitude, latitude]
+    attributes:
+      longitude:
+        description: Longitude in degrees (-180 to 180)
+        range: float
+        required: true
+        minimum_value: -180
+        maximum_value: 180
+      latitude:
+        description: Latitude in degrees (-90 to 90)
+        range: float
+        required: true
+        minimum_value: -90
+        maximum_value: 90
+
+  ViewportPolygon:
+    description: Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)
+    attributes:
+      coordinates:
+        description: Four corners in clockwise order [NW, NE, SE, SW]
+        range: Coordinate
+        multivalued: true
+        required: true
+        minimum_cardinality: 4
+        maximum_cardinality: 4
+      zoom:
+        description: Map zoom level for restoring the view (optional)
+        range: float
+        required: false
+
+  TimeInstant:
+    description: A point in time with dual representations (FR-032, FR-033)
+    attributes:
+      epoch:
+        description: Milliseconds since Unix epoch
+        range: integer
+        required: true
+      iso:
+        description: ISO 8601 UTC format string
+        range: string
+        required: true
+        pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$"
+
+  TimeRange:
+    description: A temporal interval with inclusive start and end
+    attributes:
+      start:
+        description: Start of interval
+        range: TimeInstant
+        required: true
+      end:
+        description: End of interval
+        range: TimeInstant
+        required: true
+    rules:
+      - postconditions:
+          description: Start must be less than or equal to end
+          # start.epoch <= end.epoch
+
+  TimeFilter:
+    description: Constraints on the visible time window (epoch milliseconds; null = unbounded)
+    attributes:
+      start:
+        description: Filter start as epoch milliseconds (null/missing = unbounded on the start)
+        range: integer
+        required: false
+      end:
+        description: Filter end as epoch milliseconds (null/missing = unbounded on the end)
+        range: integer
+        required: false
+
+  TimeStep:
+    description: Step size for discrete time navigation (FR-008)
+    attributes:
+      value:
+        description: Numeric step value
+        range: float
+        required: true
+        minimum_value: 0
+      unit:
+        description: Unit of the step
+        range: TimeUnitEnum
+        required: true
+
   BaseFeatureProperties:
     description: >-
       Abstract base for all GeoJSON feature properties classes.
@@ -341,6 +482,14 @@ classes:
         description: Free-text labels assigned to this feature by the analyst
         range: string
         multivalued: true
+        required: false
+      visible:
+        description: >-
+          Whether this feature is shown on the map. Absent or true means
+          visible; false means hidden. Replaces the session sidecar's
+          hiddenFeatureIds denylist (feature 261). Per-feature visibility
+          travels with the feature inside features.geojson.
+        range: boolean
         required: false
       provenance:
         description: PROV-aligned provenance records (append-only log of tool operations)

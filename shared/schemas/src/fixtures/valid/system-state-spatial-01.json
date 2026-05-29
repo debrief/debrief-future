@@ -8,8 +8,15 @@
   "properties": {
     "kind": "SYSTEM",
     "state_type": "spatial",
-    "bbox": [-5.5, 49.5, 1.5, 55.0],
-    "zoom": 8.5,
-    "center": [-2.0, 52.25]
+    "viewport": {
+      "coordinates": [
+        { "longitude": -5.5, "latitude": 55.0 },
+        { "longitude": 1.5, "latitude": 55.0 },
+        { "longitude": 1.5, "latitude": 49.5 },
+        { "longitude": -5.5, "latitude": 49.5 }
+      ],
+      "zoom": 8.5
+    },
+    "rotation": 0
   }
 }

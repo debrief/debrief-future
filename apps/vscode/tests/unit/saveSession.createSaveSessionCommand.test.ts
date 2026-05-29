@@ -26,17 +26,20 @@ function makeSessionState(savePath: string): Record<string, unknown> {
   return {
     dirty: true,
     savePath,
-    // Minimal slice surface read by `saveSession()` from @debrief/session-state.
+    // Minimal store surface read by the feature-261 systemStateBridge during
+    // save (applyStateToFeatures reads the view-state slices). With timeRange /
+    // viewport null and an empty selection, no state.* features are written —
+    // the save still proceeds (FR-020) and writes features.geojson.
     currentTime: null,
     timeRange: null,
     timeFilter: null,
-    stepSize: null,
+    stepSize: { value: 1, unit: 'minute' },
     playbackRate: 1,
-    displayMode: 'paused',
+    displayMode: 'full',
     viewport: null,
     rotation: 0,
     featureCollectionUri: null,
-    selection: [],
+    selection: { featureIds: [], primary: null, timestamp: { epoch: 0, iso: '1970-01-01T00:00:00.000Z' } },
     hiddenFeatureIds: [],
     setSavePath: vi.fn(),
     markClean: vi.fn(),

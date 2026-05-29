@@ -546,7 +546,7 @@ class SystemStateTypeEnum(str, Enum):
     """
     spatial = "spatial"
     """
-    Map viewport state (bbox, zoom)
+    Map viewport state (ViewportPolygon)
     """
     selection = "selection"
     """
@@ -631,6 +631,64 @@ class LineLabelPositionEnum(str, Enum):
     END = "END"
     """
     At the far end of the bearing line
+    """
+
+
+class PlaybackStateEnum(str, Enum):
+    """
+    Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
+    """
+    stopped = "stopped"
+    """
+    Playback is stopped
+    """
+    playing = "playing"
+    """
+    Playback is running
+    """
+    paused = "paused"
+    """
+    Playback is paused
+    """
+
+
+class DisplayModeEnum(str, Enum):
+    """
+    Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.
+    """
+    full = "full"
+    """
+    Render the entire track regardless of current time
+    """
+    trail = "trail"
+    """
+    Render a snail-trail from track start up to current time
+    """
+
+
+class TimeUnitEnum(str, Enum):
+    """
+    Units for time step navigation
+    """
+    millisecond = "millisecond"
+    """
+    Milliseconds
+    """
+    second = "second"
+    """
+    Seconds
+    """
+    minute = "minute"
+    """
+    Minutes
+    """
+    hour = "hour"
+    """
+    Hours
+    """
+    day = "day"
+    """
+    Days
     """
 
 
@@ -790,64 +848,6 @@ Used with the `equals_string` constraint on each class's `type` slot so the gene
     Collection = "Collection"
 
 
-class PlaybackStateEnum(str, Enum):
-    """
-    Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
-    """
-    stopped = "stopped"
-    """
-    Playback is stopped
-    """
-    playing = "playing"
-    """
-    Playback is running
-    """
-    paused = "paused"
-    """
-    Playback is paused
-    """
-
-
-class DisplayModeEnum(str, Enum):
-    """
-    Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time. Mirrors session-state.yaml — see comment above.
-    """
-    full = "full"
-    """
-    Render the entire track regardless of current time
-    """
-    trail = "trail"
-    """
-    Render a snail-trail from track start up to current time
-    """
-
-
-class TimeUnitEnum(str, Enum):
-    """
-    Units for time step navigation
-    """
-    millisecond = "millisecond"
-    """
-    Milliseconds
-    """
-    second = "second"
-    """
-    Seconds
-    """
-    minute = "minute"
-    """
-    Minutes
-    """
-    hour = "hour"
-    """
-    Hours
-    """
-    day = "day"
-    """
-    Days
-    """
-
-
 class AddressingMode(str, Enum):
     """
     How addresses in a selection path level are interpreted (Feature 053)
@@ -969,6 +969,86 @@ class ReplayStatusEnum(str, Enum):
 
 
 
+class Coordinate(ConfiguredBaseModel):
+    """
+    A geographic coordinate [longitude, latitude]
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/common'})
+
+    longitude: float = Field(default=..., description="""Longitude in degrees (-180 to 180)""", ge=-180, le=180, json_schema_extra = { "linkml_meta": {'domain_of': ['Coordinate']} })
+    latitude: float = Field(default=..., description="""Latitude in degrees (-90 to 90)""", ge=-90, le=90, json_schema_extra = { "linkml_meta": {'domain_of': ['Coordinate']} })
+
+
+class ViewportPolygon(ConfiguredBaseModel):
+    """
+    Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/common'})
+
+    coordinates: list[Coordinate] = Field(default=..., description="""Four corners in clockwise order [NW, NE, SE, SW]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['ViewportPolygon',
+                       'GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon']} })
+    zoom: Optional[float] = Field(default=None, description="""Map zoom level for restoring the view (optional)""", json_schema_extra = { "linkml_meta": {'domain_of': ['ViewportPolygon', 'Viewport']} })
+
+
+class TimeInstant(ConfiguredBaseModel):
+    """
+    A point in time with dual representations (FR-032, FR-033)
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/common'})
+
+    epoch: int = Field(default=..., description="""Milliseconds since Unix epoch""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeInstant']} })
+    iso: str = Field(default=..., description="""ISO 8601 UTC format string""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeInstant']} })
+
+    @field_validator('iso')
+    def pattern_iso(cls, v):
+        pattern=re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid iso format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid iso format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+
+class TimeRange(ConfiguredBaseModel):
+    """
+    Time interval for a time-range Scene (#263). The interval is closed on both ends. `end` MUST be strictly greater than `start`. Introduced by Spec #263 to make `SceneProperties.time_range` a first-class slot.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/storyboard'})
+
+    start: datetime  = Field(default=..., description="""ISO-8601 instant; the slider position at the first capture action. By convention CRUD writes the owning Scene's `timestamp` into this slot, but the system does not depend on the two being equal — ordering reads `time_range?.start ?? timestamp`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeRange', 'TimeFilter', 'PlotTimeExtent']} })
+    end: datetime  = Field(default=..., description="""ISO-8601 instant; the slider position at the second (confirm) capture action. MUST be strictly greater than `start`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeRange', 'TimeFilter', 'PlotTimeExtent']} })
+
+
+class TimeFilter(ConfiguredBaseModel):
+    """
+    Constraints on the visible time window (epoch milliseconds; null = unbounded)
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/common'})
+
+    start: Optional[int] = Field(default=None, description="""Filter start as epoch milliseconds (null/missing = unbounded on the start)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeRange', 'TimeFilter', 'PlotTimeExtent']} })
+    end: Optional[int] = Field(default=None, description="""Filter end as epoch milliseconds (null/missing = unbounded on the end)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeRange', 'TimeFilter', 'PlotTimeExtent']} })
+
+
+class TimeStep(ConfiguredBaseModel):
+    """
+    Step size for discrete time navigation (FR-008)
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/common'})
+
+    value: float = Field(default=..., description="""Numeric step value""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['TimeStep', 'ParameterValue', 'ToolParameterMeta']} })
+    unit: TimeUnitEnum = Field(default=..., description="""Unit of the step""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeStep']} })
+
+
 class BaseFeatureProperties(ConfiguredBaseModel):
     """
     Abstract base for all GeoJSON feature properties classes. Provides shared attributes inherited by every concrete properties type.
@@ -997,6 +1077,7 @@ class BaseFeatureProperties(ConfiguredBaseModel):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -1255,14 +1336,14 @@ class GeoJSONPoint(ConfiguredBaseModel):
                        'MCPParamSchema',
                        'ToolsUpdateMessage'],
          'equals_string': 'Point'} })
-    coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['ViewportPolygon',
+                       'GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'GeoJSONMultiPoint',
                        'GeoJSONMultiLineString',
-                       'GeoJSONMultiPolygon',
-                       'ViewportPolygon']} })
+                       'GeoJSONMultiPolygon']} })
 
 
 class GeoJSONEmptyPoint(ConfiguredBaseModel):
@@ -1309,14 +1390,14 @@ class GeoJSONEmptyPoint(ConfiguredBaseModel):
                        'MCPParamSchema',
                        'ToolsUpdateMessage'],
          'equals_string': 'Point'} })
-    coordinates: list[float] = Field(default=..., description="""Empty array for non-spatial features""", max_length=0, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[float] = Field(default=..., description="""Empty array for non-spatial features""", max_length=0, json_schema_extra = { "linkml_meta": {'domain_of': ['ViewportPolygon',
+                       'GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'GeoJSONMultiPoint',
                        'GeoJSONMultiLineString',
-                       'GeoJSONMultiPolygon',
-                       'ViewportPolygon']} })
+                       'GeoJSONMultiPolygon']} })
 
 
 class GeoJSONLineString(ConfiguredBaseModel):
@@ -1363,14 +1444,14 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'MCPParamSchema',
                        'ToolsUpdateMessage'],
          'equals_string': 'LineString'} })
-    coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['ViewportPolygon',
+                       'GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'GeoJSONMultiPoint',
                        'GeoJSONMultiLineString',
-                       'GeoJSONMultiPolygon',
-                       'ViewportPolygon']} })
+                       'GeoJSONMultiPolygon']} })
 
 
 class GeoJSONPolygon(ConfiguredBaseModel):
@@ -1417,14 +1498,14 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'MCPParamSchema',
                        'ToolsUpdateMessage'],
          'equals_string': 'Polygon'} })
-    coordinates: list[list[list[float]]] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[float]]] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['ViewportPolygon',
+                       'GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'GeoJSONMultiPoint',
                        'GeoJSONMultiLineString',
-                       'GeoJSONMultiPolygon',
-                       'ViewportPolygon']} })
+                       'GeoJSONMultiPolygon']} })
 
 
 class GeoJSONMultiPoint(ConfiguredBaseModel):
@@ -1471,14 +1552,14 @@ class GeoJSONMultiPoint(ConfiguredBaseModel):
                        'MCPParamSchema',
                        'ToolsUpdateMessage'],
          'equals_string': 'MultiPoint'} })
-    coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['ViewportPolygon',
+                       'GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'GeoJSONMultiPoint',
                        'GeoJSONMultiLineString',
-                       'GeoJSONMultiPolygon',
-                       'ViewportPolygon']} })
+                       'GeoJSONMultiPolygon']} })
 
 
 class GeoJSONMultiLineString(ConfiguredBaseModel):
@@ -1525,14 +1606,14 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'MCPParamSchema',
                        'ToolsUpdateMessage'],
          'equals_string': 'MultiLineString'} })
-    coordinates: list[list[list[float]]] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[float]]] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['ViewportPolygon',
+                       'GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'GeoJSONMultiPoint',
                        'GeoJSONMultiLineString',
-                       'GeoJSONMultiPolygon',
-                       'ViewportPolygon']} })
+                       'GeoJSONMultiPolygon']} })
 
 
 class GeoJSONMultiPolygon(ConfiguredBaseModel):
@@ -1579,14 +1660,14 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'MCPParamSchema',
                        'ToolsUpdateMessage'],
          'equals_string': 'MultiPolygon'} })
-    coordinates: list[list[list[list[float]]]] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[list[float]]]] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['ViewportPolygon',
+                       'GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'GeoJSONMultiPoint',
                        'GeoJSONMultiLineString',
-                       'GeoJSONMultiPolygon',
-                       'ViewportPolygon']} })
+                       'GeoJSONMultiPolygon']} })
 
 
 class SegmentMetadata(ConfiguredBaseModel):
@@ -1690,7 +1771,7 @@ class SensorContact(ConfiguredBaseModel):
                        'PolygonProperties',
                        'SensorContact',
                        'SensorData']} })
-    visible: Optional[bool] = Field(default=None, description="""Contact visibility""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'SensorData']} })
+    visible: Optional[bool] = Field(default=None, description="""Contact visibility""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     show_label: Optional[bool] = Field(default=None, description="""Label visibility""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride', 'SensorContact']} })
     line_style: Optional[LineStyleEnum] = Field(default=None, description="""Bearing line visual style""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
     label_location: Optional[LabelLocationEnum] = Field(default=None, description="""Label horizontal alignment""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
@@ -1727,7 +1808,7 @@ class SensorData(ConfiguredBaseModel):
                        'PolygonProperties',
                        'SensorContact',
                        'SensorData']} })
-    visible: Optional[bool] = Field(default=None, description="""Sensor visibility""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'SensorData']} })
+    visible: Optional[bool] = Field(default=None, description="""Sensor visibility""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     line_thickness: Optional[int] = Field(default=None, description="""Bearing line width in pixels""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
     contacts: list[SensorContact] = Field(default=..., description="""Array of sensor measurements""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
     measured_positions: Optional[list[MeasuredArrayPosition]] = Field(default=[], description="""Actual towed array positions for MEASURED array centre mode""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
@@ -1856,6 +1937,7 @@ class TrackProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2046,7 +2128,6 @@ class TrackFeature(ConfiguredBaseModel):
                        'StoryboardFeature',
                        'SceneFeature']} })
     bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
@@ -2166,6 +2247,7 @@ class ReferenceLocationProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2282,7 +2364,30 @@ class SystemStateProperties(ConfiguredBaseModel):
     """
     Properties for SYSTEM features storing application state
     """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson',
+         'rules': [{'description': 'temporal variant requires start_time and end_time',
+                    'postconditions': {'slot_conditions': {'end_time': {'name': 'end_time',
+                                                                        'required': True},
+                                                           'start_time': {'name': 'start_time',
+                                                                          'required': True}}},
+                    'preconditions': {'slot_conditions': {'state_type': {'equals_string': 'temporal',
+                                                                         'name': 'state_type'}}}},
+                   {'description': 'spatial variant requires viewport',
+                    'postconditions': {'slot_conditions': {'viewport': {'name': 'viewport',
+                                                                        'required': True}}},
+                    'preconditions': {'slot_conditions': {'state_type': {'equals_string': 'spatial',
+                                                                         'name': 'state_type'}}}},
+                   {'description': 'selection variant requires selected_ids',
+                    'postconditions': {'slot_conditions': {'selected_ids': {'name': 'selected_ids',
+                                                                            'required': True}}},
+                    'preconditions': {'slot_conditions': {'state_type': {'equals_string': 'selection',
+                                                                         'name': 'state_type'}}}},
+                   {'description': 'active_storyboard variant requires '
+                                   'active_storyboard_id',
+                    'postconditions': {'slot_conditions': {'active_storyboard_id': {'name': 'active_storyboard_id',
+                                                                                    'required': True}}},
+                    'preconditions': {'slot_conditions': {'state_type': {'equals_string': 'active_storyboard',
+                                                                         'name': 'state_type'}}}}]})
 
     kind: Literal["SYSTEM"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'TrackProperties',
@@ -2304,23 +2409,18 @@ class SystemStateProperties(ConfiguredBaseModel):
                        'MCPSelectionRequirement'],
          'equals_string': 'SYSTEM'} })
     state_type: SystemStateTypeEnum = Field(default=..., description="""Discriminator for state variant (temporal, spatial, selection, active_storyboard)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
-    start_time: Optional[datetime ] = Field(default=None, description="""Viewport start time (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
-    end_time: Optional[datetime ] = Field(default=None, description="""Viewport end time (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
-    bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'SystemStateProperties',
-                       'MultiPointFeature',
-                       'MultiPolygonFeature',
-                       'PlotSummary',
-                       'StacItemSummary',
-                       'StacItem',
-                       'StacSpatialExtent',
-                       'RawGeoJSONFeature',
-                       'RawGeoJSONFeatureCollection']} })
-    zoom: Optional[float] = Field(default=None, description="""Map zoom level - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'ViewportPolygon', 'Viewport']} })
-    center: Optional[list[float]] = Field(default=[], description="""Map center [longitude, latitude] - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties',
-                       'CircleAnnotationProperties',
-                       'Viewport']} })
+    start_time: Optional[datetime ] = Field(default=None, description="""Analytical window start (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
+    end_time: Optional[datetime ] = Field(default=None, description="""Analytical window end (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
+    current_time: Optional[datetime ] = Field(default=None, description="""Playhead position at save (ISO-8601). When present, must lie within [start_time, end_time] (enforced by the load validator, not the schema).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
+    filter_start_time: Optional[datetime ] = Field(default=None, description="""Visible-window filter start (ISO-8601). Absent = unbounded start.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
+    filter_end_time: Optional[datetime ] = Field(default=None, description="""Visible-window filter end (ISO-8601). Absent = unbounded end.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
+    display_mode: Optional[DisplayModeEnum] = Field(default=None, description="""Track visualization mode for this plot.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'SceneProperties']} })
+    step_size: Optional[TimeStep] = Field(default=None, description="""Playback step granularity for this plot.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
+    playback_rate: Optional[float] = Field(default=None, description="""Playback speed multiplier for this plot (0.1-100).""", ge=0.1, le=100.0, json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
+    viewport: Optional[ViewportPolygon] = Field(default=None, description="""Saved map viewport (ViewportPolygon). Identity-mapped to SpatialSlice.viewport.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'SpatialSlice', 'SceneProperties']} })
+    rotation: Optional[float] = Field(default=None, description="""Map rotation in degrees (0-360).""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'SpatialSlice']} })
     selected_ids: Optional[list[str]] = Field(default=[], description="""Array of selected feature IDs - for selection state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
+    selected_primary: Optional[str] = Field(default=None, description="""Primary selection path for properties display.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
     active_storyboard_id: Optional[str] = Field(default=None, description="""Storyboard properties.id the analyst last pinned for this plot (#237)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
@@ -2518,6 +2618,7 @@ class MultiPointFeatureProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2628,7 +2729,6 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'StoryboardFeature',
                        'SceneFeature']} })
     bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
@@ -2712,6 +2812,7 @@ class MultiPolygonFeatureProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2822,7 +2923,6 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'StoryboardFeature',
                        'SceneFeature']} })
     bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
@@ -2889,7 +2989,7 @@ class ParameterValue(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/log-entry'})
 
-    value: str = Field(default=..., description="""The parameter value (any JSON type).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue', 'TimeStep', 'ToolParameterMeta']} })
+    value: str = Field(default=..., description="""The parameter value (any JSON type).""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeStep', 'ParameterValue', 'ToolParameterMeta']} })
     default: Optional[bool] = Field(default=False, description="""Whether this is the default value.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue', 'ToolParameterMeta'], 'ifabsent': 'false'} })
     tunable: Optional[bool] = Field(default=True, description="""Whether this parameter can be modified during replay.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue', 'ToolParameterMeta'], 'ifabsent': 'true'} })
 
@@ -3020,6 +3120,7 @@ class NarrativeEntryProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -3156,9 +3257,7 @@ class CircleAnnotationProperties(BaseFeatureProperties):
                        'SceneProperties',
                        'MCPSelectionRequirement'],
          'equals_string': 'CIRCLE'} })
-    center: list[float] = Field(default=..., description="""Circle center as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties',
-                       'CircleAnnotationProperties',
-                       'Viewport']} })
+    center: list[float] = Field(default=..., description="""Circle center as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['CircleAnnotationProperties', 'Viewport']} })
     radius: float = Field(default=..., description="""Circle radius in meters for precise reconstruction""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'CircleAnnotationProperties']} })
     label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['VertexMetadata',
                        'PositionStyleOverride',
@@ -3199,6 +3298,7 @@ class CircleAnnotationProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -3374,6 +3474,7 @@ class RectangleAnnotationProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -3549,6 +3650,7 @@ class LineAnnotationProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -3714,6 +3816,7 @@ class TextAnnotationProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -3895,6 +3998,7 @@ class VectorAnnotationProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -4072,6 +4176,7 @@ class PolyAnnotationProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -4274,7 +4379,7 @@ class Tool(ConfiguredBaseModel):
                        'MCPParamSchema',
                        'MCPToolDefinition',
                        'ToolDefinition']} })
-    version: Optional[str] = Field(default=None, description="""Tool version string for provenance tracking. Follows semantic versioning (e.g., \"1.0.0\").""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool', 'SessionFile']} })
+    version: Optional[str] = Field(default=None, description="""Tool version string for provenance tracking. Follows semantic versioning (e.g., \"1.0.0\").""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool']} })
     requirements: Optional[list[SelectionRequirement]] = Field(default=[], description="""List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool']} })
     category: Optional[ToolCategoryEnum] = Field(default=None, description="""Visual category for Log Panel icon rendering. Null / absent tools render with the neutral-grey \"Other\" icon. First-party tools MUST declare a value (enforced by test policy; see specs/207-tool-manifest-categories/research.md §R5). Feature 207.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool']} })
 
@@ -4693,8 +4798,8 @@ class PlotTimeExtent(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac-extension'})
 
-    start: str = Field(default=..., description="""Start of time extent (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
-    end: str = Field(default=..., description="""End of time extent (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
+    start: str = Field(default=..., description="""Start of time extent (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeRange', 'TimeFilter', 'PlotTimeExtent']} })
+    end: str = Field(default=..., description="""End of time extent (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeRange', 'TimeFilter', 'PlotTimeExtent']} })
 
 
 class PlotSummary(ConfiguredBaseModel):
@@ -4745,7 +4850,6 @@ class PlotSummary(ConfiguredBaseModel):
     catalog_id: str = Field(default=..., description="""Parent catalog identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
     source_path: Optional[str] = Field(default=None, description="""Original source file path (for provenance)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary']} })
     bbox: Optional[list[float]] = Field(default=None, description="""Geographic bounding box as [west, south, east, north]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
@@ -4807,7 +4911,6 @@ class StacItemSummary(ConfiguredBaseModel):
     catalog_id: str = Field(default=..., description="""Parent catalog identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
     store_id: str = Field(default=..., description="""Parent store identifier (needed for URI construction)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
     bbox: Optional[list[float]] = Field(default=None, description="""Geographic bounding box as [west, south, east, north]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
@@ -5037,7 +5140,6 @@ class StacItem(ConfiguredBaseModel):
                        'StoryboardFeature',
                        'SceneFeature']} })
     bbox: list[float] = Field(default=..., description="""Bounding box — either [west, south, east, north] (4-element 2D) or [west, south, min_alt, east, north, max_alt] (6-element 3D). Live fixtures use 4-element 2D (Research R-004).""", min_length=4, max_length=6, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
@@ -5416,7 +5518,6 @@ class StacSpatialExtent(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
 
     bbox: list[list[float]] = Field(default=..., description="""List of bounding-box arrays `[[w, s, e, n], ...]`. Each inner array is 4-element 2D or 6-element 3D.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
@@ -5442,8 +5543,8 @@ class StacExtent(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac'})
 
-    spatial: StacSpatialExtent = Field(default=..., description="""Spatial extent — one or more bounding boxes.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
-    temporal: StacTemporalExtent = Field(default=..., description="""Temporal extent — one or more start/end intervals.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
+    spatial: StacSpatialExtent = Field(default=..., description="""Spatial extent — one or more bounding boxes.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent']} })
+    temporal: StacTemporalExtent = Field(default=..., description="""Temporal extent — one or more start/end intervals.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent']} })
 
 
 class StacSummaries(ConfiguredBaseModel):
@@ -5685,7 +5786,6 @@ class RawGeoJSONFeature(ConfiguredBaseModel):
                        'StoryboardFeature',
                        'SceneFeature']} })
     bbox: Optional[list[float]] = Field(default=[], description="""Optional bounding box. Either [minLon, minLat, maxLon, maxLat] (length 4) or [minLon, minLat, minAlt, maxLon, maxLat, maxAlt] (length 6).""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
@@ -5741,12 +5841,9 @@ class RawGeoJSONFeatureCollection(ConfiguredBaseModel):
                        'ToolsUpdateMessage'],
          'equals_string': 'FeatureCollection'} })
     features: list[RawGeoJSONFeature] = Field(default=..., description="""The collection's features, in document order.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
-                       'SessionState',
-                       'SessionFile',
                        'ToolResultForLog',
                        'ToolExecutionResultForReplay']} })
     bbox: Optional[list[float]] = Field(default=[], description="""Optional bounding box, shaped as in RawGeoJSONFeature.bbox.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
@@ -5755,86 +5852,6 @@ class RawGeoJSONFeatureCollection(ConfiguredBaseModel):
                        'StacSpatialExtent',
                        'RawGeoJSONFeature',
                        'RawGeoJSONFeatureCollection']} })
-
-
-class TimeInstant(ConfiguredBaseModel):
-    """
-    A point in time with dual representations (FR-032, FR-033)
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
-
-    epoch: int = Field(default=..., description="""Milliseconds since Unix epoch""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeInstant']} })
-    iso: str = Field(default=..., description="""ISO 8601 UTC format string""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeInstant']} })
-
-    @field_validator('iso')
-    def pattern_iso(cls, v):
-        pattern=re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$")
-        if isinstance(v, list):
-            for element in v:
-                if isinstance(element, str) and not pattern.match(element):
-                    err_msg = f"Invalid iso format: {element}"
-                    raise ValueError(err_msg)
-        elif isinstance(v, str) and not pattern.match(v):
-            err_msg = f"Invalid iso format: {v}"
-            raise ValueError(err_msg)
-        return v
-
-
-class TimeRange(ConfiguredBaseModel):
-    """
-    Time interval for a time-range Scene (#263). The interval is closed on both ends. `end` MUST be strictly greater than `start`. Introduced by Spec #263 to make `SceneProperties.time_range` a first-class slot.
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/storyboard'})
-
-    start: datetime  = Field(default=..., description="""ISO-8601 instant; the slider position at the first capture action. By convention CRUD writes the owning Scene's `timestamp` into this slot, but the system does not depend on the two being equal — ordering reads `time_range?.start ?? timestamp`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
-    end: datetime  = Field(default=..., description="""ISO-8601 instant; the slider position at the second (confirm) capture action. MUST be strictly greater than `start`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
-
-
-class TimeFilter(ConfiguredBaseModel):
-    """
-    Constraints on the visible time window (epoch milliseconds; null = unbounded)
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
-
-    start: Optional[int] = Field(default=None, description="""Filter start as epoch milliseconds (null/missing = unbounded on the start)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
-    end: Optional[int] = Field(default=None, description="""Filter end as epoch milliseconds (null/missing = unbounded on the end)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
-
-
-class TimeStep(ConfiguredBaseModel):
-    """
-    Step size for discrete time navigation (FR-008)
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
-
-    value: float = Field(default=..., description="""Numeric step value""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue', 'TimeStep', 'ToolParameterMeta']} })
-    unit: TimeUnitEnum = Field(default=..., description="""Unit of the step""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeStep']} })
-
-
-class Coordinate(ConfiguredBaseModel):
-    """
-    A geographic coordinate [longitude, latitude]
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
-
-    longitude: float = Field(default=..., description="""Longitude in degrees (-180 to 180)""", ge=-180, le=180, json_schema_extra = { "linkml_meta": {'domain_of': ['Coordinate']} })
-    latitude: float = Field(default=..., description="""Latitude in degrees (-90 to 90)""", ge=-90, le=90, json_schema_extra = { "linkml_meta": {'domain_of': ['Coordinate']} })
-
-
-class ViewportPolygon(ConfiguredBaseModel):
-    """
-    Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
-
-    coordinates: list[Coordinate] = Field(default=..., description="""Four corners in clockwise order [NW, NE, SE, SW]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
-                       'GeoJSONEmptyPoint',
-                       'GeoJSONLineString',
-                       'GeoJSONPolygon',
-                       'GeoJSONMultiPoint',
-                       'GeoJSONMultiLineString',
-                       'GeoJSONMultiPolygon',
-                       'ViewportPolygon']} })
-    zoom: Optional[float] = Field(default=None, description="""Map zoom level for restoring the view (optional)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'ViewportPolygon', 'Viewport']} })
 
 
 class LevelDefinition(ConfiguredBaseModel):
@@ -5914,8 +5931,8 @@ class SpatialSlice(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
 
-    viewport: Optional[ViewportPolygon] = Field(default=None, description="""Visible map area as 4-corner polygon (FR-012)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpatialSlice', 'SceneProperties']} })
-    rotation: float = Field(default=..., description="""Map rotation in degrees 0-360 (FR-013)""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['SpatialSlice']} })
+    viewport: Optional[ViewportPolygon] = Field(default=None, description="""Visible map area as 4-corner polygon (FR-012)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'SpatialSlice', 'SceneProperties']} })
+    rotation: float = Field(default=..., description="""Map rotation in degrees 0-360 (FR-013)""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'SpatialSlice']} })
 
 
 class FeaturesSlice(ConfiguredBaseModel):
@@ -5975,67 +5992,6 @@ class BrowserFilterSlice(ConfiguredBaseModel):
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['BrowserFilterSlice']} })
     spatial_filter_active: bool = Field(default=..., description="""Whether the map viewport is used as a spatial filter""", json_schema_extra = { "linkml_meta": {'domain_of': ['BrowserFilterSlice']} })
     temporal_filter_active: bool = Field(default=..., description="""Whether the timeline range is used as a temporal filter""", json_schema_extra = { "linkml_meta": {'domain_of': ['BrowserFilterSlice']} })
-
-
-class SessionState(ConfiguredBaseModel):
-    """
-    Root entity containing all session state slices (FR-001, FR-002)
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state', 'tree_root': True})
-
-    schemaVersion: str = Field(default=..., description="""Schema version for persistence compatibility (FR-026)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState']} })
-    temporal: TemporalSlice = Field(default=..., description="""Time-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
-    spatial: SpatialSlice = Field(default=..., description="""Geographic view state""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
-    features: FeaturesSlice = Field(default=..., description="""Feature-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
-                       'SessionState',
-                       'SessionFile',
-                       'ToolResultForLog',
-                       'ToolExecutionResultForReplay']} })
-    document: DocumentSlice = Field(default=..., description="""Editor state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState']} })
-
-    @field_validator('schemaVersion')
-    def pattern_schemaVersion(cls, v):
-        pattern=re.compile(r"^\d+\.\d+\.\d+$")
-        if isinstance(v, list):
-            for element in v:
-                if isinstance(element, str) and not pattern.match(element):
-                    err_msg = f"Invalid schemaVersion format: {element}"
-                    raise ValueError(err_msg)
-        elif isinstance(v, str) and not pattern.match(v):
-            err_msg = f"Invalid schemaVersion format: {v}"
-            raise ValueError(err_msg)
-        return v
-
-
-class SessionFile(ConfiguredBaseModel):
-    """
-    Persisted session file format (FR-024)
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
-
-    schema: Optional[str] = Field(default=None, alias="$schema", description="""JSON Schema URI""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionFile']} })
-    version: str = Field(default=..., description="""Schema version""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool', 'SessionFile']} })
-    savedAt: str = Field(default=..., description="""When the session was saved (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionFile']} })
-    temporal: TemporalSlice = Field(default=..., description="""Temporal state (excluding ephemeral playbackState)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
-    spatial: SpatialSlice = Field(default=..., description="""Spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtent', 'SessionState', 'SessionFile']} })
-    features: FeaturesSlice = Field(default=..., description="""Features state""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
-                       'SessionState',
-                       'SessionFile',
-                       'ToolResultForLog',
-                       'ToolExecutionResultForReplay']} })
-
-    @field_validator('version')
-    def pattern_version(cls, v):
-        pattern=re.compile(r"^\d+\.\d+\.\d+$")
-        if isinstance(v, list):
-            for element in v:
-                if isinstance(element, str) and not pattern.match(element):
-                    err_msg = f"Invalid version format: {element}"
-                    raise ValueError(err_msg)
-        elif isinstance(v, str) and not pattern.match(v):
-            err_msg = f"Invalid version format: {v}"
-            raise ValueError(err_msg)
-        return v
 
 
 class ResultTypePath(ConfiguredBaseModel):
@@ -6282,10 +6238,8 @@ class Viewport(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/storyboard'})
 
-    center: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties',
-                       'CircleAnnotationProperties',
-                       'Viewport']} })
-    zoom: float = Field(default=..., description="""Leaflet-compatible zoom level""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'ViewportPolygon', 'Viewport']} })
+    center: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['CircleAnnotationProperties', 'Viewport']} })
+    zoom: float = Field(default=..., description="""Leaflet-compatible zoom level""", json_schema_extra = { "linkml_meta": {'domain_of': ['ViewportPolygon', 'Viewport']} })
     bearing: float = Field(default=..., description="""Viewport bearing in degrees. MUST be 0 in schema v1 (reserved slot for future rotated viewports).""", ge=0, le=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact',
                        'TUASolution',
                        'VectorAnnotationProperties',
@@ -6378,6 +6332,7 @@ class StoryboardProperties(BaseFeatureProperties):
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -6492,7 +6447,7 @@ class SceneProperties(BaseFeatureProperties):
                        'MCPParamSchema',
                        'MCPToolDefinition',
                        'ToolDefinition']} })
-    viewport: Viewport = Field(default=..., description="""Map viewport camera state at capture time""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpatialSlice', 'SceneProperties']} })
+    viewport: Viewport = Field(default=..., description="""Map viewport camera state at capture time""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'SpatialSlice', 'SceneProperties']} })
     timestamp: datetime  = Field(default=..., description="""ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard) as the primary sort key. Multiple Scenes MAY share the same timestamp; ties are broken by `creation_order` ascending (see #259).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry',
                        'TuneAnnotation',
                        'FileProvEntry',
@@ -6506,12 +6461,13 @@ class SceneProperties(BaseFeatureProperties):
     feature_set_hash: str = Field(default=..., description="""SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     thumbnail_asset_ref: str = Field(default=..., description="""STAC asset key (path + name within the plot's STAC item). Populated by #216 at capture time via #174 helpers.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     transition_duration_ms: int = Field(default=..., description="""Playback transition duration in milliseconds. Default 500.""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
-    display_mode: Optional[DisplayModeEnum] = Field(default=None, description="""Time-controller display mode at capture time (full = entire track history; trail = only the tail behind each platform). Reuses DisplayModeEnum from session-state.yaml. Optional for legacy compatibility (Spec #258): readers MUST leave the time controller untouched when this slot is absent (FR-003). Writers populate it from session.displayMode at the moment the scene is created.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
+    display_mode: Optional[DisplayModeEnum] = Field(default=None, description="""Time-controller display mode at capture time (full = entire track history; trail = only the tail behind each platform). Reuses DisplayModeEnum from session-state.yaml. Optional for legacy compatibility (Spec #258): readers MUST leave the time controller untouched when this slot is absent (FR-003). Writers populate it from session.displayMode at the moment the scene is created.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'SceneProperties']} })
     polygon_source: Optional[PolygonSourceEnum] = Field(default=None, alias="_polygon_source", description="""Provenance of the scene's stored polygon geometry (Spec #258). 'bounds' = computed from real Leaflet map bounds at capture time; 'placeholder' = pre-#258 ~100m square; 'manual' = reserved for future user-drawn rectangles. Render-side consumers recompute the polygon from (viewport, map dimensions) when this value is anything other than 'bounds' (including absent, for legacy scenes). The stored geometry is NEVER rewritten on read (Article III.2 source preservation).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'VertexMetadata',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
+    visible: Optional[bool] = Field(default=None, description="""Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'SensorContact', 'SensorData']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -7083,7 +7039,7 @@ class ToolParameterMeta(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/mcp'})
 
-    value: Any = Field(default=..., description="""Parameter value used during the invocation.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue', 'TimeStep', 'ToolParameterMeta']} })
+    value: Any = Field(default=..., description="""Parameter value used during the invocation.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimeStep', 'ParameterValue', 'ToolParameterMeta']} })
     default: bool = Field(default=..., description="""Whether the parameter took its default value.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue', 'ToolParameterMeta']} })
     tunable: bool = Field(default=..., description="""Whether the parameter is operator-tunable.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue', 'ToolParameterMeta']} })
 
@@ -7181,8 +7137,6 @@ class ToolResultForLog(ConfiguredBaseModel):
                        'ToolResultForLog',
                        'ToolExecutionResultForReplay']} })
     features: Optional[dict[str, object]] = Field(default=None, description="""GeoJSON FeatureCollection produced by the tool. Free-form per Article XV.2 (the tool's output shape is its own contract).""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
-                       'SessionState',
-                       'SessionFile',
                        'ToolResultForLog',
                        'ToolExecutionResultForReplay']} })
     duration_ms: int = Field(default=..., description="""Wall-clock duration of the tool invocation in milliseconds.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse',
@@ -7206,8 +7160,6 @@ class ToolExecutionResultForReplay(ConfiguredBaseModel):
                        'ToolResultForLog',
                        'ToolExecutionResultForReplay']} })
     features: Optional[dict[str, object]] = Field(default=None, description="""GeoJSON FeatureCollection produced by the tool during replay. Free-form per Article XV.2.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
-                       'SessionState',
-                       'SessionFile',
                        'ToolResultForLog',
                        'ToolExecutionResultForReplay']} })
     duration_ms: int = Field(default=..., description="""Wall-clock duration of the replay invocation in milliseconds.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse',
@@ -7268,6 +7220,12 @@ class ToolsUpdateMessage(ConfiguredBaseModel):
 
 # Model rebuild
 # see https://pydantic-docs.helpmanual.io/usage/models/#rebuilding-a-model
+Coordinate.model_rebuild()
+ViewportPolygon.model_rebuild()
+TimeInstant.model_rebuild()
+TimeRange.model_rebuild()
+TimeFilter.model_rebuild()
+TimeStep.model_rebuild()
 BaseFeatureProperties.model_rebuild()
 VertexMetadata.model_rebuild()
 TimestampedPosition.model_rebuild()
@@ -7349,12 +7307,6 @@ StacSummaries.model_rebuild()
 StacCollection.model_rebuild()
 RawGeoJSONFeature.model_rebuild()
 RawGeoJSONFeatureCollection.model_rebuild()
-TimeInstant.model_rebuild()
-TimeRange.model_rebuild()
-TimeFilter.model_rebuild()
-TimeStep.model_rebuild()
-Coordinate.model_rebuild()
-ViewportPolygon.model_rebuild()
 LevelDefinition.model_rebuild()
 FeatureSelection.model_rebuild()
 TemporalSlice.model_rebuild()
@@ -7364,8 +7316,6 @@ DocumentSlice.model_rebuild()
 LastToolExecution.model_rebuild()
 ResultsSlice.model_rebuild()
 BrowserFilterSlice.model_rebuild()
-SessionState.model_rebuild()
-SessionFile.model_rebuild()
 ResultTypePath.model_rebuild()
 ToolResultAnnotations.model_rebuild()
 DatasetAxisMetadata.model_rebuild()

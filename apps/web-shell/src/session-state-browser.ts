@@ -58,3 +58,29 @@ export {
   selectIsReadOnly,
   selectReadOnlyReason,
 } from '../../../services/session-state/src/store/slices/plot.js';
+
+// SystemState helper (Feature 261) — pure, browser-safe FeatureCollection
+// read/write for all four variants + per-feature visibility + the store bridge.
+// The single shared producer/consumer used by both hosts (FR-015).
+export {
+  readSystemStateFromFeatureCollection,
+  writeSystemStateIntoFeatureCollection,
+  readHiddenFeatureIds,
+  applyVisibilityToFeatureCollection,
+  buildWriteInputFromStore,
+  applyStateToFeatures,
+  mirrorViewStateIntoFeatures,
+  hydrateStoreFromFeatures,
+  checkTemporalCrossField,
+  SystemStateLoadError,
+  STATE_FEATURE_ID,
+  type SystemStateLoadErrorKind,
+  type FeatureLike,
+  type SystemStateType,
+  type TemporalVariant,
+  type SpatialVariant,
+  type SelectionVariant,
+  type ActiveStoryboardVariant,
+  type SystemStateMap,
+  type SystemStateWriteInput,
+} from '../../../services/session-state/src/system-state/index.js';

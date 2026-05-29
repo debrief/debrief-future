@@ -42,6 +42,39 @@
       "title": "ActivityType",
       "type": "string"
     },
+    "Coordinate": {
+      "additionalProperties": false,
+      "description": "A geographic coordinate [longitude, latitude]",
+      "properties": {
+        "latitude": {
+          "description": "Latitude in degrees (-90 to 90)",
+          "maximum": 90,
+          "minimum": -90,
+          "type": "number"
+        },
+        "longitude": {
+          "description": "Longitude in degrees (-180 to 180)",
+          "maximum": 180,
+          "minimum": -180,
+          "type": "number"
+        }
+      },
+      "required": [
+        "longitude",
+        "latitude"
+      ],
+      "title": "Coordinate",
+      "type": "object"
+    },
+    "DisplayModeEnum": {
+      "description": "Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.",
+      "enum": [
+        "full",
+        "trail"
+      ],
+      "title": "DisplayModeEnum",
+      "type": "string"
+    },
     "FeatureKindEnum": {
       "description": "Discriminator for GeoJSON feature types",
       "enum": [
@@ -248,6 +281,90 @@
     },
     "SystemStateProperties": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state_type": {
+                "const": "temporal"
+              }
+            },
+            "required": [
+              "state_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "end_time": {},
+              "start_time": {}
+            },
+            "required": [
+              "start_time",
+              "end_time"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state_type": {
+                "const": "spatial"
+              }
+            },
+            "required": [
+              "state_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "viewport": {}
+            },
+            "required": [
+              "viewport"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state_type": {
+                "const": "selection"
+              }
+            },
+            "required": [
+              "state_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selected_ids": {}
+            },
+            "required": [
+              "selected_ids"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state_type": {
+                "const": "active_storyboard"
+              }
+            },
+            "required": [
+              "state_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "active_storyboard_id": {}
+            },
+            "required": [
+              "active_storyboard_id"
+            ]
+          }
+        }
+      ],
       "description": "Properties for SYSTEM features storing application state",
       "properties": {
         "active_storyboard_id": {
@@ -257,28 +374,36 @@
             "null"
           ]
         },
-        "bbox": {
-          "description": "Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state",
-          "items": {
-            "type": "number"
-          },
+        "current_time": {
+          "description": "Playhead position at save (ISO-8601). When present, must lie within [start_time, end_time] (enforced by the load validator, not the schema).",
+          "format": "date-time",
           "type": [
-            "array",
+            "string",
             "null"
           ]
         },
-        "center": {
-          "description": "Map center [longitude, latitude] - for spatial state",
-          "items": {
-            "type": "number"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
+        "display_mode": {
+          "$ref": "#/$defs/DisplayModeEnum",
+          "description": "Track visualization mode for this plot."
         },
         "end_time": {
-          "description": "Viewport end time (ISO8601) - for temporal state",
+          "description": "Analytical window end (ISO8601) - for temporal state",
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "filter_end_time": {
+          "description": "Visible-window filter end (ISO-8601). Absent = unbounded end.",
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "filter_start_time": {
+          "description": "Visible-window filter start (ISO-8601). Absent = unbounded start.",
           "format": "date-time",
           "type": [
             "string",
@@ -290,6 +415,15 @@
           "const": "SYSTEM",
           "description": "Feature type discriminator"
         },
+        "playback_rate": {
+          "description": "Playback speed multiplier for this plot (0.1-100).",
+          "maximum": 100.0,
+          "minimum": 0.1,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
         "provenance": {
           "description": "PROV-aligned provenance records (append-only log of tool operations)",
           "items": {
@@ -297,6 +431,15 @@
           },
           "type": [
             "array",
+            "null"
+          ]
+        },
+        "rotation": {
+          "description": "Map rotation in degrees (0-360).",
+          "maximum": 360,
+          "minimum": 0,
+          "type": [
+            "number",
             "null"
           ]
         },
@@ -310,8 +453,15 @@
             "null"
           ]
         },
+        "selected_primary": {
+          "description": "Primary selection path for properties display.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "start_time": {
-          "description": "Viewport start time (ISO8601) - for temporal state",
+          "description": "Analytical window start (ISO8601) - for temporal state",
           "format": "date-time",
           "type": [
             "string",
@@ -322,12 +472,27 @@
           "$ref": "#/$defs/SystemStateTypeEnum",
           "description": "Discriminator for state variant (temporal, spatial, selection, active_storyboard)"
         },
-        "zoom": {
-          "description": "Map zoom level - for spatial state",
-          "type": [
-            "number",
-            "null"
-          ]
+        "step_size": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TimeStep"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Playback step granularity for this plot."
+        },
+        "viewport": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ViewportPolygon"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Saved map viewport (ViewportPolygon). Identity-mapped to SpatialSlice.viewport."
         }
       },
       "required": [
@@ -346,6 +511,39 @@
         "active_storyboard"
       ],
       "title": "SystemStateTypeEnum",
+      "type": "string"
+    },
+    "TimeStep": {
+      "additionalProperties": false,
+      "description": "Step size for discrete time navigation (FR-008)",
+      "properties": {
+        "unit": {
+          "$ref": "#/$defs/TimeUnitEnum",
+          "description": "Unit of the step"
+        },
+        "value": {
+          "description": "Numeric step value",
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "TimeStep",
+      "type": "object"
+    },
+    "TimeUnitEnum": {
+      "description": "Units for time step navigation",
+      "enum": [
+        "millisecond",
+        "second",
+        "minute",
+        "hour",
+        "day"
+      ],
+      "title": "TimeUnitEnum",
       "type": "string"
     },
     "TuneAnnotation": {
@@ -377,6 +575,33 @@
         "new_value"
       ],
       "title": "TuneAnnotation",
+      "type": "object"
+    },
+    "ViewportPolygon": {
+      "additionalProperties": false,
+      "description": "Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)",
+      "properties": {
+        "coordinates": {
+          "description": "Four corners in clockwise order [NW, NE, SE, SW]",
+          "items": {
+            "$ref": "#/$defs/Coordinate"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        },
+        "zoom": {
+          "description": "Map zoom level for restoring the view (optional)",
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "ViewportPolygon",
       "type": "object"
     },
     "WasGeneratedBy": {
