@@ -32,7 +32,7 @@ describe('active_storyboard via the shared helper', () => {
     const out = writeSystemStateIntoFeatureCollection(emptyFc(), {
       active_storyboard: { active_storyboard_id: 'sb-42' },
     });
-    const map = readSystemStateFromFeatureCollection(out);
+    const { map } = readSystemStateFromFeatureCollection(out);
     expect(activeStoryboardVariantToId(map.active_storyboard)).toBe('sb-42');
   });
 

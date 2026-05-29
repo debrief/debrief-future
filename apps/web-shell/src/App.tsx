@@ -73,10 +73,12 @@ import {
   hydrateStoreFromFeatures,
   mirrorViewStateIntoFeatures,
   SystemStateLoadError,
+  type PlayheadClampDiagnostic,
 } from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
 import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
+import { buildPlayheadClampMessage, PLAYHEAD_CLAMP_NOTICE_MS } from './playheadClampMessage';
 import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
 import {
   StoryboardEditHarness,
@@ -274,6 +276,21 @@ export default function App() {
   const [logSelectedEntryId, setLogSelectedEntryId] = useState<string | null>(null);
   const [logFilterState, setLogFilterState] = useState<LogFilterState>(LOG_DEFAULT_FILTER_STATE);
   const [logNotification, setLogNotification] = useState<string | null>(null);
+  // #267 — non-blocking, always-visible clamp notice for an orphaned playhead
+  // adjusted on load. NOT the LogPanel transient (that is tab-gated and does not
+  // render a notice set while the Log tab is unmounted) and NOT the #259 error
+  // banner (this is a recovery, not a failure).
+  const [playheadClampNotice, setPlayheadClampNotice] = useState<string | null>(null);
+
+  // #267 — surface the non-blocking clamp notice (auto-dismiss). No-op when no
+  // playhead was clamped (valid plots stay silent — FR-009).
+  const surfacePlayheadClamp = useCallback((clamps: readonly PlayheadClampDiagnostic[]): void => {
+    const message = buildPlayheadClampMessage(clamps);
+    if (message !== null) {
+      setPlayheadClampNotice(message);
+      setTimeout(() => setPlayheadClampNotice(null), PLAYHEAD_CLAMP_NOTICE_MS);
+    }
+  }, []);
 
   // Counter for generating unique activity IDs
   const [activityCounter, setActivityCounter] = useState(0);
@@ -587,8 +604,12 @@ export default function App() {
       // Strict-on-import: a malformed/duplicate/cross-field-invalid SystemState
       // feature surfaces the same error banner as a Storyboard validation
       // failure (FR-011/FR-012).
+      let playheadClamps: PlayheadClampDiagnostic[] = [];
       try {
-        hydrateStoreFromFeatures(freshStore.getState(), plotData.features as DebriefFeature[]);
+        playheadClamps = hydrateStoreFromFeatures(
+          freshStore.getState(),
+          plotData.features as DebriefFeature[],
+        );
       } catch (err) {
         if (err instanceof SystemStateLoadError) {
           setPlotLoadError({ code: err.kind, message: err.message });
@@ -596,6 +617,9 @@ export default function App() {
         }
         throw err;
       }
+      // spec 267 (FR-003): an orphaned playhead was clamped to the window edge
+      // on load — surface a non-blocking notice. Never silent (Article I.3).
+      surfacePlayheadClamp(playheadClamps);
 
       // Clear undo history — initialization isn't a user action
       freshStore.getState().clearHistory();
@@ -642,7 +666,7 @@ export default function App() {
       console.error('Failed to load plot:', error);
     }
     })();
-  }, []);
+  }, [surfacePlayheadClamp]);
 
   // Handle back to catalog
   const handleBackToCatalog = useCallback(() => {
@@ -673,8 +697,9 @@ export default function App() {
       const fresh = getSessionStore();
       window.__sessionStore = fresh;
       fresh.getState().setFeatureCollectionUri(itemPath);
+      let playheadClamps: PlayheadClampDiagnostic[] = [];
       try {
-        hydrateStoreFromFeatures(fresh.getState(), features as DebriefFeature[]);
+        playheadClamps = hydrateStoreFromFeatures(fresh.getState(), features as DebriefFeature[]);
       } catch (err) {
         if (err instanceof SystemStateLoadError) {
           setPlotLoadError({ code: err.kind, message: err.message });
@@ -682,6 +707,8 @@ export default function App() {
         }
         throw err;
       }
+      // spec 267 (FR-003): non-blocking clamp notice on the transfer/test path too.
+      surfacePlayheadClamp(playheadClamps);
       fresh.getState().clearHistory();
       fresh.getState().markClean();
       const transferredFc: PlotState['features'] = {
@@ -696,7 +723,7 @@ export default function App() {
       delete window.__backToCatalog;
       delete window.__openPlotFromFeatures;
     };
-  }, [handlePlotSelect, handleBackToCatalog]);
+  }, [handlePlotSelect, handleBackToCatalog, surfacePlayheadClamp]);
 
   // Restore original features for a reverted activity
   const restoreSnapshots = useCallback((aid: string) => {
@@ -1967,6 +1994,26 @@ export default function App() {
           Reset Layout
         </button>
       </header>
+
+      {/* #267 — non-blocking playhead-clamp notice. Always visible (not tab-gated),
+          auto-dismisses, and is visually distinct from the #259 error banner. */}
+      {playheadClampNotice !== null && (
+        <div
+          role="status"
+          data-testid="playhead-clamp-toast"
+          style={{
+            background: '#78350f',
+            color: '#fef3c7',
+            padding: '8px 16px',
+            borderBottom: '1px solid #f59e0b',
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '13px',
+            lineHeight: '1.4',
+          }}
+        >
+          {playheadClampNotice}
+        </div>
+      )}
 
       {toolMessage && (
         <div className="web-shell__tool-message" role="status">

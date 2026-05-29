@@ -11,4 +11,7 @@ export {
   hydrateStoreFromFeatures,
   SystemStateLoadError,
   type FeatureLike,
+  // spec 267 — the tolerant-clamp diagnostic the load path may return so the
+  // command call-sites can type the value they surface to the analyst.
+  type PlayheadClampDiagnostic,
 } from '@debrief/session-state';

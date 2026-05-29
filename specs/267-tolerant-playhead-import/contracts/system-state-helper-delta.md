@@ -29,7 +29,7 @@ Host call sites: `apps/vscode/src/commands/openPlot.ts:180` (+ wrapper `apps/vsc
 ```typescript
 export interface PlayheadClampDiagnostic {
   readonly kind: 'playhead-clamped';
-  readonly featureId: string;
+  readonly feature_id: string;             // snake_case per ADR-010 (lint-enforced)
   readonly edge: 'start' | 'end';
   readonly originalCurrentTime: string;   // ISO-8601, verbatim from the file
   readonly clampedCurrentTime: string;    // ISO-8601 — exactly start_time (edge:'start') or end_time (edge:'end')
@@ -90,7 +90,7 @@ if (res.status === 'recoverable-playhead') {
   temporal = { ...v, current_time: res.clampedCurrentTime };   // typed copy, in-window before it enters the map
   playheadClamps.push({
     kind: 'playhead-clamped',
-    featureId: featureId(f),
+    feature_id: featureId(f),
     edge: res.edge,
     originalCurrentTime: v.current_time as string,
     clampedCurrentTime: res.clampedCurrentTime,
@@ -128,7 +128,7 @@ Body: `const { map, playheadClamps } = readSystemStateFromFeatureCollection(fc);
 ## Δ5 — Host rendering (no helper change; consume the return)
 
 - **VS Code** `apps/vscode/src/commands/openPlot.ts` (~line 180): capture `const clamps = hydrateStoreFromFeatures(...)`; after the `try`, if `clamps.length > 0` show a non-blocking `vscode.window.showWarningMessage(...)`. The existing `catch (SystemStateLoadError) → showErrorMessage` stays for fatal cases. Apply the same in the wrapper `apps/vscode/src/services/systemStateBridge.ts` if it narrows the return type. (Per-plot load → at most one clamp; coalescing dropped at review.)
-- **web-shell** `apps/web-shell/src/App.tsx` (lines 591, 677): capture the return at both hydrate call sites; surface a non-blocking message by reusing the existing `logNotification` transient (App.tsx:276, auto-dismiss) — not the #259 error banner.
+- **web-shell** `apps/web-shell/src/App.tsx` (lines 591, 677): capture the return at both hydrate call sites; surface a non-blocking message via `surfacePlayheadClamp`. **Implementation note (deviation from plan):** the originally-planned `logNotification` transient (App.tsx:276) renders inside the LogPanel, which is *tab-gated* — it does not render a notice set while the Log tab is unmounted, the exact load-time case here. So this ships a dedicated, always-visible, auto-dismissing App-level toast (`data-testid="playhead-clamp-toast"`, amber/info styling) instead — still non-blocking, still distinct from the #259 error banner (red). Same wording as the VS Code host via `playheadClampMessage.buildPlayheadClampMessage`.
 
 ---
 

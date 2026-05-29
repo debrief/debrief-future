@@ -8,6 +8,7 @@
 export {
   readSystemStateFromFeatureCollection,
 } from './read.js';
+export type { ReadSystemStateResult } from './read.js';
 export {
   writeSystemStateIntoFeatureCollection,
 } from './write.js';
@@ -32,6 +33,7 @@ export {
   activeStoryboardSchema,
   checkTemporalCrossField,
 } from './validate.js';
+export type { TemporalCrossFieldResult } from './validate.js';
 export {
   buildWriteInputFromStore,
   applyStateToFeatures,
@@ -52,4 +54,5 @@ export type {
   ActiveStoryboardVariant,
   SystemStateMap,
   SystemStateWriteInput,
+  PlayheadClampDiagnostic,
 } from './types.js';

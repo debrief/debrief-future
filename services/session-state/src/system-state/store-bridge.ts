@@ -25,7 +25,12 @@ import {
   spatialVariantToSlice,
   selectionVariantToSlice,
 } from './mapping.js';
-import type { PlotFeature, PlotFeatureCollection, SystemStateWriteInput } from './types.js';
+import type {
+  PlayheadClampDiagnostic,
+  PlotFeature,
+  PlotFeatureCollection,
+  SystemStateWriteInput,
+} from './types.js';
 import type { TemporalSlice } from '../types/temporal.js';
 import type { SpatialSlice } from '../types/spatial.js';
 import type { FeaturesSlice } from '../types/features.js';
@@ -124,16 +129,23 @@ export function mirrorViewStateIntoFeatures(
 /**
  * Hydrate the store's temporal / spatial / selection slices and per-feature
  * hidden set from a loaded FeatureCollection (FR-007). Throws
- * `SystemStateLoadError` on malformed / duplicate / cross-field-invalid
+ * `SystemStateLoadError` on malformed / duplicate / FATAL cross-field-invalid
  * SystemState features (strict-on-import, FR-011/FR-012). Absence of a variant
  * leaves the store at its current value (FR-008).
+ *
+ * Spec 267: returns the `PlayheadClampDiagnostic[]` produced when an orphaned
+ * playhead was clamped to the window edge (the store's `currentTime` receives
+ * the in-window value via the unchanged `temporalVariantToSlice`). `[]` when no
+ * clamp occurred. The host renders a non-blocking notification for each entry
+ * (Article IV.1 — the helper emits data, never UI). Both hosts call this single
+ * function, so the tolerant rule is exercised identically (SC-007).
  */
 export function hydrateStoreFromFeatures(
   state: ViewStateStore,
   features: ReadonlyArray<FeatureLike>,
-): void {
+): PlayheadClampDiagnostic[] {
   const fc = toFc(features);
-  const map = readSystemStateFromFeatureCollection(fc); // may throw SystemStateLoadError
+  const { map, playheadClamps } = readSystemStateFromFeatureCollection(fc); // may throw SystemStateLoadError
 
   const temporal = temporalVariantToSlice(map.temporal);
   if (temporal.timeRange !== undefined) {
@@ -169,4 +181,6 @@ export function hydrateStoreFromFeatures(
   }
 
   state.setHiddenFeatures(readHiddenFeatureIds(fc));
+
+  return playheadClamps;
 }

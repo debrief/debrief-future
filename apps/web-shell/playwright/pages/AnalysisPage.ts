@@ -586,6 +586,37 @@ export class AnalysisPage {
   // Drawing state introspection (#108)
   // ─────────────────────────────────────────────────────────────────────────────
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Playhead-clamp notification (#267)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * The non-blocking clamp notification surfaced when an orphaned saved playhead
+   * is moved to the window edge on load (spec 267, FR-003). An always-visible,
+   * auto-dismissing App-level toast (not tab-gated), distinct from the #259
+   * error banner.
+   */
+  get clampNotification(): Locator {
+    return this.page.getByTestId('playhead-clamp-toast');
+  }
+
+  /**
+   * Read the session-state playhead (`currentTime`, epoch ms) via the
+   * `window.__sessionStore` test-introspection handle. Used to assert the
+   * playhead landed on the window edge after a tolerant clamp.
+   */
+  async getCurrentTime(): Promise<number | null> {
+    return await this.page.evaluate(() => window.__sessionStore.getState().currentTime);
+  }
+
+  /**
+   * Read the session-state time window (`timeRange`, epoch ms) so a test can
+   * assert the clamped playhead equals the window's `start`/`end`.
+   */
+  async getTimeRange(): Promise<{ start: number; end: number } | null> {
+    return await this.page.evaluate(() => window.__sessionStore.getState().timeRange);
+  }
+
   /**
    * Read the current drawingMode from the session-state store via the
    * test-introspection handle exposed at `window.__sessionStore`. Used by

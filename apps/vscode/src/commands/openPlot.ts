@@ -5,7 +5,8 @@
 import * as vscode from 'vscode';
 import { readFile } from 'fs/promises';
 import { createLogService, createSnapshotService, createTimeInstant, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
-import { hydrateStoreFromFeatures, SystemStateLoadError } from '../services/systemStateBridge';
+import { hydrateStoreFromFeatures, SystemStateLoadError, type PlayheadClampDiagnostic } from '../services/systemStateBridge';
+import { notifyPlayheadClamps } from '../services/playheadClampNotice';
 import type { StacWriter } from '@debrief/stac-writer';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
@@ -176,8 +177,9 @@ export function createOpenPlotCommand(
     // plot is self-describing. Absence of a SystemState variant leaves the store
     // at its defaults (FR-008). Malformed / duplicate / cross-field-invalid
     // SystemState features fail loudly (strict-on-import, FR-011/FR-012).
+    let playheadClamps: PlayheadClampDiagnostic[] = [];
     try {
-      hydrateStoreFromFeatures(session.getState(), plotData.features);
+      playheadClamps = hydrateStoreFromFeatures(session.getState(), plotData.features);
     } catch (err) {
       if (err instanceof SystemStateLoadError) {
         void vscode.window.showErrorMessage(
@@ -187,6 +189,12 @@ export function createOpenPlotCommand(
         throw err;
       }
     }
+    // spec 267 (FR-003): an orphaned playhead (out-of-window current_time inside
+    // a coherent window) is clamped on load — never silent. Surface a
+    // non-blocking warning naming the edge it moved to. A fatal cross-field
+    // error (incoherent window) was already surfaced as an error above and
+    // leaves `playheadClamps` empty, so the two paths never collide.
+    notifyPlayheadClamps(playheadClamps);
 
     // Set as active document
     sessionManager.setActiveDocument(plotUri);

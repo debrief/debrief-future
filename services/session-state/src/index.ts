@@ -127,6 +127,9 @@ export {
   type ActiveStoryboardVariant,
   type SystemStateMap,
   type SystemStateWriteInput,
+  type PlayheadClampDiagnostic,
+  type ReadSystemStateResult,
+  type TemporalCrossFieldResult,
 } from './system-state/index.js';
 
 // Log Service (Feature: 071)
