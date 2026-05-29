@@ -17,8 +17,8 @@ Alias: end_datetime
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
 | [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
+| [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
 
 
 

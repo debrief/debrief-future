@@ -17,8 +17,8 @@ Alias: input_state
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [LogEntry](../classes/LogEntry.md) | A PROV-aligned provenance record stored on GeoJSON features |  no  |
 | [ToolResultForLog](../classes/ToolResultForLog.md) | Persisted tool-result shape written by the live tool-result logger and read b... |  no  |
+| [LogEntry](../classes/LogEntry.md) | A PROV-aligned provenance record stored on GeoJSON features |  no  |
 
 
 
