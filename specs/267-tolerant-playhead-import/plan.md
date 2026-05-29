@@ -74,10 +74,11 @@ services/session-state/src/system-state/
 ├── types.ts             # MODIFY — add the PlayheadClampDiagnostic interface
 ├── validate.ts          # MODIFY — checkTemporalCrossField returns TemporalCrossFieldResult
 │                         #          (fatal | recoverable-playhead{edge,clampedCurrentTime} | ok)
-├── read.ts              # MODIFY — optional playheadClamps sink; on recoverable, clamp current_time
-│                         #          + push diagnostic; fatal still throws SystemStateLoadError
+├── read.ts              # MODIFY — return ReadSystemStateResult { map; playheadClamps } (review 1A);
+│                         #          on recoverable, typed-copy clamp current_time (review 2A) + push
+│                         #          diagnostic; fatal still throws SystemStateLoadError
 ├── store-bridge.ts      # MODIFY — hydrateStoreFromFeatures returns PlayheadClampDiagnostic[]
-├── index.ts             # MODIFY — export PlayheadClampDiagnostic type
+├── index.ts             # MODIFY — export PlayheadClampDiagnostic + ReadSystemStateResult types
 └── __tests__/
     ├── validate.test.ts    # MODIFY — assert fatal vs recoverable-playhead vs ok
     └── read.test.ts        # MODIFY — out-of-window clamps (was: throws); start>end still throws

@@ -69,7 +69,7 @@ description: "Task list for 267-tolerant-playhead-import"
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: The diagnostic type, the severity-split cross-field check, the `read.ts` clamp + sink, the `store-bridge` return, and the re-exports — all consumed by BOTH stories.
+**Purpose**: The diagnostic type, the severity-split cross-field check, the `read.ts` clamp + explicit `{ map, playheadClamps }` return, the `store-bridge` return, and the re-exports — all consumed by BOTH stories.
 
 **⚠️ CRITICAL**: Blocks US1 and US2. Depends on T001.
 
@@ -217,7 +217,7 @@ description: "Task list for 267-tolerant-playhead-import"
 ### Incremental Delivery
 
 1. **Confirm (T001)** — 261 is merged; verify the surfaces match (quick).
-2. **Foundation (Phase 2)** — the diagnostic type, the `checkTemporalCrossField` severity split, the `read.ts` clamp + sink, the `hydrateStoreFromFeatures` return, the re-exports. Unit-green before any story.
+2. **Foundation (Phase 2)** — the diagnostic type, the `checkTemporalCrossField` severity split, the `read.ts` clamp + explicit `{ map, playheadClamps }` return, the `hydrateStoreFromFeatures` return, the re-exports. Unit-green before any story.
 3. **US1 (tolerant path)** — wire the host notifications + E2E. Ship → orphaned playheads open, clamp, notify (every load until healed), heal on save.
 4. **US2 (guard rail)** — verify the incoherent-window hard fail survives end-to-end. Keeps the relaxation honest (the XIV.4 exception's justification).
 5. **Polish** — `task verify`, evidence + screenshots, feature post from the cached opener, update PR #650 via `/speckit.pr`.

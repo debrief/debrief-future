@@ -28,7 +28,7 @@ pnpm --filter @debrief/session-state test read
 ```
 
 Expect:
-- A temporal `SystemState` with `current_time` after `end_time` → `read` does NOT throw; `map.temporal.current_time === end_time`; with a `playheadClamps` sink, one `PlayheadClampDiagnostic{edge:'end'}` is pushed.
+- A temporal `SystemState` with `current_time` after `end_time` → `read` does NOT throw; `result.map.temporal.current_time === end_time`; `result.playheadClamps` has one `PlayheadClampDiagnostic{edge:'end'}`.
 - `start_time > end_time` → still throws `SystemStateLoadError(kind='cross-field-invariant')`.
 - Both defects on one feature → throws (precedence; clamp never attempted).
 

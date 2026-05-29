@@ -10,13 +10,13 @@ There were no `NEEDS CLARIFICATION` markers in the Technical Context — the sta
 
 ## R-001 — Where does the clamp + diagnostic live? *(reconciled to 261 as merged)*
 
-**Decision**: The clamp decision is computed in `validate.ts`'s `checkTemporalCrossField` (which is refactored to return a severity-split `TemporalCrossFieldResult`), and **applied in `read.ts`** — the existing throw site. `read.ts` gains an optional `playheadClamps` sink; on the `recoverable-playhead` result it sets the parsed `current_time` to the window boundary and pushes a `PlayheadClampDiagnostic`. `start>end`/unparseable stay `fatal` and still throw. `store-bridge.hydrateStoreFromFeatures` owns the sink and returns it to the host.
+**Decision**: The clamp decision is computed in `validate.ts`'s `checkTemporalCrossField` (which is refactored to return a severity-split `TemporalCrossFieldResult`), and **applied in `read.ts`** — the existing throw site. `read.ts` changes its return type to an explicit `ReadSystemStateResult { map; playheadClamps }` (review 1A); on the `recoverable-playhead` result it builds a typed copy of the variant with `current_time` set to the window boundary (review 2A — no `as`-cast, no mutation) and pushes a `PlayheadClampDiagnostic`. `start>end`/unparseable stay `fatal` and still throw. `store-bridge.hydrateStoreFromFeatures` destructures `{ map, playheadClamps }` and returns the clamps to the host.
 
 **Why this differs from the original plan**: the original R-001 targeted an `applyTemporalReconciliation` function and a `validate.ts`-only throw. **Neither matches 261 as merged.** 261 has no `reconcile.ts` and no `applyTemporalReconciliation`; the *only* place that throws `cross-field-invariant` is `read.ts` (driven by `checkTemporalCrossField`'s string return); and the both-host load entry is `store-bridge.hydrateStoreFromFeatures` (not `persistence/load.ts`, which doesn't exist). So the clamp must live where the throw lives — `read.ts` — which is also the only place holding the `featureId`, the parsed `TemporalVariant`, and the verdict together.
 
 **Rationale**:
 - `read.ts` already holds everything the diagnostic needs (`featureId`, the variant, the cross-field verdict). Clamping the value *before* it enters the `SystemStateMap` means the downstream `temporalVariantToSlice` (ISO→epoch) needs **no change** — it converts the already-in-window value.
-- An **optional** sink keeps `read`'s signature backward-compatible for its ~6 existing callers/tests (they pass one arg and simply recover instead of throwing); only the `read.test.ts` case that asserted a throw must flip to assert a clamp.
+- An **explicit return** (`{ map, playheadClamps }`) — chosen at /speckit.review over an optional mutable sink — makes the diagnostics a visible value rather than a forgettable out-param (the sink risked a *silent* clamp if a host forgot to pass/read it, breaking Article I.3). The ~6 existing callers/tests migrate mechanically to destructure `.map`; the `read.test.ts` case that asserted a throw flips to assert a clamp on `result.playheadClamps`.
 - Keeping `fatal` in `read.ts`'s throw path preserves 261's strict-on-import for incoherent windows — the plot fails before any store hydration (FR-005).
 
 **Alternatives rejected**:
@@ -97,7 +97,7 @@ All of R-001 and R-002 above are the reconciled positions. The contract delta an
 
 | ID | Decision *(reconciled to 261 as merged, 2026-05-29)* |
 |---|---|
-| R-001 | Clamp decision in `checkTemporalCrossField` (severity-split result); applied in `read.ts` via an optional `playheadClamps` sink; `store-bridge.hydrateStoreFromFeatures` returns it. No `reconcile.ts` (doesn't exist). |
+| R-001 | Clamp decision in `checkTemporalCrossField` (severity-split result); applied in `read.ts` via an explicit `{ map, playheadClamps }` return (review 1A) + typed-copy clamp (review 2A); `store-bridge.hydrateStoreFromFeatures` returns it. No `reconcile.ts` (doesn't exist). |
 | R-002 | **No provenance written** — 261 ships view-state markers provenance-free (FR-013). The repeating non-blocking notification (every load until healed) is the durable-until-healed record. Old provenance task removed; FR-007 revised. |
 | R-003 | Reuse host-native non-modal surfaces (`showWarningMessage` / web-shell `logNotification`); warning severity. Coalescing **dropped** (per-plot loads; deferred to backlog). |
 | R-004 | Compare in epoch (`Date.parse`); the clamped value is the boundary's verbatim ISO string (no reformat drift). |
