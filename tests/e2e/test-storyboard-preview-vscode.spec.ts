@@ -15,7 +15,7 @@
  * blocked under code-server (#143 — driving the map webview iframe), so a
  * 3-scene Storyboard is injected into the workspace's Exercise Alpha plot in
  * `beforeAll` (over the HMS Defender / USS Freedom tracks, referencing them by
- * their top-level GeoJSON id per ADR-035) and removed again in `afterAll`. The
+ * their top-level GeoJSON id per ADR-038) and removed again in `afterAll`. The
  * Preview *launch* (loopback server → external browser tab) is not automated:
  * it's a webview-button click the code-server proxy rewrites against the
  * `Host`-allowlisted loopback URL, and the launched player is byte-identical

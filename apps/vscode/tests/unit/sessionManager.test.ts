@@ -435,8 +435,9 @@ describe('SessionManager', () => {
 
     it('should return true for hasDirtySessions when session is modified', () => {
       const session = sessionManager.createSession('uri1', createMockPlotData());
-      // Modify the session to make it dirty
-      session.getState().setSelection(['track-1'], 'track-1');
+      // Feature 261 (FR-021): a content edit marks dirty (view-state
+      // changes like setSelection are exploration and do not — FR-019).
+      session.getState().markDirty();
 
       expect(sessionManager.hasDirtySessions()).toBe(true);
     });
@@ -453,20 +454,20 @@ describe('SessionManager', () => {
       session1.getState().markClean();
       session2.getState().markClean();
 
-      // Make only session1 dirty
-      session1.getState().setSelection(['track-1'], 'track-1');
+      // Make only session1 dirty (content edit — FR-021)
+      session1.getState().markDirty();
 
       expect(sessionManager.getDirtySessionCount()).toBe(1);
 
-      // Make session2 dirty too
-      session2.getState().setSelection(['track-2'], 'track-2');
+      // Make session2 dirty too (content edit — FR-021)
+      session2.getState().markDirty();
 
       expect(sessionManager.getDirtySessionCount()).toBe(2);
     });
 
     it('should update dirty count when session is marked clean', () => {
       const session = sessionManager.createSession('uri1', createMockPlotData());
-      session.getState().setSelection(['track-1'], 'track-1');
+      session.getState().markDirty();
 
       expect(sessionManager.getDirtySessionCount()).toBe(1);
 

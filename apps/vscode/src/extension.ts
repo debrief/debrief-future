@@ -372,7 +372,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       const hiddenIds = new Set(state?.hiddenFeatureIds ?? []);
       const visibleFeatureIds: string[] = [];
       for (const f of features) {
-        // ADR-035: canonical identity is the top-level GeoJSON `id`.
+        // ADR-038: canonical identity is the top-level GeoJSON `id`.
         const id = getPlotFeatureId(f);
         if (id === undefined) {continue;}
         if (hiddenIds.has(id)) {continue;}

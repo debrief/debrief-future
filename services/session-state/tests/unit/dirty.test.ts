@@ -1,7 +1,12 @@
 /**
  * Dirty tracking tests.
  * Feature: 024-document-session-state
- * Phase 7: User Story 5
+ * Updated: 261-session-state-systemstate (FR-019/FR-021).
+ *
+ * Contract (261): view-state changes are exploration and MUST NOT mark the plot
+ * dirty (FR-019); only substantive content edits set the dirty flag, via the
+ * Log Service `markDirty()` (FR-021). An explicit save still persists the
+ * current view regardless of the dirty flag (FR-020 — host concern).
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -21,32 +26,48 @@ describe('Dirty Tracking', () => {
       expect(store.getState().dirty).toBe(false);
     });
 
-    it('should become dirty after persistent state change', () => {
-      store.getState().setPlaybackRate(2.0);
+    it('markDirty() (content-edit mechanism) marks the plot dirty (FR-021)', () => {
+      store.getState().markDirty();
       expect(store.getState().dirty).toBe(true);
     });
 
     it('should become clean after markClean', () => {
-      store.getState().setPlaybackRate(2.0);
+      store.getState().markDirty();
       expect(store.getState().dirty).toBe(true);
-
       store.getState().markClean();
       expect(store.getState().dirty).toBe(false);
     });
+  });
 
-    it('should track dirty for spatial changes', () => {
+  describe('view-state changes are exploration (FR-019)', () => {
+    it('setPlaybackRate does NOT mark dirty', () => {
+      store.getState().setPlaybackRate(2.0);
+      expect(store.getState().dirty).toBe(false);
+    });
+
+    it('setRotation does NOT mark dirty', () => {
       store.getState().setRotation(45);
-      expect(store.getState().dirty).toBe(true);
+      expect(store.getState().dirty).toBe(false);
     });
 
-    it('should track dirty for feature selection changes', () => {
+    it('setSelection does NOT mark dirty', () => {
       store.getState().setSelection(['f1'], 'f1');
-      expect(store.getState().dirty).toBe(true);
+      expect(store.getState().dirty).toBe(false);
     });
 
-    it('should track dirty for hidden features changes', () => {
+    it('setHiddenFeatures (hide/reveal) does NOT mark dirty', () => {
       store.getState().setHiddenFeatures(['f1']);
-      expect(store.getState().dirty).toBe(true);
+      expect(store.getState().dirty).toBe(false);
+    });
+
+    it('setCurrentTime / setTimeRange / setTimeFilter / setStepSize / setDisplayMode do NOT mark dirty', () => {
+      const s = store.getState();
+      s.setCurrentTime(Date.now());
+      s.setTimeRange({ start: 0, end: 1000 });
+      s.setTimeFilter({ start: 100, end: 900 });
+      s.setStepSize({ value: 5, unit: 'minute' });
+      s.setDisplayMode('trail');
+      expect(store.getState().dirty).toBe(false);
     });
   });
 
@@ -71,7 +92,7 @@ describe('Dirty Tracking', () => {
         callbacks.push(dirty);
       });
 
-      store.getState().setPlaybackRate(2.0);
+      store.getState().markDirty();
       expect(callbacks).toContain(true);
 
       store.getState().markClean();
@@ -80,14 +101,15 @@ describe('Dirty Tracking', () => {
       unsubscribe();
     });
 
-    it('should not notify for non-dirty changes', () => {
+    it('should not notify for view-state-only changes (FR-019)', () => {
       const callbacks: boolean[] = [];
       const unsubscribe = subscribeToDirty(store, (dirty) => {
         callbacks.push(dirty);
       });
 
-      // Ephemeral change should not trigger
       store.getState().setPlaybackState('playing');
+      store.getState().setRotation(30);
+      store.getState().setSelection(['f1']);
       expect(callbacks.length).toBe(0);
 
       unsubscribe();
@@ -100,39 +122,16 @@ describe('Dirty Tracking', () => {
       expect(hasUnsavedChangesSelector(state)).toBe(false);
     });
 
-    it('should return true when dirty', () => {
-      store.getState().setPlaybackRate(2.0);
+    it('should return true after a content edit (markDirty)', () => {
+      store.getState().markDirty();
       const state = store.getState();
       expect(hasUnsavedChangesSelector(state)).toBe(true);
     });
   });
 
-  describe('dirty after undo', () => {
-    it('should remain dirty after undo if different from saved state', () => {
-      store.getState().setPlaybackRate(2.0);
-      store.getState().markClean();
-      store.getState().setPlaybackRate(3.0);
-      expect(store.getState().dirty).toBe(true);
-
-      store.getState().undo();
-      // After undo, we're back to saved state, but dirty tracking is simple
-      // It doesn't compare with saved state, just tracks if changes occurred
-      // This is expected behavior - dirty just means "changed since last markClean"
-    });
-
-    it('should become dirty after undo from clean state', () => {
-      store.getState().setPlaybackRate(2.0);
-      store.getState().markClean();
-
-      store.getState().undo();
-      // Undo changes state from saved point, so it should be dirty
-      expect(store.getState().dirty).toBe(true);
-    });
-  });
-
   describe('reset behavior', () => {
     it('should be clean after reset', () => {
-      store.getState().setPlaybackRate(2.0);
+      store.getState().markDirty();
       expect(store.getState().dirty).toBe(true);
 
       store.getState().reset();
@@ -141,12 +140,6 @@ describe('Dirty Tracking', () => {
   });
 
   describe('savePath interaction', () => {
-    it('should become dirty when savePath changes', () => {
-      store.getState().setSavePath('/new/path.json');
-      // savePath is part of document state but not a "persistent" field
-      // The actual dirty flag depends on whether other persistent fields changed
-    });
-
     it('should track savePath independently', () => {
       store.getState().setSavePath('/path/to/session.json');
       expect(store.getState().savePath).toBe('/path/to/session.json');

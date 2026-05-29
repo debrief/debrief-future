@@ -22,14 +22,6 @@ import type { BrowserFilterSlice, BrowserFilterActions } from './browser-filter.
 import type { PlotSlice, PlotActions } from './plot.js';
 
 /**
- * Schema version for persistence compatibility (FR-026).
- *
- * Bumped to 1.1.0 by feature 203 (spatial types consolidation): ViewportPolygon
- * coordinates switch from tuple form `[lon, lat]` to object form
- * `{ longitude, latitude }`, handled inline at load time by `coerceViewport`.
- */
-export const SCHEMA_VERSION = '1.1.0';
-
 /**
  * Complete session state combining all slices (FR-001, FR-002).
  * This is the flat store structure used by Zustand.
@@ -83,25 +75,9 @@ export interface SessionActions
   reset: () => void;
 }
 
-/**
- * Persistent state - what gets saved to file (FR-024).
- * Excludes ephemeral fields: playbackState, dirty, undo/redo stacks.
- */
-export interface PersistentSessionState {
-  schemaVersion: string;
-  savedAt: string;
-  temporal: Omit<TemporalSlice, 'playbackState'>;
-  // Spec 260: ephemeral spatial fields (viewportLocked + the pre-existing
-  // drawingMode / drawingPaletteIndex) are excluded structurally per
-  // Constitution Article IV.5. Adding another ephemeral spatial field is a
-  // one-line edit here; tsc enforces that extractPersistentState does not
-  // re-introduce them at the boundary.
-  spatial: Omit<
-    SpatialSlice,
-    'viewportLocked' | 'drawingMode' | 'drawingPaletteIndex'
-  >;
-  features: FeaturesSlice;
-}
+// PersistentSessionState (the `.debrief-session` sidecar's on-disk shape) was
+// removed in feature 261 together with the sidecar I/O. Plot state now lives in
+// features.geojson as SystemState features + per-feature `visible` flags.
 
 /**
  * State snapshot for undo/redo history.

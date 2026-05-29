@@ -317,7 +317,7 @@ async function captureSceneInner(
   const zoom = viewport.zoom;
   const visibleIds: string[] = [];
   for (const f of features) {
-    // ADR-035: canonical identity is the top-level GeoJSON `id`.
+    // ADR-038: canonical identity is the top-level GeoJSON `id`.
     // `properties.id` is absent on data features (Tracks), so reading it
     // here silently dropped every Track from `visible_feature_ids`.
     const rawId = getPlotFeatureId(f);

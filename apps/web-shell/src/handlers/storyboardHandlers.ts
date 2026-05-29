@@ -293,7 +293,7 @@ export function createStoryboardHandlers(
       const hidden = new Set(sessionState.hiddenFeatureIds);
       const visibleIds: string[] = [];
       for (const f of fc.features) {
-        // ADR-035: canonical identity is the top-level GeoJSON `id`.
+        // ADR-038: canonical identity is the top-level GeoJSON `id`.
         const rawId = getPlotFeatureId(f);
         if (rawId === undefined) continue;
         if (hidden.has(rawId)) continue;

@@ -1188,7 +1188,7 @@ function plotHasAnyStoryboard(plot: StoryboardPlot): boolean {
  * `visible_feature_ids` entry. Excludes Storyboard and Scene features
  * (those carry their own provenance / structure, never the underlying
  * plot data a Scene references). Uses the **top-level GeoJSON `id`** as the
- * canonical identity (ADR-035) — the same source capture now records into
+ * canonical identity (ADR-038) — the same source capture now records into
  * `visible_feature_ids`. (The prior implementation read `properties.id`,
  * which is absent on data features, so it would have failed to resolve
  * every captured Track once capture was fixed.)

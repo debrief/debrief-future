@@ -627,28 +627,50 @@ classes:
         required: true
       # Temporal viewport fields (when state_type = temporal)
       start_time:
-        description: Viewport start time (ISO8601) - for temporal state
+        description: Analytical window start (ISO8601) - for temporal state
         range: datetime
       end_time:
-        description: Viewport end time (ISO8601) - for temporal state
+        description: Analytical window end (ISO8601) - for temporal state
         range: datetime
+      current_time:
+        description: >-
+          Playhead position at save (ISO-8601). When present, must lie within
+          [start_time, end_time] (enforced by the load validator, not the schema).
+        range: datetime
+      filter_start_time:
+        description: Visible-window filter start (ISO-8601). Absent = unbounded start.
+        range: datetime
+      filter_end_time:
+        description: Visible-window filter end (ISO-8601). Absent = unbounded end.
+        range: datetime
+      display_mode:
+        description: Track visualization mode for this plot.
+        range: DisplayModeEnum
+      step_size:
+        description: Playback step granularity for this plot.
+        range: TimeStep
+      playback_rate:
+        description: Playback speed multiplier for this plot (0.1-100).
+        range: float
+        minimum_value: 0.1
+        maximum_value: 100.0
       # Spatial viewport fields (when state_type = spatial)
-      bbox:
-        description: Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state
+      viewport:
+        description: Saved map viewport (ViewportPolygon). Identity-mapped to SpatialSlice.viewport.
+        range: ViewportPolygon
+      rotation:
+        description: Map rotation in degrees (0-360).
         range: float
-        multivalued: true
-      zoom:
-        description: Map zoom level - for spatial state
-        range: float
-      center:
-        description: Map center [longitude, latitude] - for spatial state
-        range: float
-        multivalued: true
+        minimum_value: 0
+        maximum_value: 360
       # Selection state fields (when state_type = selection)
       selected_ids:
         description: Array of selected feature IDs - for selection state
         range: string
         multivalued: true
+      selected_primary:
+        description: Primary selection path for properties display.
+        range: string
       # Active-storyboard fields (when state_type = active_storyboard)
       active_storyboard_id:
         description: Storyboard properties.id the analyst last pinned for this plot (#237)
@@ -658,6 +680,45 @@ classes:
         range: LogEntry
         multivalued: true
         inlined_as_list: true
+    rules:
+      - description: temporal variant requires start_time and end_time
+        preconditions:
+          slot_conditions:
+            state_type:
+              equals_string: temporal
+        postconditions:
+          slot_conditions:
+            start_time:
+              required: true
+            end_time:
+              required: true
+      - description: spatial variant requires viewport
+        preconditions:
+          slot_conditions:
+            state_type:
+              equals_string: spatial
+        postconditions:
+          slot_conditions:
+            viewport:
+              required: true
+      - description: selection variant requires selected_ids
+        preconditions:
+          slot_conditions:
+            state_type:
+              equals_string: selection
+        postconditions:
+          slot_conditions:
+            selected_ids:
+              required: true
+      - description: active_storyboard variant requires active_storyboard_id
+        preconditions:
+          slot_conditions:
+            state_type:
+              equals_string: active_storyboard
+        postconditions:
+          slot_conditions:
+            active_storyboard_id:
+              required: true
 
   SystemState:
     description: GeoJSON Feature for storing non-spatial system state

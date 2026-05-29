@@ -1,0 +1,10 @@
+{
+  "type": "Feature",
+  "id": "state.selection",
+  "geometry": { "type": "Point", "coordinates": [] },
+  "properties": {
+    "kind": "SYSTEM",
+    "state_type": "selection",
+    "selected_ids": [1, 2]
+  }
+}

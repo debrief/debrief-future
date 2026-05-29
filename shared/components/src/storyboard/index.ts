@@ -38,7 +38,7 @@ export {
   asUlid,
   asStoryboardId,
   asSceneId,
-  // Canonical feature identity accessor (ADR-035) — reads the top-level
+  // Canonical feature identity accessor (ADR-038) — reads the top-level
   // GeoJSON `id`; never `properties.id` (absent on data features).
   getPlotFeatureId,
 } from "./types";

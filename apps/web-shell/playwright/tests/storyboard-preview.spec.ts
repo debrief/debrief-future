@@ -12,7 +12,7 @@
  *   4. Step the transport through the Scenes and capture the playback at
  *      each, plus Present mode — the media the feature post embeds.
  *
- * Regression guard for ADR-035: the captured Scenes' `visible_feature_ids`
+ * Regression guard for ADR-038: the captured Scenes' `visible_feature_ids`
  * must reference the two tracks (by their top-level GeoJSON `id`), so
  * `scopeStoryboard` carries them into the preview and the renderer draws
  * them. Before the fix, capture read the non-existent `properties.id` and
@@ -239,7 +239,7 @@ test.describe('#273 — Storyboard live Preview (web-shell)', () => {
     await popup.screenshot({ path: shot('preview-present-mode.png') });
 
     // ── Assertions (after media is captured) ───────────────────────────
-    // ADR-035 regression guard: captured Scenes reference the two tracks by
+    // ADR-038 regression guard: captured Scenes reference the two tracks by
     // their top-level id, so scopeStoryboard carries them into the preview.
     const sceneVisibleCounts = await page.evaluate(() => {
       const fc = window.__currentPlotFeatures ?? [];

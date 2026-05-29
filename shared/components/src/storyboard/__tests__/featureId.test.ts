@@ -1,5 +1,5 @@
 /**
- * Canonical feature-identity accessor tests (ADR-035).
+ * Canonical feature-identity accessor tests (ADR-038).
  *
  * `getPlotFeatureId` exists to close the defect where the storyboard
  * capture pipeline read `properties.id` to identify *data* features. The
@@ -24,7 +24,7 @@ const trackFeature: PlotFeature = {
   properties: { kind: "TRACK", platform_id: "HMS Richmond" },
 };
 
-describe("getPlotFeatureId (ADR-035 canonical identity)", () => {
+describe("getPlotFeatureId (ADR-038 canonical identity)", () => {
   it("reads the top-level `id` of a data feature that has no properties.id", () => {
     expect(getPlotFeatureId(trackFeature)).toBe(
       "749aca01-653d-4c68-99c7-4a770b871e2b",

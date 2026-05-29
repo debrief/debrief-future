@@ -10,7 +10,7 @@ coverage_pct: null
 
 > **Continuation update (2026-05-28).** While capturing live-preview evidence,
 > the preview map came up empty — root-caused to a latent identity defect
-> (ADR-035): capture read the non-existent `properties.id` on data features, so
+> (ADR-038): capture read the non-existent `properties.id` on data features, so
 > tracks were dropped from `visible_feature_ids` and the briefing rendered no
 > vessels. Fixed by routing identity through `getPlotFeatureId` (top-level
 > GeoJSON `id`) at all five collection/resolution sites, plus a lint ban on
@@ -130,9 +130,9 @@ Screenshots written to `evidence/screenshots/`:
   expectation on `SceneRow`, which #273 did not touch). All #273 Preview tests
   pass and all four evidence screenshots were captured.
 
-## Continuation (2026-05-28) — ADR-035 fix + real preview workflow E2E
+## Continuation (2026-05-28) — ADR-038 fix + real preview workflow E2E
 
-### Canonical-identity regression (ADR-035)
+### Canonical-identity regression (ADR-038)
 
 | Area | Status |
 |------|--------|
@@ -154,8 +154,8 @@ collector, and the missing-data resolver (`collectResolvableFeatureIds`).
 | Capture four Scenes at progressively tighter framings + advancing time | Pass |
 | Click **Preview** → new tab opens at `/briefing-renderer/?features=blob%3A…` | Pass |
 | Renderer reaches `ready`, transport reads `1 / 4`, OSM basemap paints | Pass |
-| **ADR-035 guard:** every captured Scene references both tracks (`visible_feature_ids ≥ 2`) | Pass |
-| **ADR-035 guard:** renderer draws the vessel-track SVG paths (preview not empty) | Pass |
+| **ADR-038 guard:** every captured Scene references both tracks (`visible_feature_ids ≥ 2`) | Pass |
+| **ADR-038 guard:** renderer draws the vessel-track SVG paths (preview not empty) | Pass |
 | Step transport through all four Scenes; `P` enters Present mode (chrome hidden) | Pass |
 
 Screenshots written to `evidence/screenshots/` (also mirrored to `media/images/`):

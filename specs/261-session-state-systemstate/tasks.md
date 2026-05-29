@@ -52,11 +52,11 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 **Goal**: Confirm the workspace and codegen pipeline are healthy before touching the schema, and inventory the call sites this work will move or delete.
 
-- [ ] T001 Confirm branch + active feature: `git branch --show-current` is `claude/speckit-implement-261-gC93A` and `.specify/.active-feature` contains `261-session-state-systemstate`. No file path.
-- [ ] T002 Verify codegen runs clean on the current schema before changes: `cd shared/schemas && uv run python scripts/generate.py`, then `git diff --quiet -- shared/schemas/src/generated/` (expect no drift). Establishes that any post-T010 drift is genuinely this work's. No file path.
-- [ ] T003 [P] Inventory active_storyboard call sites to retire/repoint in Phase 3 (`readPersistedActiveStoryboardId`, `persistActiveStoryboardId`, `getActiveStoryboardSelection`, `setActiveStoryboardSelection`). Record at `specs/261-session-state-systemstate/research-notes/active-storyboard-call-sites.md`.
-- [ ] T004 [P] Inventory the sidecar surface to delete in Phase 6 (`deriveSessionPath`, package `saveSession`/`loadSession`/`extractPersistentState`/`serializeState`, `SessionFile`/`schema.ts`, and `@debrief/session-state` re-exports of them). Record at `specs/261-session-state-systemstate/research-notes/sidecar-call-sites.md`.
-- [ ] T005 [P] Confirm zero runtime readers of `SystemStateProperties.bbox`/`.zoom`/`.center` and confirm the generated `SessionFile`/`SessionState`/slice classes have no runtime importer (gates the Phase 2 deletions). Record at `specs/261-session-state-systemstate/research-notes/schema-deletion-safety.md`.
+- [x] T001 Confirm branch + active feature: `git branch --show-current` is `claude/speckit-implement-261-gC93A` and `.specify/.active-feature` contains `261-session-state-systemstate`. No file path.
+- [x] T002 Verify codegen runs clean on the current schema before changes: `cd shared/schemas && uv run python scripts/generate.py`, then `git diff --quiet -- shared/schemas/src/generated/` (expect no drift). Establishes that any post-T010 drift is genuinely this work's. No file path.
+- [x] T003 [P] Inventory active_storyboard call sites to retire/repoint in Phase 3 (`readPersistedActiveStoryboardId`, `persistActiveStoryboardId`, `getActiveStoryboardSelection`, `setActiveStoryboardSelection`). Record at `specs/261-session-state-systemstate/research-notes/active-storyboard-call-sites.md`.
+- [x] T004 [P] Inventory the sidecar surface to delete in Phase 6 (`deriveSessionPath`, package `saveSession`/`loadSession`/`extractPersistentState`/`serializeState`, `SessionFile`/`schema.ts`, and `@debrief/session-state` re-exports of them). Record at `specs/261-session-state-systemstate/research-notes/sidecar-call-sites.md`.
+- [x] T005 [P] Confirm zero runtime readers of `SystemStateProperties.bbox`/`.zoom`/`.center` and confirm the generated `SessionFile`/`SessionState`/slice classes have no runtime importer (gates the Phase 2 deletions). Record at `specs/261-session-state-systemstate/research-notes/schema-deletion-safety.md`.
 
 ## Phase 2: Foundation
 
@@ -66,55 +66,55 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Schema cluster consolidation (FR-002a, R-004)
 
-- [ ] T010 Move the shared value types into `common.yaml` as their single definition — `ViewportPolygon`, `TimeStep` + `TimeUnitEnum`, `DisplayModeEnum`, `PlaybackStateEnum`, `TimeInstant`, `TimeRange`, `TimeFilter` — and delete the `session-state.yaml` copies; dedup `Coordinate` (keep `common.yaml`'s) and delete the `storyboard.yaml` `DisplayModeEnum` duplicate. File: `shared/schemas/src/linkml/common.yaml`.
-- [ ] T011 Remove the now-vestigial `SessionFile` and `SessionState` classes from `session-state.yaml`, plus any slice classes confirmed unused by runtime (per T005); if the file is left empty, remove it from the `debrief.yaml` imports list. Files: `shared/schemas/src/linkml/session-state.yaml`, `shared/schemas/src/linkml/debrief.yaml`.
-- [ ] T012 Add optional `visible: boolean` to `BaseFeatureProperties` (absent/true ⇒ visible) per `contracts/linkml-delta.md` §1. File: `shared/schemas/src/linkml/common.yaml`.
+- [x] T010 Move the shared value types into `common.yaml` as their single definition — `ViewportPolygon`, `TimeStep` + `TimeUnitEnum`, `DisplayModeEnum`, `PlaybackStateEnum`, `TimeInstant`, `TimeRange`, `TimeFilter` — and delete the `session-state.yaml` copies; dedup `Coordinate` (keep `common.yaml`'s) and delete the `storyboard.yaml` `DisplayModeEnum` duplicate. File: `shared/schemas/src/linkml/common.yaml`.
+- [x] T011 Remove the now-vestigial `SessionFile` and `SessionState` classes from `session-state.yaml`, plus any slice classes confirmed unused by runtime (per T005); if the file is left empty, remove it from the `debrief.yaml` imports list. Files: `shared/schemas/src/linkml/session-state.yaml`, `shared/schemas/src/linkml/debrief.yaml`.
+- [x] T012 Add optional `visible: boolean` to `BaseFeatureProperties` (absent/true ⇒ visible) per `contracts/linkml-delta.md` §1. File: `shared/schemas/src/linkml/common.yaml`.
 
 ### SystemStateProperties delta (FR-001/FR-002/FR-004)
 
-- [ ] T013 Apply the `SystemStateProperties` delta per `contracts/linkml-delta.md` §3: remove `bbox`/`zoom`/`center`; add `viewport`, `rotation`, `current_time`, `filter_start_time`, `filter_end_time`, `display_mode`, `step_size`, `playback_rate`, `selected_primary`; add the four per-variant `rules:` blocks; update the `SystemStateTypeEnum.spatial` description. Files: `shared/schemas/src/linkml/geojson.yaml`, `shared/schemas/src/linkml/common.yaml`.
+- [x] T013 Apply the `SystemStateProperties` delta per `contracts/linkml-delta.md` §3: remove `bbox`/`zoom`/`center`; add `viewport`, `rotation`, `current_time`, `filter_start_time`, `filter_end_time`, `display_mode`, `step_size`, `playback_rate`, `selected_primary`; add the four per-variant `rules:` blocks; update the `SystemStateTypeEnum.spatial` description. Files: `shared/schemas/src/linkml/geojson.yaml`, `shared/schemas/src/linkml/common.yaml`.
 
 ### Codegen (FR-002, FR-006a)
 
-- [ ] T014 Regenerate all bindings: `cd shared/schemas && uv run python scripts/generate.py`. Verify generated `SystemStateProperties` gains the new fields and loses `bbox`/`zoom`/`center`, and that `BaseFeatureProperties` children gain `visible?: boolean`. Files: `shared/schemas/src/generated/**`.
-- [ ] T015 Resolve the `gen-json-schema` `ViewportPolygon.coordinates` multivalued-class-range risk (FR-006a / R-005): add a targeted post-processor in `scripts/generate.py` mirroring the existing GeoJSON-coordinate fixes, or — if brittle — exclude the SystemState `viewport` slot from the JSON Schema build and document Pydantic-only validation. File: `shared/schemas/scripts/generate.py`.
+- [x] T014 Regenerate all bindings: `cd shared/schemas && uv run python scripts/generate.py`. Verify generated `SystemStateProperties` gains the new fields and loses `bbox`/`zoom`/`center`, and that `BaseFeatureProperties` children gain `visible?: boolean`. Files: `shared/schemas/src/generated/**`.
+- [x] T015 Resolve the `gen-json-schema` `ViewportPolygon.coordinates` multivalued-class-range risk (FR-006a / R-005): add a targeted post-processor in `scripts/generate.py` mirroring the existing GeoJSON-coordinate fixes, or — if brittle — exclude the SystemState `viewport` slot from the JSON Schema build and document Pydantic-only validation. File: `shared/schemas/scripts/generate.py`.
 
 ### Golden fixtures (FR-006, SC-005)
 
-- [ ] T016 [P] Create valid spatial fixture (`viewport` + `rotation`). File: `shared/schemas/fixtures/system-state/valid/spatial.json`.
-- [ ] T017 [P] Create valid temporal fixture (all of `start_time`/`end_time`/`current_time`/`filter_start_time`/`filter_end_time`/`display_mode`/`step_size`/`playback_rate`). File: `shared/schemas/fixtures/system-state/valid/temporal.json`.
-- [ ] T018 [P] Create valid selection fixture (`selected_ids` + `selected_primary`). File: `shared/schemas/fixtures/system-state/valid/selection.json`.
-- [ ] T019 [P] Create valid active_storyboard fixture in #237's shipped shape (closes the missing-fixture gap). File: `shared/schemas/fixtures/system-state/valid/active-storyboard.json`.
-- [ ] T020 [P] Create a valid geographic feature carrying `properties.visible: false`. File: `shared/schemas/fixtures/system-state/valid/feature-visible-false.json`.
-- [ ] T021 [P] Create invalid spatial fixture: `state_type: spatial` with no `viewport` (rules violation). File: `shared/schemas/fixtures/system-state/invalid/spatial-missing-viewport.json`.
-- [ ] T022 [P] Create invalid selection fixture: `selected_ids: [1, 2]` (numbers). File: `shared/schemas/fixtures/system-state/invalid/selection-non-string-id.json`.
-- [ ] T023 [P] Create invalid fixture: two features both `state_type: spatial` in one FC. File: `shared/schemas/fixtures/system-state/invalid/multiple-same-state-type.json`.
-- [ ] T024 [P] Create invalid fixture: unknown `state_type` value. File: `shared/schemas/fixtures/system-state/invalid/unknown-state-type.json`.
-- [ ] T025 [P] Create invalid fixture: `kind: SYSTEM` with no `state_type` discriminator. File: `shared/schemas/fixtures/system-state/invalid/missing-discriminator.json`.
-- [ ] T026 [P] Create cross-field fixtures (schema-valid, invariant-violating — classified by the helper, not Pydantic): `current_time` outside `[start_time,end_time]`, and `start_time > end_time`. Files: `shared/schemas/fixtures/system-state/cross-field/temporal-current-time-out-of-window.json`, `shared/schemas/fixtures/system-state/cross-field/temporal-bad-window.json`.
+- [x] T016 [P] Create valid spatial fixture (`viewport` + `rotation`). File: `shared/schemas/fixtures/system-state/valid/spatial.json`.
+- [x] T017 [P] Create valid temporal fixture (all of `start_time`/`end_time`/`current_time`/`filter_start_time`/`filter_end_time`/`display_mode`/`step_size`/`playback_rate`). File: `shared/schemas/fixtures/system-state/valid/temporal.json`.
+- [x] T018 [P] Create valid selection fixture (`selected_ids` + `selected_primary`). File: `shared/schemas/fixtures/system-state/valid/selection.json`.
+- [x] T019 [P] Create valid active_storyboard fixture in #237's shipped shape (closes the missing-fixture gap). File: `shared/schemas/fixtures/system-state/valid/active-storyboard.json`.
+- [x] T020 [P] Create a valid geographic feature carrying `properties.visible: false`. File: `shared/schemas/fixtures/system-state/valid/feature-visible-false.json`.
+- [x] T021 [P] Create invalid spatial fixture: `state_type: spatial` with no `viewport` (rules violation). File: `shared/schemas/fixtures/system-state/invalid/spatial-missing-viewport.json`.
+- [x] T022 [P] Create invalid selection fixture: `selected_ids: [1, 2]` (numbers). File: `shared/schemas/fixtures/system-state/invalid/selection-non-string-id.json`.
+- [x] T023 [P] Create invalid fixture: two features both `state_type: spatial` in one FC. File: `shared/schemas/fixtures/system-state/invalid/multiple-same-state-type.json`.
+- [x] T024 [P] Create invalid fixture: unknown `state_type` value. File: `shared/schemas/fixtures/system-state/invalid/unknown-state-type.json`.
+- [x] T025 [P] Create invalid fixture: `kind: SYSTEM` with no `state_type` discriminator. File: `shared/schemas/fixtures/system-state/invalid/missing-discriminator.json`.
+- [x] T026 [P] Create cross-field fixtures (schema-valid, invariant-violating — classified by the helper, not Pydantic): `current_time` outside `[start_time,end_time]`, and `start_time > end_time`. Files: `shared/schemas/fixtures/system-state/cross-field/temporal-current-time-out-of-window.json`, `shared/schemas/fixtures/system-state/cross-field/temporal-bad-window.json`.
 
 ### Schema adherence tests (FR-006, SC-005/SC-006/SC-008)
 
-- [ ] T027 [test] Pydantic adherence: every `valid/*` parses and round-trips Python→JSON→Python bit-identically; every `invalid/*` is rejected by Pydantic. File: `shared/schemas/tests/test_system_state_adherence.py`.
-- [ ] T028 [test] Cross-language round-trip for all four variants + the `visible:false` feature: Python writes → TypeScript reads → TypeScript writes → Python reads → bit-equal (Article II.2). File: `shared/schemas/tests/test_system_state_round_trip.py`.
+- [x] T027 [test] Pydantic adherence: every `valid/*` parses and round-trips Python→JSON→Python bit-identically; every `invalid/*` is rejected by Pydantic. File: `shared/schemas/tests/test_system_state_adherence.py`.
+- [x] T028 [test] Cross-language round-trip for all four variants + the `visible:false` feature: Python writes → TypeScript reads → TypeScript writes → Python reads → bit-equal (Article II.2). File: `shared/schemas/tests/test_system_state_round_trip.py`.
 
 ### Shared helper — variant-agnostic core (R-002, R-003, R-013)
 
-- [ ] T030 Implement `SystemStateLoadError` with the five `kind`s per `contracts/system-state-helper.ts.md`. File: `services/session-state/src/system-state/errors.ts`.
-- [ ] T031 [P] Implement the compile-time exhaustiveness guard over `SystemStateTypeEnum`. File: `services/session-state/src/system-state/exhaustive.ts`.
-- [ ] T032 Implement Zod discriminated-union validators (one schema per variant, keyed on `state_type`) plus the temporal cross-field invariants (`current_time ∈ [start,end]`; `start ≤ end`). Structurally check `z.infer` against the generated flat `SystemStateProperties` so drift fails the build (R-003). File: `services/session-state/src/system-state/validate.ts`.
-- [ ] T033 Implement `readSystemStateFromFeatureCollection(fc)` → `SystemStateMap` per contract: empty FC ⇒ `{}`; one well-formed ⇒ populate; malformed/unknown/missing-discriminator/duplicate-state_type/cross-field ⇒ throw `SystemStateLoadError`. Pure, order-independent, no mutation. File: `services/session-state/src/system-state/read.ts`.
-- [ ] T034 Implement `writeSystemStateIntoFeatureCollection(fc, input)` → new FC per contract: upsert by `state.<type>` id with empty-Point geometry; **no** `provenance` written (FR-013); absent keys unchanged; input not mutated; cardinality ≤1 per `state_type`. File: `services/session-state/src/system-state/write.ts`.
-- [ ] T035 Implement visibility helpers `readHiddenFeatureIds(fc)` and `applyVisibilityToFeatureCollection(fc, hiddenIds)` (absent/`true` ⇒ visible; `false` ⇒ hidden; pure). File: `services/session-state/src/system-state/visibility.ts`.
-- [ ] T036 Implement the `mapping.ts` skeleton: declare the six store↔variant converter signatures from the contract; implement the conversion utilities (epoch↔ISO via existing `epochToISO`/`isoToEpoch`/`timeRange*`; `FeatureSelection`↔`selected_ids`/`selected_primary`). Per-variant converter bodies are completed in Phases 3–4. File: `services/session-state/src/system-state/mapping.ts`.
-- [ ] T037 Create the public barrel and re-export the helper surface from `@debrief/session-state`. Files: `services/session-state/src/system-state/index.ts`, `services/session-state/src/index.ts`.
+- [x] T030 Implement `SystemStateLoadError` with the five `kind`s per `contracts/system-state-helper.ts.md`. File: `services/session-state/src/system-state/errors.ts`.
+- [x] T031 [P] Implement the compile-time exhaustiveness guard over `SystemStateTypeEnum`. File: `services/session-state/src/system-state/exhaustive.ts`.
+- [x] T032 Implement Zod discriminated-union validators (one schema per variant, keyed on `state_type`) plus the temporal cross-field invariants (`current_time ∈ [start,end]`; `start ≤ end`). Structurally check `z.infer` against the generated flat `SystemStateProperties` so drift fails the build (R-003). File: `services/session-state/src/system-state/validate.ts`.
+- [x] T033 Implement `readSystemStateFromFeatureCollection(fc)` → `SystemStateMap` per contract: empty FC ⇒ `{}`; one well-formed ⇒ populate; malformed/unknown/missing-discriminator/duplicate-state_type/cross-field ⇒ throw `SystemStateLoadError`. Pure, order-independent, no mutation. File: `services/session-state/src/system-state/read.ts`.
+- [x] T034 Implement `writeSystemStateIntoFeatureCollection(fc, input)` → new FC per contract: upsert by `state.<type>` id with empty-Point geometry; **no** `provenance` written (FR-013); absent keys unchanged; input not mutated; cardinality ≤1 per `state_type`. File: `services/session-state/src/system-state/write.ts`.
+- [x] T035 Implement visibility helpers `readHiddenFeatureIds(fc)` and `applyVisibilityToFeatureCollection(fc, hiddenIds)` (absent/`true` ⇒ visible; `false` ⇒ hidden; pure). File: `services/session-state/src/system-state/visibility.ts`.
+- [x] T036 Implement the `mapping.ts` skeleton: declare the six store↔variant converter signatures from the contract; implement the conversion utilities (epoch↔ISO via existing `epochToISO`/`isoToEpoch`/`timeRange*`; `FeatureSelection`↔`selected_ids`/`selected_primary`). Per-variant converter bodies are completed in Phases 3–4. File: `services/session-state/src/system-state/mapping.ts`.
+- [x] T037 Create the public barrel and re-export the helper surface from `@debrief/session-state`. Files: `services/session-state/src/system-state/index.ts`, `services/session-state/src/index.ts`.
 
 ### Helper unit tests (variant-agnostic)
 
-- [ ] T038 [test] `read.ts` tests: every `SystemStateLoadError.kind` branch hit (using the Phase 2 invalid/cross-field fixtures); empty FC ⇒ `{}`. File: `services/session-state/src/system-state/__tests__/read.test.ts`.
-- [ ] T039 [P][test] `write.ts` tests: input `fc` not mutated (deep-equal after call); cardinality ≤1 per `state_type`; no `provenance` on `state.*`; absent keys untouched. File: `services/session-state/src/system-state/__tests__/write.test.ts`.
-- [ ] T040 [P][test] `validate.ts` tests: each variant accepts its happy fixture, rejects a wrong-shape one; cross-field invariants fire with `kind='cross-field-invariant'`. File: `services/session-state/src/system-state/__tests__/validate.test.ts`.
-- [ ] T041 [P][test] `visibility.ts` + round-trip tests: `write(read(fc))` is structurally equal for valid fixtures; visibility absent=visible and round-trips. File: `services/session-state/src/system-state/__tests__/round-trip.test.ts`.
+- [x] T038 [test] `read.ts` tests: every `SystemStateLoadError.kind` branch hit (using the Phase 2 invalid/cross-field fixtures); empty FC ⇒ `{}`. File: `services/session-state/src/system-state/__tests__/read.test.ts`.
+- [x] T039 [P][test] `write.ts` tests: input `fc` not mutated (deep-equal after call); cardinality ≤1 per `state_type`; no `provenance` on `state.*`; absent keys untouched. File: `services/session-state/src/system-state/__tests__/write.test.ts`.
+- [x] T040 [P][test] `validate.ts` tests: each variant accepts its happy fixture, rejects a wrong-shape one; cross-field invariants fire with `kind='cross-field-invariant'`. File: `services/session-state/src/system-state/__tests__/validate.test.ts`.
+- [x] T041 [P][test] `visibility.ts` + round-trip tests: `write(read(fc))` is structurally equal for valid fixtures; visibility absent=visible and round-trips. File: `services/session-state/src/system-state/__tests__/round-trip.test.ts`.
 
 ## Phase 3: User Story 4 — Host parity via one shared writer + active_storyboard consolidation (P1)
 
@@ -126,8 +126,8 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Wire active_storyboard into the shared helper (delegating to #237 — R-011)
 
-- [ ] T050 Complete the `active_storyboard` converter in `mapping.ts`: `activeStoryboardId ↔ active_storyboard_id`, delegating the FC read/write to `@debrief/components` `getActiveStoryboardSelection`/`setActiveStoryboardSelection` so the wire shape is unchanged (NG-002). File: `services/session-state/src/system-state/mapping.ts`.
-- [ ] T051 [P][test] Unit test the active_storyboard converter + that `read`/`write` surface the same shape #237 produces. File: `services/session-state/src/system-state/__tests__/active-storyboard.test.ts`.
+- [x] T050 Complete the `active_storyboard` converter in `mapping.ts`: `activeStoryboardId ↔ active_storyboard_id`, delegating the FC read/write to `@debrief/components` `getActiveStoryboardSelection`/`setActiveStoryboardSelection` so the wire shape is unchanged (NG-002). File: `services/session-state/src/system-state/mapping.ts`.
+- [x] T051 [P][test] Unit test the active_storyboard converter + that `read`/`write` surface the same shape #237 produces. File: `services/session-state/src/system-state/__tests__/active-storyboard.test.ts`.
 
 ### Consolidate #237's writer (sequenced — three commits)
 
@@ -137,13 +137,13 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Wire active_storyboard into VS Code (read + write via the helper)
 
-- [ ] T055 In `openPlot.ts`, after `stacService.loadPlotData`, call `readSystemStateFromFeatureCollection(plotData)` and apply the `active_storyboard` pin via the existing storyboard-selection store action. (Leave the sidecar load block intact for now — it carries temporal/spatial/selection until Phase 4.) File: `apps/vscode/src/commands/openPlot.ts`.
-- [ ] T056 In `saveSession.ts`, populate `active_storyboard` into `writeSystemStateIntoFeatureCollection(mapPanel.getCurrentFeatures(), input)` before the `storeFeatureCollection` write. (Leave the sidecar write intact for now.) File: `apps/vscode/src/commands/saveSession.ts`.
+- [x] T055 In `openPlot.ts`, after `stacService.loadPlotData`, call `readSystemStateFromFeatureCollection(plotData)` and apply the `active_storyboard` pin via the existing storyboard-selection store action. (Leave the sidecar load block intact for now — it carries temporal/spatial/selection until Phase 4.) File: `apps/vscode/src/commands/openPlot.ts`.
+- [x] T056 In `saveSession.ts`, populate `active_storyboard` into `writeSystemStateIntoFeatureCollection(mapPanel.getCurrentFeatures(), input)` before the `storeFeatureCollection` write. (Leave the sidecar write intact for now.) File: `apps/vscode/src/commands/saveSession.ts`.
 
 ### Cross-host parity + #237 regression
 
-- [ ] T057 [test] VS Code extension test (Mocha): pin a storyboard via the store, save, assert the resulting `features.geojson` contains `state.activestoryboard` with the correct `active_storyboard_id`. File: `apps/vscode/test/system-state-roundtrip.test.ts`.
-- [ ] T058 [test] Run the existing `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts` post-T054 — MUST pass unchanged (the shared helper is now the writer; behaviour preserved). File: `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts` (verify only).
+- [x] T057 [test] VS Code extension test (Mocha): pin a storyboard via the store, save, assert the resulting `features.geojson` contains `state.activestoryboard` with the correct `active_storyboard_id`. File: `apps/vscode/test/system-state-roundtrip.test.ts`.
+- [x] T058 [test] Run the existing `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts` post-T054 — MUST pass unchanged (the shared helper is now the writer; behaviour preserved). File: `apps/web-shell/playwright/tests/active-storyboard-persistence.spec.ts` (verify only).
 
 ## Phase 4: User Story 1 — Self-describing plot: spatial + temporal + selection round-trip (P1)
 
@@ -153,35 +153,35 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Complete the per-variant converters (mapping.ts)
 
-- [ ] T060 Complete the spatial converter: `viewport` identity (both `ViewportPolygon`); `rotation` identity; `viewport === null` ⇒ omit `state.spatial`. File: `services/session-state/src/system-state/mapping.ts`.
-- [ ] T061 Complete the temporal converter: `timeRange.{start,end}` epoch→ISO `start_time`/`end_time`; `currentTime` epoch→ISO `current_time` (null ⇒ omit); `timeFilter.{start,end}` epoch→ISO `filter_start_time`/`filter_end_time` (absent ⇒ omit); `displayMode`/`stepSize`/`playbackRate` identity; `timeRange === null` ⇒ omit `state.temporal`. File: `services/session-state/src/system-state/mapping.ts`.
-- [ ] T062 Complete the selection converter: `selection.featureIds → selected_ids`, `selection.primary → selected_primary` (null ⇒ omit); empty selection ⇒ omit `state.selection`; on load regenerate `selection.timestamp`. File: `services/session-state/src/system-state/mapping.ts`.
-- [ ] T063 [P][test] Unit tests for the three converters: epoch↔ISO bit-equality within SC-001/SC-002 tolerance; `FeatureSelection` split; null/empty ⇒ omit; defaults on absence. File: `services/session-state/src/system-state/__tests__/mapping.test.ts`.
+- [x] T060 Complete the spatial converter: `viewport` identity (both `ViewportPolygon`); `rotation` identity; `viewport === null` ⇒ omit `state.spatial`. File: `services/session-state/src/system-state/mapping.ts`.
+- [x] T061 Complete the temporal converter: `timeRange.{start,end}` epoch→ISO `start_time`/`end_time`; `currentTime` epoch→ISO `current_time` (null ⇒ omit); `timeFilter.{start,end}` epoch→ISO `filter_start_time`/`filter_end_time` (absent ⇒ omit); `displayMode`/`stepSize`/`playbackRate` identity; `timeRange === null` ⇒ omit `state.temporal`. File: `services/session-state/src/system-state/mapping.ts`.
+- [x] T062 Complete the selection converter: `selection.featureIds → selected_ids`, `selection.primary → selected_primary` (null ⇒ omit); empty selection ⇒ omit `state.selection`; on load regenerate `selection.timestamp`. File: `services/session-state/src/system-state/mapping.ts`.
+- [x] T063 [P][test] Unit tests for the three converters: epoch↔ISO bit-equality within SC-001/SC-002 tolerance; `FeatureSelection` split; null/empty ⇒ omit; defaults on absence. File: `services/session-state/src/system-state/__tests__/mapping.test.ts`.
 
 ### Dirty-tracking contract (FR-019/FR-020/FR-021)
 
-- [ ] T064 Ensure view-state store mutations do NOT set the dirty flag — `setViewport`, `setRotation`, `setSelection`, `setCurrentTime`, `setTimeRange`, `setTimeFilter`, `setDisplayMode`, `setStepSize`, `setPlaybackRate` — while substantive content edits still do (FR-019/FR-021). File: `services/session-state/src/store/middleware/dirty.ts` (and/or the relevant slice setters).
-- [ ] T065 [P][test] Behaviour test: each view-state action leaves `dirty` false; a content edit sets it true. File: `services/session-state/src/store/middleware/__tests__/dirty.systemstate.test.ts`.
+- [x] T064 Ensure view-state store mutations do NOT set the dirty flag — `setViewport`, `setRotation`, `setSelection`, `setCurrentTime`, `setTimeRange`, `setTimeFilter`, `setDisplayMode`, `setStepSize`, `setPlaybackRate` — while substantive content edits still do (FR-019/FR-021). File: `services/session-state/src/store/middleware/dirty.ts` (and/or the relevant slice setters).
+- [x] T065 [P][test] Behaviour test: each view-state action leaves `dirty` false; a content edit sets it true. File: `services/session-state/src/store/middleware/__tests__/dirty.systemstate.test.ts`.
 
 ### VS Code load + save wiring (remove the sidecar calls)
 
-- [ ] T066 In `openPlot.ts`, extend the SystemState read (from T055) to hydrate spatial/temporal/selection into the store via the converters, then **delete** the sidecar load block (≈ lines 188–208) and the `deriveSessionPath` import there. File: `apps/vscode/src/commands/openPlot.ts`.
-- [ ] T067 In `saveSession.ts`, add spatial/temporal/selection to the `writeSystemStateIntoFeatureCollection` input; **delete** the `saveSession(session, savePath)` sidecar call and `deriveSessionPath`; relax the `if (!state.dirty) {…return}` early-return so an explicit save persists a looked-at-only view (FR-020). File: `apps/vscode/src/commands/saveSession.ts`.
+- [x] T066 In `openPlot.ts`, extend the SystemState read (from T055) to hydrate spatial/temporal/selection into the store via the converters, then **delete** the sidecar load block (≈ lines 188–208) and the `deriveSessionPath` import there. File: `apps/vscode/src/commands/openPlot.ts`.
+- [x] T067 In `saveSession.ts`, add spatial/temporal/selection to the `writeSystemStateIntoFeatureCollection` input; **delete** the `saveSession(session, savePath)` sidecar call and `deriveSessionPath`; relax the `if (!state.dirty) {…return}` early-return so an explicit save persists a looked-at-only view (FR-020). File: `apps/vscode/src/commands/saveSession.ts`.
 
 ### Web-shell load + save wiring (FR-009a)
 
-- [ ] T068 Web-shell plot open: hydrate spatial/temporal/selection from the loaded FeatureCollection via the shared helper. File: `apps/web-shell/src/` (plot-open path — confirm exact module, e.g. the plot loader feeding the session store).
-- [ ] T069 Web-shell save: ensure view-state changes funnel into the FeatureCollection through the shared writer so the existing IndexedDB persistence (#236) captures the `state.*` features (FR-009a). File: `apps/web-shell/src/` (FC-persist path).
+- [x] T068 Web-shell plot open: hydrate spatial/temporal/selection from the loaded FeatureCollection via the shared helper. File: `apps/web-shell/src/` (plot-open path — confirm exact module, e.g. the plot loader feeding the session store).
+- [x] T069 Web-shell save: ensure view-state changes funnel into the FeatureCollection through the shared writer so the existing IndexedDB persistence (#236) captures the `state.*` features (FR-009a). File: `apps/web-shell/src/` (FC-persist path).
 
 ### Tests + cross-host E2E (SC-001/SC-002a/SC-003)
 
-- [ ] T070 [P][test] Unit/integration: an FC with no `state.*` features loads with defaults (no error); an FC with them hydrates the store; saving a populated store yields the three `state.*` features and writes no sidecar. File: `services/session-state/src/system-state/__tests__/host-roundtrip.test.ts`.
-- [ ] T071 [test] Playwright web-shell spec: set a recognisable viewport + time window + playhead + selection → explicit save → reload page (clear in-memory store) → reopen `features.geojson` only → assert viewport/time/selection restored. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
-- [ ] T072 [test] Cross-host parity: a `features.geojson` written by the VS Code Mocha test is opened by the Playwright spec (state restored), and one written by Playwright is read by the Mocha test — via a shared fixture corpus. Files: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`, `apps/vscode/test/system-state-roundtrip.test.ts`.
+- [x] T070 [P][test] Unit/integration: an FC with no `state.*` features loads with defaults (no error); an FC with them hydrates the store; saving a populated store yields the three `state.*` features and writes no sidecar. File: `services/session-state/src/system-state/__tests__/host-roundtrip.test.ts`.
+- [x] T071 [test] Playwright web-shell spec: set a recognisable viewport + time window + playhead + selection → explicit save → reload page (clear in-memory store) → reopen `features.geojson` only → assert viewport/time/selection restored. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
+- [x] T072 [test] Cross-host parity: a `features.geojson` written by the VS Code Mocha test is opened by the Playwright spec (state restored), and one written by Playwright is read by the Mocha test — via a shared fixture corpus. Files: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`, `apps/vscode/test/system-state-roundtrip.test.ts`.
 
 ### Phase 4 evidence capture
 
-- [ ] T073 The T071 spec writes `roundtrip-host-a.png` (recognisable viewport/time/selection pre-transfer) and `roundtrip-host-b.png` (restored from `features.geojson` only) into `specs/261-session-state-systemstate/evidence/screenshots/`, plus `features-before.json`/`features-after.json` showing the `state.*` features appear. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
+- [x] T073 The T071 spec writes `roundtrip-host-a.png` (recognisable viewport/time/selection pre-transfer) and `roundtrip-host-b.png` (restored from `features.geojson` only) into `specs/261-session-state-systemstate/evidence/screenshots/`, plus `features-before.json`/`features-after.json` showing the `state.*` features appear. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
 
 ## Phase 5: User Story 3 — Feature visibility as a per-feature property (P2)
 
@@ -191,9 +191,9 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Host wiring (both hosts, via the helper from T035)
 
-- [ ] T080 VS Code load: in `openPlot.ts`, hydrate the store's hidden set from `readHiddenFeatureIds(plotData)` (so visibility comes solely from per-feature `visible`, not a sidecar). File: `apps/vscode/src/commands/openPlot.ts`.
-- [ ] T081 VS Code save: in `saveSession.ts`, apply the store's hidden set to the FeatureCollection via `applyVisibilityToFeatureCollection(features, hiddenIds)` before writing `features.geojson`. File: `apps/vscode/src/commands/saveSession.ts`.
-- [ ] T082 Web-shell: hydrate the hidden set from the FC on plot open and apply it back through the shared writer on persist (mirrors T068/T069). File: `apps/web-shell/src/` (plot-open / FC-persist path).
+- [x] T080 VS Code load: in `openPlot.ts`, hydrate the store's hidden set from `readHiddenFeatureIds(plotData)` (so visibility comes solely from per-feature `visible`, not a sidecar). File: `apps/vscode/src/commands/openPlot.ts`.
+- [x] T081 VS Code save: in `saveSession.ts`, apply the store's hidden set to the FeatureCollection via `applyVisibilityToFeatureCollection(features, hiddenIds)` before writing `features.geojson`. File: `apps/vscode/src/commands/saveSession.ts`.
+- [x] T082 Web-shell: hydrate the hidden set from the FC on plot open and apply it back through the shared writer on persist (mirrors T068/T069). File: `apps/web-shell/src/` (plot-open / FC-persist path).
 
 ### Visibility provenance (FR-013/FR-014/R-012)
 
@@ -201,8 +201,8 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Tests + E2E (SC-004)
 
-- [ ] T084 [P][test] Visibility round-trip unit/integration: `applyVisibilityToFeatureCollection` then `readHiddenFeatureIds` is identity; absent `visible` ⇒ visible; a revealed feature clears the flag. File: `services/session-state/src/system-state/__tests__/visibility.roundtrip.test.ts`.
-- [ ] T085 [test] Playwright web-shell spec: hide two features → save → reload → reopen `features.geojson` only → same two hidden; assert the file carries `visible: false` on exactly those ids. Writes `visibility-host-a.png` / `visibility-host-b.png` into `specs/261-session-state-systemstate/evidence/screenshots/`. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
+- [x] T084 [P][test] Visibility round-trip unit/integration: `applyVisibilityToFeatureCollection` then `readHiddenFeatureIds` is identity; absent `visible` ⇒ visible; a revealed feature clears the flag. File: `services/session-state/src/system-state/__tests__/visibility.roundtrip.test.ts`.
+- [x] T085 [test] Playwright web-shell spec: hide two features → save → reload → reopen `features.geojson` only → same two hidden; assert the file carries `visible: false` on exactly those ids. Writes `visibility-host-a.png` / `visibility-host-b.png` into `specs/261-session-state-systemstate/evidence/screenshots/`. File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts`.
 
 ## Phase 6: User Story 2 — Delete the sidecar (P1)
 
@@ -210,12 +210,12 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 **Independent test**: `grep -rn "debrief-session"` over `apps`/`services` (excluding generated/docs) returns no runtime read/write code; a save produces no third file.
 
-- [ ] T090 Delete the package-level sidecar I/O — `saveSession`, `loadSession`, `extractPersistentState`, `serializeState`, `parseSessionJson`, the local `SessionFile` interface, and the version machinery — or reduce `load.ts`/`save.ts` to thin FC hydrate/extract wrappers only if a caller still needs them. Files: `services/session-state/src/persistence/load.ts`, `services/session-state/src/persistence/save.ts`, `services/session-state/src/persistence/schema.ts`, `services/session-state/src/persistence/index.ts`.
-- [ ] T091 Remove the `@debrief/session-state` re-exports of the deleted sidecar functions/types. File: `services/session-state/src/index.ts`.
-- [ ] T092 Update remaining consumers identified in T004 so the build is clean (e.g. `apps/vscode/src/services/sessionManager.ts`, `services/session-state/src/standalone.ts`, the MCP server) — none should import the deleted functions. Files: per T004 inventory.
-- [ ] T093 [test] Remove or rewrite tests that exercised the deleted sidecar functions (the `persistence` load/save/round-trip suites) — replace assertions with the FC-based hydrate/extract path where still relevant. Files: `services/session-state/src/persistence/__tests__/**` (and any sidecar fixtures).
-- [ ] T094 [test] Two-file-invariant check (SC-002): after a save, assert the item directory contains only `item.json` + `features.geojson` (+ thumbnail assets) and no `*.debrief-session`; capture `dir-listing-after.txt`. Add the repo grep guard (`grep -rn "debrief-session" apps services --include='*.ts' | grep -v generated` ⇒ empty). File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts` (extend) + `specs/261-session-state-systemstate/evidence/dir-listing-after.txt`.
-- [ ] T095 Run `pnpm exec knip` (and `task verify` lint+typecheck) to confirm no dead exports/files remain from the sidecar deletion. No file path.
+- [x] T090 Delete the package-level sidecar I/O — `saveSession`, `loadSession`, `extractPersistentState`, `serializeState`, `parseSessionJson`, the local `SessionFile` interface, and the version machinery — or reduce `load.ts`/`save.ts` to thin FC hydrate/extract wrappers only if a caller still needs them. Files: `services/session-state/src/persistence/load.ts`, `services/session-state/src/persistence/save.ts`, `services/session-state/src/persistence/schema.ts`, `services/session-state/src/persistence/index.ts`.
+- [x] T091 Remove the `@debrief/session-state` re-exports of the deleted sidecar functions/types. File: `services/session-state/src/index.ts`.
+- [x] T092 Update remaining consumers identified in T004 so the build is clean (e.g. `apps/vscode/src/services/sessionManager.ts`, `services/session-state/src/standalone.ts`, the MCP server) — none should import the deleted functions. Files: per T004 inventory.
+- [x] T093 [test] Remove or rewrite tests that exercised the deleted sidecar functions (the `persistence` load/save/round-trip suites) — replace assertions with the FC-based hydrate/extract path where still relevant. Files: `services/session-state/src/persistence/__tests__/**` (and any sidecar fixtures).
+- [x] T094 [test] Two-file-invariant check (SC-002): after a save, assert the item directory contains only `item.json` + `features.geojson` (+ thumbnail assets) and no `*.debrief-session`; capture `dir-listing-after.txt`. Add the repo grep guard (`grep -rn "debrief-session" apps services --include='*.ts' | grep -v generated` ⇒ empty). File: `apps/web-shell/playwright/tests/system-state-roundtrip.spec.ts` (extend) + `specs/261-session-state-systemstate/evidence/dir-listing-after.txt`.
+- [x] T095 Run `pnpm exec knip` (and `task verify` lint+typecheck) to confirm no dead exports/files remain from the sidecar deletion. No file path.
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
@@ -225,27 +225,27 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Evidence Collection
 
-- [ ] T100 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body covers schema adherence (4 variants + visibility), the helper unit suite, cross-host round-trip, visibility, strict-import, and dirty-tracking. File: `specs/261-session-state-systemstate/evidence/test-summary.md`.
-- [ ] T101 [P] Create the usage demonstration — TS snippet calling `readSystemStateFromFeatureCollection` / `writeSystemStateIntoFeatureCollection` + the visibility helpers, with before/after `features.geojson` JSON. File: `specs/261-session-state-systemstate/evidence/usage-example.md`.
-- [ ] T102 [P] Capture the schema round-trip proof (Article II.2 rubric): Python → JSON → TypeScript → JSON → Python bit-equality across all four variants + a `visible:false` feature, as a markdown table. File: `specs/261-session-state-systemstate/evidence/round-trip-evidence.md`.
-- [ ] T103 Run the full Playwright suite (`cd apps/web-shell && node run-playwright.mjs system-state-roundtrip`) to (re)produce `roundtrip-host-a.png`, `roundtrip-host-b.png`, `visibility-host-a.png`, `visibility-host-b.png`, `features-before.json`, `features-after.json` and confirm they land in `specs/261-session-state-systemstate/evidence/`. No file path — verification step.
-- [ ] T104 [P] Capture `strict-import-error.png`: load a hand-crafted `features.geojson` with a malformed SystemState feature and screenshot the structured error the user sees (Article XIV.4). File: `specs/261-session-state-systemstate/evidence/screenshots/strict-import-error.png`.
-- [ ] T105 Record the interaction GIF (< 5s, < 2MB): save in host A → reopen `features.geojson` only in host B → same view/time/selection. Use Playwright `recordVideo` + ffmpeg-to-gif. File: `specs/261-session-state-systemstate/evidence/screenshots/interaction.gif`.
+- [x] T100 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body covers schema adherence (4 variants + visibility), the helper unit suite, cross-host round-trip, visibility, strict-import, and dirty-tracking. File: `specs/261-session-state-systemstate/evidence/test-summary.md`.
+- [x] T101 [P] Create the usage demonstration — TS snippet calling `readSystemStateFromFeatureCollection` / `writeSystemStateIntoFeatureCollection` + the visibility helpers, with before/after `features.geojson` JSON. File: `specs/261-session-state-systemstate/evidence/usage-example.md`.
+- [x] T102 [P] Capture the schema round-trip proof (Article II.2 rubric): Python → JSON → TypeScript → JSON → Python bit-equality across all four variants + a `visible:false` feature, as a markdown table. File: `specs/261-session-state-systemstate/evidence/round-trip-evidence.md`.
+- [x] T103 Run the full Playwright suite (`cd apps/web-shell && node run-playwright.mjs system-state-roundtrip`) to (re)produce `roundtrip-host-a.png`, `roundtrip-host-b.png`, `visibility-host-a.png`, `visibility-host-b.png`, `features-before.json`, `features-after.json` and confirm they land in `specs/261-session-state-systemstate/evidence/`. No file path — verification step.
+- [x] T104 [P] Capture `strict-import-error.png`: load a hand-crafted `features.geojson` with a malformed SystemState feature and screenshot the structured error the user sees (Article XIV.4). File: `specs/261-session-state-systemstate/evidence/screenshots/strict-import-error.png`.
+- [x] T105 Record the interaction GIF (< 5s, < 2MB): save in host A → reopen `features.geojson` only in host B → same view/time/selection. Use Playwright `recordVideo` + ffmpeg-to-gif. File: `specs/261-session-state-systemstate/evidence/screenshots/interaction.gif`.
 
 ### Media Content
 
-- [ ] T106 Create the feature post via the Content Specialist agent (`.claude/agents/media/content.md`): title prefixed with `Building `; the `What We're Building` / `How It Fits` / `Key Decisions` sections copied verbatim from `evidence/opening-context.md`; add `Screenshots`, `By the Numbers`, `Lessons Learned`, `What's Next` from the captured evidence. File: `specs/261-session-state-systemstate/media/shipped-post.md`.
+- [x] T106 Create the feature post via the Content Specialist agent (`.claude/agents/media/content.md`): title prefixed with `Building `; the `What We're Building` / `How It Fits` / `Key Decisions` sections copied verbatim from `evidence/opening-context.md`; add `Screenshots`, `By the Numbers`, `Lessons Learned`, `What's Next` from the captured evidence. File: `specs/261-session-state-systemstate/media/shipped-post.md`.
 
 ### Project memory + backlog
 
-- [ ] T107 [P] Add ADRs to `docs/project_notes/decisions.md`: (a) sidecar retirement → two-file model; (b) visibility as a per-feature `visible` flag with accepted provenance growth; (c) shared value-type consolidation into `common.yaml`. File: `docs/project_notes/decisions.md`.
-- [ ] T108 [P] Log completion in `docs/project_notes/issues.md` with ticket #249, the PR URL, and the evidence directory link. File: `docs/project_notes/issues.md`.
-- [ ] T109 [P] Strike through BACKLOG.md row 249 (status → `complete`). File: `BACKLOG.md`.
+- [x] T107 [P] Add ADRs to `docs/project_notes/decisions.md`: (a) sidecar retirement → two-file model; (b) visibility as a per-feature `visible` flag with accepted provenance growth; (c) shared value-type consolidation into `common.yaml`. File: `docs/project_notes/decisions.md`.
+- [x] T108 [P] Log completion in `docs/project_notes/issues.md` with ticket #249, the PR URL, and the evidence directory link. File: `docs/project_notes/issues.md`.
+- [x] T109 [P] Strike through BACKLOG.md row 249 (status → `complete`). File: `BACKLOG.md`.
 
 ### Final verification + PR
 
-- [ ] T110 Run `task verify` (lint + typecheck + unit + Playwright E2E + knip) from the repo root — all green. No file path — verification step.
-- [ ] T111 Create PR and publish blog: run `/speckit.pr`. Creates the feature PR in debrief-future (with evidence + media) and the blog PR in debrief.github.io (`shipped-post.md`); returns both URLs. **MUST run last.**
+- [x] T110 Run `task verify` (lint + typecheck + unit + Playwright E2E + knip) from the repo root — all green. No file path — verification step.
+- [x] T111 Create PR and publish blog: run `/speckit.pr`. Creates the feature PR in debrief-future (with evidence + media) and the blog PR in debrief.github.io (`shipped-post.md`); returns both URLs. **MUST run last.**
 
 **Task T111 must run last. It depends on T100–T110 being complete.**
 

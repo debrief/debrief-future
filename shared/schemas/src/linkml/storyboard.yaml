@@ -52,27 +52,10 @@ imports:
   - log-entry
 
 enums:
-  # NB: DisplayModeEnum is canonical in session-state.yaml (Article II.1 —
-  # single source of truth for the time-controller's display mode). It is
-  # mirrored here because session-state.yaml cannot be imported into
-  # storyboard.yaml without also importing it into debrief-jsonschema.yaml,
-  # which is excluded from JSON Schema generation due to a gen-json-schema
-  # bug with `Coordinate as multivalued class range` (see comment in
-  # debrief-jsonschema.yaml). The canonical declaration stays in
-  # session-state.yaml; this mirror is kept in lock-step manually. Update
-  # both files together if a new display mode ships.
-  DisplayModeEnum:
-    description: >-
-      Track visualization display mode. `full` renders the entire track
-      regardless of current time; `trail` renders a snail-trail from
-      track start up to current time. Mirrors session-state.yaml — see
-      comment above.
-    permissible_values:
-      full:
-        description: Render the entire track regardless of current time
-      trail:
-        description: Render a snail-trail from track start up to current time
-
+  # NB: DisplayModeEnum is now canonical in common.yaml (feature 261, FR-002a —
+  # single source of truth for the time-controller's display mode). common.yaml
+  # is imported above, so SceneProperties.display_mode references it directly;
+  # the former mirror that lived here has been removed.
   PolygonSourceEnum:
     description: >-
       Provenance of a Scene's stored polygon geometry. Render-side consumers

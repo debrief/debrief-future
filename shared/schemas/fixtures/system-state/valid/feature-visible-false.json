@@ -1,0 +1,27 @@
+{
+  "type": "Feature",
+  "id": "ref-hidden-01",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-5.5, 50.0]
+  },
+  "properties": {
+    "kind": "POINT",
+    "name": "Hidden Waypoint",
+    "location_type": "WAYPOINT",
+    "description": "A reference location hidden from the map (visible:false)",
+    "symbol": "waypoint-circle",
+    "visible": false,
+    "style": {
+      "shape": "circle",
+      "radius": 6,
+      "fill": true,
+      "fill_color": "#FF5733",
+      "fill_opacity": 0.8,
+      "stroke": true,
+      "color": "#000000",
+      "weight": 2,
+      "opacity": 1.0
+    }
+  }
+}

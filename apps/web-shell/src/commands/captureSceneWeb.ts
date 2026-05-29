@@ -380,7 +380,7 @@ async function captureSceneWebInner(
   // the createStoryboard call above).
   const visibleIds: string[] = [];
   for (const f of plot.features) {
-    // ADR-035: canonical identity is the top-level GeoJSON `id`.
+    // ADR-038: canonical identity is the top-level GeoJSON `id`.
     // `properties.id` is absent on data features (Tracks), so reading it
     // here silently dropped every Track from `visible_feature_ids`.
     const rawId = getPlotFeatureId(f);

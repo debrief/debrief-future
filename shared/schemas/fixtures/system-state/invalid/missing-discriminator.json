@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "id": "state.spatial",
+  "geometry": { "type": "Point", "coordinates": [] },
+  "properties": {
+    "kind": "SYSTEM",
+    "viewport": {
+      "coordinates": [
+        { "longitude": -3.5, "latitude": 51.5 },
+        { "longitude": 2.5, "latitude": 51.5 },
+        { "longitude": 2.5, "latitude": 50.0 },
+        { "longitude": -3.5, "latitude": 50.0 }
+      ],
+      "zoom": 8
+    }
+  }
+}
