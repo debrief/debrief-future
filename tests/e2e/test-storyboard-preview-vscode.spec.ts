@@ -199,6 +199,42 @@ test.describe('#273 — Storyboard Preview in VS Code (manual evidence)', () => 
     await page.keyboard.press('Enter');
     await page.waitForTimeout(2_500);
 
+    // Collapse every Debrief-sidebar section except Storyboard so the panel
+    // gets the height (Time Controller / Tools / Layers / Properties all live
+    // inside the single "Activity" view; collapsing it frees the space).
+    const headers = page.locator('.part.sidebar .pane-header, .sidebar .pane-header');
+    const headerCount = await headers.count().catch(() => 0);
+    for (let i = 0; i < headerCount; i += 1) {
+      const h = headers.nth(i);
+      const title = (
+        (await h.locator('.title').first().textContent().catch(() => '')) ?? ''
+      ).trim();
+      if (/storyboard/i.test(title)) continue; // keep Storyboard open
+      const expanded = await h.getAttribute('aria-expanded').catch(() => null);
+      if (expanded === 'true') {
+        await h.click().catch(() => {});
+        await page.waitForTimeout(400);
+      }
+    }
+    // Make sure the Storyboard pane itself is expanded.
+    const sbHeader = page
+      .locator('.part.sidebar .pane-header, .sidebar .pane-header')
+      .filter({ hasText: /storyboard/i })
+      .first();
+    if ((await sbHeader.getAttribute('aria-expanded').catch(() => null)) === 'false') {
+      await sbHeader.click().catch(() => {});
+    }
+    await page.waitForTimeout(1_000);
+
+    // Close code-server's secondary (auxiliary) side bar — its "agent" panel —
+    // so the shot is just the Debrief workbench.
+    await page.keyboard.press('Control+Shift+KeyP');
+    await palette.waitFor({ state: 'visible', timeout: 5_000 }).catch(() => {});
+    await palette.fill('>View: Close Secondary Side Bar');
+    await page.waitForTimeout(300);
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(600);
+
     // Clear code-server port-forward / info toasts that would clutter the shot.
     await cs.dismissNotifications().catch(() => {});
     await page.keyboard.press('Escape').catch(() => {});
