@@ -17,8 +17,8 @@ Alias: platforms
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
 | [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
+| [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
 | [StacExtensionProperties](../classes/StacExtensionProperties.md) | Extension properties added to STAC item |  no  |
 
 

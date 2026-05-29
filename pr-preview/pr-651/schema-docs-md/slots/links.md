@@ -17,9 +17,9 @@ Alias: links
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [StacCollection](../classes/StacCollection.md) | A STAC 1 |  no  |
-| [StacCatalog](../classes/StacCatalog.md) | A flat STAC Catalog (no extent, no summaries) |  no  |
 | [StacItem](../classes/StacItem.md) | A STAC 1 |  no  |
+| [StacCatalog](../classes/StacCatalog.md) | A flat STAC Catalog (no extent, no summaries) |  no  |
+| [StacCollection](../classes/StacCollection.md) | A STAC 1 |  no  |
 
 
 
