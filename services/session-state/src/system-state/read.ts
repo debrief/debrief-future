@@ -138,7 +138,7 @@ export function readSystemStateFromFeatureCollection(
         const clamped: TemporalVariant = { ...temporal, current_time: verdict.clampedCurrentTime };
         playheadClamps.push({
           kind: 'playhead-clamped',
-          featureId: featureId(f),
+          feature_id: featureId(f),
           edge: verdict.edge,
           originalCurrentTime: temporal.current_time ?? verdict.clampedCurrentTime,
           clampedCurrentTime: verdict.clampedCurrentTime,

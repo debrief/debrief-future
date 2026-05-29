@@ -14,7 +14,7 @@ import type { PlayheadClampDiagnostic } from '../../src/services/systemStateBrid
 
 const clamp = (edge: 'start' | 'end'): PlayheadClampDiagnostic => ({
   kind: 'playhead-clamped',
-  featureId: 'state.temporal',
+  feature_id: 'state.temporal',
   edge,
   originalCurrentTime: '2024-02-01T00:00:00Z',
   clampedCurrentTime: edge === 'end' ? '2024-01-07T00:00:00Z' : '2024-01-01T00:00:00Z',

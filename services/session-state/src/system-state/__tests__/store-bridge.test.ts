@@ -62,7 +62,7 @@ describe('hydrateStoreFromFeatures — tolerant playhead clamp (spec 267)', () =
     expect(clamps).toHaveLength(1);
     expect(clamps[0]).toMatchObject({
       kind: 'playhead-clamped',
-      featureId: 'state.temporal',
+      feature_id: 'state.temporal',
       edge: 'end',
       originalCurrentTime: '2024-02-01T00:00:00Z',
       clampedCurrentTime: '2024-01-07T00:00:00Z',

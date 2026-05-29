@@ -129,7 +129,7 @@ describe('readSystemStateFromFeatureCollection', () => {
     expect(playheadClamps).toHaveLength(1);
     expect(playheadClamps[0]).toEqual({
       kind: 'playhead-clamped',
-      featureId: 'state.temporal',
+      feature_id: 'state.temporal',
       edge: 'end',
       originalCurrentTime: '2024-02-01T00:00:00Z',
       clampedCurrentTime: '2024-01-07T00:00:00Z',

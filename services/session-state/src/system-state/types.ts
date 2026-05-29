@@ -92,7 +92,9 @@ export interface SystemStateMap {
  */
 export interface PlayheadClampDiagnostic {
   readonly kind: 'playhead-clamped';
-  readonly featureId: string;
+  // snake_case per ADR-010 (the SystemState wire types — state_type, start_time,
+  // current_time — are all snake_case; the lint rule enforces feature_id).
+  readonly feature_id: string;
   readonly edge: 'start' | 'end';
   readonly originalCurrentTime: string;
   readonly clampedCurrentTime: string;
