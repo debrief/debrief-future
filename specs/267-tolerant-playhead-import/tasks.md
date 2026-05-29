@@ -176,7 +176,7 @@ description: "Task list for 267-tolerant-playhead-import"
 
 ### PR Creation
 
-- [ ] T033 Create PR and publish blog: run `/speckit.pr`
+- [x] T033 Create PR and publish blog: run `/speckit.pr`
 
 **Task T033 MUST run last — it depends on all evidence (T025–T031) and media (T032) tasks being complete. It updates the existing feature PR (#650) in debrief-future and publishes `shipped-post.md` to debrief.github.io.**
 
