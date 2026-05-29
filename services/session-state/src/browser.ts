@@ -74,3 +74,40 @@ export {
   hasSelectionSelector,
   hasUnsavedChangesSelector,
 } from './store/middleware/selector.js';
+
+// SystemState helper (Feature 261) — pure, browser-safe FeatureCollection
+// read/write for all four variants + per-feature visibility. The single
+// shared producer/consumer used by both hosts (FR-015).
+export {
+  readSystemStateFromFeatureCollection,
+  writeSystemStateIntoFeatureCollection,
+  readHiddenFeatureIds,
+  applyVisibilityToFeatureCollection,
+  temporalSliceToInput,
+  temporalVariantToSlice,
+  spatialSliceToInput,
+  spatialVariantToSlice,
+  selectionSliceToInput,
+  selectionVariantToSlice,
+  activeStoryboardIdToInput,
+  activeStoryboardVariantToId,
+  checkTemporalCrossField,
+  buildWriteInputFromStore,
+  applyStateToFeatures,
+  mirrorViewStateIntoFeatures,
+  hydrateStoreFromFeatures,
+  SystemStateLoadError,
+  STATE_FEATURE_ID,
+  type FeatureLike,
+  type ViewStateStore,
+  type SystemStateLoadErrorKind,
+  type PlotFeature as SystemStatePlotFeature,
+  type PlotFeatureCollection as SystemStatePlotFeatureCollection,
+  type SystemStateType,
+  type TemporalVariant,
+  type SpatialVariant,
+  type SelectionVariant,
+  type ActiveStoryboardVariant,
+  type SystemStateMap,
+  type SystemStateWriteInput,
+} from './system-state/index.js';

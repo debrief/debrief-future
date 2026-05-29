@@ -1,0 +1,10 @@
+{
+  "type": "Feature",
+  "id": "state.spatial",
+  "geometry": { "type": "Point", "coordinates": [] },
+  "properties": {
+    "kind": "SYSTEM",
+    "state_type": "spatial",
+    "rotation": 45
+  }
+}

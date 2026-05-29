@@ -1,0 +1,15 @@
+# Item directory BEFORE feature 261 — three files (the sidecar split state)
+#
+# A plot materialised on disk carried the analytical state in TWO places:
+# features.geojson (the portable artefact) AND item.debrief-session (the
+# sidecar, written by services/session-state, NOT travelling with the plot).
+# Opening a colleague's plot without its sidecar landed you on default
+# view/time/selection.
+
+$ ls -1 <store>/core--boat1t/
+assets
+features.geojson
+item.debrief-session     <-- the sidecar: temporal/spatial/selection/visibility
+item.json
+overview.png
+thumbnail.png

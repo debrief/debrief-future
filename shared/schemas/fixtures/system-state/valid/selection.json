@@ -1,0 +1,11 @@
+{
+  "type": "Feature",
+  "id": "state.selection",
+  "geometry": { "type": "Point", "coordinates": [] },
+  "properties": {
+    "kind": "SYSTEM",
+    "state_type": "selection",
+    "selected_ids": ["track-001", "track-002/positions/4"],
+    "selected_primary": "track-001"
+  }
+}

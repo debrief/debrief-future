@@ -1541,3 +1541,112 @@ shared service and delete the local driver.
 `specs/264-briefing-zip-renderer/plan.md`,
 `specs/264-briefing-zip-renderer/contracts/{export-command,spa-loading,tile-coverage}.md`.
 Evidence: `specs/264-briefing-zip-renderer/evidence/`.
+
+---
+
+### ADR-034: Retire the `.debrief-session` sidecar — all plot state lives in `features.geojson` (#249 / spec 261, 2026-05-28)
+
+**Context.** A plot was materialised on disk as three files: `item.json` (STAC
+metadata), `features.geojson` (the portable FeatureCollection), and
+`item.debrief-session` (a sidecar written by `services/session-state` carrying
+the Zustand store's temporal / spatial / selection / visibility slices). The
+sidecar violated Constitution Article II.1 (single source of truth): a plot's
+state was split across two files, only one of which travelled with the plot.
+Open a colleague's plot without its sidecar — email, STAC catalog, git, USB —
+and you landed on default view/time/selection.
+
+**Decision.** Delete the sidecar. Every field it carried is reclassified into
+one of three homes:
+
+- **Plot state** → a `SystemState` Feature inside `features.geojson`
+  (`state.spatial` / `state.temporal` / `state.selection` /
+  `state.activestoryboard`), the #237 pattern generalised to all four variants.
+- **Per-feature state** → `properties.visible` on the individual feature
+  (absent/`true` ⇒ visible; `false` ⇒ hidden) — replacing the sidecar's
+  `hiddenFeatureIds` denylist.
+- **Ephemeral runtime** → not persisted; defaulted on load (`playbackState`,
+  `drawingMode`, `viewportLocked`, `styleVersion`, `selection.timestamp`,
+  `featureCollectionUri`).
+
+A plot is now **exactly two files** (`item.json` + `features.geojson`, plus
+thumbnail assets), and the entire interactive state is reconstructable from
+`features.geojson` alone. A single pure helper in `@debrief/session-state`
+(`system-state/`) is the sole producer/consumer of SystemState read/write for
+both hosts; a host-agnostic store-bridge translates store↔FeatureCollection.
+The package-level sidecar I/O (`saveSession`/`loadSession`/`extractPersistentState`/
+`serializeState`/`parseSessionJson` + the `SessionFile` version machinery) is
+deleted with no legacy read shim (Article XIV — pre-release breaking change).
+
+**Trade-offs.** Provenance growth from frequent hide/reveal toggles is accepted
+(bounded to *saved* states; compaction is a follow-up). Strict-on-import:
+malformed / duplicate-`state_type` / cross-field-invariant SystemState features
+fail load loudly with the offending feature id, rather than a tolerant fallback
+(Article XIV.4; the out-of-window `current_time` policy is revisitable as #267).
+
+**Provenance.** Spec `specs/261-session-state-systemstate/`. Evidence:
+`specs/261-session-state-systemstate/evidence/` (round-trip screenshots, the
+self-describing `features-after.json`, the two-file dir listings).
+
+---
+
+### ADR-035: Per-feature visibility as a `visible` flag on `BaseFeatureProperties` (#249 / spec 261, 2026-05-28)
+
+**Context.** The sidecar stored hidden features as a `hiddenFeatureIds`
+denylist on the session store — a parallel structure that did not travel with
+the plot and could go stale against a renamed/deleted feature.
+
+**Decision.** Add an optional `visible: boolean` to the shared
+`BaseFeatureProperties` LinkML class, so every concrete feature-properties type
+inherits it. Absent or `true` means visible; `false` means hidden. Visibility
+now travels *with the feature* inside `features.geojson` and round-trips for
+free. Visibility transitions append a `LogEntry` to the affected feature's own
+provenance via the existing `LogService` (Article III.1) — the pure helper never
+writes provenance for the `state.*` view-state features themselves (they are
+current-state markers, FR-013). The web-shell already modelled visibility this
+way (`properties.visible`); this decision makes it the schema-blessed, cross-host
+home and removes the sidecar denylist.
+
+**Provenance.** Spec `specs/261-session-state-systemstate/`,
+`contracts/linkml-delta.md` §1.
+
+---
+
+### ADR-036: Consolidate shared value types into `common.yaml`; active_storyboard stays tolerant via `@debrief/components` (#249 / spec 261, 2026-05-28)
+
+**Context (a) — value-type duplication.** `ViewportPolygon`, the `Coordinate`
+lng/lat class, `TimeStep`/`TimeUnitEnum`, `DisplayModeEnum`, `PlaybackStateEnum`,
+and the `TimeInstant`/`TimeRange`/`TimeFilter` types lived in `session-state.yaml`
+(with `DisplayModeEnum` also duplicated in `storyboard.yaml` and a scalar
+`Coordinate` *type* shadowed in `common.yaml`). `geojson.yaml`'s
+`SystemStateProperties` could not reference them as authored, and the JSON Schema
+build (`debrief-jsonschema.yaml`) deliberately excluded `session-state.yaml`.
+
+**Decision (a).** Move these value types into `common.yaml` as their single
+definition (it is imported by every cluster, including the JSON Schema build),
+delete the duplicates, and remove the dead scalar `Coordinate` type. Generated
+symbol names are unchanged (the master `debrief.yaml` already imports every
+cluster), so this pays down an Article II.1 duplication with no consumer churn.
+The long-feared `gen-json-schema` multivalued-`Coordinate`-range bug did **not**
+resurface — `SystemState.schema.json` is correct and no post-processor was
+needed (FR-006a closed).
+
+**Context (b) — active_storyboard.** FR-015 asked for one shared helper to own
+all four SystemState variants, folding #237's host-private web-shell writer in.
+But `@debrief/components` (which owns the tolerant `get/setActiveStoryboardSelection`
+used by storyboard playback) depends on `@debrief/session-state`, so the helper
+cannot import it (cycle); and the strict helper reader throws on
+duplicate/malformed features, whereas the web-shell reads active_storyboard on
+*every* edit and must stay tolerant.
+
+**Decision (b).** The `@debrief/session-state` helper owns the three migrated
+variants (spatial/temporal/selection) + per-feature visibility + the unified
+*load-time* read of all four variants, and implements `active_storyboard` with
+the identical #237 wire shape (NG-002) for that read and for VS Code parity. The
+web-shell's *interactive* active_storyboard read/write deliberately keeps
+delegating to the shared `@debrief/components` helpers (R-011) — those are shared
+logic, not a host-private re-implementation of the SystemState shape. No host
+re-implements the wire shape; the single-source goal holds for every variant
+that 261 migrates.
+
+**Provenance.** Spec `specs/261-session-state-systemstate/`,
+`contracts/linkml-delta.md` §2, research-notes/active-storyboard-call-sites.md.

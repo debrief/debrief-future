@@ -1,97 +1,106 @@
-# Data Model: SystemState migration
+# Data Model: Retire the sidecar — all plot state in the FeatureCollection
 
-**Feature**: `261-session-state-systemstate`
-**Phase**: 1 (design)
-**Date**: 2026-05-19
+**Feature**: `261-session-state-systemstate` | **Phase**: 1 | **Date**: 2026-05-27
 
-This document enumerates the entities the feature touches, their shapes, the relationships between them, and the state transitions they undergo. Wire formats and API surfaces are in `contracts/`. Field-level mappings between the sidecar and the new in-plot home are in `contracts/slice-mappings.md`.
+Entity shapes, relationships, and state transitions. Wire/API surfaces are in `contracts/`. Field-level store↔variant mappings are in `contracts/slice-mappings.md`.
 
 ---
 
-## Entity 1: `SystemStateProperties` (LinkML — extended by this work)
+## Entity 1: `SystemStateProperties` (LinkML — extended)
 
-**Definition source**: `shared/schemas/src/linkml/geojson.yaml` (existing class, modified).
+**Source**: `shared/schemas/src/linkml/geojson.yaml` (existing class, modified).
 
-**Shape post-migration** (all fields):
+**Shape post-this-work** (one flat class; per-variant required-ness enforced by `rules:`):
 
-| Field | Type | Required | Notes |
+| Field | Type | Required | Variant | Notes |
+|---|---|---|---|---|
+| `kind` | `FeatureKindEnum` literal `"SYSTEM"` | yes | all | Discriminates SystemState features. |
+| `state_type` | `SystemStateTypeEnum` | yes | all | `temporal` / `spatial` / `selection` / `active_storyboard`. |
+| `start_time` | datetime (ISO-8601) | when `temporal` | temporal | Analytical window start. |
+| `end_time` | datetime (ISO-8601) | when `temporal` | temporal | Analytical window end. |
+| `current_time` | datetime (ISO-8601) | optional | temporal | Playhead at save. Cross-field: ∈ `[start_time, end_time]` when present. |
+| `filter_start_time` | datetime (ISO-8601) | optional | temporal | Visible-window filter start (was epoch `timeFilter.start`). |
+| `filter_end_time` | datetime (ISO-8601) | optional | temporal | Visible-window filter end (was epoch `timeFilter.end`). |
+| `display_mode` | `DisplayModeEnum` | optional | temporal | `full` / `trail`. |
+| `step_size` | `TimeStep` | optional | temporal | `{ value, unit }`. |
+| `playback_rate` | float | optional | temporal | 0.1–100. |
+| `viewport` | `ViewportPolygon` | when `spatial` | spatial | Identity map to `SpatialSlice.viewport`. Replaces removed `bbox`/`zoom`/`center`. |
+| `rotation` | float | optional | spatial | Map rotation 0–360. |
+| `selected_ids` | string[] | when `selection` | selection | May be empty (= explicit no-selection). |
+| `selected_primary` | string | optional | selection | Primary selection path for properties display. |
+| `active_storyboard_id` | string | when `active_storyboard` | active_storyboard | Unchanged from #237 (NG-002). |
+| `provenance` | `LogEntry[]` | optional | — | **Not written** for `state.*` view features (FR-013, lean). Remains in the schema (it predates this work; other SYSTEM uses may exist). |
+
+**Removed**: `bbox` (float[]), `zoom` (float), `center` (float[]) — Article XIV.1, zero runtime consumers (verified).
+
+**Conditional-required** enforced by four LinkML `rules:` blocks keyed on `state_type` (see `contracts/linkml-delta.md`). Runtime narrowing is via the helper's Zod discriminated union (R-003), since `gen-typescript` emits a flat interface with `string`-typed `kind`/`state_type`.
+
+---
+
+## Entity 2: `BaseFeatureProperties.visible` (LinkML — new field)
+
+**Source**: `shared/schemas/src/linkml/common.yaml:330` (base class — all feature-props classes `is_a` it, verified).
+
+| Field | Type | Required | Semantics |
 |---|---|---|---|
-| `kind` | string (literal `"SYSTEM"`) | yes | Distinguishes SystemState features from spatial features. |
-| `state_type` | `SystemStateTypeEnum` | yes | Discriminator: `temporal` / `spatial` / `selection` / `active_storyboard`. |
-| `provenance` | `LogEntry[]` | yes | Append-only audit trail (Article III.3). Per review 2A — uses existing LinkML LogEntry fields verbatim, no new fields added. |
-| `start_time` | datetime | conditional | Required when `state_type=temporal`. |
-| `end_time` | datetime | conditional | Required when `state_type=temporal`. |
-| `current_time` | datetime | **NEW — optional** | The playhead at save time. Only meaningful when `state_type=temporal`. Optional initially per FR-016 (may tighten to required after a deprecation cycle). Cross-field invariant: when present, must lie in `[start_time, end_time]` (FR-018 — R-011). |
-| `viewport` | `ViewportPolygon` | conditional | Required when `state_type=spatial`. Per review 1B — replaces the parallel `bbox`/`zoom`/`center` fields. Identity-mapped to `SpatialSlice.viewport`. |
-| `selected_ids` | string[] | conditional | Required when `state_type=selection`. May be empty array (= "explicit no-selection"). |
-| `active_storyboard_id` | string \| null | conditional | Required when `state_type=active_storyboard`. `null` = "explicit no pin"; absence of the feature entirely = "no preference, use default" (different semantics). |
+| `visible` | boolean | optional | **Absent or `true` ⇒ visible; `false` ⇒ hidden.** Replaces the sidecar `features.hiddenFeatureIds` denylist. |
 
-**Conditional-required semantics** are enforced by a LinkML `rules:` block keyed on `state_type`. The Pydantic and TS bindings reflect this at runtime via the discriminated-union shape (R-005).
-
-**Why one class with optional fields rather than four sub-classes**: matches the existing LinkML structure (#215), keeps the wire format flat for human inspection of plot files, and lets the discriminated-union narrowing happen at the runtime validator boundary rather than at the type-generator level.
-
-**Schema delta** vs pre-migration: one field added (`current_time`), no fields renamed or removed. Additive minor bump per Article II.3.
+Because every feature-properties class (`TrackProperties`, the annotations, `MultiPointFeatureProperties`, etc.) inherits from `BaseFeatureProperties`, one edit covers all feature types. Toggling appends a `LogEntry` to that feature's own `provenance` (FR-013/R-012).
 
 ---
 
-## Entity 2: `SystemStateTypeEnum`
+## Entity 3: `SystemStateTypeEnum`
 
-**Definition source**: `shared/schemas/src/linkml/common.yaml` (existing, unchanged by this work).
-
-**Permissible values** (post-migration, no change from pre-migration):
-
-- `temporal`
-- `spatial`
-- `selection`
-- `active_storyboard`
-
-This work does NOT add new enum values. It activates the three values (`temporal`, `spatial`, `selection`) that #215 modelled but #237 left unproduced.
+**Source**: `shared/schemas/src/linkml/common.yaml` (currently in `common.yaml`; permissible values unchanged). Values: `temporal`, `spatial`, `selection`, `active_storyboard`. The `spatial` value's description is updated from "(bbox, zoom)" → viewport (FR-002). No values added.
 
 ---
 
-## Entity 3: `SystemState` Feature (the GeoJSON wire shape)
+## Entity 4: Consolidated shared value types (LinkML — relocated, FR-002a)
 
-**Definition**: A GeoJSON `Feature` whose `properties` conform to `SystemStateProperties`. The `geometry` field is **always `null`** (these features have no spatial extent — they're state-bearing, not geographic).
+These move into `common.yaml` (geojson's import graph) as their single definition, duplicates deleted:
 
-**Example — temporal variant** (provenance shape per review 2A — uses existing LinkML LogEntry fields):
+| Type | Was in | Now in | Used by |
+|---|---|---|---|
+| `ViewportPolygon` | session-state.yaml | common.yaml | `SystemStateProperties.viewport`, `SpatialSlice.viewport`, store |
+| `Coordinate` | common.yaml + session-state.yaml (dup) | common.yaml (single) | `ViewportPolygon`, store |
+| `TimeStep` + `TimeUnitEnum` | session-state.yaml | common.yaml | `SystemStateProperties.step_size`, store |
+| `DisplayModeEnum` | session-state.yaml + storyboard.yaml (dup) | common.yaml (single) | `SystemStateProperties.display_mode`, store, scenes |
+| `PlaybackStateEnum` | session-state.yaml | common.yaml | store (ephemeral; not persisted) |
+| `TimeInstant`, `TimeRange`, `TimeFilter` | session-state.yaml | common.yaml | store (the feature uses flat ISO fields, not these classes) |
+
+`session-state.yaml`'s `SessionFile` / `SessionState` root classes are **deleted** (sidecar retired). Slice classes (`TemporalSlice`/`SpatialSlice`/`FeaturesSlice`/…) are deleted unless a runtime consumer remains; the TS store uses hand-authored interfaces in `services/session-state/src/types/`, not the generated slice classes (verified — "Not migrated" comments), so they are removal candidates.
+
+---
+
+## Entity 5: `SystemState` Feature (GeoJSON wire shape)
+
+A GeoJSON `Feature`:
 
 ```json
 {
   "type": "Feature",
-  "id": "sys-temporal-01HZ0EXAMPLE",
-  "geometry": null,
+  "id": "state.temporal",
+  "geometry": { "type": "Point", "coordinates": [] },
   "properties": {
     "kind": "SYSTEM",
     "state_type": "temporal",
     "start_time": "2024-01-01T00:00:00Z",
     "end_time": "2024-01-07T00:00:00Z",
     "current_time": "2024-01-03T14:30:00Z",
-    "provenance": [
-      {
-        "activity_id": "01HZ0PROV0EXAMPLE",
-        "timestamp": "2026-05-19T10:14:22Z",
-        "agent": "alice@machine-7",
-        "activity_type": "created",
-        "was_generated_by": {
-          "tool": "vscode-extension",
-          "tool_version": "0.4.2"
-        },
-        "used": [],
-        "generated": ["sys-temporal-01HZ0EXAMPLE"],
-        "execution_duration": "PT0S"
-      }
-    ]
+    "filter_start_time": "2024-01-02T00:00:00Z",
+    "filter_end_time": "2024-01-05T00:00:00Z",
+    "display_mode": "trail",
+    "step_size": { "value": 1, "unit": "hour" },
+    "playback_rate": 2.0
   }
 }
 ```
 
-**Example — spatial variant** (post-1B — viewport carries ViewportPolygon identity, not bbox+center):
-
 ```json
 {
   "type": "Feature",
-  "id": "sys-spatial-01HZ1EXAMPLE",
-  "geometry": null,
+  "id": "state.spatial",
+  "geometry": { "type": "Point", "coordinates": [] },
   "properties": {
     "kind": "SYSTEM",
     "state_type": "spatial",
@@ -104,166 +113,99 @@ This work does NOT add new enum values. It activates the three values (`temporal
       ],
       "zoom": 8
     },
-    "provenance": [ /* same shape as above */ ]
+    "rotation": 0
   }
 }
 ```
 
-**ID convention**: `sys-<state_type>-<ULID>`. ULIDs (already a project dependency) make IDs sortable by creation time without colliding across hosts. The helper allocates the ID on **first** write; subsequent writes for the same `state_type` reuse the existing feature's ID (per FR-008).
-
-**Cardinality invariant**: At most one `SystemState` feature per `state_type` per `FeatureCollection` (FR-003). Multiple is a load error.
+**ID convention**: `state.<state_type>` — `state.temporal`, `state.spatial`, `state.selection`, `state.activestoryboard`. Deterministic → natural upsert key; matches schema id pattern `^state\.[a-z]+$`.
+**Cardinality**: at most one per `state_type` (FR-003); two is a load error.
+**No provenance array** on these features (FR-013).
 
 ---
 
-## Entity 4: `SystemStateMap` (runtime helper output)
-
-**Definition**: The typed map the helper returns from `readSystemStateFromFeatureCollection(fc)`. Lives in the helper's public API surface (`services/session-state/src/system-state/index.ts`).
-
-**TypeScript shape** (illustrative — actual derivation is from generated types):
+## Entity 6: `SystemStateMap` (helper read output)
 
 ```typescript
-import type { SystemStateProperties, SystemStateTypeEnum } from '@debrief/schemas';
-
-type VariantOf<K extends SystemStateTypeEnum> =
-  Extract<SystemStateProperties, { state_type: K }>;
-
 export interface SystemStateMap {
-  temporal?: VariantOf<'temporal'>;
-  spatial?: VariantOf<'spatial'>;
-  selection?: VariantOf<'selection'>;
-  active_storyboard?: VariantOf<'active_storyboard'>;
+  temporal?: TemporalVariant;
+  spatial?: SpatialVariant;
+  selection?: SelectionVariant;
+  active_storyboard?: ActiveStoryboardVariant;
 }
 ```
 
-**Key invariant**: every key is **either absent or fully-typed**. A `temporal` entry that exists has all of `start_time`, `end_time`, `current_time?` and `provenance` — there is no partially-populated state in the runtime shape. Parsing-time validation (R-005) rejects partial features at the boundary.
-
-**Why `VariantOf<K>` rather than the verbatim union**: Article IV.5 — boundary types are derived structurally, not re-listed. The `Extract<…>` form makes new variants in LinkML automatically extend the map shape via `SystemStateProperties`'s widened union.
+Each `*Variant` is the `z.infer` output of the corresponding Zod schema in `validate.ts` (R-003). Every key is **absent or fully-typed-and-validated** — parsing rejects partial/malformed features at the boundary. (Contrast the prior contract's `Extract<SystemStateProperties, …>`, which does not work against the flat generated interface.)
 
 ---
 
-## Entity 5: `SessionFile` sidecar (existing — modified shape post-migration)
+## Entity 7: The plot directory (post-this-work)
 
-**Definition source**: `services/session-state/src/persistence/load.ts` (existing `SessionFile` interface).
-
-**Pre-migration shape** (today):
-
-```typescript
-interface SessionFile {
-  $schema: string;
-  version: "1.1.0";
-  savedAt: string;            // ISO-8601
-  temporal: TemporalSlice;    // full Zustand slice (~7 fields)
-  spatial: SpatialSlice;      // full Zustand slice (~5 fields)
-  features: FeaturesSlice;    // full Zustand slice including selection
-}
+```text
+<item-dir>/
+├── item.json          # STAC item — catalog metadata only (unchanged role)
+└── features.geojson   # FeatureCollection — sole source of truth for plot state
 ```
 
-**Post-migration shape**:
-
-```typescript
-interface SessionFile {
-  $schema: string;
-  version: "1.2.0";            // bumped (R-004)
-  savedAt: string;
-  migration_lineage?: {        // NEW — optional, diagnostic only (R-004)
-    schema_version_at_write: string;
-    migrated_variants: SystemStateTypeEnum[];
-  };
-  temporal: PartialOmit<TemporalSlice, MigratedTemporalFields>;
-  spatial: PartialOmit<SpatialSlice, MigratedSpatialFields>;
-  features: PartialOmit<FeaturesSlice, MigratedSelectionFields>;
-}
-```
-
-Where `MigratedXFields` are the keys enumerated in `contracts/slice-mappings.md`. The `PartialOmit` pattern (a `Pick<>` over the non-migrated keys, with optionality preserved) is a derived boundary type per Article IV.5 — not hand-rewritten.
-
-**Old sidecar compatibility**: A `1.1.0` sidecar opened under post-migration code: the helper sees `version === "1.1.0"` and reconciles **as if** the plot file had no SystemState features for the migrated variants — i.e. all values come from the sidecar. On next save, the sidecar is rewritten as `1.2.0` with migrated fields dropped; the SystemState features now exist in the plot.
+**Removed**: `item.debrief-session` (the sidecar). No third file.
 
 ---
 
-## Entity 6: Slice (existing — unchanged shape)
+## Entity 8: Zustand store (unchanged shape)
 
-The three Zustand slices (`temporal`, `spatial`, `features`) keep their **in-memory shape** unchanged. The store API and the slice interfaces stay byte-identical pre- and post-migration. Only the persistence wiring (`load.ts`, `save.ts`) changes.
+The in-memory store (`services/session-state/src/store/`) keeps its current slice shapes:
+- `TemporalSlice` — `currentTime: number|null` (epoch), `timeRange: {start,end}|null` (epoch), `timeFilter: {start?,end?}` (epoch), `stepSize`, `playbackRate`, `playbackState` (ephemeral), `displayMode`.
+- `SpatialSlice` — `viewport: ViewportPolygon|null`, `rotation`, `drawingMode` (ephemeral), `drawingPaletteIndex` (ephemeral), `viewportLocked` (ephemeral).
+- `FeaturesSlice` — `featureCollectionUri` (derived at load), `selection: FeatureSelection`, `hiddenFeatureIds: string[]`, `styleVersion` (ephemeral).
 
-This is deliberate per spec Key Entities: "Session-state Zustand store: …Unchanged in shape — its `loadSession` and `saveSession` boundaries gain the new responsibility of reading/writing `SystemState` Features alongside the sidecar."
+Only the **persistence boundary** changes: hydrate-from-FeatureCollection on load, extract-to-FeatureCollection on save, in place of sidecar I/O.
 
 ---
 
 ## Relationships
 
 ```text
-                       Plot File (*.plot.geojson)
-                       ┌─────────────────────────────┐
-                       │ FeatureCollection           │
-                       │  ┌────────────────────┐     │
-                       │  │ regular Features    │    │
-                       │  │ (Track, Point, etc) │    │
-                       │  └────────────────────┘     │
-                       │  ┌────────────────────┐     │
-                       │  │ SystemState        │     │  ←── at most one per state_type
-                       │  │   state_type:      │     │
-                       │  │     temporal       │     │
-                       │  └────────────────────┘     │
-                       │  ┌────────────────────┐     │
-                       │  │ SystemState        │     │
-                       │  │   state_type:      │     │
-                       │  │     spatial        │     │
-                       │  └────────────────────┘     │
-                       │  ┌────────────────────┐     │
-                       │  │ SystemState        │     │
-                       │  │   state_type:      │     │
-                       │  │     selection      │     │
-                       │  └────────────────────┘     │
-                       │  ┌────────────────────┐     │
-                       │  │ SystemState        │     │
-                       │  │   state_type:      │     │
-                       │  │   active_storyboard│     │
-                       │  └────────────────────┘     │
-                       └─────────────────────────────┘
-                                  │
-                                  │ readSystemStateFromFeatureCollection()
-                                  ▼
-                          SystemStateMap
-                                  │
-                                  │ + sidecar (non-migrated fields)
-                                  ▼
-                          ┌────────────────┐
-                          │ Zustand store  │
-                          │  - temporal    │
-                          │  - spatial     │
-                          │  - features    │
-                          │  - storyboard  │
-                          └────────────────┘
-                                  │
-                                  │ saveSession() →
-                                  ▼
-                          Updated FeatureCollection  +  shrunken sidecar
+features.geojson (FeatureCollection)
+ ├── geographic Features  ── properties.visible? ──► store.hiddenFeatureIds
+ ├── Feature id=state.spatial          ─┐
+ ├── Feature id=state.temporal          ├─ readSystemStateFromFeatureCollection() ─► SystemStateMap
+ ├── Feature id=state.selection         │                                              │
+ └── Feature id=state.activestoryboard ─┘                                              ▼
+                                                                          reconcile → Zustand store
+                                                                                       │
+                                              writeSystemStateIntoFeatureCollection() ◄┘ (on save)
+                                              + apply visible flags
+                                                       │
+                                                       ▼
+                                          updated FeatureCollection ── existing writer ──► features.geojson
 ```
 
-The diagram emphasises the two persistence destinations and the asymmetry: SystemState features flow through the (existing) writer abstraction with the rest of the FeatureCollection; the sidecar continues to write via its existing path. The helper is the *transformer* — it doesn't own a write call.
+The helper is a pure transformer; it never performs I/O. The existing writer (VS Code STAC writer / web-shell IndexedDB plot store) persists the FeatureCollection (Article IV.4).
 
 ---
 
 ## State transitions
 
-The four `SystemState` features in a plot transition through three relevant runtime states:
+### SystemState feature per variant
 
 ```text
-   absent ──── first save with new code ───▶ created
-     ▲                                          │
-     │                                          │ save with new value
-     │                                          ▼
-     │                                       updated  ──── save with same value ──▶ updated  (LogEntry still appended)
-     │                                          │
-     │ user explicitly clears via host UI       │
-     └──────────────────────────────────────────┘
-                       (out of scope of this work —
-                        spec does not specify a "reset SystemState" command)
+absent ── first explicit save with a non-default value ──► present
+  ▲                                                          │
+  │                                                          │ save with new value
+  └──────────────────────────────────────────────── present (replaced in place, same id)
 ```
 
-The `absent → created` transition writes a new Feature into the FeatureCollection with a fresh ULID. The `created/updated → updated` transition replaces the Feature's `properties` (preserving its `id`) and appends a `LogEntry`.
+`absent → present`: insert a Feature with id `state.<type>`. `present → present`: replace the Feature's `properties` (id preserved). No `present → absent` transition in this work (no "reset SystemState" command; out of scope).
 
-There is no `updated → absent` transition in this work — clearing a SystemState feature is out of scope. If a future feature wants "forget the saved bbox", it can either delete the feature outright (via direct FeatureCollection edit) or write a sentinel value; this work doesn't speculate.
+### Per-feature visibility
+
+```text
+visible (no flag / true) ── hide ──► visible:false (+ provenance LogEntry)
+        ▲                                   │
+        └──────────── reveal ───────────────┘ (+ provenance LogEntry)
+```
+
+Transitions update the store immediately (no dirty — FR-019) and are persisted on the next save (FR-021).
 
 ---
 
@@ -271,47 +213,19 @@ There is no `updated → absent` transition in this work — clearing a SystemSt
 
 | Rule | Enforcement point | Article |
 |---|---|---|
-| `kind === "SYSTEM"` on every SystemState Feature | LinkML schema; Zod validator at load. | II.1 |
-| `state_type` is one of the four enum values | LinkML schema; Zod validator at load. | II.1, XIV.4 |
-| At most one Feature per `state_type` per FeatureCollection | Helper `read.ts` check during load. | FR-003 |
-| Provenance array non-empty | Helper `write.ts` enforces — never writes without appending a LogEntry. | III.1 |
-| Provenance is append-only | Helper `write.ts` only appends; type system enforces (no public mutators). | III.3 |
-| Per-variant required fields populated (e.g. temporal requires start_time + end_time) | LinkML `rules` block; Pydantic at adherence-test gate; Zod at runtime load. | XIV.4 |
-| `current_time` (when present) lies within `[start_time, end_time]` | Helper `validate.ts` cross-field check at runtime load. Throws `SystemStateLoadError(kind='cross-field-invariant')`. **Per review 3A / R-011.** | I.3, XIV.4 |
-| `start_time ≤ end_time` (degenerate-window check) | Helper `validate.ts` cross-field check. Throws `SystemStateLoadError(kind='cross-field-invariant')`. | I.3, XIV.4 |
-| VS Code save: FC write must succeed before sidecar write commits | Host save command (saveSession.ts) — FC-first, sidecar-second flow per R-012. **Per review 3A.** | I.3 |
+| `kind === "SYSTEM"`, `state_type ∈ enum` | LinkML; Zod at load | II.1, XIV.4 |
+| At most one feature per `state_type` | helper `read.ts` | FR-003 |
+| Per-variant required fields (temporal⇒start/end; spatial⇒viewport; selection⇒selected_ids; active_storyboard⇒active_storyboard_id) | LinkML `rules:`; Pydantic at adherence gate; Zod at load | XIV.4 |
+| `current_time ∈ [start_time, end_time]` when present | helper `validate.ts` cross-field | I.3, XIV.4 |
+| `start_time ≤ end_time` | helper `validate.ts` cross-field | I.3, XIV.4 |
+| `visible` absent ⇒ visible | helper `visibility.ts` | — |
+| view-state features carry no provenance | helper `write.ts` (never appends) | FR-013 |
+| visibility transitions append to the feature's provenance | host visibility action via `LogService` | III.1/III.3 |
 
 ---
 
-## Per-variant detail
+## Open issues carried to `/speckit.tasks`
 
-### `temporal`
-
-- Migrated from sidecar: `temporal.timeRange.start` → `start_time`; `temporal.timeRange.end` → `end_time`; `temporal.currentTime` → `current_time` (Q2=B).
-- Stays in sidecar (per-user): `temporal.playbackState`, `temporal.playbackRate`, `temporal.stepSize`, `temporal.displayMode`, `temporal.timeFilter`.
-- Default when absent: derived from the plot's feature timestamps (existing behaviour — same as today's "no sidecar" path).
-
-### `spatial`
-
-- Migrated from sidecar: `spatial.viewport` → `viewport` (identity — same `ViewportPolygon` shape on both sides, per review 1B / R-010).
-- Stays in sidecar (per-user): `spatial.rotation`, `spatial.drawingMode`, `spatial.drawingPaletteIndex`, `spatial.viewportLocked`.
-- Default when absent: derived from the plot's bbox extent (existing behaviour).
-
-### `selection`
-
-- Migrated from sidecar: `features.selection` → `selected_ids` (Q1=B).
-- Stays in sidecar (per-user): `features.hiddenFeatureIds`, `features.styleVersion`, `features.featureCollectionUri`.
-- Default when absent: empty selection (existing behaviour).
-
-### `active_storyboard`
-
-- Migrated from #237's existing runtime: no new migration needed — already in the FeatureCollection. **This work consolidates the writer to the shared helper** (FR-011/FR-012) but does not change the wire shape (NG-004).
-- Default when absent: platform default (whichever storyboard the application picks by default).
-
----
-
-## Open issues for `/speckit.tasks`
-
-- The exact ULID generation entry point — does the helper depend on a `ulid` library directly, or should it accept a generator from the caller (testability)? Tactical implementation detail; ADR-027 ULID guidance applies.
-- Whether `LogEntry.host` exists today as a field on the LinkML `LogEntry` class — if not, this work adds it (additive minor bump on LogEntry too).
-- Fixture naming convention — single fixture per variant, or "happy / variant-A / variant-B"? Should follow whatever convention `shared/schemas/fixtures/system-record/valid/` uses today.
+- Confirm whether the helper *delegates* `active_storyboard` to `shared/components/src/storyboard/activeStoryboardSelection.ts` or supersedes it (R-011 lean: delegate).
+- Confirm `session-state.yaml` slice classes have no remaining runtime consumer before deleting them (grep generated-type imports).
+- Confirm the `generate.py` post-processor approach for `ViewportPolygon` in the JSON Schema build (R-005), or fall back to Pydantic-only validation for SystemState fixtures.

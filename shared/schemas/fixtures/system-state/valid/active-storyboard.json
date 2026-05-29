@@ -1,0 +1,10 @@
+{
+  "type": "Feature",
+  "id": "state.activestoryboard",
+  "geometry": { "type": "Point", "coordinates": [] },
+  "properties": {
+    "kind": "SYSTEM",
+    "state_type": "active_storyboard",
+    "active_storyboard_id": "storyboard-alpha"
+  }
+}

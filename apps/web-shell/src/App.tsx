@@ -67,7 +67,13 @@ import type {
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
-import { getSessionStore, resetSessionStore } from '@debrief/session-state';
+import {
+  getSessionStore,
+  resetSessionStore,
+  hydrateStoreFromFeatures,
+  mirrorViewStateIntoFeatures,
+  SystemStateLoadError,
+} from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
 import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
@@ -160,6 +166,10 @@ declare global {
      *  captured without smuggling a pre-#259 fixture through the bundled
      *  catalog's pre-loaded cache. */
     __triggerPlotValidation?: (fc: FeatureCollection) => void;
+    /** #261 — Playwright hook: open a plot from a supplied FeatureCollection
+     *  (a fresh store hydrated from the file alone), simulating "transfer ONLY
+     *  features.geojson to another host" for the self-describing round-trip. */
+    __openPlotFromFeatures?: (itemPath: string, features: unknown[]) => void;
   }
 }
 window.__sessionStore = getSessionStore();
@@ -217,6 +227,7 @@ function getMimeType(filePath: string): string {
 }
 
 /**
+/**
  * Main application component.
  */
 export default function App() {
@@ -240,6 +251,7 @@ export default function App() {
   useEffect(() => {
     currentPlotRef.current = currentPlot;
   }, [currentPlot]);
+
   // Result layers now live in session-state store (#109)
   const resultLayers = state.resultLayers;
   /** Maps activityId → original feature snapshots so revert can restore them */
@@ -372,6 +384,34 @@ export default function App() {
     return currentPlot.features.features as DebriefFeature[];
   }, [currentPlot]);
 
+  // Feature 261 (FR-009a): the SELF-DESCRIBING FeatureCollection — the plot's
+  // features plus the analyst's current view-state (viewport / time window /
+  // playhead / selection) materialised as `state.*` SystemState features.
+  // `currentPlot.features` itself stays pure: storyboard capture, the layers
+  // panel, and scene packaging never see view-state SystemState features. This
+  // augmented view is what the persistence / round-trip boundary exposes so the
+  // plot round-trips from features.geojson alone. Per-feature `visible` flags
+  // already ride on the plot features (the layer:toggleVisibility handler), so
+  // this only adds state.* and never rewrites visibility. Recomputed reactively
+  // from the store view-state (the `state` snapshot drives the deps).
+  const selfDescribingFeatures = useMemo<DebriefFeature[]>(() => {
+    const augmented = mirrorViewStateIntoFeatures(plotFeatures, store.getState());
+    // eslint-disable-next-line no-restricted-syntax -- #261 FC boundary cast (mirror of #235 ADR-019): the helper returns the structural PlotFeature shape; the consumers treat it as DebriefFeature.
+    return augmented as unknown as DebriefFeature[];
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- store snapshot fields are the real deps
+  }, [
+    plotFeatures,
+    state.viewport,
+    state.rotation,
+    state.selection,
+    state.currentTime,
+    state.timeRange,
+    state.timeFilter,
+    state.displayMode,
+    state.stepSize,
+    state.playbackRate,
+  ]);
+
   // All features including result layers and drawn features
   const allFeatures = useMemo<DebriefFeature[]>(() => {
     return [...plotFeatures, ...asDebriefFeatures(resultLayers as Feature[]), ...drawnFeatures];
@@ -405,10 +445,11 @@ export default function App() {
     return names;
   }, [allFeatures]);
 
-  // Expose plot features on window for Playwright test introspection
+  // Expose the self-describing plot features (incl. state.* view-state) on
+  // window for Playwright introspection + the round-trip transfer hook.
   useEffect(() => {
-    window.__currentPlotFeatures = plotFeatures as Feature[];
-  }, [plotFeatures]);
+    window.__currentPlotFeatures = selfDescribingFeatures as Feature[];
+  }, [selfDescribingFeatures]);
 
   // #259 — Playwright hook: run validatePlot against an arbitrary FC and
   // drive the same banner state handlePlotSelect would on a real failure.
@@ -539,6 +580,23 @@ export default function App() {
         freshStore.getState().setCurrentTime(extent[0]);
       }
 
+      // Feature 261 (FR-007): hydrate saved view-state (viewport, time window/
+      // playhead, selection) from the plot's SystemState features, overriding
+      // the data-extent defaults above. The plot is self-describing — no
+      // sidecar. Per-feature visibility already rides on `properties.visible`.
+      // Strict-on-import: a malformed/duplicate/cross-field-invalid SystemState
+      // feature surfaces the same error banner as a Storyboard validation
+      // failure (FR-011/FR-012).
+      try {
+        hydrateStoreFromFeatures(freshStore.getState(), plotData.features as DebriefFeature[]);
+      } catch (err) {
+        if (err instanceof SystemStateLoadError) {
+          setPlotLoadError({ code: err.kind, message: err.message });
+          return;
+        }
+        throw err;
+      }
+
       // Clear undo history — initialization isn't a user action
       freshStore.getState().clearHistory();
       freshStore.getState().markClean();
@@ -606,7 +664,38 @@ export default function App() {
   useEffect(() => {
     window.__openPlot = handlePlotSelect;
     window.__backToCatalog = handleBackToCatalog;
-    return () => { delete window.__openPlot; delete window.__backToCatalog; };
+    // Feature 261 test hook: open a plot from a supplied FeatureCollection
+    // (rather than the bundled catalog), simulating "transfer ONLY
+    // features.geojson to another host" — a fresh store hydrated from the file
+    // alone (US1). Drives the same reset + hydrate path handlePlotSelect uses.
+    window.__openPlotFromFeatures = (itemPath: string, features: unknown[]): void => {
+      resetSessionStore();
+      const fresh = getSessionStore();
+      window.__sessionStore = fresh;
+      fresh.getState().setFeatureCollectionUri(itemPath);
+      try {
+        hydrateStoreFromFeatures(fresh.getState(), features as DebriefFeature[]);
+      } catch (err) {
+        if (err instanceof SystemStateLoadError) {
+          setPlotLoadError({ code: err.kind, message: err.message });
+          return;
+        }
+        throw err;
+      }
+      fresh.getState().clearHistory();
+      fresh.getState().markClean();
+      const transferredFc: PlotState['features'] = {
+        type: 'FeatureCollection',
+        features: features as Feature[],
+      };
+      setCurrentPlot({ itemPath, title: itemPath, features: transferredFc });
+      setView('analysis');
+    };
+    return () => {
+      delete window.__openPlot;
+      delete window.__backToCatalog;
+      delete window.__openPlotFromFeatures;
+    };
   }, [handlePlotSelect, handleBackToCatalog]);
 
   // Restore original features for a reverted activity
