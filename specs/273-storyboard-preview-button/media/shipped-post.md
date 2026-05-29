@@ -42,11 +42,6 @@ It starts in the authoring surface. Here is the *Saxon Warrior — Twin CPA* exe
 ![Web-shell authoring surface: the Saxon Warrior storyboard with four captured scenes and the Preview button in the panel header](images/preview-trigger-webshell.png)
 *The trigger: a storyboard with four captured scenes, Preview live in the panel header. Every screenshot below was produced by a Playwright run that clicked this exact button.*
 
-The same control lives on the **desktop (VS Code) surface** — the Preview button sits in the Debrief storyboard panel beside Capture, exactly as it does in the browser. Here the *Exercise Alpha* brief is open in the VS Code extension, three scenes over the HMS Defender / USS Freedom tracks:
-
-![VS Code extension: the Debrief storyboard panel with captured scenes and the Preview button, beside the map with the exercise tracks](images/vscode-preview-panel.png)
-*The desktop surface: the storyboard panel + Preview control inside real VS Code, beside the map. Clicking Preview opens the same finished-briefing player — in VS Code via an ephemeral loopback server rather than a blob URL.*
-
 One click opens the finished-briefing player in a new tab and plays the storyboard back — the same renderer that ships inside an exported zip, here driven live from a `?features=` blob URL. The player flies the viewport to each captured scene in turn over a live OpenStreetMap basemap. Below is the briefing playing scene by scene, progressively closing on the two vessels' converging tracks.
 
 ![Scene 1 — opening overview: both vessel tracks in frame, the two paths crossing](images/preview-scene-1-overview.png)
@@ -68,6 +63,32 @@ And when there is nothing to preview yet, the button stays out of the way:
 
 ![Preview button disabled with tooltip when storyboard has no scenes](images/preview-disabled-no-scenes.png)
 *With no scenes captured, the button is disabled and a tooltip explains why.*
+
+### The same loop on the desktop (VS Code)
+
+Everything above is the browser surface. The desktop extension tells the identical story — capture, then Preview — inside real VS Code. The *Exercise Alpha* brief opens with two vessel tracks (HMS Defender and USS Freedom). Capturing a scene starts by naming the storyboard inline, right in the panel, with no modal thrown over the map:
+
+![VS Code: capturing the first scene — the inline naming row over the Exercise Alpha map](images/vscode-storyboard-capture.png)
+*Capturing in VS Code: clicking Capture names the storyboard inline, then screenshots the live map to a real thumbnail — the same capture pipeline as the browser.*
+
+A few captures later the panel holds a storyboard of real captured-map thumbnails, and **Preview** sits live beside Capture:
+
+![VS Code: the populated storyboard panel with real captured thumbnails beside the map](images/vscode-storyboard-panel.png)
+*The desktop authoring surface: each scene row is a real thumbnail of the map at capture time. Preview is active because the storyboard has scenes.*
+
+One click on Preview opens the same finished-briefing player — on the desktop it is served by an ephemeral loopback HTTP server bound to `127.0.0.1` rather than a blob URL, but the renderer is byte-identical:
+
+![VS Code: the Preview button live in the populated storyboard panel — the trigger](images/vscode-preview-trigger.png)
+*The trigger on the desktop: one click stands up the loopback server and opens the player.*
+
+![VS Code preview playback: the briefing renderer playing scene 1 over an OpenStreetMap basemap, launched from VS Code](images/vscode-preview-playback.png)
+*Replaying live, launched from VS Code's loopback server — the same player that ships inside an export zip, here reading the active storyboard over a live basemap.*
+
+![VS Code preview: flown in to the final scene, the two tracks converging](images/vscode-preview-scene-3.png)
+*Scene 3 — the player flies the viewport between the captured framings, just as on the browser surface.*
+
+![VS Code preview in Present mode — chrome hidden, the map fills the tab](images/vscode-preview-present.png)
+*Present mode (P) on the desktop-launched preview — chrome hides and the map fills the tab, exactly as the distributed briefing plays.*
 
 ## By the Numbers
 

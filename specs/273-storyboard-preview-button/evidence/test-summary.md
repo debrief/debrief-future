@@ -168,6 +168,37 @@ Screenshots written to `evidence/screenshots/` (also mirrored to `media/images/`
 > `ignoreHTTPSErrors: true` purely so the OSM basemap paints for the
 > screenshots. Real users reach OSM directly; no product code is affected.
 
+### VS Code desktop-surface capture + Preview E2E (manual evidence) — Playwright, passes
+
+`tests/e2e/test-storyboard-preview-vscode.spec.ts` drives the **real** Debrief
+extension in real code-server (`cloud-e2e-setup.sh`; CI-skipped, gated on
+`E2E_REFRESH_VSCODE_SCREENSHOTS=1`). The web-shell shots above prove the browser
+surface; these prove the desktop surface end-to-end:
+
+| Step | Status |
+|------|--------|
+| Open *Exercise Alpha* (HMS Defender / USS Freedom) in code-server, focus the Storyboard view | Pass |
+| Click **Capture** → name the storyboard inline → the real capture pipeline screenshots the map webview to a PNG, writes the thumbnail asset pair, and persists the Scene | Pass |
+| Capture three Scenes (zooming the map between each) → panel shows real captured-map thumbnails | Pass |
+| Seeded run: click **Preview** → the loopback `BriefingPreviewServer` starts on `127.0.0.1` (detected via a new listener) | Pass |
+| Navigate the served renderer → transport reads `1 / 3`, OSM basemap paints, vessel-track SVG paths drawn | Pass |
+| Step the transport to `3 / 3`; `P` enters Present mode (chrome hidden) | Pass |
+
+Screenshots written to `evidence/screenshots/` (mirrored to `media/images/`):
+`vscode-storyboard-capture.png` (naming a storyboard mid-capture),
+`vscode-storyboard-panel.png` (populated panel, real captured thumbnails),
+`vscode-preview-trigger.png` (Preview enabled), `vscode-preview-playback.png`
+(renderer playing, launched from VS Code's loopback server),
+`vscode-preview-scene-3.png`, `vscode-preview-present.png`.
+
+> Note: capturing a Scene from inside code-server was previously believed
+> blocked (#143). It is not — the genuine capture round-trip works when the
+> panel webview frame reference is kept stable across the click→name→confirm
+> interaction (re-finding mid-flow races the post-confirm re-mount). The
+> Preview *playback* shots use a seeded three-scene storyboard (distinct
+> viewports + times) for a deterministic, visibly-flying briefing; the renderer
+> the loopback server serves is byte-identical to the export-zip player.
+
 ## Environment
 
 - Runners: vitest (renderer / export / components / vscode / web-shell), Playwright (`@sparticuz/chromium` bundled Chromium, cloud session).
