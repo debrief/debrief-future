@@ -103,21 +103,19 @@ test.describe('267 — tolerant playhead import', () => {
       window.__openPlotFromFeatures?.('orphaned/plot.geojson', features);
     }, transfer);
 
-    // The plot OPENS (map renders) — no hard fail.
-    await expect(page.locator('.leaflet-container')).toBeVisible();
+    // The plot OPENS (analysis view) — no hard fail. The clamp is NOT silent:
+    // an always-visible, non-blocking toast names the edge (no tab switch).
+    await expect(page.locator('.web-shell--analysis')).toBeVisible();
     await expect(page.locator('[data-testid="plot-load-error-banner"]')).toHaveCount(0);
-
-    // The in-memory playhead was clamped to the window END (epoch ms).
-    await expect
-      .poll(() => analysis.getCurrentTime())
-      .toBe(Date.parse(WINDOW_END));
-
-    // The clamp is NOT silent — a non-blocking toast names the edge. The toast
-    // lives in the LogPanel; switch to the Log tab to bring it into view.
-    await analysis.switchToLogTab();
     await expect(analysis.clampNotification).toBeVisible();
     await expect(analysis.clampNotification).toContainText(/time range/i);
     await expect(analysis.clampNotification).toContainText(/window end/i);
+
+    // The in-memory playhead was clamped to the window END (epoch ms).
+    await expect.poll(() => analysis.getCurrentTime()).toBe(Date.parse(WINDOW_END));
+
+    // The map renders too (the plot is fully usable, not just partially loaded).
+    await expect(page.locator('.leaflet-container')).toBeVisible();
 
     await page.screenshot({ path: path.join(SHOTS, 'playhead-clamp-toast.png') });
   });

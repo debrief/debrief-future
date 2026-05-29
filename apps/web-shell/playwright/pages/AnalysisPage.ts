@@ -591,13 +591,13 @@ export class AnalysisPage {
   // ─────────────────────────────────────────────────────────────────────────────
 
   /**
-   * The non-blocking clamp notification surfaced in the LogPanel when an
-   * orphaned saved playhead is moved to the window edge on load (spec 267,
-   * FR-003). Reuses the existing LogPanel `actionResultMessage` transient — it
-   * is only visible while the Log tab is active.
+   * The non-blocking clamp notification surfaced when an orphaned saved playhead
+   * is moved to the window edge on load (spec 267, FR-003). An always-visible,
+   * auto-dismissing App-level toast (not tab-gated), distinct from the #259
+   * error banner.
    */
   get clampNotification(): Locator {
-    return this.page.getByTestId('log-panel-notification');
+    return this.page.getByTestId('playhead-clamp-toast');
   }
 
   /**

@@ -6,8 +6,12 @@
  */
 import type { PlayheadClampDiagnostic } from '@debrief/session-state';
 
-/** Auto-dismiss dwell (ms) for the clamp toast — long enough to read and notice. */
-export const PLAYHEAD_CLAMP_NOTICE_MS = 6000;
+/**
+ * Auto-dismiss dwell (ms) for the clamp toast. Longer than the routine
+ * action transients (~3 s) because a load-time notice competes with the map
+ * mounting — the analyst should still catch it after the plot settles.
+ */
+export const PLAYHEAD_CLAMP_NOTICE_MS = 10000;
 
 /** Build the clamp toast text, or `null` when nothing was clamped (FR-009). */
 export function buildPlayheadClampMessage(
