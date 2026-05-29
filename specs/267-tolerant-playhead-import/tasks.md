@@ -59,7 +59,7 @@ description: "Task list for 267-tolerant-playhead-import"
 > **261 is MERGED (2026-05-29)** — the gate is now a quick confirmation, not a blocker. Real targets: `system-state/{validate.ts,read.ts,store-bridge.ts,errors.ts,types.ts}`.
 
 - [ ] T001 Confirm spec-261 surfaces are present and have the expected shape: `checkTemporalCrossField` in `validate.ts` (returns a string today), `readSystemStateFromFeatureCollection` in `read.ts` (throws `SystemStateLoadError(kind='cross-field-invariant')` at the temporal branch), `hydrateStoreFromFeatures` in `store-bridge.ts` (returns `void` today), `SystemStateLoadError` in `errors.ts` `services/session-state/src/system-state/`
-- [ ] T002 [P] Add shared in-memory fixture FeatureCollections — temporal SystemState with `current_time` before-start, after-end, in-range, on-boundary, single-instant window, and an incoherent `start>end` window `services/session-state/src/system-state/__tests__/fixtures/playhead-clamp-fixtures.ts`
+- [ ] T002 [P] Reuse the already-shipped 261 fixtures `cross-field/temporal-current-time-out-of-window.json` and `cross-field/temporal-bad-window.json` (`shared/schemas/fixtures/`); add only the missing in-memory cases not covered by them (before-start, on-boundary, single-instant window) `services/session-state/src/system-state/__tests__/fixtures/playhead-clamp-fixtures.ts`
 
 **Checkpoint**: Surfaces confirmed; fixtures ready for both stories.
 
@@ -74,13 +74,13 @@ description: "Task list for 267-tolerant-playhead-import"
 **⚠️ CRITICAL**: Blocks US1 and US2. Depends on T001.
 
 - [ ] T003 Add the `PlayheadClampDiagnostic` interface (`kind:'playhead-clamped'`, `featureId`, `edge:'start'|'end'`, `originalCurrentTime`, `clampedCurrentTime`) `services/session-state/src/system-state/types.ts`
-- [ ] T004 [P][test] Write `checkTemporalCrossField` tests — `fatal` for `start>end`/unparseable; `recoverable-playhead` (with `edge` + `clampedCurrentTime`) for before-start / after-end; `ok` for in-range/boundary/absent — update existing assertions, must FAIL first `services/session-state/src/system-state/__tests__/validate.test.ts`
+- [ ] T004 [P][test] Write `checkTemporalCrossField` tests — `fatal` for `start>end` AND for **unparseable** `start_time`/`end_time`/`current_time` (enumerate each explicitly — review test gap); `recoverable-playhead` (with `edge` + `clampedCurrentTime`) for before-start / after-end; `ok` for in-range/boundary/absent — update existing assertions, must FAIL first `services/session-state/src/system-state/__tests__/validate.test.ts`
 - [ ] T005 Refactor `checkTemporalCrossField` to return `TemporalCrossFieldResult` (`{status:'ok'} | {status:'fatal';message} | {status:'recoverable-playhead';edge;clampedCurrentTime;message}`); export the type `services/session-state/src/system-state/validate.ts`
-- [ ] T006 [P][test] Write `read.ts` tests — out-of-window `current_time` no longer throws: `map.temporal.current_time` is clamped to the boundary and (with a sink) a diagnostic is pushed; `start>end` still throws `cross-field-invariant` — update existing throw-assertion, must FAIL first `services/session-state/src/system-state/__tests__/read.test.ts`
-- [ ] T007 Amend `read.ts`: add optional `playheadClamps?: PlayheadClampDiagnostic[]` param; on `fatal` throw `SystemStateLoadError` (unchanged), on `recoverable-playhead` set `current_time = clampedCurrentTime` + push the diagnostic `services/session-state/src/system-state/read.ts`
-- [ ] T008 Amend `hydrateStoreFromFeatures` to own a local clamp sink, pass it to `read`, and return `PlayheadClampDiagnostic[]` (still throws for fatal) `services/session-state/src/system-state/store-bridge.ts`
-- [ ] T009 [P] Re-export `PlayheadClampDiagnostic` from the helper barrel `services/session-state/src/system-state/index.ts`
-- [ ] T010 [P] Re-export `PlayheadClampDiagnostic` from the package barrels `services/session-state/src/index.ts` and `services/session-state/src/browser.ts`
+- [ ] T006 [P][test] Write `read.ts` tests — out-of-window `current_time` no longer throws: `result.map.temporal.current_time` is clamped to the boundary and `result.playheadClamps` has one entry; `start>end` still throws `cross-field-invariant` — update existing throw-assertion + the ~6 callers to destructure `.map`, must FAIL first `services/session-state/src/system-state/__tests__/read.test.ts`
+- [ ] T007 Amend `read.ts`: change return to `ReadSystemStateResult { map; playheadClamps }` (review 1A — explicit return, not an optional sink); on `fatal` throw `SystemStateLoadError` (unchanged), on `recoverable-playhead` build a typed copy `{ ...v, current_time: clampedCurrentTime }` (review 2A — no `as`-cast) + push the diagnostic; update the ~6 callers/re-exports to destructure `.map` `services/session-state/src/system-state/read.ts`
+- [ ] T008 Amend `hydrateStoreFromFeatures` to destructure `{ map, playheadClamps }` from `read`, hydrate from `map`, and return `playheadClamps` (still throws for fatal) `services/session-state/src/system-state/store-bridge.ts`
+- [ ] T009 [P] Re-export `PlayheadClampDiagnostic` and `ReadSystemStateResult` from the helper barrel `services/session-state/src/system-state/index.ts`
+- [ ] T010 [P] Re-export `PlayheadClampDiagnostic` (and `ReadSystemStateResult`) from the package barrels `services/session-state/src/index.ts` and `services/session-state/src/browser.ts`
 
 **Checkpoint**: Diagnostic type + severity split + read clamp + bridge return exist and unit-pass. Stories can begin.
 
@@ -99,7 +99,7 @@ description: "Task list for 267-tolerant-playhead-import"
 ### Tests for User Story 1 ⚠️ (write first, must FAIL before implementation)
 
 - [ ] T011 [P][test][US1] `store-bridge` test: `hydrateStoreFromFeatures` returns ONE `PlayheadClampDiagnostic` for an orphaned-playhead plot and sets the store's `currentTime` to the window edge; returns `[]` for a clean plot (uses a structural `ViewStateStore` stub — no Zustand needed) `services/session-state/src/system-state/__tests__/store-bridge.test.ts`
-- [ ] T012 [P][test][US1] VS Code bridge test: an orphaned-playhead plot does NOT throw and yields a clamp; the existing malformed-feature `toThrow(SystemStateLoadError)` case still passes `apps/vscode/tests/unit/systemStateBridge.test.ts`
+- [ ] T012 [P][test][US1] VS Code tests (review 3A — closes the silent-clamp gap): (a) in `apps/vscode/tests/unit/systemStateBridge.test.ts` — an orphaned-playhead plot does NOT throw and yields a clamp; the existing malformed `toThrow(SystemStateLoadError)` still passes; (b) an `openPlot` clamp-branch test that mocks `vscode.window.showWarningMessage` and asserts it IS called for a returned clamp and `showErrorMessage` is NOT called for the recoverable case `apps/vscode/tests/unit/systemStateBridge.test.ts`
 
 ### Web-Shell E2E Tests for User Story 1 🖥️
 
@@ -110,8 +110,8 @@ description: "Task list for 267-tolerant-playhead-import"
 
 ### Implementation for User Story 1
 
-- [ ] T015 [P][US1] VS Code host: capture the `hydrateStoreFromFeatures` return at `openPlot.ts:~180`; if clamps present, show ONE coalesced non-blocking `vscode.window.showWarningMessage` (count-summarised for multi-plot restore); keep the existing `catch (SystemStateLoadError) → showErrorMessage` for fatal cases `apps/vscode/src/commands/openPlot.ts`
-- [ ] T016 [P][US1] Web-shell host: capture the `hydrateStoreFromFeatures` return at both call sites (`App.tsx:591,677`); surface ONE coalesced non-blocking toast via the existing App notification surface `apps/web-shell/src/App.tsx`
+- [ ] T015 [P][US1] VS Code host: capture the `hydrateStoreFromFeatures` return at `openPlot.ts:~180`; if a clamp is present, show a non-blocking `vscode.window.showWarningMessage`; keep the existing `catch (SystemStateLoadError) → showErrorMessage` for fatal cases (per-plot load — no coalescing needed, FR-006 dropped) `apps/vscode/src/commands/openPlot.ts`
+- [ ] T016 [P][US1] Web-shell host: capture the `hydrateStoreFromFeatures` return at both call sites (`App.tsx:591,677`); surface a non-blocking message by reusing the existing `logNotification` transient (App.tsx:276, auto-dismiss) — NOT the #259 error banner `apps/web-shell/src/App.tsx`
 - [ ] T017 [P][US1] Re-export `PlayheadClampDiagnostic` through the host bridge barrels so call sites can type the return `apps/vscode/src/services/systemStateBridge.ts` and `apps/web-shell/src/session-state-browser.ts`
 - [ ] T018 [US1] Run web-shell E2E tolerant scenario: `cd apps/web-shell && node run-playwright.mjs playhead-clamp`
 
@@ -159,7 +159,7 @@ description: "Task list for 267-tolerant-playhead-import"
 
 - [ ] T025 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed/failed/skipped`, `coverage_pct`) + key scenarios verified `specs/267-tolerant-playhead-import/evidence/test-summary.md`
 - [ ] T026 [P] Record usage demonstration — before/after temporal SystemState JSON + the `checkTemporalCrossField` `recoverable-playhead` result + the emitted `PlayheadClampDiagnostic` + the save-time heal (re-open shows no clamp) `specs/267-tolerant-playhead-import/evidence/usage-example.md`
-- [ ] T027 [P] Write the integration flow narrative — load → `checkTemporalCrossField` (split severity) → `read.ts` clamp + diagnostic → `hydrateStoreFromFeatures` returns → coalesced host notification → save-time heal `specs/267-tolerant-playhead-import/evidence/integration-flow.md`
+- [ ] T027 [P] Write the integration flow narrative — load → `checkTemporalCrossField` (split severity) → `read.ts` clamp + diagnostic → `hydrateStoreFromFeatures` returns → non-blocking host notification → save-time heal `specs/267-tolerant-playhead-import/evidence/integration-flow.md`
 - [ ] T028 [P] Author the sequence diagram of the same flow (`validate.ts` / `read.ts` / `store-bridge.ts` / host / save) `specs/267-tolerant-playhead-import/evidence/sequence.mermaid`
 
 ### Web-Shell E2E Evidence Collection (REQUIRED) 🖥️

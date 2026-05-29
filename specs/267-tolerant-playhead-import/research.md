@@ -41,19 +41,19 @@ There were no `NEEDS CLARIFICATION` markers in the Technical Context — the sta
 
 ---
 
-## R-003 — Notification surface & multi-clamp coalescing (FR-003, FR-006)
+## R-003 — Notification surface (FR-003) — coalescing dropped post-review
 
-**Decision**: Each host renders the clamp diagnostic on its **existing** non-modal surface — VS Code `window.showWarningMessage(...)` (non-modal by default; no `{modal:true}`), web-shell's existing toast component. When a single load/restore operation produces **multiple** clamp diagnostics (session restore of N plots), the host coalesces them into **one** summary notification (e.g. "Adjusted the saved time-cursor on 3 plots that fell outside their time range"). No new notification framework is introduced (Assumption 4).
+**Decision**: Each host renders the clamp diagnostic on its **existing** non-modal surface — VS Code `window.showWarningMessage(...)` (non-modal by default; no `{modal:true}`); web-shell's existing **`logNotification`** transient (App.tsx:276, auto-dismiss after 3 s) — **not** the #259 error banner, which is for load failures. No new notification framework is introduced (Assumption 4).
+
+**Multi-clamp coalescing (FR-006) was dropped at /speckit.review.** Both hosts load plots **one at a time** (VS Code `openPlot`, web-shell `App.tsx` per-plot hydrate), so a single load yields at most one clamp → one notification. There is no batch/session-restore path that could stack notifications, so coalescing solved a problem that can't occur (YAGNI; Article XIV move-fast). If such a path is ever added, coalescing is captured as a backlog item.
 
 **Rationale**:
 - Reusing host-native surfaces respects Article IV.1 (the shared helper emits data; the host owns presentation) and avoids a new dependency (Article IX).
-- Coalescing is the cheapest way to satisfy FR-006's "must not block / must not stack a wall of toasts" — a count-summarised single notification scales to any N.
-- A *warning*-level surface (not info, not error) matches the semantics: the plot opened fine (not an error), but the analyst should know their saved position was adjusted (more than mere info).
+- A *warning*-level surface (not info, not error) matches the semantics: the plot opened fine, but the analyst should know their saved position was adjusted.
 
 **Alternatives rejected**:
-- *One toast per clamp*: fails FR-006 under session restore.
-- *Status-bar-only indicator*: too easy to miss; weakens the Article I.3 "users must know" guarantee for a state change they didn't initiate.
-- *Modal dialog*: explicitly forbidden (FR-006, NG-003).
+- *Modal dialog*: explicitly forbidden (NG-003).
+- *Building coalescing now*: speculative — no multi-plot load path exists (deferred to backlog).
 
 ---
 
@@ -99,7 +99,7 @@ All of R-001 and R-002 above are the reconciled positions. The contract delta an
 |---|---|
 | R-001 | Clamp decision in `checkTemporalCrossField` (severity-split result); applied in `read.ts` via an optional `playheadClamps` sink; `store-bridge.hydrateStoreFromFeatures` returns it. No `reconcile.ts` (doesn't exist). |
 | R-002 | **No provenance written** — 261 ships view-state markers provenance-free (FR-013). The repeating non-blocking notification (every load until healed) is the durable-until-healed record. Old provenance task removed; FR-007 revised. |
-| R-003 | Reuse host-native non-modal surfaces (`showWarningMessage` / web-shell toast); coalesce multi-clamp into one summary; warning severity. |
+| R-003 | Reuse host-native non-modal surfaces (`showWarningMessage` / web-shell `logNotification`); warning severity. Coalescing **dropped** (per-plot loads; deferred to backlog). |
 | R-004 | Compare in epoch (`Date.parse`); the clamped value is the boundary's verbatim ISO string (no reformat drift). |
 | R-005 | **Resolved** — 261 merged; T001 is now a confirmation. Shipped shape differed from planned contract; all artifacts reconciled. |
 | R-006 | `start>end` is `fatal` and throws in `read.ts` before any clamp (precedence). |

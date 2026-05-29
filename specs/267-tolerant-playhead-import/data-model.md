@@ -58,21 +58,22 @@ The clamp *decision* (which edge, what value) is computed here — no separate c
 
 ## Entity 3: `read.ts` recoverable handling (`readSystemStateFromFeatureCollection`)
 
-`read.ts` is the throw site. It gains an **optional diagnostics sink** (so existing callers compile unchanged):
+`read.ts` is the throw site. Its **return type** changes to surface diagnostics explicitly (review 1A — chosen over an optional mutable sink to remove the silent-clamp footgun):
 
 ```typescript
-export function readSystemStateFromFeatureCollection(
-  fc: PlotFeatureCollection,
-  playheadClamps?: PlayheadClampDiagnostic[],
-): SystemStateMap;
+export interface ReadSystemStateResult {
+  map: SystemStateMap;
+  playheadClamps: PlayheadClampDiagnostic[];   // [] when none
+}
+export function readSystemStateFromFeatureCollection(fc: PlotFeatureCollection): ReadSystemStateResult;
 ```
 
 At the temporal branch it switches on `checkTemporalCrossField`:
 - `fatal` → `throw new SystemStateLoadError({ kind: 'cross-field-invariant', … })` (as today).
-- `recoverable-playhead` → set the parsed variant's `current_time` to `clampedCurrentTime` (so the value in the returned `SystemStateMap` is already in-window), then `playheadClamps?.push({...})`.
+- `recoverable-playhead` → build a **typed copy** `{ ...v, current_time: clampedCurrentTime }` (review 2A — no `as`-cast, no mutation of the parsed object), place it in the map, and push the diagnostic into `playheadClamps`.
 - `ok` → unchanged.
 
-**Why the clamp lands here**: `read.ts` is the one place holding the `featureId`, the parsed `TemporalVariant`, and the cross-field verdict together. Clamping the value before it enters the `SystemStateMap` means the downstream `temporalVariantToSlice` (ISO→epoch) needs **no change** — it converts the already-clamped value.
+**Why the clamp lands here**: `read.ts` is the one place holding the `featureId`, the parsed `TemporalVariant`, and the cross-field verdict together — and once it throws, the whole map is lost, so recovery *must* happen before the throw. Clamping the value before it enters the `SystemStateMap` means the downstream `temporalVariantToSlice` (ISO→epoch) needs **no change** — it converts the already-clamped value.
 
 ---
 
@@ -89,7 +90,7 @@ export function hydrateStoreFromFeatures(
 ): PlayheadClampDiagnostic[];
 ```
 
-It owns a local sink, passes it to `read`, hydrates the store as today, and returns the sink (`[]` when no clamp). Still throws `SystemStateLoadError` for fatal cases (callers' `try/catch` is unchanged).
+It destructures `const { map, playheadClamps } = readSystemStateFromFeatureCollection(fc)`, hydrates the store from `map` as today, and returns `playheadClamps` (`[]` when no clamp). Still throws `SystemStateLoadError` for fatal cases (callers' `try/catch` is unchanged).
 
 ---
 
@@ -116,8 +117,8 @@ It owns a local sink, passes it to `read`, hydrates the store as today, and retu
                                    store-bridge.hydrateStoreFromFeatures → returns PlayheadClampDiagnostic[]
                                             (store.setCurrentTime gets the in-window value via temporalVariantToSlice)
                                                         ▼
-                                   host (openPlot.ts / App.tsx): ONE coalesced non-blocking
-                                            warning/toast (FR-003/006). Repeats on every load
+                                   host (openPlot.ts / App.tsx): non-blocking
+                                            warning/logNotification (FR-003). Repeats on every load
                                                         ▼
                                    (next explicit save) write.ts persists the in-window current_time;
                                             re-open → ok, no clamp, no notification (FR-008, SC-005)
@@ -131,7 +132,7 @@ It owns a local sink, passes it to `read`, hydrates the store as today, and retu
 |---|---|---|
 | `start_time > end_time` (or unparseable) still throws | `validate.ts` `fatal` → `read.ts` throw | I.3, XIV.4, FR-004/005 |
 | Coherent-window `current_time` out of range → clamp to boundary, no throw | `validate.ts` `recoverable-playhead` → `read.ts` | FR-001/002 (XIV.4 sanctioned relaxation) |
-| A clamp emits exactly one `PlayheadClampDiagnostic` (when a sink is supplied) | `read.ts` | FR-003, SC-003 |
+| A clamp emits exactly one `PlayheadClampDiagnostic` in `result.playheadClamps` | `read.ts` | FR-003, SC-003 |
 | In-range/absent `current_time` → no diagnostic, behaviour byte-identical to 261 | `validate.ts` `ok` path | FR-009, SC-006 |
 | Clamp never marks dirty / never auto-saves | host load path (no save triggered) | FR-008, 261 FR-017 |
 | The clamp is surfaced on **every** load until the analyst saves the healed value | host notification (repeats; no in-plot provenance — 261 FR-013) | I.3, FR-003 (revised FR-007) |

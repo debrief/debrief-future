@@ -66,43 +66,46 @@ Sole runtime caller is `read.ts`; the only test is `validate.test.ts`. (The `che
 
 ## Δ3 — `read.ts`: clamp the recoverable case instead of throwing
 
-`read.ts` gains an **optional** diagnostics sink so existing callers compile unchanged:
+`read.ts` changes its **return type** to surface diagnostics explicitly (review decision 1A — chosen over an optional mutable sink, which risked a silent clamp if a caller forgot it):
 
 ```diff
 - export function readSystemStateFromFeatureCollection(fc: PlotFeatureCollection): SystemStateMap
-+ export function readSystemStateFromFeatureCollection(
-+   fc: PlotFeatureCollection,
-+   playheadClamps?: PlayheadClampDiagnostic[],   // optional sink; pushed-to on a recoverable clamp
-+ ): SystemStateMap
++ export interface ReadSystemStateResult {
++   map: SystemStateMap;
++   playheadClamps: PlayheadClampDiagnostic[];   // [] when none
++ }
++ export function readSystemStateFromFeatureCollection(fc: PlotFeatureCollection): ReadSystemStateResult
 ```
 
-At the temporal branch (currently lines 98-109):
+At the temporal branch (currently lines 98-109), build the clamped variant with a **typed copy — no `as`-cast, no mutation** (review decision 2A, Article XV):
 
 ```typescript
-const res = checkTemporalCrossField(result.data as TemporalVariant);
+const v = result.data as TemporalVariant;
+const res = checkTemporalCrossField(v);
 if (res.status === 'fatal') {
   throw new SystemStateLoadError({ kind: 'cross-field-invariant', featureIds: [featureId(f)], message: `… ${res.message}.` });
 }
+let temporal: TemporalVariant = v;
 if (res.status === 'recoverable-playhead') {
-  const original = (result.data as TemporalVariant).current_time as string;
-  (result.data as { current_time?: string }).current_time = res.clampedCurrentTime; // in-window before it reaches the map
-  playheadClamps?.push({
+  temporal = { ...v, current_time: res.clampedCurrentTime };   // typed copy, in-window before it enters the map
+  playheadClamps.push({
     kind: 'playhead-clamped',
     featureId: featureId(f),
     edge: res.edge,
-    originalCurrentTime: original,
+    originalCurrentTime: v.current_time as string,
     clampedCurrentTime: res.clampedCurrentTime,
   });
 }
+// place `temporal` into the map for the temporal key
 ```
 
 **Observable behaviour**:
-- Pure (modulo the caller-owned `playheadClamps` array). No mutation of `fc`.
+- Pure (the `playheadClamps` array is created fresh inside `read` and returned). No mutation of `fc`, no mutation of the Zod-parsed object.
 - Fatal cross-field (incl. `start>end`) still throws `SystemStateLoadError(kind='cross-field-invariant')` — FR-004/FR-005.
-- Recoverable case: the returned `map.temporal.current_time` is already clamped in-window; a diagnostic is pushed iff a sink was supplied.
+- Recoverable case: `map.temporal.current_time` is already clamped in-window; the clamp is reported in `playheadClamps`.
 - All other read behaviour (duplicate, malformed, unknown, missing-discriminator) unchanged.
 
-> Existing non-sink callers (tests, public re-exports) keep compiling and now *recover* rather than throw for the orphaned-playhead case. The only test that must change is the `read.test.ts` case asserting that out-of-window `current_time` throws — it flips to asserting a clamp.
+**Caller migration (~6 sites)**: `store-bridge.ts` (Δ4) and the read unit tests destructure `.map`; the public re-exports (`index.ts`, `browser.ts`, `session-state-browser.ts`) re-export the new `ReadSystemStateResult` type. Trivial, mechanical. The `read.test.ts` case asserting out-of-window `current_time` *throws* flips to asserting a clamp on `result.playheadClamps`.
 
 ---
 
@@ -116,16 +119,16 @@ if (res.status === 'recoverable-playhead') {
 + ): PlayheadClampDiagnostic[]
 ```
 
-Body: create `const playheadClamps: PlayheadClampDiagnostic[] = []`, pass it to `readSystemStateFromFeatureCollection(fc, playheadClamps)`, hydrate the store as today (the temporal slice now receives the clamped `current_time` via the unchanged `temporalVariantToSlice`), and `return playheadClamps`.
+Body: `const { map, playheadClamps } = readSystemStateFromFeatureCollection(fc);` — hydrate the store from `map` as today (the temporal slice receives the clamped `current_time` via the unchanged `temporalVariantToSlice`), and `return playheadClamps`.
 
-**Observable behaviour**: still throws `SystemStateLoadError` for fatal cases (callers' `try/catch` unchanged). Returns `[]` when no clamp occurred. Existing callers that ignore the return value keep compiling.
+**Observable behaviour**: still throws `SystemStateLoadError` for fatal cases (callers' `try/catch` unchanged). Returns `[]` when no clamp occurred. Existing callers that ignore the return value keep compiling — but per review decision 1A the explicit return makes the diagnostics a visible value rather than a forgettable out-param.
 
 ---
 
 ## Δ5 — Host rendering (no helper change; consume the return)
 
-- **VS Code** `apps/vscode/src/commands/openPlot.ts` (~line 180): capture `const clamps = hydrateStoreFromFeatures(...)`; after the `try`, if `clamps.length > 0` show ONE coalesced non-blocking `vscode.window.showWarningMessage(...)` (count-summarised). The existing `catch (SystemStateLoadError) → showErrorMessage` stays for fatal cases. Apply the same in the wrapper `apps/vscode/src/services/systemStateBridge.ts` if it narrows the return type.
-- **web-shell** `apps/web-shell/src/App.tsx` (lines 591, 677): capture the return at both hydrate call sites; surface ONE coalesced non-blocking toast via the existing App notification surface.
+- **VS Code** `apps/vscode/src/commands/openPlot.ts` (~line 180): capture `const clamps = hydrateStoreFromFeatures(...)`; after the `try`, if `clamps.length > 0` show a non-blocking `vscode.window.showWarningMessage(...)`. The existing `catch (SystemStateLoadError) → showErrorMessage` stays for fatal cases. Apply the same in the wrapper `apps/vscode/src/services/systemStateBridge.ts` if it narrows the return type. (Per-plot load → at most one clamp; coalescing dropped at review.)
+- **web-shell** `apps/web-shell/src/App.tsx` (lines 591, 677): capture the return at both hydrate call sites; surface a non-blocking message by reusing the existing `logNotification` transient (App.tsx:276, auto-dismiss) — not the #259 error banner.
 
 ---
 
@@ -142,7 +145,8 @@ Durable-until-healed record instead: the clamp surfaces a non-blocking notificat
 | File | Coverage |
 |---|---|
 | `system-state/__tests__/validate.test.ts` | `checkTemporalCrossField` returns `fatal` for `start>end`/unparseable; `recoverable-playhead` (`edge`, `clampedCurrentTime`) for before-start / after-end; `ok` for in-range/boundary/absent. |
-| `system-state/__tests__/read.test.ts` | out-of-window `current_time` → no throw, `map.temporal.current_time` clamped, diagnostic pushed to sink; `start>end` → still throws `cross-field-invariant`; both-defects → throws (precedence). |
-| `system-state/__tests__/store-bridge.test.ts` (or `apps/vscode/tests/unit/systemStateBridge.test.ts`) | `hydrateStoreFromFeatures` returns one clamp for an orphaned plot and `[]` for a clean plot; store `currentTime` lands on the window edge; malformed feature still throws. |
+| `system-state/__tests__/read.test.ts` | out-of-window `current_time` → no throw, `result.map.temporal.current_time` clamped, `result.playheadClamps` has one entry; `start>end` → still throws `cross-field-invariant`; **unparseable** start/end/current → throws (fatal); both-defects → throws (precedence). |
+| `system-state/__tests__/store-bridge.test.ts` | `hydrateStoreFromFeatures` returns one clamp for an orphaned plot and `[]` for a clean plot; store `currentTime` lands on the window edge; malformed feature still throws. |
 | `apps/vscode/tests/unit/systemStateBridge.test.ts` | existing `toThrow(SystemStateLoadError)` (malformed) still passes; new: orphaned playhead does not throw and returns a clamp. |
+| **VS Code render** (review 3A) | `openPlot` clamp branch calls `vscode.window.showWarningMessage` (mock) when `hydrateStoreFromFeatures` returns clamps, and does **not** call `showErrorMessage` for the recoverable case — closes the silent-clamp gap (Article I.3). |
 | web-shell E2E `apps/web-shell/playwright/tests/playhead-clamp.spec.ts` | orphaned-playhead plot opens + toast + playhead at edge; incoherent-window plot fails to open. |

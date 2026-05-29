@@ -7,7 +7,7 @@
 
 Relax spec-261's FR-018 strict-on-import rule for exactly one recoverable sub-case: a temporal `SystemState` whose `current_time` (saved playhead) falls outside an *otherwise-coherent* `[start_time, end_time]` window. Instead of failing the whole plot load with `SystemStateLoadError(kind='cross-field-invariant')`, the load succeeds, the in-memory playhead is clamped to the nearest window edge, and the host surfaces a non-blocking notification. The genuinely-incoherent case (`start_time > end_time`) keeps its hard, structured load error — the guard rail that keeps the relaxation narrow.
 
-Technical approach *(reconciled to spec-261 as merged, 2026-05-29)*: this is a behavioural amendment to spec-261's shipped `SystemState` layer (`services/session-state/src/system-state/`), not a schema change. `checkTemporalCrossField` (`validate.ts`) — today returning a single violation string for both invariants — is split by severity: `start>end`/unparseable stays `fatal` (throws), `current_time`-out-of-window becomes `recoverable-playhead` carrying the clamp edge + value. `read.ts` (the throw site) applies the recoverable case by clamping `current_time` to the window boundary and pushing a `PlayheadClampDiagnostic` to an optional sink. `hydrateStoreFromFeatures` (`store-bridge.ts` — the single both-host load entry) returns those diagnostics; the hosts (`openPlot.ts` / `App.tsx`) render one coalesced non-blocking notification. No LinkML change, no new runtime dependency, and **no provenance write** — 261 ships view-state markers provenance-free (FR-013), so the repeating notification is the durable-until-healed record (revised FR-007).
+Technical approach *(reconciled to spec-261 as merged, 2026-05-29)*: this is a behavioural amendment to spec-261's shipped `SystemState` layer (`services/session-state/src/system-state/`), not a schema change. `checkTemporalCrossField` (`validate.ts`) — today returning a single violation string for both invariants — is split by severity: `start>end`/unparseable stays `fatal` (throws), `current_time`-out-of-window becomes `recoverable-playhead` carrying the clamp edge + value. `read.ts` (the throw site) applies the recoverable case by clamping `current_time` to the window boundary (a typed copy, review 2A) and returning it in an explicit `{ map, playheadClamps }` result (review 1A — not an optional sink). `hydrateStoreFromFeatures` (`store-bridge.ts` — the single both-host load entry) returns those diagnostics; the hosts (`openPlot.ts` / `App.tsx`) render a non-blocking notification (one per plot — coalescing dropped per /speckit.review). No LinkML change, no new runtime dependency, and **no provenance write** — 261 ships view-state markers provenance-free (FR-013), so the repeating notification is the durable-until-healed record (revised FR-007).
 
 ## Technical Context
 
@@ -19,7 +19,7 @@ Technical approach *(reconciled to spec-261 as merged, 2026-05-29)*: this is a b
 **Project Type**: Web/extension monorepo (existing). No new project.
 **Performance Goals**: Negligible — one extra interval comparison per temporal `SystemState` at load. No measurable impact on load time.
 **Constraints**: Offline-capable (no network); the clamp is pure, in-memory, deterministic. Must not auto-mark the plot dirty (spec-261 FR-017). Notifications must be non-blocking (no modal-per-plot during session restore).
-**Scale/Scope**: At most one temporal `SystemState` per plot; session restore may open N plots, each potentially producing one clamp diagnostic → coalesced notification.
+**Scale/Scope**: At most one temporal `SystemState` per plot, loaded one plot at a time → at most one clamp + one notification per load. No batch-restore path (multi-plot coalescing deferred to backlog per /speckit.review).
 
 **Hard dependency — RESOLVED**: spec-261 (`261-session-state-systemstate`) is **MERGED** (2026-05-29). The real surfaces (`validate.ts` `checkTemporalCrossField`, `read.ts`, `store-bridge.ts` `hydrateStoreFromFeatures`, `errors.ts` `SystemStateLoadError`) exist and are the amendment targets. The shipped shape differs from 261's planned contract (no `reconcile.ts`, no `persistence/load.ts`, no provenance on markers); all artifacts here have been reconciled to the merged code. See research.md § R-005 and `contracts/system-state-helper-delta.md`.
 
@@ -87,13 +87,13 @@ services/session-state/src/
 └── browser.ts           # MODIFY — re-export PlayheadClampDiagnostic (web-shell barrel)
 
 apps/vscode/src/
-├── commands/openPlot.ts # MODIFY (~line 180) — capture hydrate return; coalesced window.showWarningMessage;
+├── commands/openPlot.ts # MODIFY (~line 180) — capture hydrate return; non-blocking window.showWarningMessage;
 │                         #          keep catch(SystemStateLoadError)→showErrorMessage for fatal
 ├── services/systemStateBridge.ts   # MODIFY — re-export the type if it narrows the bridge surface
 └── tests/unit/systemStateBridge.test.ts  # MODIFY — orphaned playhead returns a clamp (no throw)
 
 apps/web-shell/src/
-├── App.tsx              # MODIFY (lines 591, 677) — capture hydrate return; coalesced toast
+├── App.tsx              # MODIFY (lines 591, 677) — capture hydrate return; reuse logNotification transient (App.tsx:276)
 └── session-state-browser.ts        # MODIFY — re-export PlayheadClampDiagnostic
 
 apps/web-shell/playwright/
