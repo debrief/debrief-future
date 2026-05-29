@@ -40,7 +40,7 @@ export interface Plot {
  * `BaseFeatureProperties` and carry no `id`.
  *
  * Reading `properties.id` to identify a *data* feature is the defect fixed
- * in ADR-035: it silently dropped every Track from captured Scenes'
+ * in ADR-038: it silently dropped every Track from captured Scenes'
  * `visible_feature_ids`, so the exported / previewed briefing rendered an
  * empty map. Identity MUST be read from the top level via this accessor —
  * never an ad-hoc `feature.properties as { id }` cast (an unchecked
