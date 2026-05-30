@@ -33,8 +33,17 @@ COPY apps/web-shell/package.json ./apps/web-shell/
 # Docker commits layer diffs: creating + deleting node_modules in the same
 # RUN means Docker never snapshots the ~500MB node_modules directory.
 # This prevents OOM on Heroku's constrained build dynos.
+#
+# --workspace-concurrency=1 serialises the topological package build so only
+# one compiler (tsup DTS / vite / tsc) runs at a time. Heroku build containers
+# report many vCPUs, so pnpm's default parallelism builds all 7 packages at
+# once and exhausts the dyno's memory; an OOM-killed @debrief/briefing-export
+# build leaves its freshly-cleaned dist empty, which surfaces downstream as
+# esbuild "Could not resolve @debrief/briefing-export" in the vscode compile.
+# The build itself is correct (green locally under both full and scoped
+# install) — this only caps peak build-time memory.
 RUN pnpm install --filter debrief-vscode... --no-frozen-lockfile && \
-    pnpm --filter debrief-vscode... build && \
+    pnpm --filter debrief-vscode... --workspace-concurrency=1 build && \
     cd apps/vscode && npx @vscode/vsce package --no-dependencies && \
     cd /build && \
     rm -rf node_modules
