@@ -118,7 +118,7 @@ Frontend-only, no schema change, no Python. A pure shared `detectSceneOverlaps()
 
 ### PR Creation
 
-- [ ] T032 Create PR and publish blog: run `/speckit.pr`
+- [x] T032 Create PR and publish blog: run `/speckit.pr`
 
 **Task T032 must run last. It depends on all evidence and media tasks being complete.**
 
