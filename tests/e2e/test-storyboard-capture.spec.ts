@@ -37,7 +37,7 @@ test.describe.skip('Storyboard Capture — US1 end-to-end (blocked by #143)', ()
     await page.keyboard.press('Enter');
 
     // Scene row appears in the minimal Storyboard panel
-    const storyboardFrame = page.frameLocator('iframe[src*="storyboardPanel"]');
+    const storyboardFrame = page.frameLocator('iframe[src*="activityPanel"]');
     await expect(
       storyboardFrame.locator('[data-testid="scene-row"]').first(),
     ).toBeVisible({ timeout: 10_000 });

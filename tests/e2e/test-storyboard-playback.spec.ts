@@ -33,13 +33,16 @@ test.describe.skip('Storyboard Playback — US1 end-to-end (blocked by #143)', (
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await codeServerPage.getWebviewFrame();
 
-    // Open the Storyboard panel (the panel is registered as
-    // `debrief.storyboardPanel`; reveal via command palette).
+    // The Storyboard now renders as a collapsible section inside the
+    // Activity panel (UX-review flatten). Reveal the Activity view via the
+    // "Storyboard: Show Panel" command; when these tests are unblocked
+    // (#143) they must also expand the "Storyboard" PaneSection before
+    // querying transport controls.
     await page.keyboard.press('Control+Shift+KeyP');
-    await page.keyboard.type('Storyboard: Open Panel');
+    await page.keyboard.type('Storyboard: Show Panel');
     await page.keyboard.press('Enter');
 
-    const storyboardFrame = page.frameLocator('iframe[src*="storyboardPanel"]');
+    const storyboardFrame = page.frameLocator('iframe[src*="activityPanel"]');
     const transportRow = storyboardFrame.locator('[data-testid="transport-row"]');
     await transportRow.waitFor({ state: 'visible', timeout: 10_000 });
 
@@ -80,7 +83,7 @@ test.describe.skip('Storyboard Playback — US1 end-to-end (blocked by #143)', (
     await page.keyboard.press('ArrowRight');
     await page.waitForTimeout(700);
 
-    const storyboardFrame = page.frameLocator('iframe[src*="storyboardPanel"]');
+    const storyboardFrame = page.frameLocator('iframe[src*="activityPanel"]');
     await expect(
       storyboardFrame.locator('[data-testid="transport-counter"]'),
     ).toContainText('Scene 2');
@@ -122,7 +125,7 @@ test.describe.skip('Storyboard Playback — US1 end-to-end (blocked by #143)', (
 
     // Verify the current scene is still the same — the clamp prevented
     // scrubbing past scene[N+1].
-    const storyboardFrame = page.frameLocator('iframe[src*="storyboardPanel"]');
+    const storyboardFrame = page.frameLocator('iframe[src*="activityPanel"]');
     await expect(
       storyboardFrame.locator('[data-testid="transport-counter"]'),
     ).toContainText(/Scene \d/);
@@ -144,7 +147,7 @@ test.describe.skip('Storyboard Playback — US1 end-to-end (blocked by #143)', (
       await rectangles.nth(2).click();
       await page.waitForTimeout(700);
 
-      const storyboardFrame = page.frameLocator('iframe[src*="storyboardPanel"]');
+      const storyboardFrame = page.frameLocator('iframe[src*="activityPanel"]');
       const activeRow = storyboardFrame.locator(
         '[data-testid="scene-row"][data-active="true"]',
       );
@@ -163,7 +166,7 @@ test.describe.skip('Storyboard Playback — US1 end-to-end (blocked by #143)', (
     // Precondition: fixture plot with a scene referencing deleted features.
     // (In production, this is arranged by the fixture loader — here we
     // rely on the plot-under-test having a deliberately-broken scene.)
-    const storyboardFrame = page.frameLocator('iframe[src*="storyboardPanel"]');
+    const storyboardFrame = page.frameLocator('iframe[src*="activityPanel"]');
     const forward = storyboardFrame.locator('[data-testid="transport-forward"]');
 
     // Step until we hit the blocked scene.
@@ -198,7 +201,7 @@ test.describe.skip('Storyboard Playback — US1 end-to-end (blocked by #143)', (
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await codeServerPage.getWebviewFrame();
 
-    const storyboardFrame = page.frameLocator('iframe[src*="storyboardPanel"]');
+    const storyboardFrame = page.frameLocator('iframe[src*="activityPanel"]');
     const dropdown = storyboardFrame.locator(
       '[data-testid="storyboard-header-select"]',
     );
@@ -246,7 +249,7 @@ test.describe.skip('Storyboard Playback — US1 end-to-end (blocked by #143)', (
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await codeServerPage.getWebviewFrame();
 
-    const storyboardFrame = page.frameLocator('iframe[src*="storyboardPanel"]');
+    const storyboardFrame = page.frameLocator('iframe[src*="activityPanel"]');
     const overflow = storyboardFrame.locator(
       '[data-testid="storyboard-header-overflow"]',
     );
@@ -284,7 +287,7 @@ test.describe.skip('Storyboard Playback — US1 end-to-end (blocked by #143)', (
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await codeServerPage.getWebviewFrame();
 
-    const storyboardFrame = page.frameLocator('iframe[src*="storyboardPanel"]');
+    const storyboardFrame = page.frameLocator('iframe[src*="activityPanel"]');
     const overflow = storyboardFrame.locator(
       '[data-testid="storyboard-header-overflow"]',
     );
@@ -318,7 +321,7 @@ test.describe.skip('Storyboard Playback — US1 end-to-end (blocked by #143)', (
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await codeServerPage.getWebviewFrame();
 
-    const storyboardFrame = page.frameLocator('iframe[src*="storyboardPanel"]');
+    const storyboardFrame = page.frameLocator('iframe[src*="activityPanel"]');
     const overflow = storyboardFrame.locator(
       '[data-testid="storyboard-header-overflow"]',
     );

@@ -76,6 +76,13 @@ export function registerStoryboardManagementCommands(
   sessionManager: ManagementSessionManager,
 ): vscode.Disposable {
   const disposables: vscode.Disposable[] = [
+    // "Storyboard: Show Panel" — the Storyboard now renders as a section
+    // inside the Activity panel (UX-review flatten), so revealing it means
+    // focusing the Activity view. (Previously this command id was declared
+    // in package.json but never registered.)
+    vscode.commands.registerCommand('debrief.storyboard.openPanel', () => {
+      void vscode.commands.executeCommand('debrief.activityPanel.focus');
+    }),
     vscode.commands.registerCommand('debrief.storyboard.create', async () => {
       const documentUri = sessionManager.getActiveDocumentUri();
       if (!documentUri) {return;}

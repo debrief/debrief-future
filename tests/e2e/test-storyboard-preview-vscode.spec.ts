@@ -134,7 +134,7 @@ function seedStoryboard(features: PlotFeatureLike[]): PlotFeatureLike[] {
 
 // ── Shared driving helpers ────────────────────────────────────────────────
 const SB_SEL =
-  '[data-testid="storyboard-header"], [data-testid="storyboard-panel-rail"], [data-testid="storyboard-empty-state"], [data-testid="capture-scene-button"], [data-testid="storyboard-preview"]';
+  '[data-testid="storyboard-header"], [data-testid="storyboard-panel-rail"], [data-testid="storyboard-empty-state"], [data-testid="capture-button"], [data-testid="storyboard-preview"]';
 
 /** Re-find the Storyboard panel webview frame (frames re-mount on re-render). */
 async function storyboardFrame(page: Page, timeoutMs = 20_000): Promise<Frame> {
@@ -277,7 +277,7 @@ test.describe('#273 — Storyboard Capture + Preview in VS Code (manual evidence
     let namingShown = false;
     for (let attempt = 0; attempt < 3 && !namingShown; attempt += 1) {
       const ff = await storyboardFrame(page);
-      await ff.locator('[data-testid="capture-scene-button"]').first().click().catch(() => {});
+      await ff.locator('[data-testid="capture-button"]').first().click().catch(() => {});
       namingShown = await ff
         .locator('[data-testid="storyboard-naming-row-input"]')
         .first()
