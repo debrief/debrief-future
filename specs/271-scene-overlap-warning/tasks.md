@@ -61,10 +61,10 @@ Frontend-only, no schema change, no Python. A pure shared `detectSceneOverlaps()
 - [x] T008 Render `OverlapBadge` in the Scene list, gated on `sceneEditViewModels[sceneId]?.overlapsWith?.length`, in the same slot pattern as `StaleBadge`, skipped for `pendingDelete` rows; wire its `onDismiss` → `onSceneOverlapDismiss?.(sceneId, overlapsWith.map(p => p.sceneId))` (C3.1–C3.3) `shared/components/src/panels/StoryboardPanel/SceneList.tsx`
 - [x] T009 Thread the optional `onSceneOverlapDismiss` prop through the panel into `SceneList` `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
 - [x] T010 [P] Add a `WithOverlapWarnings` story: fixture Storyboard with two overlapping time-range Scenes (mutual warning), one non-overlapping time-range Scene, and one instant Scene (both clean) `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T011 VS Code host: call `detectSceneOverlaps(plot, activeStoryboardId, dismissedPairs)` once per `refresh()` and populate each `SceneEditViewModel.overlapsWith` in `composeSceneEditViewModel` (C4.1, C4.5) `apps/vscode/src/views/storyboardPanelView.ts`
-- [ ] T012 web-shell host: compute `detectSceneOverlaps(plot, activeStoryboardId, dismissedPairs)` (memoised over `featureCollection`/`activeStoryboardId`) and merge `overlapsWith` into the `sceneEditViewModels` passed to `StoryboardPanel` (C4.1, C4.5) `apps/web-shell/src/StoryboardPanelMount.tsx`
-- [ ] T013 [test] VS Code host unit test: overlapping time-range Scenes get mutual `overlapsWith`; instant Scenes, touching endpoints, non-overlapping, and cross-Storyboard pairs get none `apps/vscode/tests/unit/storyboardPanelView.test.ts`
-- [ ] T014 [P][test] Storybook E2E: in light/dark/vscode, the two overlapping rows show the named badge and the clean rows do not; assert accessible name `shared/components/e2e/StoryboardOverlap.spec.ts`
+- [x] T011 VS Code host: call `detectSceneOverlaps(plot, activeStoryboardId, dismissedPairs)` once per `refresh()` and populate each `SceneEditViewModel.overlapsWith` in `composeSceneEditViewModel` (C4.1, C4.5) `apps/vscode/src/views/storyboardPanelView.ts`
+- [x] T012 web-shell host: compute `detectSceneOverlaps(plot, activeStoryboardId, dismissedPairs)` (memoised over `featureCollection`/`activeStoryboardId`) and merge `overlapsWith` into the `sceneEditViewModels` passed to `StoryboardPanel` (C4.1, C4.5) `apps/web-shell/src/StoryboardPanelMount.tsx`
+- [x] T013 [test] VS Code host unit test: overlapping time-range Scenes get mutual `overlapsWith`; instant Scenes, touching endpoints, non-overlapping, and cross-Storyboard pairs get none `apps/vscode/tests/unit/storyboardPanelView.test.ts`
+- [x] T014 [P][test] Storybook E2E: in light/dark/vscode, the two overlapping rows show the named badge and the clean rows do not; assert accessible name `shared/components/e2e/StoryboardOverlap.spec.ts`
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — run `cd shared/components && node run-playwright.mjs StoryboardOverlap` (extracts bundled `@sparticuz/chromium`). Do NOT skip E2E assuming browsers can't install. See `docs/project_notes/playwright-installation-research.md`.
 
@@ -76,12 +76,12 @@ Frontend-only, no schema change, no Python. A pure shared `detectSceneOverlaps()
 
 **Independent Test**: With a mutual warning visible, click Dismiss on one row → both rows clear. Re-render (no data change) → still suppressed. (Re-warn-on-new-overlap is verified in US3.)
 
-- [ ] T015 [test] VS Code host unit test for dismissal: a `scene-overlap-dismiss` message adds the pair, removes the warning from both rows, leaves Scene data untouched, and a Scene with another live overlap keeps its (reduced) badge `apps/vscode/tests/unit/storyboardPanelView.test.ts`
-- [ ] T016 Add an inbound `scene-overlap-dismiss` message (carrying `sceneId` + `partnerSceneIds`) to the panel message contract `apps/vscode/src/types/storyboardPanelMessages.ts`
-- [ ] T017 VS Code host: hold a session-scoped `dismissedOverlapPairs: Set<string>`, handle the dismiss message by adding `overlapPairKey(sceneId, partner)` for each partner and re-pushing, and pass the set into `detectSceneOverlaps` (C4.2–C4.3) `apps/vscode/src/views/storyboardPanelView.ts`
-- [ ] T018 VS Code webview: wire the panel's `onSceneOverlapDismiss` to post the `scene-overlap-dismiss` message `apps/vscode/src/webview/web/storyboardPanel.tsx`
-- [ ] T019 web-shell host: hold `dismissedOverlapPairs` (a `useState`/`useRef` set), implement `onSceneOverlapDismiss` to add pair keys and trigger recompute, and pass the set into `detectSceneOverlaps` (C4.2–C4.3) `apps/web-shell/src/StoryboardPanelMount.tsx`
-- [ ] T020 [P][test] Storybook E2E: clicking Dismiss removes the badge from both rows; record the interaction video for the GIF `shared/components/e2e/StoryboardOverlap.spec.ts`
+- [x] T015 [test] VS Code host unit test for dismissal: a `scene-overlap-dismiss` message adds the pair, removes the warning from both rows, leaves Scene data untouched, and a Scene with another live overlap keeps its (reduced) badge `apps/vscode/tests/unit/storyboardPanelView.test.ts`
+- [x] T016 Add an inbound `scene-overlap-dismiss` message (carrying `sceneId` + `partnerSceneIds`) to the panel message contract `apps/vscode/src/types/storyboardPanelMessages.ts`
+- [x] T017 VS Code host: hold a session-scoped `dismissedOverlapPairs: Set<string>`, handle the dismiss message by adding `overlapPairKey(sceneId, partner)` for each partner and re-pushing, and pass the set into `detectSceneOverlaps` (C4.2–C4.3) `apps/vscode/src/views/storyboardPanelView.ts`
+- [x] T018 VS Code webview: wire the panel's `onSceneOverlapDismiss` to post the `scene-overlap-dismiss` message `apps/vscode/src/webview/web/storyboardPanel.tsx`
+- [x] T019 web-shell host: hold `dismissedOverlapPairs` (a `useState`/`useRef` set), implement `onSceneOverlapDismiss` to add pair keys and trigger recompute, and pass the set into `detectSceneOverlaps` (C4.2–C4.3) `apps/web-shell/src/StoryboardPanelMount.tsx`
+- [x] T020 [P][test] Storybook E2E: clicking Dismiss removes the badge from both rows; record the interaction video for the GIF `shared/components/e2e/StoryboardOverlap.spec.ts`
 
 **Checkpoint**: US2 testable independently — dismissal clears both rows in both hosts; no plot write occurs (C4.6).
 
@@ -91,10 +91,10 @@ Frontend-only, no schema change, no Python. A pure shared `detectSceneOverlaps()
 
 **Independent Test**: Two overlapping Scenes warn; edit one window apart → both warnings vanish; edit back → warnings return. Dismiss a pair, pull apart, then re-overlap the same pair → it warns again.
 
-- [ ] T021 [test] VS Code host re-evaluation test: editing a window so Scenes no longer overlap drops both warnings; editing back re-adds them; deleting a Scene drops its partner's warning `apps/vscode/tests/unit/storyboardPanelView.test.ts`
-- [ ] T022 VS Code host: prune `dismissedOverlapPairs` to the currently-active overlap set on each recompute (`dismissed ← dismissed ∩ active`) so a re-created pair re-warns (FR-009, C4.4) `apps/vscode/src/views/storyboardPanelView.ts`
-- [ ] T023 web-shell host: apply the same prune-on-recompute to `dismissedOverlapPairs` (FR-009, C4.4) `apps/web-shell/src/StoryboardPanelMount.tsx`
-- [ ] T024 [P][test] Extend the helper unit tests to prove prune/re-warn semantics: a dismissed pair that resolves then re-overlaps appears again when its stale key is dropped `shared/components/src/storyboard/__tests__/overlap.test.ts`
+- [x] T021 [test] VS Code host re-evaluation test: editing a window so Scenes no longer overlap drops both warnings; editing back re-adds them; deleting a Scene drops its partner's warning `apps/vscode/tests/unit/storyboardPanelView.test.ts`
+- [x] T022 VS Code host: prune `dismissedOverlapPairs` to the currently-active overlap set on each recompute (`dismissed ← dismissed ∩ active`) so a re-created pair re-warns (FR-009, C4.4) `apps/vscode/src/views/storyboardPanelView.ts`
+- [x] T023 web-shell host: apply the same prune-on-recompute to `dismissedOverlapPairs` (FR-009, C4.4) `apps/web-shell/src/StoryboardPanelMount.tsx`
+- [x] T024 [P][test] Extend the helper unit tests to prove prune/re-warn semantics: a dismissed pair that resolves then re-overlaps appears again when its stale key is dropped `shared/components/src/storyboard/__tests__/overlap.test.ts`
 
 **Checkpoint**: All three stories complete; live accuracy and re-warn-on-change verified.
 

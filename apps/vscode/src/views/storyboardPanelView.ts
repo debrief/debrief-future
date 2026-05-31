@@ -16,11 +16,13 @@ import {
   getActiveStoryboardDefault,
   isSceneFeature,
   listScenesOrdered,
+  detectSceneOverlaps,
+  overlapPairKey,
   type StoryboardPlot,
   type SceneEditViewModel,
   type StoryboardEditViewModel,
 } from '@debrief/components';
-import type { SceneRowViewModel } from '@debrief/components';
+import type { SceneRowViewModel, OverlapPartner } from '@debrief/components';
 import type { SessionManager } from '../services/sessionManager';
 import type { MapPanel } from '../webview/mapPanel';
 import type { StoryboardPlaybackService, StoryboardPlaybackSnapshot } from '../services/storyboardPlayback';
@@ -79,6 +81,12 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
    */
   private currentNamingRow: NamingRowPushState | null = null;
   private currentCollisionBanner: CollisionBannerPushState | null = null;
+  /**
+   * #271 — session-scoped set of dismissed overlap pair keys
+   * (`overlapPairKey`). Never persisted. Pruned to the currently-active
+   * overlap set on every refresh so a re-created pair re-warns (FR-009).
+   */
+  private dismissedOverlapPairs = new Set<string>();
 
   /**
    * #235 — pending resolvers for the host-driven prompts. The capture
@@ -174,12 +182,21 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     // (review 13A from #218 / FR-008 of #230). Do not introduce per-Scene
     // cross-plot lookups here.
     const docUri = this.sessionManager.getActiveDocumentUri();
+    // #271 — compute time-range overlap warnings once for the active
+    // Storyboard, applying session dismissals, then prune the dismissal set
+    // to the still-active overlaps so a re-created pair warns afresh (FR-009).
+    const overlaps =
+      activeId !== null
+        ? detectSceneOverlaps(plot, activeId, this.dismissedOverlapPairs)
+        : new Map<string, readonly OverlapPartner[]>();
+    this.pruneDismissedOverlapPairs(plot, activeId);
     const sceneEditViewModels: Record<string, SceneEditViewModel> = {};
     for (const row of scenes) {
       sceneEditViewModels[row.sceneId] = this.composeSceneEditViewModel(
         plot,
         row,
         docUri,
+        overlaps.get(row.sceneId) ?? [],
       );
     }
     const storyboardEditViewModel: StoryboardEditViewModel | null =
@@ -218,6 +235,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     plot: StoryboardPlot,
     row: SceneRowViewModel,
     documentUri: string | null,
+    overlapsWith: readonly OverlapPartner[],
   ): SceneEditViewModel {
     const svc = this.editService;
     const staleFlag =
@@ -249,7 +267,34 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       stale: staleFlag?.stale ?? false,
       unresolvedFeatureIds: staleFlag?.unresolvedFeatureIds ?? [],
       missingData: { kind: 'ok' },
+      overlapsWith,
     };
+  }
+
+  /**
+   * #271 — drop dismissed overlap pair keys that no longer correspond to an
+   * active (undismissed) overlap, so a pair that is pulled apart and later
+   * re-overlapped warns afresh (FR-009 / contract C4.4). Pure set bookkeeping.
+   */
+  private pruneDismissedOverlapPairs(
+    plot: StoryboardPlot,
+    activeStoryboardId: string | null,
+  ): void {
+    if (this.dismissedOverlapPairs.size === 0) return;
+    // Re-detect WITHOUT dismissals to learn the full set of currently-active
+    // overlap pairs, then intersect the dismissed set with it.
+    const activePairs = new Set<string>();
+    if (activeStoryboardId !== null) {
+      const raw = detectSceneOverlaps(plot, activeStoryboardId);
+      for (const [sceneId, partners] of raw) {
+        for (const partner of partners) {
+          activePairs.add(overlapPairKey(sceneId, partner.sceneId));
+        }
+      }
+    }
+    for (const key of [...this.dismissedOverlapPairs]) {
+      if (!activePairs.has(key)) this.dismissedOverlapPairs.delete(key);
+    }
   }
 
   /**
@@ -296,12 +341,23 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     const docUri = this.sessionManager.getActiveDocumentUri();
     const plotFeatures = this.getMapPanel()?.getCurrentFeatures() ?? [];
     const plot: StoryboardPlot = plotFromFeatures(plotFeatures);
+    // #271 — keep overlap warnings visible during playback snapshots too.
+    const overlaps =
+      snapshot.activeStoryboardId !== null
+        ? detectSceneOverlaps(
+            plot,
+            snapshot.activeStoryboardId,
+            this.dismissedOverlapPairs,
+          )
+        : new Map<string, readonly OverlapPartner[]>();
+    this.pruneDismissedOverlapPairs(plot, snapshot.activeStoryboardId);
     const sceneEditViewModels: Record<string, SceneEditViewModel> = {};
     for (const row of enrichedScenes) {
       sceneEditViewModels[row.sceneId] = this.composeSceneEditViewModel(
         plot,
         row,
         docUri,
+        overlaps.get(row.sceneId) ?? [],
       );
     }
     let storyboardEditViewModel: StoryboardEditViewModel | null = null;
@@ -733,6 +789,17 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
         ) {
           this.collisionResolver({ kind: 'cancel' });
         }
+        break;
+      }
+      case 'scene-overlap-dismiss': {
+        // #271 — session-scoped dismissal. Mark every named pair dismissed
+        // and re-render; no Scene data is touched.
+        for (const partnerId of message.partnerSceneIds) {
+          this.dismissedOverlapPairs.add(
+            overlapPairKey(message.sceneId, partnerId),
+          );
+        }
+        this.refresh();
         break;
       }
     }

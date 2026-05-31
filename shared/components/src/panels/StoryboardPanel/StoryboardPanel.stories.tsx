@@ -144,30 +144,67 @@ function overlapVm(
   };
 }
 
+// Static overlap relationships for the story (mirrors what a host's
+// `detectSceneOverlaps` would return for OVERLAP_SCENES).
+const OVERLAP_PARTNERS: Record<string, ReadonlyArray<{ sceneId: string; title: string }>> = {
+  'scene-1': [{ sceneId: 'scene-2', title: 'Egress leg' }],
+  'scene-2': [{ sceneId: 'scene-1', title: 'Approach run' }],
+};
+
+function pairKey(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+/**
+ * Interactive panel that mirrors a host's dismissal handling: clicking
+ * Dismiss adds the pair to local state, which removes the warning from both
+ * rows on the next render. Used by both the screenshot and dismiss E2E.
+ */
+function OverlapWarningStory(): React.ReactElement {
+  const [dismissed, setDismissed] = React.useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
+  const sceneEditViewModels: Record<string, import('./types').SceneEditViewModel> = {};
+  for (const row of OVERLAP_SCENES) {
+    const partners = (OVERLAP_PARTNERS[row.sceneId] ?? []).filter(
+      (p) => !dismissed.has(pairKey(row.sceneId, p.sceneId)),
+    );
+    sceneEditViewModels[row.sceneId] = overlapVm(
+      row.sceneId,
+      row.title,
+      row.timestampIso,
+      partners,
+    );
+  }
+  return (
+    <StoryboardPanel
+      scenes={OVERLAP_SCENES}
+      activeStoryboardName="Exercise Alpha"
+      captureInFlight={false}
+      onCaptureClick={() => undefined}
+      onSceneRowClick={() => undefined}
+      sceneEditViewModels={sceneEditViewModels}
+      onSceneOverlapDismiss={(sceneId, partnerSceneIds): void => {
+        setDismissed((prev) => {
+          const next = new Set(prev);
+          for (const partnerId of partnerSceneIds) {
+            next.add(pairKey(sceneId, partnerId));
+          }
+          return next;
+        });
+      }}
+    />
+  );
+}
+
 /**
  * Two time-range Scenes whose windows overlap (Approach run 10:00–10:30 and
  * Egress leg 10:15–10:45) each carry a passive warning naming the other.
  * The non-overlapping time-range Scene and the instant Scene stay clean.
+ * Clicking Dismiss clears the warning on both rows.
  */
 export const WithOverlapWarnings: Story = {
-  args: {
-    scenes: OVERLAP_SCENES,
-    activeStoryboardName: 'Exercise Alpha',
-    captureInFlight: false,
-    onCaptureClick: () => undefined,
-    onSceneRowClick: () => undefined,
-    onSceneOverlapDismiss: () => undefined,
-    sceneEditViewModels: {
-      'scene-1': overlapVm('scene-1', 'Approach run', '2026-04-20T10:00:00.000Z', [
-        { sceneId: 'scene-2', title: 'Egress leg' },
-      ]),
-      'scene-2': overlapVm('scene-2', 'Egress leg', '2026-04-20T10:15:00.000Z', [
-        { sceneId: 'scene-1', title: 'Approach run' },
-      ]),
-      'scene-3': overlapVm('scene-3', 'Final approach', '2026-04-20T11:00:00.000Z'),
-      'scene-4': overlapVm('scene-4', 'Contact datum', '2026-04-20T11:30:00.000Z'),
-    },
-  },
+  render: () => <OverlapWarningStory />,
 };
 
 // ─── Spec 260 — viewport-lock padlock variants ────────────────────────

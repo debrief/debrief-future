@@ -326,6 +326,18 @@ function StoryboardPanelApp(): React.ReactElement {
     vscode.postMessage({ type: 'collision-cancel' });
   }, []);
 
+  // ─── #271 — overlap warning dismissal ────────────────────────────────
+  const onSceneOverlapDismiss = useCallback(
+    (sceneId: string, partnerSceneIds: readonly string[]) => {
+      vscode.postMessage({
+        type: 'scene-overlap-dismiss',
+        sceneId,
+        partnerSceneIds,
+      });
+    },
+    [],
+  );
+
   // Theme is sourced from the parent <Bootstrap> wrapper (#220) — the
   // local `state.theme` is retained only because the reducer's existing
   // shape accepts it; it no longer drives the React tree.
@@ -381,6 +393,7 @@ function StoryboardPanelApp(): React.ReactElement {
         onCollisionReplace={onCollisionReplace}
         onCollisionOffset={onCollisionOffset}
         onCollisionCancel={onCollisionCancel}
+        onSceneOverlapDismiss={onSceneOverlapDismiss}
       />
     </>
   );

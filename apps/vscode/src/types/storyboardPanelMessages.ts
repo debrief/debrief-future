@@ -82,7 +82,14 @@ export type StoryboardPanelMessage =
       readonly conflictingSceneId: string;
     }
   | { readonly type: 'collision-offset' }
-  | { readonly type: 'collision-cancel' };
+  | { readonly type: 'collision-cancel' }
+  // #271 — author dismissed the overlap warning on a Scene row; carries the
+  // partner Scenes named on that badge so the host marks each pair dismissed.
+  | {
+      readonly type: 'scene-overlap-dismiss';
+      readonly sceneId: string;
+      readonly partnerSceneIds: readonly string[];
+    };
 
 /**
  * Full snapshot projection for the panel (#217). Replaces the narrower
