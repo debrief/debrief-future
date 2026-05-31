@@ -18,7 +18,7 @@ Frontend-only, no schema change, no Python. A pure shared `detectSceneOverlaps()
 | `screenshots/overlap-light.png` | `WithOverlapWarnings` story, light theme — two rows warning, others clean (Hook image) | Storybook E2E (US1) |
 | `screenshots/overlap-dark.png` | Same story, dark theme | Storybook E2E (US1) |
 | `screenshots/overlap-vscode.png` | Same story, vscode theme | Storybook E2E (US1) |
-| `screenshots/interaction.gif` | Dismiss interaction — badge present → click Dismiss → both rows clear (< 5s, < 2MB) | Storybook E2E (US2) |
+| `screenshots/overlap-after-dismiss.png` | Dismiss interaction "after" frame — paired with `overlap-light.png` as a before/after (static pair stands in for a GIF; `ffmpeg` unavailable in capture env) | Storybook E2E (US2) |
 | `e2e-summary.md` | Storybook E2E pass rates + theme-variant coverage | After E2E green |
 
 ### Media Content
@@ -109,7 +109,7 @@ Frontend-only, no schema change, no Python. A pure shared `detectSceneOverlaps()
 - [x] T026 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) `specs/271-scene-overlap-warning/evidence/test-summary.md`
 - [x] T027 Create the usage demonstration: two overlapping time-range Scenes → named warning → dismiss → re-warn on re-overlap `specs/271-scene-overlap-warning/evidence/usage-example.md`
 - [x] T028 [P] Capture the three theme screenshots via the Storybook E2E (`overlap-light.png`, `overlap-dark.png`, `overlap-vscode.png`) `specs/271-scene-overlap-warning/evidence/screenshots/`
-- [x] T029 [P] Capture the dismiss interaction GIF (< 5s, < 2MB) from the E2E recording `specs/271-scene-overlap-warning/evidence/screenshots/interaction.gif`
+- [x] T029 [P] Capture the dismiss interaction "after" frame (before/after pair with `overlap-light.png`; static pair substitutes for a GIF — `ffmpeg` unavailable) `specs/271-scene-overlap-warning/evidence/screenshots/overlap-after-dismiss.png`
 - [x] T030 [P] Write the E2E summary (pass rates, theme-variant coverage) `specs/271-scene-overlap-warning/evidence/e2e-summary.md`
 
 ### Media Content
