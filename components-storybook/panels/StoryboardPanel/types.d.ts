@@ -279,5 +279,20 @@ export interface StoryboardPanelProps {
      * host applies any time-controller mutation at its own boundary.
      */
     onSceneActivated?(scene: SceneFeature): void;
+    /**
+     * Fires when the analyst clicks the header **Preview** button. The host
+     * opens the finished-briefing player in a new tab, loaded live from the
+     * active storyboard's features (VS Code: loopback server; web-shell:
+     * blob URL). When omitted, the Preview button is not rendered — idiomatic
+     * gating so legacy/Storybook consumers keep compiling unchanged (C-A1/C-A3).
+     */
+    onPreview?(): void;
+    /**
+     * Whether the active storyboard can be previewed. When `false`, the
+     * Preview button is disabled with an explanatory tooltip (FR-007 / C-A2)
+     * — e.g. no active storyboard, or it has zero scenes. Defaults to
+     * `scenes.length > 0` when omitted.
+     */
+    readonly canPreview?: boolean;
 }
 //# sourceMappingURL=types.d.ts.map

@@ -6,7 +6,7 @@
  * `@debrief/components` and treat the module as a pure data-layer helper.
  */
 export type { Plot as StoryboardPlot, SceneFeature, StoryboardFeature, TimeRange, Viewport, Ulid, StoryboardId, SceneId, InstantSceneFeature, TimeRangeSceneFeature, InstantSceneProperties, TimeRangeSceneProperties, } from './types';
-export { isStoryboardFeature, isSceneFeature, isTimeRangeScene, asUlid, asStoryboardId, asSceneId, } from './types';
+export { isStoryboardFeature, isSceneFeature, isTimeRangeScene, asUlid, asStoryboardId, asSceneId, getPlotFeatureId, } from './types';
 export { StoryboardError, OrphanSceneError, UnknownStoryboardError, UnknownSceneError, ReservedSlotViolationError, DuplicateStoryboardNameError, ThumbnailDeepCopyFailedError, SchemaMigrationFailedError, InvariantViolationError, DuplicateCreationOrderError, CreationOrderOutOfRangeError, MissingCreationOrderError, UnsupportedSchemaVersionError, SceneFlavourXorViolationError, SceneTimeRangeEndNotAfterStartError, } from './errors';
 export type { StoryboardErrorCode } from './errors';
 export { createStoryboard, renameStoryboard, deleteStoryboard, createScene, updateScene, deleteScene, duplicateScene, copySceneToOtherStoryboard, describeStoryboard, restoreScene, bboxToPolygon, reorderSceneInTiedGroup, } from './crud';
