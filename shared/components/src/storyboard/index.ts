@@ -127,6 +127,12 @@ export type {
 } from "./missing-data";
 
 // ---------------------------------------------------------------------------
+// Time-range Scene overlap detector (#271 — sync, pure)
+// ---------------------------------------------------------------------------
+export { detectSceneOverlaps, overlapPairKey } from "./overlap";
+export type { OverlapPartner } from "./overlap";
+
+// ---------------------------------------------------------------------------
 // Invariant helpers
 // ---------------------------------------------------------------------------
 export {

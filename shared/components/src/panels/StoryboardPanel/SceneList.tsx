@@ -9,6 +9,7 @@ import React from 'react';
 import { SceneRow } from './SceneRow';
 import { SceneEditForm } from './SceneEditForm';
 import { StaleBadge } from './StaleBadge';
+import { OverlapBadge } from './OverlapBadge';
 import type { SceneEditViewModel, SceneRowViewModel } from './types';
 
 export interface SceneListProps {
@@ -32,6 +33,9 @@ export interface SceneListProps {
   // ── #230 chevron + right-click affordances (panel-driven) ─────────
   onSceneRowExpandToggle?(sceneId: string): void;
   onSceneOverflowMenuOpen?(sceneId: string, anchorRect: DOMRect): void;
+
+  // ── #271 overlap warning dismissal ────────────────────────────────
+  onSceneOverlapDismiss?(sceneId: string, partnerSceneIds: readonly string[]): void;
 }
 
 const PENDING_SCENE: SceneRowViewModel = {
@@ -59,6 +63,7 @@ export function SceneList({
   onSceneEditFormCancel,
   onSceneRowExpandToggle,
   onSceneOverflowMenuOpen,
+  onSceneOverlapDismiss,
 }: SceneListProps): React.ReactElement {
   return (
     // 234 US3 fix (FR-022): role="list" was rejected by axe-core
@@ -101,6 +106,19 @@ export function SceneList({
                 }
               />
             )}
+            {editVm?.overlapsWith !== undefined &&
+              editVm.overlapsWith.length > 0 && (
+                <OverlapBadge
+                  sceneId={scene.sceneId}
+                  overlapsWith={editVm.overlapsWith}
+                  onDismiss={(): void =>
+                    onSceneOverlapDismiss?.(
+                      scene.sceneId,
+                      editVm.overlapsWith!.map((p) => p.sceneId),
+                    )
+                  }
+                />
+              )}
             {editVm?.editFormOpen && (
               <SceneEditForm
                 sceneId={scene.sceneId}

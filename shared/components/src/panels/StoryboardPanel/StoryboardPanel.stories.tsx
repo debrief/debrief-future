@@ -113,6 +113,63 @@ export const Capturing: Story = {
   },
 };
 
+// ─── #271 — overlap warning for time-range Scenes ─────────────────────
+
+const OVERLAP_SCENES: SceneRowViewModel[] = [
+  makeSceneRow('scene-1', '2026-04-20T10:00:00.000Z', 'Approach run'),
+  makeSceneRow('scene-2', '2026-04-20T10:15:00.000Z', 'Egress leg'),
+  makeSceneRow('scene-3', '2026-04-20T11:00:00.000Z', 'Final approach'),
+  makeSceneRow('scene-4', '2026-04-20T11:30:00.000Z', 'Contact datum'),
+];
+
+/** Minimal per-row edit view-model carrying just the overlap warning. */
+function overlapVm(
+  sceneId: string,
+  title: string,
+  timestamp: string,
+  overlapsWith: ReadonlyArray<{ sceneId: string; title: string }> = [],
+): import('./types').SceneEditViewModel {
+  return {
+    sceneId,
+    title,
+    description: null,
+    timestamp,
+    titleIsEditing: false,
+    editFormOpen: false,
+    pendingDelete: false,
+    stale: false,
+    unresolvedFeatureIds: [],
+    missingData: { kind: 'ok' },
+    overlapsWith,
+  };
+}
+
+/**
+ * Two time-range Scenes whose windows overlap (Approach run 10:00–10:30 and
+ * Egress leg 10:15–10:45) each carry a passive warning naming the other.
+ * The non-overlapping time-range Scene and the instant Scene stay clean.
+ */
+export const WithOverlapWarnings: Story = {
+  args: {
+    scenes: OVERLAP_SCENES,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    onSceneOverlapDismiss: () => undefined,
+    sceneEditViewModels: {
+      'scene-1': overlapVm('scene-1', 'Approach run', '2026-04-20T10:00:00.000Z', [
+        { sceneId: 'scene-2', title: 'Egress leg' },
+      ]),
+      'scene-2': overlapVm('scene-2', 'Egress leg', '2026-04-20T10:15:00.000Z', [
+        { sceneId: 'scene-1', title: 'Approach run' },
+      ]),
+      'scene-3': overlapVm('scene-3', 'Final approach', '2026-04-20T11:00:00.000Z'),
+      'scene-4': overlapVm('scene-4', 'Contact datum', '2026-04-20T11:30:00.000Z'),
+    },
+  },
+};
+
 // ─── Spec 260 — viewport-lock padlock variants ────────────────────────
 
 /**

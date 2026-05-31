@@ -91,6 +91,8 @@ export function StoryboardPanel({
   viewportLocked = false,
   onViewportLockToggle,
   hasActivePlot = true,
+  // #271 — overlap warning dismissal
+  onSceneOverlapDismiss,
 }: StoryboardPanelProps): React.ReactElement {
   const isEmptyNoStoryboard =
     activeStoryboardName === null && scenes.length === 0 && !captureInFlight;
@@ -353,6 +355,7 @@ export function StoryboardPanel({
             onSceneEditFormCancel={onSceneEditFormCancel}
             onSceneRowExpandToggle={onSceneRowExpandToggle}
             onSceneOverflowMenuOpen={onSceneOverflowMenuOpen}
+            onSceneOverlapDismiss={onSceneOverlapDismiss}
           />
         </div>
       )}

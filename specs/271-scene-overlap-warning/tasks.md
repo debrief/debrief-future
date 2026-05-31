@@ -37,16 +37,16 @@ Frontend-only, no schema change, no Python. A pure shared `detectSceneOverlaps()
 
 ## Phase 1: Setup
 
-- [ ] T001 Create the overlap helper module skeleton with exported signatures and the `OverlapPartner` interface (no logic yet) `shared/components/src/storyboard/overlap.ts`
+- [x] T001 Create the overlap helper module skeleton with exported signatures and the `OverlapPartner` interface (no logic yet) `shared/components/src/storyboard/overlap.ts`
 
 ## Phase 2: Foundation
 
 **Blocks all user stories.** The pure detection helper, its exports, and the boundary-type extension everything else consumes.
 
-- [ ] T002 [test] Write table-driven unit tests for `detectSceneOverlaps`/`overlapPairKey` covering every contract case C1.1–C1.12 (strict overlap, touching endpoints, instant exclusion, multi-overlap, chain A-B-C, identical windows, zero-length, cross-Storyboard isolation, dismissedPairs filtering, empty/single-Scene, determinism) `shared/components/src/storyboard/__tests__/overlap.test.ts`
-- [ ] T003 Implement `overlapPairKey` (sorted `${lo}|${hi}`) and `detectSceneOverlaps(plot, storyboardId, dismissedPairs?)` — strict interior overlap on `Date.parse` epoch ms, time-range Scenes only via `isTimeRangeScene`, single-Storyboard scope, symmetric result, dismissal filtering `shared/components/src/storyboard/overlap.ts`
-- [ ] T004 Export `detectSceneOverlaps`, `overlapPairKey`, and the `OverlapPartner` type from the component-library barrel `shared/components/src/index.ts`
-- [ ] T005 Extend the panel boundary contract: add optional `readonly overlapsWith?: readonly OverlapPartner[]` to `SceneEditViewModel` and optional `onSceneOverlapDismiss?(sceneId: string, partnerSceneIds: readonly string[]): void` to `StoryboardPanelProps`, re-exporting `OverlapPartner` for hosts `shared/components/src/panels/StoryboardPanel/types.ts`
+- [x] T002 [test] Write table-driven unit tests for `detectSceneOverlaps`/`overlapPairKey` covering every contract case C1.1–C1.12 (strict overlap, touching endpoints, instant exclusion, multi-overlap, chain A-B-C, identical windows, zero-length, cross-Storyboard isolation, dismissedPairs filtering, empty/single-Scene, determinism) `shared/components/src/storyboard/__tests__/overlap.test.ts`
+- [x] T003 Implement `overlapPairKey` (sorted `${lo}|${hi}`) and `detectSceneOverlaps(plot, storyboardId, dismissedPairs?)` — strict interior overlap on `Date.parse` epoch ms, time-range Scenes only via `isTimeRangeScene`, single-Storyboard scope, symmetric result, dismissal filtering `shared/components/src/storyboard/overlap.ts`
+- [x] T004 Export `detectSceneOverlaps`, `overlapPairKey`, and the `OverlapPartner` type from the component-library barrel `shared/components/src/index.ts`
+- [x] T005 Extend the panel boundary contract: add optional `readonly overlapsWith?: readonly OverlapPartner[]` to `SceneEditViewModel` and optional `onSceneOverlapDismiss?(sceneId: string, partnerSceneIds: readonly string[]): void` to `StoryboardPanelProps`, re-exporting `OverlapPartner` for hosts `shared/components/src/panels/StoryboardPanel/types.ts`
 
 **Checkpoint**: `pnpm --filter @debrief/components test overlap` green; library builds with the new exports/types and all existing fixtures still compile (optional+defaulted additions).
 
@@ -56,11 +56,11 @@ Frontend-only, no schema change, no Python. A pure shared `detectSceneOverlaps()
 
 **Independent Test**: Open the `WithOverlapWarnings` story (and a VS Code plot) containing two overlapping time-range Scenes plus a non-overlapping one and an instant Scene. The two overlapping rows show "Overlaps with …" naming each other; the other rows are clean. Playback/capture/save remain unaffected.
 
-- [ ] T006 [test] Write `OverlapBadge` render tests: renders only when `overlapsWith` non-empty, names every partner in visible text + accessible name (not colour-only), `role="status"`, `data-testid="overlap-badge"`, `data-scene-id`, and coexists with a stale badge on the same row (C2.1–C2.3, C2.6, C3.4) `shared/components/src/panels/StoryboardPanel/__tests__/OverlapBadge.test.tsx`
-- [ ] T007 Implement `OverlapBadge` mirroring `StaleBadge` — warning glyph, partner names, `role="status"`, accessible label, a keyboard-activable Dismiss button calling `onDismiss`, VS Code warning fg/bg tokens (axe-contrast safe) `shared/components/src/panels/StoryboardPanel/OverlapBadge.tsx`
-- [ ] T008 Render `OverlapBadge` in the Scene list, gated on `sceneEditViewModels[sceneId]?.overlapsWith?.length`, in the same slot pattern as `StaleBadge`, skipped for `pendingDelete` rows; wire its `onDismiss` → `onSceneOverlapDismiss?.(sceneId, overlapsWith.map(p => p.sceneId))` (C3.1–C3.3) `shared/components/src/panels/StoryboardPanel/SceneList.tsx`
-- [ ] T009 Thread the optional `onSceneOverlapDismiss` prop through the panel into `SceneList` `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
-- [ ] T010 [P] Add a `WithOverlapWarnings` story: fixture Storyboard with two overlapping time-range Scenes (mutual warning), one non-overlapping time-range Scene, and one instant Scene (both clean) `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T006 [test] Write `OverlapBadge` render tests: renders only when `overlapsWith` non-empty, names every partner in visible text + accessible name (not colour-only), `role="status"`, `data-testid="overlap-badge"`, `data-scene-id`, and coexists with a stale badge on the same row (C2.1–C2.3, C2.6, C3.4) `shared/components/src/panels/StoryboardPanel/__tests__/OverlapBadge.test.tsx`
+- [x] T007 Implement `OverlapBadge` mirroring `StaleBadge` — warning glyph, partner names, `role="status"`, accessible label, a keyboard-activable Dismiss button calling `onDismiss`, VS Code warning fg/bg tokens (axe-contrast safe) `shared/components/src/panels/StoryboardPanel/OverlapBadge.tsx`
+- [x] T008 Render `OverlapBadge` in the Scene list, gated on `sceneEditViewModels[sceneId]?.overlapsWith?.length`, in the same slot pattern as `StaleBadge`, skipped for `pendingDelete` rows; wire its `onDismiss` → `onSceneOverlapDismiss?.(sceneId, overlapsWith.map(p => p.sceneId))` (C3.1–C3.3) `shared/components/src/panels/StoryboardPanel/SceneList.tsx`
+- [x] T009 Thread the optional `onSceneOverlapDismiss` prop through the panel into `SceneList` `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
+- [x] T010 [P] Add a `WithOverlapWarnings` story: fixture Storyboard with two overlapping time-range Scenes (mutual warning), one non-overlapping time-range Scene, and one instant Scene (both clean) `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
 - [ ] T011 VS Code host: call `detectSceneOverlaps(plot, activeStoryboardId, dismissedPairs)` once per `refresh()` and populate each `SceneEditViewModel.overlapsWith` in `composeSceneEditViewModel` (C4.1, C4.5) `apps/vscode/src/views/storyboardPanelView.ts`
 - [ ] T012 web-shell host: compute `detectSceneOverlaps(plot, activeStoryboardId, dismissedPairs)` (memoised over `featureCollection`/`activeStoryboardId`) and merge `overlapsWith` into the `sceneEditViewModels` passed to `StoryboardPanel` (C4.1, C4.5) `apps/web-shell/src/StoryboardPanelMount.tsx`
 - [ ] T013 [test] VS Code host unit test: overlapping time-range Scenes get mutual `overlapsWith`; instant Scenes, touching endpoints, non-overlapping, and cross-Storyboard pairs get none `apps/vscode/tests/unit/storyboardPanelView.test.ts`
