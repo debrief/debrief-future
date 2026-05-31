@@ -3,7 +3,9 @@
  *
  * Validates:
  * - The Debrief Activity panel is present in the sidebar
- * - Four child sections (Time Controller, Tools, Layers, Properties) exist
+ * - Five child sections (Time Controller, Tools, Layers, Properties,
+ *   Storyboard) exist — the Storyboard was flattened into the Activity
+ *   panel as a 5th collapsible section (UX-review)
  * - Each section can be collapsed and re-expanded via its header button
  * - The Tools section shows tool items or a status message (proves debrief-calc responded)
  *
@@ -15,7 +17,7 @@ import { test, expect } from './fixtures/base';
 test.describe('Activity Panel Sections', () => {
   test.setTimeout(90_000);
 
-  test('activity panel is present with four collapsible sections', async ({
+  test('activity panel is present with five collapsible sections', async ({
     codeServerPage,
   }) => {
     await codeServerPage.dismissNotifications();
@@ -55,12 +57,12 @@ test.describe('Activity Panel Sections', () => {
     const frame = activityFrame!;
     console.log('  ✓ Activity panel found in webview frame');
 
-    // ─── Verify four section headers exist ───
+    // ─── Verify five section headers exist ───
     const sectionHeaders = frame.locator(
       '.debrief-activity-panel__section-header'
     );
     const headerCount = await sectionHeaders.count();
-    expect(headerCount).toBe(4);
+    expect(headerCount).toBe(5);
     console.log(`  ✓ Found ${headerCount} section headers`);
 
     // Verify section titles
@@ -76,11 +78,15 @@ test.describe('Activity Panel Sections', () => {
     const propertiesHeader = frame.locator(
       '.debrief-activity-panel__section-header:has-text("Properties")'
     );
+    const storyboardHeader = frame.locator(
+      '.debrief-activity-panel__section-header:has-text("Storyboard")'
+    );
     expect(await timeHeader.isVisible()).toBe(true);
     expect(await toolsHeader.isVisible()).toBe(true);
     expect(await layersHeader.isVisible()).toBe(true);
     expect(await propertiesHeader.isVisible()).toBe(true);
-    console.log('  ✓ All four sections visible: Time Controller, Tools, Layers, Properties');
+    expect(await storyboardHeader.isVisible()).toBe(true);
+    console.log('  ✓ All five sections visible: Time Controller, Tools, Layers, Properties, Storyboard');
 
     // ─── Test collapse/expand for each section ───
     const sections = [
@@ -88,6 +94,7 @@ test.describe('Activity Panel Sections', () => {
       { name: 'Tools', header: toolsHeader },
       { name: 'Layers', header: layersHeader },
       { name: 'Properties', header: propertiesHeader },
+      { name: 'Storyboard', header: storyboardHeader },
     ];
 
     for (const { name, header } of sections) {
