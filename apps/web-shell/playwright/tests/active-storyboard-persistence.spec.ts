@@ -77,8 +77,8 @@ async function openFirstPlot(page: Page): Promise<void> {
 }
 
 async function captureFirstStoryboard(page: Page, name: string): Promise<void> {
-  // Empty-state path: capture-scene-button → naming row → confirm.
-  await page.locator('[data-testid="capture-scene-button"]').click();
+  // Empty-state path: capture-button → naming row → confirm.
+  await page.locator('[data-testid="capture-button"]').click();
   await page
     .locator('[data-testid="storyboard-naming-row-input"]')
     .waitFor({ state: 'visible', timeout: 10_000 });

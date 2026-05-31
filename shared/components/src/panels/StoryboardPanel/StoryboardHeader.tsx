@@ -2,10 +2,12 @@
  * Storyboard header (Feature 217, T402).
  *
  * Renders a native `<select>` dropdown populated from `storyboards[]`, plus an
- * overflow `<button>` that toggles a menu with Create / Rename / Delete items.
- * Each menu item fires the corresponding prop callback, or is hidden if the
- * callback is undefined (or in the case of Rename/Delete, when no Storyboard
- * is active).
+ * overflow `<button>` that toggles a menu with Create / Rename items. Each menu
+ * item fires the corresponding prop callback, or is hidden if the callback is
+ * undefined (or in the case of Rename, when no Storyboard is active).
+ *
+ * Delete is intentionally NOT in this menu — the StoryboardPanel header carries
+ * a dedicated "Delete storyboard" button with an inline two-step confirm.
  *
  * Presentational — no VS Code imports; consumers wire the callbacks to
  * `postMessage` in the webview entry.
@@ -24,7 +26,6 @@ export interface StoryboardHeaderProps {
   onActiveStoryboardChange(storyboardId: string): void;
   onCreateStoryboard?(): void;
   onRenameStoryboard?(): void;
-  onDeleteStoryboard?(): void;
 }
 
 export function StoryboardHeader({
@@ -33,7 +34,6 @@ export function StoryboardHeader({
   onActiveStoryboardChange,
   onCreateStoryboard,
   onRenameStoryboard,
-  onDeleteStoryboard,
 }: StoryboardHeaderProps): React.ReactElement | null {
   const [menuOpen, setMenuOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -66,9 +66,8 @@ export function StoryboardHeader({
   if (storyboards.length === 0) return null;
 
   const hasRename = typeof onRenameStoryboard === 'function' && activeStoryboardId !== null;
-  const hasDelete = typeof onDeleteStoryboard === 'function' && activeStoryboardId !== null;
   const hasCreate = typeof onCreateStoryboard === 'function';
-  const showOverflow = hasCreate || hasRename || hasDelete;
+  const showOverflow = hasCreate || hasRename;
 
   return (
     <div
@@ -166,20 +165,6 @@ export function StoryboardHeader({
               style={menuItemStyle}
             >
               Rename Storyboard…
-            </button>
-          )}
-          {hasDelete && (
-            <button
-              type="button"
-              role="menuitem"
-              data-testid="storyboard-header-menu-delete"
-              onClick={() => {
-                setMenuOpen(false);
-                onDeleteStoryboard?.();
-              }}
-              style={menuItemStyle}
-            >
-              Delete Storyboard…
             </button>
           )}
         </div>

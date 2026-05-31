@@ -34,13 +34,15 @@ describe('StoryboardPanel', () => {
         captureInFlight={false}
         onCaptureClick={() => undefined}
         onSceneRowClick={() => undefined}
+        onCreateStoryboard={() => undefined}
       />,
     );
     const empty = screen.getByTestId('storyboard-empty-state');
     expect(empty.textContent).toMatch(/No storyboards yet/i);
     expect(screen.queryByTestId('scene-list')).toBeNull();
-    // #235: empty state offers a primary Capture Scene affordance.
-    expect(screen.getByTestId('capture-scene-button')).not.toBeNull();
+    // Empty state leads with a "Create storyboard" affordance (name-first).
+    expect(screen.getByTestId('create-storyboard-button')).not.toBeNull();
+    expect(screen.queryByTestId('capture-scene-button')).toBeNull();
   });
 
   it('renders empty-Storyboard copy when scenes is empty but name is set', () => {
@@ -373,7 +375,7 @@ describe('StoryboardPanel', () => {
 
   // ─── #218 edit-suite wiring ────────────────────────────────────────
 
-  it('renders SceneEditForm inline when sceneEditViewModels[sceneId].editFormOpen is true', () => {
+  it('renders SceneEditDialog when sceneEditViewModels[sceneId].editFormOpen is true', () => {
     render(
       <StoryboardPanel
         scenes={[row({ sceneId: 'a' })]}
@@ -397,10 +399,10 @@ describe('StoryboardPanel', () => {
         }}
       />,
     );
-    expect(screen.getByTestId('scene-edit-form')).toBeTruthy();
+    expect(screen.getByTestId('scene-edit-dialog')).toBeTruthy();
   });
 
-  it('does NOT render SceneEditForm when editFormOpen is false', () => {
+  it('does NOT render SceneEditDialog when editFormOpen is false', () => {
     render(
       <StoryboardPanel
         scenes={[row({ sceneId: 'a' })]}
@@ -424,7 +426,7 @@ describe('StoryboardPanel', () => {
         }}
       />,
     );
-    expect(screen.queryByTestId('scene-edit-form')).toBeNull();
+    expect(screen.queryByTestId('scene-edit-dialog')).toBeNull();
   });
 
   it('hides rows flagged pendingDelete (undo window active)', () => {
@@ -477,8 +479,10 @@ describe('StoryboardPanel', () => {
     expect(onSceneUndoDeleteClicked).toHaveBeenCalledWith('a');
   });
 
-  it('SceneEditForm row-action delete click surfaces via onSceneDeleteRequested', () => {
-    const onSceneDeleteRequested = vi.fn();
+  it('SceneEditDialog Save surfaces title + description commits', () => {
+    const onSceneTitleRenameCommit = vi.fn();
+    const onSceneDescriptionSubmit = vi.fn();
+    const onSceneEditFormCancel = vi.fn();
     render(
       <StoryboardPanel
         scenes={[row({ sceneId: 'a' })]}
@@ -500,16 +504,29 @@ describe('StoryboardPanel', () => {
             missingData: { kind: 'ok' },
           },
         }}
-        onSceneDeleteRequested={onSceneDeleteRequested}
+        onSceneTitleRenameCommit={onSceneTitleRenameCommit}
+        onSceneDescriptionSubmit={onSceneDescriptionSubmit}
+        onSceneEditFormCancel={onSceneEditFormCancel}
       />,
     );
-    fireEvent.click(screen.getByTestId('scene-edit-form-action-delete'));
-    expect(onSceneDeleteRequested).toHaveBeenCalledWith('a');
+    fireEvent.change(
+      screen.getByTestId('scene-edit-dialog-title-input'),
+      { target: { value: 'Renamed' } },
+    );
+    fireEvent.change(
+      screen.getByTestId('scene-edit-dialog-description-textarea'),
+      { target: { value: 'Notes' } },
+    );
+    fireEvent.click(screen.getByTestId('scene-edit-dialog-save'));
+    expect(onSceneTitleRenameCommit).toHaveBeenCalledWith('a', 'Renamed');
+    expect(onSceneDescriptionSubmit).toHaveBeenCalledWith('a', 'Notes');
+    // Saving closes the dialog.
+    expect(onSceneEditFormCancel).toHaveBeenCalledWith('a');
   });
 
   // ── Feature 230 — in-panel affordances ─────────────────────────────
 
-  it('chevron clicks surface onSceneRowExpandToggle (FR-001)', () => {
+  it('double-click on a row surfaces onSceneRowExpandToggle (opens edit dialog)', () => {
     const onSceneRowExpandToggle = vi.fn();
     render(
       <StoryboardPanel
@@ -521,8 +538,8 @@ describe('StoryboardPanel', () => {
         onSceneRowExpandToggle={onSceneRowExpandToggle}
       />,
     );
-    const chevrons = screen.getAllByTestId('scene-row-chevron');
-    fireEvent.click(chevrons[1]!);
+    const rows = screen.getAllByTestId('scene-row');
+    fireEvent.doubleClick(rows[1]!);
     expect(onSceneRowExpandToggle).toHaveBeenCalledWith('b');
   });
 
@@ -638,52 +655,57 @@ describe('StoryboardPanel', () => {
 // Feature 235 — empty-state Capture button + naming row + collision banner
 // ─────────────────────────────────────────────────────────────────────
 
-describe('StoryboardPanel — empty-state Capture button (T008)', () => {
-  it('mouse click invokes onCaptureClick', () => {
-    const onCaptureClick = vi.fn();
+describe('StoryboardPanel — empty-state Create storyboard button', () => {
+  it('mouse click invokes onCreateStoryboard', () => {
+    const onCreateStoryboard = vi.fn();
     render(
       <StoryboardPanel
         scenes={[]}
         activeStoryboardName={null}
         captureInFlight={false}
-        onCaptureClick={onCaptureClick}
+        onCaptureClick={() => undefined}
         onSceneRowClick={() => undefined}
+        onCreateStoryboard={onCreateStoryboard}
       />,
     );
-    fireEvent.click(screen.getByTestId('capture-scene-button'));
-    expect(onCaptureClick).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByTestId('create-storyboard-button'));
+    expect(onCreateStoryboard).toHaveBeenCalledTimes(1);
   });
 
-  it('Enter key on the button invokes onCaptureClick', () => {
-    const onCaptureClick = vi.fn();
+  it('Enter key on the button invokes onCreateStoryboard', () => {
+    const onCreateStoryboard = vi.fn();
     render(
       <StoryboardPanel
         scenes={[]}
         activeStoryboardName={null}
         captureInFlight={false}
-        onCaptureClick={onCaptureClick}
+        onCaptureClick={() => undefined}
         onSceneRowClick={() => undefined}
+        onCreateStoryboard={onCreateStoryboard}
       />,
     );
-    const btn = screen.getByTestId('capture-scene-button');
+    const btn = screen.getByTestId('create-storyboard-button');
     btn.focus();
     fireEvent.keyDown(btn, { key: 'Enter' });
-    expect(onCaptureClick).toHaveBeenCalledTimes(1);
+    expect(onCreateStoryboard).toHaveBeenCalledTimes(1);
   });
 
-  it('Space key on the button invokes onCaptureClick', () => {
-    const onCaptureClick = vi.fn();
+  it('Space key on the button invokes onCreateStoryboard', () => {
+    const onCreateStoryboard = vi.fn();
     render(
       <StoryboardPanel
         scenes={[]}
         activeStoryboardName={null}
         captureInFlight={false}
-        onCaptureClick={onCaptureClick}
+        onCaptureClick={() => undefined}
         onSceneRowClick={() => undefined}
+        onCreateStoryboard={onCreateStoryboard}
       />,
     );
-    fireEvent.keyDown(screen.getByTestId('capture-scene-button'), { key: ' ' });
-    expect(onCaptureClick).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(screen.getByTestId('create-storyboard-button'), {
+      key: ' ',
+    });
+    expect(onCreateStoryboard).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -1037,5 +1059,78 @@ describe('StoryboardPanel — collision banner (T010)', () => {
       />,
     );
     expect(screen.queryByTestId('storyboard-collision-banner')).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Delete-storyboard header button (inline two-step confirm)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('StoryboardPanel — delete-storyboard header button', () => {
+  it('is hidden when there is no active storyboard', () => {
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        onDeleteStoryboard={() => undefined}
+      />,
+    );
+    expect(screen.queryByTestId('delete-storyboard-button')).toBeNull();
+  });
+
+  it('is hidden when onDeleteStoryboard is not provided', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+      />,
+    );
+    expect(screen.queryByTestId('delete-storyboard-button')).toBeNull();
+  });
+
+  it('confirms inline before invoking onDeleteStoryboard', () => {
+    const onDeleteStoryboard = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        onDeleteStoryboard={onDeleteStoryboard}
+      />,
+    );
+    // First click only reveals the confirm row — no delete yet.
+    fireEvent.click(screen.getByTestId('delete-storyboard-button'));
+    expect(onDeleteStoryboard).not.toHaveBeenCalled();
+    expect(screen.getByTestId('delete-storyboard-confirm-row')).toBeTruthy();
+    // Confirm fires the callback.
+    fireEvent.click(screen.getByTestId('delete-storyboard-confirm'));
+    expect(onDeleteStoryboard).toHaveBeenCalledTimes(1);
+  });
+
+  it('cancel dismisses the confirm without deleting', () => {
+    const onDeleteStoryboard = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        onDeleteStoryboard={onDeleteStoryboard}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('delete-storyboard-button'));
+    fireEvent.click(screen.getByTestId('delete-storyboard-cancel'));
+    expect(onDeleteStoryboard).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('delete-storyboard-confirm-row')).toBeNull();
+    expect(screen.getByTestId('delete-storyboard-button')).toBeTruthy();
   });
 });

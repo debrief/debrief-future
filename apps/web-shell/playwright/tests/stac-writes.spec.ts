@@ -85,7 +85,7 @@ test.describe('#236 — IndexedDB persistence + capability badge', () => {
     // evaluates false on the first conjunct, so the badge stays hidden
     // even though storyboard content exists. This is the headline
     // before/after visual: same content, different badge state.
-    await page.locator('[data-testid="capture-scene-button"]').click();
+    await page.locator('[data-testid="capture-button"]').click();
     await page
       .locator('[data-testid="storyboard-naming-row-input"]')
       .waitFor({ state: 'visible', timeout: 10_000 });
@@ -134,7 +134,7 @@ test.describe('#236 — IndexedDB persistence + capability badge', () => {
     // lands in the FC. Once that's there, the badge predicate
     // (`!capability.available && hasStoryboardContent`) fires and the
     // session-only badge becomes visible.
-    await page.locator('[data-testid="capture-scene-button"]').click();
+    await page.locator('[data-testid="capture-button"]').click();
     await page
       .locator('[data-testid="storyboard-naming-row-input"]')
       .waitFor({ state: 'visible', timeout: 10_000 });

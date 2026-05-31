@@ -222,6 +222,8 @@ export function ActivityPanel({
   onCollapseStateChange,
   // Communication
   onMessage,
+  // Storyboard section (optional 5th pane)
+  storyboardSlot,
   className,
 }: ActivityPanelProps) {
   const [internalCollapseState, setInternalCollapseState] = useState(DEFAULT_COLLAPSE_STATE);
@@ -722,6 +724,23 @@ export function ActivityPanel({
           />
         </SectionErrorBoundary>
       </PaneSection>
+
+      {/* Storyboard — optional 5th section. Rendered only when the host
+          supplies a slot, so the sidebar reads as a single flat list
+          (Time Controller, Tools, Layers, Properties, Storyboard). */}
+      {storyboardSlot && (
+        <PaneSection
+          title="Storyboard"
+          icon="device-camera-video"
+          collapsed={collapseState.storyboardCollapsed ?? false}
+          onToggle={() => toggleSection('storyboardCollapsed')}
+          layout="flexible"
+        >
+          <SectionErrorBoundary sectionName="Storyboard">
+            {storyboardSlot}
+          </SectionErrorBoundary>
+        </PaneSection>
+      )}
     </div>
   );
 }

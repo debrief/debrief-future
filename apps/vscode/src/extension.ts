@@ -752,11 +752,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       resultsPanelProvider,
       { webviewOptions: { retainContextWhenHidden: true } },
     ),
-    vscode.window.registerWebviewViewProvider(
-      'debrief.storyboardPanel',
-      storyboardPanelProvider,
-    )
+    // Storyboard is no longer a standalone view — it renders as the 5th
+    // section of the Activity panel (UX-review flatten). The Storyboard
+    // provider attaches to the Activity webview instead of registering a
+    // view of its own.
   );
+
+  // Wire the Storyboard provider to attach to the Activity webview.
+  activityPanelProvider.setStoryboardProvider(storyboardPanelProvider);
 
   // Register outline provider for selection
   context.subscriptions.push(

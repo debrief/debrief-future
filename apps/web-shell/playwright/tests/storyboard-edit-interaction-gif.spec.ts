@@ -74,39 +74,30 @@ test.describe('Storyboard edit suite — interaction GIF (#234 FR-042)', () => {
     // Idle frame so the GIF starts on a clean state.
     await page.waitForTimeout(400);
 
-    // ── Step 1: rename sceneA inline ─────────────────────────────────
+    // ── Step 1+2: rename + describe sceneA via the edit dialog ───────
     await page
       .locator('[data-testid="scene-row"][data-scene-id="sceneA"]')
-      .locator('[data-testid="scene-row-chevron"]')
+      .locator('[data-testid="scene-overflow-trigger"]')
       .click();
-    await page.waitForSelector('[data-testid="scene-edit-form"]', {
+    await page
+      .locator('[data-testid="scene-overflow-menuitem-edit-description"]')
+      .click();
+    await page.waitForSelector('[data-testid="scene-edit-dialog"]', {
       state: 'visible',
       timeout: 5_000,
     });
     const titleInput = page.locator(
-      '[data-testid="scene-edit-form-title-input"]',
+      '[data-testid="scene-edit-dialog-title-input"]',
     );
     await titleInput.click();
     await titleInput.fill('Renamed scene');
-    await titleInput.blur();
-    await page.waitForTimeout(300);
-
-    // ── Step 2: describe sceneA ──────────────────────────────────────
-    await page
-      .locator('[data-testid="scene-row"][data-scene-id="sceneA"]')
-      .locator('[data-testid="scene-row-chevron"]')
-      .click();
-    await page.waitForSelector('[data-testid="scene-edit-form"]', {
-      state: 'visible',
-      timeout: 5_000,
-    });
+    await page.waitForTimeout(200);
     const descInput = page.locator(
-      '[data-testid="scene-edit-form-description-textarea"]',
+      '[data-testid="scene-edit-dialog-description-textarea"]',
     );
     await descInput.fill('Surface contact, holding course.');
-    await page
-      .locator('[data-testid="scene-edit-form-save-description"]')
-      .click();
+    await page.waitForTimeout(200);
+    await page.locator('[data-testid="scene-edit-dialog-save"]').click();
     await page.waitForTimeout(300);
 
     // ── Step 3: delete + undo on sceneB ──────────────────────────────

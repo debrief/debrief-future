@@ -1,11 +1,11 @@
 {
-  "capturedAt": "2026-04-27T20:34:00.475Z",
+  "capturedAt": "2026-05-31T15:48:08.896Z",
   "axeVersion": "4.8.5",
-  "gitSha": "9d606d3",
+  "gitSha": "f785036",
   "surfaces": [
     {
       "surface": "with-edit-form",
-      "label": "WithEditForm — inline edit form expanded on sceneA",
+      "label": "WithEditDialog — edit dialog open on sceneA",
       "axeVersion": "4.8.5",
       "counts": {
         "fail": 0,

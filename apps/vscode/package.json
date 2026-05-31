@@ -434,12 +434,12 @@
       {
         "command": "debrief.storyboard.forward",
         "key": "right",
-        "when": "debrief.storyboardActive && (debrief.mapFocused || focusedView == 'debrief.storyboardPanel')"
+        "when": "debrief.storyboardActive && (debrief.mapFocused || focusedView == 'debrief.activityPanel')"
       },
       {
         "command": "debrief.storyboard.backward",
         "key": "left",
-        "when": "debrief.storyboardActive && (debrief.mapFocused || focusedView == 'debrief.storyboardPanel')"
+        "when": "debrief.storyboardActive && (debrief.mapFocused || focusedView == 'debrief.activityPanel')"
       }
     ],
     "viewsContainers": {
@@ -469,13 +469,6 @@
           "id": "debrief.activityPanel",
           "name": "Activity",
           "type": "webview"
-        },
-        {
-          "id": "debrief.storyboardPanel",
-          "name": "Storyboard",
-          "type": "webview",
-          "when": "debrief.plotOpen",
-          "icon": "$(device-camera-video)"
         }
       ],
       "debrief-log": [
@@ -540,7 +533,7 @@
         },
         {
           "command": "debrief.captureScene",
-          "when": "view == debrief.storyboardPanel && debrief.mapFocused && debrief.plotOpen",
+          "when": "view == debrief.activityPanel && debrief.mapFocused && debrief.plotOpen",
           "group": "navigation"
         }
       ],
@@ -794,10 +787,10 @@
     "compile": "npm run compile:extension && npm run compile:webview",
     "sync-briefing-renderer": "pnpm --filter @debrief/briefing-renderer build && cpy 'apps/briefing-renderer/dist/**' apps/vscode/resources/briefing-renderer-static --cwd ../..",
     "compile:extension": "node esbuild.config.js",
-    "compile:webview": "esbuild src/webview/web/mapView.tsx --bundle --outfile=dist/webview/mapView.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/logPanel.tsx --bundle --outfile=dist/webview/logPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/resultsPanel.tsx --bundle --outfile=dist/webview/resultsPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/storyboardPanel.tsx --bundle --outfile=dist/webview/storyboardPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && cpy src/webview/web/styles.css dist/webview/",
+    "compile:webview": "esbuild src/webview/web/mapView.tsx --bundle --outfile=dist/webview/mapView.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/logPanel.tsx --bundle --outfile=dist/webview/logPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/resultsPanel.tsx --bundle --outfile=dist/webview/resultsPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && cpy src/webview/web/styles.css dist/webview/",
     "watch": "npm run watch:extension & npm run watch:webview",
     "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
-    "watch:webview": "esbuild src/webview/web/mapView.tsx --bundle --outfile=dist/webview/mapView.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/logPanel.tsx --bundle --outfile=dist/webview/logPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/resultsPanel.tsx --bundle --outfile=dist/webview/resultsPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/storyboardPanel.tsx --bundle --outfile=dist/webview/storyboardPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch",
+    "watch:webview": "esbuild src/webview/web/mapView.tsx --bundle --outfile=dist/webview/mapView.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/logPanel.tsx --bundle --outfile=dist/webview/logPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/resultsPanel.tsx --bundle --outfile=dist/webview/resultsPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch",
     "dev": "concurrently \"npm run watch:extension\" \"npm run watch:webview\"",
     "prelint": "pnpm --filter @debrief/session-state build && pnpm --filter @debrief/utils build",
     "lint": "eslint src --ext ts",

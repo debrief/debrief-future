@@ -5,6 +5,7 @@
  * which combines time control, tools, and layers sections.
  */
 
+import type { ReactNode } from 'react';
 import type { DebriefFeature } from '../utils/types';
 import type { DisplayMode, PlaybackState } from '@debrief/schemas';
 import type { MatchResult, ToolParameter } from '../ToolMatch/types';
@@ -25,6 +26,9 @@ export interface ActivityPanelCollapseState {
   toolsCollapsed: boolean;
   layersCollapsed: boolean;
   propertiesCollapsed: boolean;
+  /** Storyboard section (rendered only when `storyboardSlot` is provided).
+   *  Optional so existing collapse-state literals keep compiling. */
+  storyboardCollapsed?: boolean;
 }
 
 /**
@@ -35,6 +39,7 @@ export const DEFAULT_COLLAPSE_STATE: ActivityPanelCollapseState = {
   toolsCollapsed: false,
   layersCollapsed: false,
   propertiesCollapsed: false,
+  storyboardCollapsed: false,
 };
 
 /**
@@ -202,6 +207,15 @@ export interface ActivityPanelProps {
   // Message callback for host communication
   /** Callback for messages sent to the host */
   onMessage?: (message: ActivityPanelMessage) => void;
+
+  // Storyboard section (UX review: flatten the sidebar into a single list).
+  /**
+   * Optional Storyboard content rendered as a 5th collapsible section at the
+   * bottom of the panel. The host composes the `StoryboardPanel` (with all its
+   * wiring) and passes it here; ActivityPanel stays ignorant of its internals.
+   * When omitted, no Storyboard section renders.
+   */
+  storyboardSlot?: ReactNode;
 
   /** CSS class name */
   className?: string;

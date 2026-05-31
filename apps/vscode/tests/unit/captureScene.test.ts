@@ -332,7 +332,7 @@ describe('captureScene — happy paths', () => {
     expect(deps.writeSceneThumbnail).toHaveBeenCalledTimes(1);
     expect(markDirty).toHaveBeenCalledTimes(1);
     expect(deps.executeCommand).toHaveBeenCalledWith(
-      'debrief.storyboardPanel.focus',
+      'debrief.activityPanel.focus',
     );
     expect(sink.calls).toEqual([true, false]);
 

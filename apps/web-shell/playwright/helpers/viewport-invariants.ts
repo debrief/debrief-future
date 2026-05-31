@@ -11,7 +11,7 @@
  * ```ts
  * import { assertViewportControlsRemainAccessible } from '../helpers/viewport-invariants';
  *
- * await page.click('[data-testid="capture-scene-button"]');
+ * await page.click('[data-testid="capture-button"]');
  * await assertViewportControlsRemainAccessible(page);
  * await page.fill('[data-testid="storyboard-naming-row-input"]', 'Alpha');
  * await assertViewportControlsRemainAccessible(page);

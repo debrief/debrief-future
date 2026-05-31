@@ -398,7 +398,7 @@ export const WithEditForm: StoryObj<InteractiveStoryArgs> = {
     docs: {
       description: {
         story:
-          'Click the chevron on a row to expand its inline edit form. Submit persists the new title via the reducer; Cancel discards. Driven by the shared `useStoryOnlyMockHandlers` helper (Feature 234, ADR-027).',
+          'Choose "Edit scene…" from a row\'s ⋯ menu (or double-click the row) to open the edit dialog. Save persists the new title/description via the reducer; Cancel discards. Driven by the shared `useStoryOnlyMockHandlers` helper (Feature 234, ADR-027).',
       },
     },
   },
@@ -490,17 +490,18 @@ export const WithMissingDataRemediation: StoryObj<InteractiveStoryArgs> = {
 // ─────────────────────────────────────────────────────────────────────
 
 /**
- * The empty rail with the primary Capture Scene affordance — the entry
- * point that replaces the legacy `Press Ctrl/Cmd+Alt+C on the map…`
- * empty-state copy from #216.
+ * The empty rail with the primary "Create storyboard" affordance — the
+ * name-first entry point. (The header still carries a "Capture" button for
+ * the capture-first flow.)
  */
-export const EmptyWithCaptureButton: Story = {
+export const EmptyWithCreateButton: Story = {
   args: {
     scenes: [],
     activeStoryboardName: null,
     captureInFlight: false,
     onCaptureClick: () => undefined,
     onSceneRowClick: () => undefined,
+    onCreateStoryboard: () => undefined,
   },
 };
 

@@ -70,7 +70,7 @@ test.describe('Storyboard capture — web-shell (#235 US1)', () => {
       checkId: 'before-capture-press',
     });
 
-    await page.locator('[data-testid="capture-scene-button"]').click();
+    await page.locator('[data-testid="capture-button"]').click();
 
     await expect(
       page.locator('[data-testid="storyboard-naming-row"]'),
@@ -150,7 +150,7 @@ test.describe('Storyboard capture — web-shell (#235 US1)', () => {
     page,
   }) => {
     // First capture — creates Storyboard + Scene at the current playhead.
-    await page.locator('[data-testid="capture-scene-button"]').click();
+    await page.locator('[data-testid="capture-button"]').click();
     await expect(
       page.locator('[data-testid="storyboard-naming-row"]'),
     ).toBeVisible({ timeout: 5000 });
@@ -231,7 +231,7 @@ test.describe('Storyboard capture — web-shell (#235 US1)', () => {
     await expect(
       page.locator('[data-testid="storyboard-empty-state"]'),
     ).toBeVisible();
-    await page.locator('[data-testid="capture-scene-button"]').click();
+    await page.locator('[data-testid="capture-button"]').click();
     await expect(
       page.locator('[data-testid="storyboard-naming-row"]'),
     ).toBeVisible();

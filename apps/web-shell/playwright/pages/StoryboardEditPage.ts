@@ -57,10 +57,6 @@ export class StoryboardEditPage {
     );
   }
 
-  chevronFor(sceneId: string): Locator {
-    return this.sceneRow(sceneId).locator('[data-testid="scene-row-chevron"]');
-  }
-
   overflowTriggerFor(sceneId: string): Locator {
     return this.sceneRow(sceneId).locator(
       '[data-testid="scene-overflow-trigger"]',
@@ -73,6 +69,21 @@ export class StoryboardEditPage {
 
   overflowMenuItem(id: string): Locator {
     return this.page.locator(`[data-testid="scene-overflow-menuitem-${id}"]`);
+  }
+
+  /** The per-Scene edit dialog (replaced the inline edit form). */
+  editDialog(): Locator {
+    return this.page.locator('[data-testid="scene-edit-dialog"]');
+  }
+
+  /**
+   * Open the per-Scene edit dialog via the ⋯ overflow menu's "Edit scene…"
+   * item (the chevron + inline form were removed in the UX-review flatten).
+   */
+  async openEditDialog(sceneId: string): Promise<void> {
+    await this.overflowTriggerFor(sceneId).click();
+    await this.overflowMenuItem('edit-description').click();
+    await this.editDialog().waitFor({ state: 'visible', timeout: 5000 });
   }
 
   undoToast(): Locator {

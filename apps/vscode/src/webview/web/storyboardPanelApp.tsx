@@ -1,16 +1,20 @@
 /**
- * Webview entrypoint for the Storyboard panel (Features 216 + 217 + 218 + 230).
+ * Reusable Storyboard webview app (Features 216 + 217 + 218 + 230 + 235).
  *
- * Mounts the presentational `<StoryboardPanel/>` from `@debrief/components`
- * and wires its event handlers to VS Code's `postMessage` channel through
- * the shared `useStoryboardEditReducer` hook (feature 230). The hook is
- * the single source of truth for panel-local display state (which row's
- * edit form is open, which overflow menu is anchored where, inbound stale
- * flags, pending undo toasts).
+ * Extracted from the former standalone `storyboardPanel.tsx` entry so it can
+ * be embedded as the 5th "Storyboard" section of the Activity webview (UX
+ * review: flatten the Debrief sidebar into a single list of collapsible
+ * sections). It mounts the presentational `<StoryboardPanel/>` and wires its
+ * handlers to VS Code's `postMessage` channel via `useStoryboardEditReducer`.
+ *
+ * Unlike the old entry, this module does NOT call `acquireVsCodeApi()` or
+ * mount a React root — the host (`activityPanel.tsx`) owns the single
+ * `acquireVsCodeApi()` instance and React root, and passes the API in. This
+ * keeps a single VS Code API per webview (calling `acquireVsCodeApi()` twice
+ * throws).
  */
 
 import React, { useCallback, useEffect } from 'react';
-import { createRoot } from 'react-dom/client';
 import {
   StoryboardPanel,
   useStoryboardEditReducer,
@@ -26,13 +30,10 @@ import type {
   NamingRowPushState,
   CollisionBannerPushState,
 } from '@debrief/components';
-import { Bootstrap } from './_bootstrap';
 
-interface AcquiredVsCodeApi {
+export interface StoryboardPanelVsCodeApi {
   postMessage(message: unknown): void;
 }
-
-declare function acquireVsCodeApi(): AcquiredVsCodeApi;
 
 interface ScenesMessage {
   type: 'scenes';
@@ -95,9 +96,11 @@ type ExtensionMessage =
   | SceneStaleFlagsUpdatedMessage
   | SceneUndoToastShownMessage;
 
-const vscode = acquireVsCodeApi();
-
-function StoryboardPanelApp(): React.ReactElement {
+export function StoryboardPanelApp({
+  vscode,
+}: {
+  vscode: StoryboardPanelVsCodeApi;
+}): React.ReactElement {
   const {
     state,
     dispatch,
@@ -170,39 +173,45 @@ function StoryboardPanelApp(): React.ReactElement {
     window.addEventListener('message', handler);
     vscode.postMessage({ type: 'ready' });
     return () => window.removeEventListener('message', handler);
-  }, [dispatch]);
+  }, [dispatch, vscode]);
 
   const onCaptureClick = useCallback(() => {
     vscode.postMessage({ type: 'capture-clicked' });
-  }, []);
+  }, [vscode]);
 
-  const onSceneRowClick = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-row-clicked', sceneId });
-  }, []);
+  const onSceneRowClick = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-row-clicked', sceneId });
+    },
+    [vscode],
+  );
 
   const onTransportForward = useCallback(() => {
     vscode.postMessage({ type: 'transport-forward-clicked' });
-  }, []);
+  }, [vscode]);
 
   const onTransportBackward = useCallback(() => {
     vscode.postMessage({ type: 'transport-backward-clicked' });
-  }, []);
+  }, [vscode]);
 
-  const onActiveStoryboardChange = useCallback((storyboardId: string) => {
-    vscode.postMessage({ type: 'active-storyboard-changed', storyboardId });
-  }, []);
+  const onActiveStoryboardChange = useCallback(
+    (storyboardId: string) => {
+      vscode.postMessage({ type: 'active-storyboard-changed', storyboardId });
+    },
+    [vscode],
+  );
 
   const onCreateStoryboard = useCallback(() => {
     vscode.postMessage({ type: 'create-storyboard-requested' });
-  }, []);
+  }, [vscode]);
 
   const onRenameStoryboard = useCallback(() => {
     vscode.postMessage({ type: 'rename-storyboard-requested' });
-  }, []);
+  }, [vscode]);
 
   const onDeleteStoryboard = useCallback(() => {
     vscode.postMessage({ type: 'delete-storyboard-requested' });
-  }, []);
+  }, [vscode]);
 
   // ─── #230 — edit-suite outbound postMessage handlers ─────────────
   const onSceneRowExpandToggle = useCallback(
@@ -224,7 +233,7 @@ function StoryboardPanelApp(): React.ReactElement {
       });
       closeEditForm();
     },
-    [closeEditForm],
+    [closeEditForm, vscode],
   );
 
   const onSceneDescriptionSubmit = useCallback(
@@ -236,32 +245,50 @@ function StoryboardPanelApp(): React.ReactElement {
       });
       closeEditForm();
     },
-    [closeEditForm],
+    [closeEditForm, vscode],
   );
 
-  const onSceneDeleteRequested = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-delete-requested', sceneId });
-  }, []);
+  const onSceneDeleteRequested = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-delete-requested', sceneId });
+    },
+    [vscode],
+  );
 
-  const onSceneUndoDeleteClicked = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-undo-delete-clicked', sceneId });
-  }, []);
+  const onSceneUndoDeleteClicked = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-undo-delete-clicked', sceneId });
+    },
+    [vscode],
+  );
 
-  const onSceneUpdateToCurrentClicked = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-update-to-current-clicked', sceneId });
-  }, []);
+  const onSceneUpdateToCurrentClicked = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-update-to-current-clicked', sceneId });
+    },
+    [vscode],
+  );
 
-  const onSceneDuplicateClicked = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-duplicate-clicked', sceneId });
-  }, []);
+  const onSceneDuplicateClicked = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-duplicate-clicked', sceneId });
+    },
+    [vscode],
+  );
 
-  const onSceneCopyToOtherClicked = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-copy-to-other-clicked', sceneId });
-  }, []);
+  const onSceneCopyToOtherClicked = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-copy-to-other-clicked', sceneId });
+    },
+    [vscode],
+  );
 
-  const onSceneRefreshThumbnailClicked = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-refresh-thumbnail-clicked', sceneId });
-  }, []);
+  const onSceneRefreshThumbnailClicked = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-refresh-thumbnail-clicked', sceneId });
+    },
+    [vscode],
+  );
 
   const onStoryboardRefreshAllStaleClicked = useCallback(
     (storyboardId: string) => {
@@ -270,7 +297,7 @@ function StoryboardPanelApp(): React.ReactElement {
         storyboardId,
       });
     },
-    [],
+    [vscode],
   );
 
   const onStoryboardNameRenameCommit = useCallback(
@@ -281,7 +308,7 @@ function StoryboardPanelApp(): React.ReactElement {
         newName,
       });
     },
-    [],
+    [vscode],
   );
 
   const onStoryboardDescriptionSubmit = useCallback(
@@ -292,7 +319,7 @@ function StoryboardPanelApp(): React.ReactElement {
         description,
       });
     },
-    [],
+    [vscode],
   );
 
   // ─── #235 — naming row + collision banner handlers ───────────────────
@@ -308,89 +335,73 @@ function StoryboardPanelApp(): React.ReactElement {
       type: 'naming-row-confirm',
       name: slice.pendingName.trim(),
     });
-  }, [state.namingRow]);
+  }, [state.namingRow, vscode]);
 
   const onNamingRowCancel = useCallback(() => {
     vscode.postMessage({ type: 'naming-row-cancel' });
-  }, []);
+  }, [vscode]);
 
-  const onCollisionReplace = useCallback((conflictingSceneId: string) => {
-    vscode.postMessage({ type: 'collision-replace', conflictingSceneId });
-  }, []);
+  const onCollisionReplace = useCallback(
+    (conflictingSceneId: string) => {
+      vscode.postMessage({ type: 'collision-replace', conflictingSceneId });
+    },
+    [vscode],
+  );
 
   const onCollisionOffset = useCallback(() => {
     vscode.postMessage({ type: 'collision-offset' });
-  }, []);
+  }, [vscode]);
 
   const onCollisionCancel = useCallback(() => {
     vscode.postMessage({ type: 'collision-cancel' });
-  }, []);
-
-  // Theme is sourced from the parent <Bootstrap> wrapper (#220) — the
-  // local `state.theme` is retained only because the reducer's existing
-  // shape accepts it; it no longer drives the React tree.
+  }, [vscode]);
 
   return (
-    <>
-      <StoryboardPanel
-        scenes={state.sceneRows}
-        activeStoryboardName={state.activeStoryboardName}
-        captureInFlight={state.captureInFlight}
-        onCaptureClick={onCaptureClick}
-        onSceneRowClick={onSceneRowClick}
-        storyboards={
-          state.storyboards.length > 0 ? state.storyboards : undefined
-        }
-        activeStoryboardId={state.activeStoryboardId}
-        currentSceneId={state.currentSceneId}
-        transport={state.transport}
-        onTransportForward={onTransportForward}
-        onTransportBackward={onTransportBackward}
-        onActiveStoryboardChange={onActiveStoryboardChange}
-        onCreateStoryboard={onCreateStoryboard}
-        onRenameStoryboard={onRenameStoryboard}
-        onDeleteStoryboard={onDeleteStoryboard}
-        sceneEditViewModels={sceneEditViewModels}
-        storyboardEditViewModel={state.storyboardEditViewModel ?? undefined}
-        pendingUndoToast={state.pendingUndoToast}
-        overflowMenuOpenFor={state.overflowMenuOpenFor}
-        overflowMenuAnchorRect={state.overflowMenuAnchorRect}
-        onSceneRowExpandToggle={onSceneRowExpandToggle}
-        onSceneOverflowMenuOpen={openOverflowMenu}
-        onSceneOverflowMenuClose={closeOverflowMenu}
-        onSceneEditFormCancel={onSceneEditFormCancel}
-        onSceneTitleRenameCommit={onSceneTitleRenameCommit}
-        onSceneDescriptionSubmit={onSceneDescriptionSubmit}
-        onSceneDeleteRequested={onSceneDeleteRequested}
-        onSceneUndoDeleteClicked={onSceneUndoDeleteClicked}
-        onSceneUpdateToCurrentClicked={onSceneUpdateToCurrentClicked}
-        onSceneDuplicateClicked={onSceneDuplicateClicked}
-        onSceneCopyToOtherClicked={onSceneCopyToOtherClicked}
-        onSceneRefreshThumbnailClicked={onSceneRefreshThumbnailClicked}
-        onStoryboardRefreshAllStaleClicked={
-          onStoryboardRefreshAllStaleClicked
-        }
-        onStoryboardNameRenameCommit={onStoryboardNameRenameCommit}
-        onStoryboardDescriptionSubmit={onStoryboardDescriptionSubmit}
-        onUndoToastDismiss={dismissUndoToast}
-        namingRowViewModel={namingRowViewModel}
-        collisionBannerViewModel={collisionBannerViewModel}
-        onNamingRowTextChanged={onNamingRowTextChanged}
-        onNamingRowConfirm={onNamingRowConfirm}
-        onNamingRowCancel={onNamingRowCancel}
-        onCollisionReplace={onCollisionReplace}
-        onCollisionOffset={onCollisionOffset}
-        onCollisionCancel={onCollisionCancel}
-      />
-    </>
-  );
-}
-
-const rootEl = document.getElementById('root');
-if (rootEl) {
-  createRoot(rootEl).render(
-    <Bootstrap>
-      <StoryboardPanelApp />
-    </Bootstrap>
+    <StoryboardPanel
+      scenes={state.sceneRows}
+      activeStoryboardName={state.activeStoryboardName}
+      captureInFlight={state.captureInFlight}
+      onCaptureClick={onCaptureClick}
+      onSceneRowClick={onSceneRowClick}
+      storyboards={state.storyboards.length > 0 ? state.storyboards : undefined}
+      activeStoryboardId={state.activeStoryboardId}
+      currentSceneId={state.currentSceneId}
+      transport={state.transport}
+      onTransportForward={onTransportForward}
+      onTransportBackward={onTransportBackward}
+      onActiveStoryboardChange={onActiveStoryboardChange}
+      onCreateStoryboard={onCreateStoryboard}
+      onRenameStoryboard={onRenameStoryboard}
+      onDeleteStoryboard={onDeleteStoryboard}
+      sceneEditViewModels={sceneEditViewModels}
+      storyboardEditViewModel={state.storyboardEditViewModel ?? undefined}
+      pendingUndoToast={state.pendingUndoToast}
+      overflowMenuOpenFor={state.overflowMenuOpenFor}
+      overflowMenuAnchorRect={state.overflowMenuAnchorRect}
+      onSceneRowExpandToggle={onSceneRowExpandToggle}
+      onSceneOverflowMenuOpen={openOverflowMenu}
+      onSceneOverflowMenuClose={closeOverflowMenu}
+      onSceneEditFormCancel={onSceneEditFormCancel}
+      onSceneTitleRenameCommit={onSceneTitleRenameCommit}
+      onSceneDescriptionSubmit={onSceneDescriptionSubmit}
+      onSceneDeleteRequested={onSceneDeleteRequested}
+      onSceneUndoDeleteClicked={onSceneUndoDeleteClicked}
+      onSceneUpdateToCurrentClicked={onSceneUpdateToCurrentClicked}
+      onSceneDuplicateClicked={onSceneDuplicateClicked}
+      onSceneCopyToOtherClicked={onSceneCopyToOtherClicked}
+      onSceneRefreshThumbnailClicked={onSceneRefreshThumbnailClicked}
+      onStoryboardRefreshAllStaleClicked={onStoryboardRefreshAllStaleClicked}
+      onStoryboardNameRenameCommit={onStoryboardNameRenameCommit}
+      onStoryboardDescriptionSubmit={onStoryboardDescriptionSubmit}
+      onUndoToastDismiss={dismissUndoToast}
+      namingRowViewModel={namingRowViewModel}
+      collisionBannerViewModel={collisionBannerViewModel}
+      onNamingRowTextChanged={onNamingRowTextChanged}
+      onNamingRowConfirm={onNamingRowConfirm}
+      onNamingRowCancel={onNamingRowCancel}
+      onCollisionReplace={onCollisionReplace}
+      onCollisionOffset={onCollisionOffset}
+      onCollisionCancel={onCollisionCancel}
+    />
   );
 }

@@ -9,6 +9,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ActivityPanel } from '@debrief/components';
 import { Bootstrap } from './_bootstrap';
+import { StoryboardPanelApp } from './storyboardPanelApp';
 
 // Import codicon font CSS for vscrui icons (esbuild loads as text string)
 import codiconCss from 'vscrui/dist/codicon.css';
@@ -229,6 +230,7 @@ function ActivityPanelApp(): React.ReactElement {
         collapseState={collapseState}
         onCollapseStateChange={handleCollapseChange}
         onMessage={handleMessage}
+        storyboardSlot={<StoryboardPanelApp vscode={vscode} />}
       />
     </div>
   );
