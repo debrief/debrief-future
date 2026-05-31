@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { scopeStoryboard, StoryboardNotFoundError } from '@/services/briefingZipExport';
+import { scopeStoryboard, StoryboardNotFoundError } from '../index';
 import type { StoryboardPlot } from '@debrief/components/storyboard';
 
 function sb(id: string, name: string) {

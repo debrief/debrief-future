@@ -535,6 +535,12 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       case 'capture-clicked':
         void vscode.commands.executeCommand('debrief.captureScene');
         break;
+      case 'preview-clicked':
+        // #273 — live preview of the active storyboard in a new browser tab.
+        void vscode.commands.executeCommand('debrief.storyboard.preview', {
+          storyboardId: message.storyboardId,
+        });
+        break;
       case 'scene-row-clicked':
         // #217: scene-row-clicked now drives transport (goToScene via
         // the debrief.storyboard.clickScene command). The service runs

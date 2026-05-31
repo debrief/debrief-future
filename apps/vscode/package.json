@@ -833,6 +833,7 @@
     "vitest": "^1.0.0"
   },
   "dependencies": {
+    "@debrief/briefing-export": "workspace:*",
     "@debrief/components": "workspace:*",
     "@debrief/schemas": "workspace:*",
     "@debrief/session-state": "workspace:*",

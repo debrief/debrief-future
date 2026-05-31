@@ -1650,3 +1650,156 @@ that 261 migrates.
 
 **Provenance.** Spec `specs/261-session-state-systemstate/`,
 `contracts/linkml-delta.md` §2, research-notes/active-storyboard-call-sites.md.
+
+---
+
+### ADR-037: Live storyboard preview — renderer dual-boot path + VS Code loopback server (#273, 2026-05-27)
+
+**Status:** Accepted.
+
+**Context.** The briefing renderer (#264) booted exactly one way: from JSON
+inlined into its `index.html` at zip-export time, read synchronously before
+first paint. That path is deliberately air-gapped — a distributed briefing zip
+plays back offline with zero network requests. Spec #273 adds a **live
+Preview** button (both VS Code and web-shell) that opens the renderer in a new
+browser tab, loaded from the *current* plot's storyboard with no zip-packing
+step. An external browser tab cannot read `vscode-webview-resource:` URIs, so a
+reachable URL is required, and the air-gapped offline guarantee must not
+regress.
+
+**Decision.**
+
+1. **Renderer gains a second, additive boot path.** When the launch URL carries
+   `?features=<url>`, the renderer enters an async `loading → ready/error`
+   lifecycle: `fetch` the URL, validate with the **existing** boundary
+   validators (one storyboard, scene ordering), seed the **unchanged** store.
+   When `?features` is absent, the synchronous inline path runs exactly as
+   before. The two paths share validators + `store.seed()` but never each
+   other's I/O — the inline path imports no `fetch`, so the offline zip path
+   provably issues zero network requests for storyboard data (test-guarded). An
+   optional renderer-local `BriefingConfig.tileLayerUrl` selects an online
+   basemap for preview; the inline/zip path leaves it unset and keeps its
+   bundled local tiles (byte-identical to pre-#273). This is a renderer-local
+   TS field, **not** a LinkML/schema change.
+
+2. **VS Code serves preview via an ephemeral loopback HTTP server.**
+   `BriefingPreviewServer` (pure Node, no `vscode` import) binds `127.0.0.1` on
+   an OS-assigned port, serves the bundled renderer at `/` and the active
+   storyboard's scoped features at `/features.geojson`. The extension opens the
+   system browser via `openExternal(await asExternalUri(...))` so the URL is
+   correct under Remote/Codespaces tunnels and works fully offline. One shared
+   lazily-started instance, disposed on deactivation; read-only serving only.
+
+   **Security — DNS-rebinding defence (C-B7).** Binding loopback blocks remote
+   network access but *not* DNS rebinding, where a malicious page resolves an
+   attacker-controlled domain to `127.0.0.1` and reaches the server from its own
+   origin — arriving as an ordinary local request carrying a *foreign* `Host`
+   header. The server enforces a **`Host` allowlist**: only `127.0.0.1[:<port>]`
+   is served; anything else gets `403`. With the ephemeral lifetime,
+   OS-assigned port, and read-only scope, this closes the loopback attack
+   surface (Article X).
+
+3. **Web-shell hands off via a same-origin blob URL.** Web-shell scopes the
+   active storyboard, builds a `Blob`, and opens the renderer (served
+   same-origin under `/briefing-renderer/`) at `?features=<blobUrl>` in a reused
+   named tab. No server needed — one code path across dev, `vite preview`, and
+   the static Pages build.
+
+4. **Packing core extracted to `@debrief/briefing-export`.** The pure
+   briefing-zip core moved out of `apps/vscode` into a shared package so both
+   hosts share one implementation and cannot drift (FR-016). VS Code keeps its
+   filesystem/save-dialog host adapter; the package is browser-safe (JSZip is
+   the only zip lib, already present — no new dependency).
+
+**Alternatives rejected.** Merging the two boot paths into one loader (pollutes
+the proven sync path, risks the air-gap); a webview instead of an external tab
+(the user chose a new tab; a webview also can't host the renderer offline
+without similar plumbing); a `file://` temp page with inlined data (that *is*
+the zip path in disguise — a packing step, contradicting "live URL, no zip").
+
+**Consequences.** One novel pattern (a local HTTP server in the extension),
+scoped tightly: loopback-only, ephemeral, read-only, `Host`-allowlisted. The
+offline distribution path is unchanged and test-guarded.
+
+**Provenance.** Spec `specs/273-storyboard-preview-button/`. Plan + contracts:
+`specs/273-storyboard-preview-button/plan.md`,
+`specs/273-storyboard-preview-button/contracts/{preview-boot,host-integration}.md`.
+Evidence: `specs/273-storyboard-preview-button/evidence/`.
+
+---
+
+### ADR-038: Canonical feature identity is the top-level GeoJSON `id`; unchecked inline-object casts are banned (#273, 2026-05-28)
+
+**Status:** Accepted.
+
+**Context.** While capturing live-preview evidence for #273 the preview map
+came up *empty* — no vessel tracks. Root cause: the storyboard capture/edit
+pipeline (#216/#217) recorded each scene's `visible_feature_ids` by reading
+`feature.properties.id`. But the LinkML schema places `id` as `required: true`
+at the **top level** of every feature class (TrackFeature, ReferenceLocation,
+MultiPoint/MultiPolygon, SystemState, Scene, Storyboard); `properties.id`
+exists *only* on `SceneProperties`/`StoryboardProperties`. Data-feature
+properties derive from `BaseFeatureProperties`, which has **no `id`**. REP
+import (`services/io/.../rep.py`), feature selection, `hiddenFeatureIds`,
+`scopeStoryboard`, and the briefing renderer all key on the top-level `id`.
+So for real tracks `properties.id` was `undefined`, scenes recorded an empty
+visibility set, and `scopeStoryboard` dropped every track from the
+exported/previewed briefing. The shipped VS Code zip export had the same latent
+hole.
+
+**Why strong typing didn't catch it.** The capture sites iterated the
+deliberately-loose `PlotFeature` boundary type, whose `properties` carries an
+index signature (`{ kind?: string; [k: string]: unknown }`), then cast it
+(`feature.properties as { id?: string | number | null }`). The index signature
+makes `.id` type-check as `unknown`; the cast fabricates a field the schema
+never defines. An unchecked assertion is precisely where the type checker stops
+helping — a direct miss against Article IV.5 (derive boundary types) and
+Article XV.7 (type assertions are expert overrides). The repo already ships the
+correctly-derived `DebriefFeature` union + guards (`@debrief/schemas/unions.ts`,
+#173) that would have made `track.properties.id` a compile error.
+
+**Decision.**
+
+1. **Canonical feature identity is the top-level GeoJSON `id`.** Not
+   `properties.id`. Scene/Storyboard features keep their `properties.id` (a
+   ULID that mirrors the top-level id and is a FK target for
+   `storyboard_id`), but identity for cross-references (visibility, selection,
+   scoping) is always the top-level id.
+
+2. **One typed accessor, no casts.** `getPlotFeatureId(feature)` (exported from
+   `@debrief/components`) reads the top-level id; all five collection/resolution
+   sites — VS Code + web-shell capture, web-shell update-to-current, the
+   extension host-deps collector, and the missing-data resolver
+   (`collectResolvableFeatureIds`) — route through it. The `feature.properties
+   as { id }` casts are removed.
+
+3. **Lint closes the hole.** A `no-restricted-syntax` selector
+   (`TSAsExpression > TSTypeLiteral`) bans casts to an inline object type
+   (`x as { … }`) — the exact form that fabricated `properties.id`. Landed at
+   `warn` in `shared/components` (the package where `PlotFeature` and the
+   generalisation live); a backlog item clears the existing warning backlog
+   across the other packages and promotes the rule to `error` repo-wide. The
+   companion wording widening of Constitution XV.7 keeps the principle and the
+   lint rule in lock-step.
+
+**Alternatives rejected.** (a) Add `id` to `BaseFeatureProperties` so every
+feature carries `properties.id`: larger blast radius, duplicates the
+already-required top-level id, and diverges from GeoJSON's top-level-id
+convention; selection/scoping/render/import would all need reworking.
+(b) Make capture fall back to `properties.id ?? feature.id` without fixing the
+loose type: leaves the unchecked-cast anti-pattern (and the index signature)
+in place to bite again.
+
+**Consequences.** Captures now reference data features by their real id, so the
+preview *and* the existing export carry the tracks. The fix is additive
+(behaviour only changes for features lacking `properties.id` — previously
+dropped, now included), so fixtures that set `properties.id` are unaffected.
+`PlotFeature` stays loose for now (it is used in 36 files / ~100 cast sites);
+tightening it / deriving from `DebriefFeature` is folded into the cast-cleanup
+backlog item.
+
+**Provenance.** Spec `specs/273-storyboard-preview-button/`. Regression test:
+`shared/components/src/storyboard/__tests__/featureId.test.ts`; E2E guard:
+`apps/web-shell/playwright/tests/storyboard-preview.spec.ts` (asserts every
+captured scene references both tracks and the renderer draws them). Related:
+ADR-011 (cast governance), ADR-033 (Article IV.5 — derived boundary types).

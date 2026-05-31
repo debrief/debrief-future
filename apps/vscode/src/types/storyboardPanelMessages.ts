@@ -23,6 +23,8 @@ export type { CollisionBannerPushState, NamingRowPushState };
 export type StoryboardPanelMessage =
   | { readonly type: 'ready' }
   | { readonly type: 'capture-clicked' }
+  // #273 — live preview of the active storyboard in a new browser tab.
+  | { readonly type: 'preview-clicked'; readonly storyboardId: string }
   | { readonly type: 'scene-row-clicked'; readonly sceneId: string }
   | {
       readonly type: 'log';

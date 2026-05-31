@@ -17,15 +17,26 @@ WORKDIR /build
 
 # Copy workspace config and all source upfront
 # (Heroku has no Docker layer cache, so separate COPY-for-cache is pointless)
+#
+# INVARIANT: every workspace package in debrief-vscode's *build closure* must
+# be copied here in full (source, not just package.json). The closure is
+# debrief-vscode + its transitive `workspace:*` deps + any package its build
+# scripts invoke (e.g. `sync-briefing-renderer` runs `@debrief/briefing-renderer`).
+# Packages outside the closure (loader, web-shell, config-ts) only need their
+# package.json so pnpm can resolve the workspace graph. When you add a new
+# workspace dependency to apps/vscode, add its source COPY here or the Heroku
+# build fails with esbuild "Could not resolve @debrief/<pkg>".
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY shared/schemas/ ./shared/schemas/
 COPY shared/components/ ./shared/components/
 COPY shared/utils/ ./shared/utils/
 COPY shared/data/ ./shared/data/
 COPY shared/stac-writer/ ./shared/stac-writer/
+COPY shared/briefing-export/ ./shared/briefing-export/
 COPY shared/config-ts/package.json ./shared/config-ts/
 COPY services/session-state/ ./services/session-state/
 COPY apps/vscode/ ./apps/vscode/
+COPY apps/briefing-renderer/ ./apps/briefing-renderer/
 COPY apps/loader/package.json ./apps/loader/
 COPY apps/web-shell/package.json ./apps/web-shell/
 
@@ -33,8 +44,24 @@ COPY apps/web-shell/package.json ./apps/web-shell/
 # Docker commits layer diffs: creating + deleting node_modules in the same
 # RUN means Docker never snapshots the ~500MB node_modules directory.
 # This prevents OOM on Heroku's constrained build dynos.
-RUN pnpm install --filter debrief-vscode... --no-frozen-lockfile && \
-    pnpm --filter debrief-vscode... build && \
+#
+# Filter scope: `debrief-vscode...` is debrief-vscode + its transitive
+# workspace deps. We additionally scope in `@debrief/briefing-renderer...`
+# because vscode's build runs `sync-briefing-renderer`, which builds the
+# renderer SPA (vite) and copies its dist into the extension's resources.
+# briefing-renderer is invoked by a script rather than declared as a
+# workspace dep, so it falls outside debrief-vscode's closure — without this
+# extra filter its devDeps (vite, react-leaflet, …) never install and the
+# sync step fails.
+#
+# --workspace-concurrency=1 serialises the topological package build so only
+# one compiler (tsup DTS / vite / tsc) runs at a time. Heroku build containers
+# report many vCPUs, so pnpm's default parallelism would build every package
+# at once and risk exhausting the constrained build dyno's memory. This caps
+# peak build-time memory; it does NOT affect correctness or build order
+# (pnpm still resolves the dependency graph topologically at concurrency 1).
+RUN pnpm install --filter debrief-vscode... --filter @debrief/briefing-renderer... --no-frozen-lockfile && \
+    pnpm --filter debrief-vscode... --filter @debrief/briefing-renderer... --workspace-concurrency=1 build && \
     cd apps/vscode && npx @vscode/vsce package --no-dependencies && \
     cd /build && \
     rm -rf node_modules
