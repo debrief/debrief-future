@@ -17,6 +17,7 @@
     "generate-thumbnails": "npx tsx scripts/generate-thumbnails.ts"
   },
   "dependencies": {
+    "@debrief/briefing-export": "workspace:*",
     "@debrief/components": "workspace:*",
     "@debrief/schemas": "workspace:*",
     "@debrief/session-state": "workspace:*",

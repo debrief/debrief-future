@@ -7,6 +7,7 @@
 
 import { test, expect } from '@playwright/test';
 import { assertViewportControlsRemainAccessible } from '../helpers/viewport-invariants';
+import { openCapturablePlot } from '../helpers/openCapturablePlot';
 
 test.describe('Storyboard capture — web-shell (#235 US1)', () => {
   // Each test gets generous time to spin up Vite + load the plot +
@@ -14,49 +15,11 @@ test.describe('Storyboard capture — web-shell (#235 US1)', () => {
   test.setTimeout(120_000);
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/?storyboardPanel=1');
-    // Confirm welcome view loaded.
-    await expect(page.locator('.web-shell--welcome')).toBeVisible({
-      timeout: 10000,
-    });
-    await page
-      .locator('[data-testid="exercise-list-item-row"]')
-      .first()
-      .waitFor({ state: 'visible', timeout: 10000 });
-    await page
-      .locator('[data-testid="exercise-list-item-row"]')
-      .first()
-      .dblclick();
-    await expect(page.locator('.web-shell--analysis')).toBeVisible({
-      timeout: 15000,
-    });
-    await expect(page.locator('.leaflet-container')).toBeVisible({
-      timeout: 15000,
-    });
-    await expect(page.locator('[data-testid="time-controller"]')).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(
-      page.locator('[data-testid="storyboard-panel-rail"]'),
-    ).toBeVisible({ timeout: 10000 });
-    // Force a Leaflet moveend by panning the map a few px — the headless
-    // browser sometimes misses the auto-fitBounds moveend round-trip.
-    const map = page.locator('.leaflet-container');
-    const box = await map.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 2 + 10, box.y + box.height / 2);
-      await page.mouse.up();
-    }
-    // Wait for the map to report a viewport into the session store and
-    // for the time-controller to push currentTime.
-    await page.waitForFunction(
-      () =>
-        window.__sessionStore?.getState().viewport !== null &&
-        window.__sessionStore?.getState().currentTime !== null,
-      { timeout: 60000 },
-    );
+    // Open a track-bearing, temporal plot so capture has a viewport AND a
+    // currentTime. (The recency-sorted .first() row can be a non-temporal
+    // "areas" plot whose missing currentTime hangs this setup — see
+    // helpers/openCapturablePlot.ts.)
+    await openCapturablePlot(page);
   });
 
   test('first capture: empty state → naming row → confirm → Scene appears', async ({

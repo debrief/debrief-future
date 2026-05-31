@@ -41,7 +41,10 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Build workspace dependencies
-        run: pnpm --filter @debrief/utils --filter @debrief/schemas --filter @debrief/session-state --filter @debrief/stac-writer --filter @debrief/components build
+        # #273: briefing-renderer must be built so the web-shell vite dev
+        # server can serve it under /briefing-renderer/ — the live-preview E2E
+        # (storyboard-preview.spec.ts) opens that path in a new tab.
+        run: pnpm --filter @debrief/utils --filter @debrief/schemas --filter @debrief/session-state --filter @debrief/stac-writer --filter @debrief/components --filter @debrief/briefing-renderer build
 
       - name: Run web-shell Playwright tests
         run: pnpm --filter @debrief/web-shell test
@@ -104,7 +107,10 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Build workspace dependencies
-        run: pnpm --filter @debrief/utils --filter @debrief/session-state --filter @debrief/stac-writer --filter @debrief/components build
+        # #273: schemas is needed by the briefing-renderer build that
+        # `pnpm run build` runs via sync-briefing-renderer; briefing-export is
+        # imported by exportStoryboardAsBriefingZip and bundled by esbuild.
+        run: pnpm --filter @debrief/utils --filter @debrief/schemas --filter @debrief/session-state --filter @debrief/stac-writer --filter @debrief/components --filter @debrief/briefing-export build
 
       - name: Build and package VS Code extension
         working-directory: apps/vscode

@@ -113,6 +113,38 @@ export const Capturing: Story = {
   },
 };
 
+// ─── #273 — live Preview control variants ─────────────────────────────
+
+/**
+ * Preview button enabled — sits beside Capture in the header. Provided
+ * `onPreview` makes the button render; ≥1 scene makes it actionable.
+ */
+export const WithPreview: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    onPreview: () => undefined,
+  },
+};
+
+/**
+ * Preview button disabled — the active storyboard has no scenes, so the
+ * button renders but is disabled with an explanatory tooltip (FR-007).
+ */
+export const PreviewDisabledNoScenes: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    onPreview: () => undefined,
+  },
+};
+
 // ─── Spec 260 — viewport-lock padlock variants ────────────────────────
 
 /**

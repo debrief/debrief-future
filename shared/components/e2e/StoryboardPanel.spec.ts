@@ -30,6 +30,12 @@ const EVIDENCE_DIR_217 = resolve(
   '../../../specs/217-storyboarding-playback/evidence/screenshots',
 );
 
+// #273 evidence dir — live Preview control captures.
+const EVIDENCE_DIR_273 = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../specs/273-storyboard-preview-button/evidence/screenshots',
+);
+
 test.describe('StoryboardPanel — Empty', () => {
   for (const theme of ['light', 'dark', 'vscode'] as const) {
     test(`renders empty-state copy in ${theme} theme`, async ({ page }) => {
@@ -175,5 +181,43 @@ test.describe('StoryboardPanel — HardBlockModal (#217)', () => {
     await page.screenshot({
       path: `${EVIDENCE_DIR_217}/storyboard-panel-hardblock-light.png`,
     });
+  });
+});
+
+// ─── #273 — live Preview control ──────────────────────────────────────
+
+test.describe('StoryboardPanel — Preview control (#273)', () => {
+  for (const theme of ['light', 'dark', 'vscode'] as const) {
+    test(`Preview button is enabled with scenes in ${theme} theme`, async ({ page }) => {
+      await page.goto(withTheme(storyUrl('with-preview'), theme));
+      await page.waitForSelector('[data-testid="storyboard-panel"]');
+      const preview = page.locator('[data-testid="storyboard-preview"]');
+      await expect(preview).toBeVisible();
+      await expect(preview).toBeEnabled();
+      await expect(preview).toHaveAttribute('aria-label', 'Preview briefing');
+      await page.screenshot({
+        path: `${EVIDENCE_DIR_273}/storyboard-preview-${theme}.png`,
+      });
+    });
+  }
+
+  test('Preview button is disabled with an explanatory tooltip when there are no scenes', async ({
+    page,
+  }) => {
+    await page.goto(withTheme(storyUrl('preview-disabled-no-scenes'), 'light'));
+    await page.waitForSelector('[data-testid="storyboard-panel"]');
+    const preview = page.locator('[data-testid="storyboard-preview"]');
+    await expect(preview).toBeVisible();
+    await expect(preview).toBeDisabled();
+    await expect(preview).toHaveAttribute('title', /at least one scene/i);
+    await page.screenshot({
+      path: `${EVIDENCE_DIR_273}/preview-disabled-no-scenes.png`,
+    });
+  });
+
+  test('absent onPreview renders no Preview button (legacy parity)', async ({ page }) => {
+    await page.goto(withTheme(storyUrl('with-three-scenes'), 'light'));
+    await page.waitForSelector('[data-testid="storyboard-panel"]');
+    await expect(page.locator('[data-testid="storyboard-preview"]')).toHaveCount(0);
   });
 });

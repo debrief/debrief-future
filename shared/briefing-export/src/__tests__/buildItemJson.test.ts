@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildItemJson, type StacItemMinimal } from '@/services/briefingZipExport';
+import { buildItemJson, type StacItemMinimal } from '../index';
 import type { SceneFeature } from '@debrief/components/storyboard';
 
 function makeScene(id: string): SceneFeature {

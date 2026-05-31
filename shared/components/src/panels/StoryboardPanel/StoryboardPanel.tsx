@@ -92,6 +92,9 @@ export function StoryboardPanel({
   viewportLocked = false,
   onViewportLockToggle,
   hasActivePlot = true,
+  // #273 — live Preview
+  onPreview,
+  canPreview,
 }: StoryboardPanelProps): React.ReactElement {
   // Inline two-step confirm for the header "Delete storyboard" button.
   // Reset whenever the active storyboard changes so a pending confirm never
@@ -107,6 +110,9 @@ export function StoryboardPanel({
     activeStoryboardName !== null && scenes.length === 0 && !captureInFlight;
   const sceneCount = scenes.length;
   const hasStoryboards = storyboards !== undefined && storyboards.length > 0;
+  // #273 — Preview is available when the active storyboard has ≥1 scene.
+  // Hosts may override via `canPreview`; default derives from scene count.
+  const previewEnabled = canPreview ?? sceneCount > 0;
 
   const staleCount = useMemo(() => {
     if (!sceneEditViewModels) return 0;
@@ -249,6 +255,28 @@ export function StoryboardPanel({
                   open (U+1F513) when unlocked. The visual relationship to
                   Capture is reinforced by sitting immediately to its left. */}
               {viewportLocked ? '🔒' : '🔓'}
+            </button>
+          )}
+          {onPreview && (
+            <button
+              type="button"
+              data-testid="storyboard-preview"
+              aria-label="Preview briefing"
+              title={
+                previewEnabled
+                  ? 'Preview this storyboard in a new tab'
+                  : 'Add at least one scene to preview this storyboard'
+              }
+              disabled={!previewEnabled}
+              onClick={onPreview}
+              className="storyboard-panel__preview"
+              style={{
+                padding: '4px 10px',
+                cursor: previewEnabled ? 'pointer' : 'not-allowed',
+                opacity: previewEnabled ? 1 : 0.4,
+              }}
+            >
+              Preview
             </button>
           )}
           {activeStoryboardName !== null &&

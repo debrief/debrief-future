@@ -83,6 +83,89 @@ describe('StoryboardPanel', () => {
     expect(rows[2]!.getAttribute('data-scene-id')).toBe('c');
   });
 
+  // ── #273 live Preview control ────────────────────────────────────────
+  describe('Preview control (#273)', () => {
+    it('C-A1: renders the Preview button only when onPreview is provided', () => {
+      const { rerender } = render(
+        <StoryboardPanel
+          scenes={[row({ sceneId: 'a' })]}
+          activeStoryboardName="Exercise Alpha"
+          captureInFlight={false}
+          onCaptureClick={() => undefined}
+          onSceneRowClick={() => undefined}
+        />,
+      );
+      // C-A3: legacy consumer (no onPreview) renders no Preview button.
+      expect(screen.queryByTestId('storyboard-preview')).toBeNull();
+
+      rerender(
+        <StoryboardPanel
+          scenes={[row({ sceneId: 'a' })]}
+          activeStoryboardName="Exercise Alpha"
+          captureInFlight={false}
+          onCaptureClick={() => undefined}
+          onSceneRowClick={() => undefined}
+          onPreview={() => undefined}
+        />,
+      );
+      expect(screen.getByTestId('storyboard-preview')).not.toBeNull();
+    });
+
+    it('C-A4: clicking an enabled Preview button fires onPreview exactly once', () => {
+      const onPreview = vi.fn();
+      render(
+        <StoryboardPanel
+          scenes={[row({ sceneId: 'a' })]}
+          activeStoryboardName="Exercise Alpha"
+          captureInFlight={false}
+          onCaptureClick={() => undefined}
+          onSceneRowClick={() => undefined}
+          onPreview={onPreview}
+        />,
+      );
+      const btn = screen.getByTestId('storyboard-preview');
+      expect(btn.hasAttribute('disabled')).toBe(false);
+      fireEvent.click(btn);
+      expect(onPreview).toHaveBeenCalledTimes(1);
+    });
+
+    it('C-A2: disables Preview with an explanatory tooltip when the storyboard has no scenes', () => {
+      const onPreview = vi.fn();
+      render(
+        <StoryboardPanel
+          scenes={[]}
+          activeStoryboardName="Exercise Alpha"
+          captureInFlight={false}
+          onCaptureClick={() => undefined}
+          onSceneRowClick={() => undefined}
+          onPreview={onPreview}
+        />,
+      );
+      const btn = screen.getByTestId('storyboard-preview');
+      expect((btn as HTMLButtonElement).disabled).toBe(true);
+      expect(btn.getAttribute('title')).toMatch(/at least one scene/i);
+      fireEvent.click(btn);
+      expect(onPreview).not.toHaveBeenCalled();
+    });
+
+    it('C-A2: honours an explicit canPreview=false even when scenes exist', () => {
+      const onPreview = vi.fn();
+      render(
+        <StoryboardPanel
+          scenes={[row({ sceneId: 'a' })]}
+          activeStoryboardName="Exercise Alpha"
+          captureInFlight={false}
+          onCaptureClick={() => undefined}
+          onSceneRowClick={() => undefined}
+          onPreview={onPreview}
+          canPreview={false}
+        />,
+      );
+      const btn = screen.getByTestId('storyboard-preview');
+      expect((btn as HTMLButtonElement).disabled).toBe(true);
+    });
+  });
+
   it('renders a pending row when captureInFlight is true, prepended to existing scenes', () => {
     render(
       <StoryboardPanel

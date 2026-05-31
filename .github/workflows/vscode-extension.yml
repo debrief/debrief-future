@@ -42,10 +42,14 @@ jobs:
           ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
       - name: Build shared packages
-        # @debrief/session-state must build BEFORE @debrief/components because
-        # the latter imports from @debrief/session-state/browser (spec #192).
-        # Without the dist directory, tsc's exports-map resolution fails.
-        run: pnpm --filter @debrief/utils build && pnpm --filter @debrief/session-state build && pnpm --filter @debrief/stac-writer build && pnpm --filter @debrief/components build
+        # #192: @debrief/session-state must build BEFORE @debrief/components
+        # (the latter imports @debrief/session-state/browser; tsc's exports-map
+        # resolution needs its dist). #273: also build @debrief/briefing-export
+        # — imported by exportStoryboardAsBriefingZip, resolved to dist — AFTER
+        # @debrief/components (it imports the storyboard subpath); schemas is
+        # source-resolved but built here for parity. The && chain keeps the
+        # order explicit.
+        run: pnpm --filter @debrief/utils build && pnpm --filter @debrief/session-state build && pnpm --filter @debrief/schemas build && pnpm --filter @debrief/stac-writer build && pnpm --filter @debrief/components build && pnpm --filter @debrief/briefing-export build
         working-directory: .
 
       - name: Lint

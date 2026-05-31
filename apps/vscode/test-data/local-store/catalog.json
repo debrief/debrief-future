@@ -26,6 +26,12 @@
       "href": "./training-run-1/item.json",
       "type": "application/json",
       "title": "Training Run 1"
+    },
+    {
+      "rel": "item",
+      "href": "./core--twin-cpa/item.json",
+      "type": "application/json",
+      "title": "Saxon Warrior: Twin Cpa"
     }
   ]
 }

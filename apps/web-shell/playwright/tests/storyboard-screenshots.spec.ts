@@ -19,6 +19,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { mkdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { openCapturablePlot } from '../helpers/openCapturablePlot';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -97,46 +98,12 @@ async function applyTheme(page: Page, theme: Theme): Promise<void> {
 }
 
 async function loadAnalysisView(page: Page): Promise<void> {
+  // Wide viewport for the theme screenshots, then open a track-bearing,
+  // temporal plot deterministically (the recency .first() row can be a
+  // non-temporal areas plot whose missing currentTime hangs the
+  // capture-readiness wait — see helpers/openCapturablePlot.ts).
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/?storyboardPanel=1');
-  await expect(page.locator('.web-shell--welcome')).toBeVisible({
-    timeout: 15000,
-  });
-  await page
-    .locator('[data-testid="exercise-list-item-row"]')
-    .first()
-    .waitFor({ state: 'visible', timeout: 15000 });
-  await page
-    .locator('[data-testid="exercise-list-item-row"]')
-    .first()
-    .dblclick();
-  await expect(page.locator('.web-shell--analysis')).toBeVisible({
-    timeout: 15000,
-  });
-  await expect(page.locator('.leaflet-container')).toBeVisible({
-    timeout: 15000,
-  });
-  await expect(page.locator('[data-testid="time-controller"]')).toBeVisible({
-    timeout: 10000,
-  });
-  await expect(
-    page.locator('[data-testid="storyboard-panel-rail"]'),
-  ).toBeVisible({ timeout: 10000 });
-  // Force a Leaflet pan so the viewport propagates into session-state.
-  const map = page.locator('.leaflet-container');
-  const box = await map.boundingBox();
-  if (box) {
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 2 + 10, box.y + box.height / 2);
-    await page.mouse.up();
-  }
-  await page.waitForFunction(
-    () =>
-      window.__sessionStore?.getState().viewport !== null &&
-      window.__sessionStore?.getState().currentTime !== null,
-    { timeout: 60000 },
-  );
+  await openCapturablePlot(page);
 }
 
 test.describe('Storyboard rail — visual evidence (#235)', () => {
