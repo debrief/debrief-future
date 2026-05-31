@@ -280,7 +280,9 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     plot: StoryboardPlot,
     activeStoryboardId: string | null,
   ): void {
-    if (this.dismissedOverlapPairs.size === 0) return;
+    if (this.dismissedOverlapPairs.size === 0) {
+      return;
+    }
     // Re-detect WITHOUT dismissals to learn the full set of currently-active
     // overlap pairs, then intersect the dismissed set with it.
     const activePairs = new Set<string>();
@@ -293,7 +295,9 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       }
     }
     for (const key of [...this.dismissedOverlapPairs]) {
-      if (!activePairs.has(key)) this.dismissedOverlapPairs.delete(key);
+      if (!activePairs.has(key)) {
+        this.dismissedOverlapPairs.delete(key);
+      }
     }
   }
 
