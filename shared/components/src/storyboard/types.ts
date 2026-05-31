@@ -45,6 +45,35 @@ export interface Plot {
   [k: string]: unknown;
 }
 
+/**
+ * Canonical identity of a plot feature: its **top-level GeoJSON `id`**.
+ *
+ * Per the LinkML schema, `id` is `required: true` on every feature class
+ * (TrackFeature, ReferenceLocation, MultiPoint/MultiPolygon, SystemState,
+ * Scene, Storyboard) and lives at the *feature* level. REP import, feature
+ * selection, the `hiddenFeatureIds` set, `scopeStoryboard`, and the briefing
+ * renderer all key on it. `properties.id` exists ONLY on Scene/Storyboard
+ * features (a domain ULID that happens to mirror the top-level id); it is
+ * **absent** on data features (Tracks etc.), whose properties derive from
+ * `BaseFeatureProperties` and carry no `id`.
+ *
+ * Reading `properties.id` to identify a *data* feature is the defect fixed
+ * in ADR-038: it silently dropped every Track from captured Scenes'
+ * `visible_feature_ids`, so the exported / previewed briefing rendered an
+ * empty map. Identity MUST be read from the top level via this accessor —
+ * never an ad-hoc `feature.properties as { id }` cast (an unchecked
+ * assertion that fabricates a field the schema does not define; banned by
+ * the `no-restricted-syntax` inline-object-cast rule, Constitution XV.7).
+ */
+export function getPlotFeatureId(feature: {
+  readonly id?: string | number | null;
+}): string | undefined {
+  const { id } = feature;
+  if (typeof id === "string") return id.length > 0 ? id : undefined;
+  if (typeof id === "number") return String(id);
+  return undefined;
+}
+
 export type { SceneFeature, StoryboardFeature, TimeRange, Viewport };
 
 /* ── Scene flavour discriminated union (#263) ──────────────────────────

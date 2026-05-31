@@ -180,6 +180,14 @@ function StoryboardPanelApp(): React.ReactElement {
     vscode.postMessage({ type: 'scene-row-clicked', sceneId });
   }, []);
 
+  // #273 — live preview of the active storyboard. The active id travels
+  // with the message so the host previews exactly what the panel shows.
+  const activeStoryboardId = state.activeStoryboardId;
+  const onPreview = useCallback(() => {
+    if (activeStoryboardId === null) return;
+    vscode.postMessage({ type: 'preview-clicked', storyboardId: activeStoryboardId });
+  }, [activeStoryboardId]);
+
   const onTransportForward = useCallback(() => {
     vscode.postMessage({ type: 'transport-forward-clicked' });
   }, []);
@@ -350,6 +358,8 @@ function StoryboardPanelApp(): React.ReactElement {
         captureInFlight={state.captureInFlight}
         onCaptureClick={onCaptureClick}
         onSceneRowClick={onSceneRowClick}
+        onPreview={onPreview}
+        canPreview={state.activeStoryboardId !== null && state.sceneRows.length > 0}
         storyboards={
           state.storyboards.length > 0 ? state.storyboards : undefined
         }

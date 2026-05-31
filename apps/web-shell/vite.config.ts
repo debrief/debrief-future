@@ -108,12 +108,93 @@ function stacStorePlugin(): Plugin {
   };
 }
 
+/**
+ * #273 — Serve the briefing-renderer SPA under `/briefing-renderer/` so the
+ * live Preview button can open it same-origin in a new tab (dev, `vite
+ * preview`, and the static Pages build). Mirrors `stacStorePlugin`: a
+ * middleware in dev/preview + a `writeBundle` copy for the static build.
+ * The renderer dist must be built first (`pnpm --filter
+ * @debrief/briefing-renderer build`).
+ */
+const BRIEFING_RENDERER_DIST = path.resolve(__dirname, '../briefing-renderer/dist');
+const BRIEFING_RENDERER_PREFIX = '/briefing-renderer/';
+
+function briefingRendererMiddleware(
+  req: IncomingMessage,
+  res: ServerResponse,
+  next: () => void,
+): void {
+  if (!req.url?.startsWith(BRIEFING_RENDERER_PREFIX)) {
+    next();
+    return;
+  }
+  // Strip the prefix + any query string; default the directory root to index.html.
+  const afterPrefix = req.url.slice(BRIEFING_RENDERER_PREFIX.length).split('?')[0] ?? '';
+  const relativePath = afterPrefix === '' ? 'index.html' : afterPrefix;
+  const filePath = path.join(BRIEFING_RENDERER_DIST, relativePath);
+
+  // Prevent directory traversal.
+  if (!filePath.startsWith(BRIEFING_RENDERER_DIST)) {
+    res.statusCode = 403;
+    res.end('Forbidden');
+    return;
+  }
+  if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+    res.statusCode = 404;
+    res.end('Not found');
+    return;
+  }
+
+  const ext = path.extname(filePath).toLowerCase();
+  const mimeTypes: Record<string, string> = {
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.svg': 'image/svg+xml',
+  };
+  res.setHeader('Content-Type', mimeTypes[ext] ?? 'application/octet-stream');
+  fs.createReadStream(filePath).pipe(res);
+}
+
+function briefingRendererPlugin(): Plugin {
+  return {
+    name: 'vite-plugin-briefing-renderer',
+    configureServer(server) {
+      server.middlewares.use(briefingRendererMiddleware);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(briefingRendererMiddleware);
+    },
+    writeBundle(_options: NormalizedOutputOptions, _bundle: OutputBundle) {
+      const outDir = _options.dir ?? path.resolve(__dirname, 'dist');
+      const destDir = path.join(outDir, 'briefing-renderer');
+      if (fs.existsSync(BRIEFING_RENDERER_DIST)) {
+        copyDirSync(BRIEFING_RENDERER_DIST, destDir);
+        console.log(`[briefing-renderer] Copied SPA to ${destDir}`);
+      } else {
+        console.warn(
+          `[briefing-renderer] dist not found at ${BRIEFING_RENDERER_DIST} — ` +
+            `run \`pnpm --filter @debrief/briefing-renderer build\` before building web-shell.`,
+        );
+      }
+    },
+  };
+}
+
 export default defineConfig({
   // Use VITE_BASE_URL for GitHub Pages deployment (e.g., /debrief-future/web-shell/)
   base: process.env.VITE_BASE_URL || '/',
-  plugins: [react(), geojsonPlugin(), stacStorePlugin()],
+  plugins: [react(), geojsonPlugin(), stacStorePlugin(), briefingRendererPlugin()],
   resolve: {
     alias: {
+      // #273 — briefing-export core + the storyboard subpath resolve to
+      // source (mirrors @debrief/components). The specific subpath MUST
+      // precede the general @debrief/components alias so prefix-matching
+      // does not mangle it.
+      '@debrief/briefing-export': path.resolve(__dirname, '../../shared/briefing-export/src/index.ts'),
+      '@debrief/components/storyboard': path.resolve(__dirname, '../../shared/components/src/storyboard/index.ts'),
       '@debrief/components': path.resolve(__dirname, '../../shared/components/src/index.ts'),
       '@debrief/schemas': path.resolve(__dirname, '../../shared/schemas/src/generated/typescript/index.ts'),
       // Use browser-only re-export — the full barrel re-exports Node-only modules (server, persistence)

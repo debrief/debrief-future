@@ -53,6 +53,10 @@ import {
   captureSceneWeb,
   __abortCaptureInFlight,
 } from './commands/captureSceneWeb';
+import {
+  previewStoryboardWeb,
+  PreviewBlockedError,
+} from './commands/previewStoryboardWeb';
 import { WebPanelHost } from './services/webPanelHost';
 import { getSceneThumbnailStore } from './services/webSceneThumbnailAdapter';
 import { createStoryboardHandlers } from './handlers/storyboardHandlers';
@@ -412,6 +416,29 @@ export function StoryboardPanelMount({
     sessionStore.getState().setViewportLocked(!current);
   }, [sessionStore]);
 
+  // ─── #273 live Preview ───────────────────────────────────────────
+  // Open the briefing renderer in a new tab, loaded live from the active
+  // storyboard's scoped features via a same-origin blob URL. A named tab
+  // target reuses a single preview window across clicks (spec A-3).
+  const handlePreview = useCallback(() => {
+    if (activeStoryboardId === null) return;
+    try {
+      previewStoryboardWeb(plot, activeStoryboardId, {
+        createObjectUrl: (blob) => URL.createObjectURL(blob),
+        revokeObjectUrl: (url) => URL.revokeObjectURL(url),
+        openWindow: (url) => window.open(url, 'debrief-briefing-preview'),
+        rendererBaseUrl: `${import.meta.env.BASE_URL}briefing-renderer/`,
+      });
+    } catch (err) {
+      if (err instanceof PreviewBlockedError) {
+        // eslint-disable-next-line no-alert -- transient author-facing notice; web-shell has no toast surface yet.
+        window.alert(err.message);
+        return;
+      }
+      console.error('[StoryboardPanelMount] preview failed:', err);
+    }
+  }, [plot, activeStoryboardId]);
+
   // ─── Naming row handlers ─────────────────────────────────────────
   const onNamingRowTextChanged = useCallback(
     (pendingName: string) => setNamingRowPendingName(pendingName),
@@ -651,6 +678,9 @@ export function StoryboardPanelMount({
           viewportLocked={viewportLocked}
           onViewportLockToggle={handleViewportLockToggle}
           hasActivePlot={true}
+          // #273 — live Preview (disabled when the active storyboard is empty).
+          onPreview={handlePreview}
+          canPreview={activeStoryboardId !== null && sceneRows.length > 0}
           storyboards={
             storyboardOptions.length > 0 ? storyboardOptions : undefined
           }

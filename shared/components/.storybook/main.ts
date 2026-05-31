@@ -50,6 +50,12 @@ const config: StorybookConfig = {
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...config.resolve.alias,
+      // #273 — web-shell stories transitively import @debrief/briefing-export.
+      // Resolve it (and the storyboard subpath it imports) to source BEFORE
+      // the general @debrief/components alias so prefix-matching does not
+      // mangle `@debrief/components/storyboard` into `src/index.ts/storyboard`.
+      '@debrief/briefing-export': path.resolve(__dirname, '../../briefing-export/src/index.ts'),
+      '@debrief/components/storyboard': path.resolve(__dirname, '../src/storyboard/index.ts'),
       // Resolve @debrief/components to source files for Storybook builds
       '@debrief/components': path.resolve(__dirname, '../src/index.ts'),
       // Resolve @debrief/schemas to generated TypeScript types

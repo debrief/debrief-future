@@ -67,7 +67,7 @@ jobs:
         run: pnpm install --ignore-scripts
 
       - name: Build shared packages
-        run: pnpm --filter @debrief/utils build && pnpm --filter @debrief/stac-writer build && pnpm --filter @debrief/session-state build && pnpm --filter @debrief/components build
+        run: pnpm --filter @debrief/utils build && pnpm --filter @debrief/stac-writer build && pnpm --filter @debrief/session-state build && pnpm --filter @debrief/components build && pnpm --filter @debrief/briefing-export build
 
       - name: Build Storybook
         run: pnpm --filter @debrief/components build-storybook
@@ -158,7 +158,7 @@ jobs:
         run: pnpm install --ignore-scripts
 
       - name: Build shared packages
-        run: pnpm --filter @debrief/utils build && pnpm --filter @debrief/stac-writer build && pnpm --filter @debrief/session-state build && pnpm --filter @debrief/components build
+        run: pnpm --filter @debrief/utils build && pnpm --filter @debrief/stac-writer build && pnpm --filter @debrief/session-state build && pnpm --filter @debrief/components build && pnpm --filter @debrief/briefing-export build
 
       - name: Build Storybook
         run: pnpm --filter @debrief/components build-storybook

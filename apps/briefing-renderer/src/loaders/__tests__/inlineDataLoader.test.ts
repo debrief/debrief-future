@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { loadInlineData, InlineDataLoadError } from '../inlineDataLoader';
 
 const validFeatures = {
@@ -160,5 +160,16 @@ describe('inlineDataLoader', () => {
     expect(() =>
       loadInlineData(deps({ features: validFeatures, item: validItem, config })),
     ).toThrow(/maxBundledZoom/);
+  });
+
+  // US3 / FR-011 / contract preview-boot G3: the inline path is the
+  // air-gapped offline path used by distributed briefing zips. It must
+  // never reach for the network — the #273 live-preview URL fetch lives in
+  // a separate loader (FR-012, clean separation).
+  it('G3: issues no network request for storyboard data', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    loadInlineData(deps({ features: validFeatures, item: validItem, config: validConfig }));
+    expect(fetchSpy).not.toHaveBeenCalled();
+    fetchSpy.mockRestore();
   });
 });

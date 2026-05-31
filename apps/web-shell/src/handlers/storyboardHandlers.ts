@@ -23,6 +23,7 @@ import {
   restoreScene,
   describeStoryboard,
   isSceneFeature,
+  getPlotFeatureId,
   type StoryboardPlot,
   type SceneFeature,
 } from '@debrief/components';
@@ -292,9 +293,9 @@ export function createStoryboardHandlers(
       const hidden = new Set(sessionState.hiddenFeatureIds);
       const visibleIds: string[] = [];
       for (const f of fc.features) {
-        const props = f.properties as { id?: string | number | null } | null;
-        const rawId = props?.id;
-        if (typeof rawId !== 'string' || rawId.length === 0) continue;
+        // ADR-038: canonical identity is the top-level GeoJSON `id`.
+        const rawId = getPlotFeatureId(f);
+        if (rawId === undefined) continue;
         if (hidden.has(rawId)) continue;
         visibleIds.push(rawId);
       }
