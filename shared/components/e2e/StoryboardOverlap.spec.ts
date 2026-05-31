@@ -68,5 +68,9 @@ test.describe('StoryboardPanel — overlap warnings (#271)', () => {
 
     await expect(page.locator(badge('scene-1'))).toHaveCount(0);
     await expect(page.locator(badge('scene-2'))).toHaveCount(0);
+
+    // After/before pair stands in for an interaction GIF (no ffmpeg in CI):
+    // `overlap-light.png` is the "before"; this is the "after-dismiss" frame.
+    await page.screenshot({ path: `${EVIDENCE_DIR}/overlap-after-dismiss.png` });
   });
 });

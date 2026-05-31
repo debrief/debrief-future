@@ -102,19 +102,19 @@ Frontend-only, no schema change, no Python. A pure shared `detectSceneOverlaps()
 
 ### Verification
 
-- [ ] T025 Run the full gate (`task verify`) and the Storybook E2E wrapper; fix any lint/type/test failures before evidence capture `specs/271-scene-overlap-warning/evidence/` (working tree)
+- [x] T025 Run the full gate (`task verify`) and the Storybook E2E wrapper; fix any lint/type/test failures before evidence capture `specs/271-scene-overlap-warning/evidence/` (working tree)
 
 ### Evidence Collection
 
-- [ ] T026 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) `specs/271-scene-overlap-warning/evidence/test-summary.md`
-- [ ] T027 Create the usage demonstration: two overlapping time-range Scenes → named warning → dismiss → re-warn on re-overlap `specs/271-scene-overlap-warning/evidence/usage-example.md`
-- [ ] T028 [P] Capture the three theme screenshots via the Storybook E2E (`overlap-light.png`, `overlap-dark.png`, `overlap-vscode.png`) `specs/271-scene-overlap-warning/evidence/screenshots/`
-- [ ] T029 [P] Capture the dismiss interaction GIF (< 5s, < 2MB) from the E2E recording `specs/271-scene-overlap-warning/evidence/screenshots/interaction.gif`
-- [ ] T030 [P] Write the E2E summary (pass rates, theme-variant coverage) `specs/271-scene-overlap-warning/evidence/e2e-summary.md`
+- [x] T026 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) `specs/271-scene-overlap-warning/evidence/test-summary.md`
+- [x] T027 Create the usage demonstration: two overlapping time-range Scenes → named warning → dismiss → re-warn on re-overlap `specs/271-scene-overlap-warning/evidence/usage-example.md`
+- [x] T028 [P] Capture the three theme screenshots via the Storybook E2E (`overlap-light.png`, `overlap-dark.png`, `overlap-vscode.png`) `specs/271-scene-overlap-warning/evidence/screenshots/`
+- [x] T029 [P] Capture the dismiss interaction GIF (< 5s, < 2MB) from the E2E recording `specs/271-scene-overlap-warning/evidence/screenshots/interaction.gif`
+- [x] T030 [P] Write the E2E summary (pass rates, theme-variant coverage) `specs/271-scene-overlap-warning/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T031 Create the feature blog post — copy the first three sections verbatim from `evidence/opening-context.md`, write Screenshots/By the Numbers/Lessons Learned/What's Next from evidence (via Content Specialist) `specs/271-scene-overlap-warning/media/shipped-post.md`
+- [x] T031 Create the feature blog post — copy the first three sections verbatim from `evidence/opening-context.md`, write Screenshots/By the Numbers/Lessons Learned/What's Next from evidence (via Content Specialist) `specs/271-scene-overlap-warning/media/shipped-post.md`
 
 ### PR Creation
 
