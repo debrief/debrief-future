@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeTileCoverage } from '@/services/briefingZipExport';
+import { computeTileCoverage } from '../index';
 import type { SceneFeature } from '@debrief/components/storyboard';
 
 function instant(centerLon: number, centerLat: number, zoom: number): SceneFeature {

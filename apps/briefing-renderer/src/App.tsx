@@ -18,7 +18,7 @@
 
 import { type FC, useEffect, useMemo, useState } from 'react';
 import { useBriefingStore } from './store';
-import { bootBriefingRenderer } from './boot';
+import { bootBriefingRenderer, bootBriefingRendererFromUrl } from './boot';
 import { runBrowserProbes, UNSUPPORTED_BROWSER_BANNER } from './probes/browserProbes';
 import { BriefingMap } from './components/BriefingMap';
 import { MinimalChrome } from './components/MinimalChrome';
@@ -57,6 +57,17 @@ export const App: FC<AppProps> = ({ inlineData, disableDevFixture = false }) => 
     return null;
   }, []);
 
+  // #273 live-preview URL-boot hook — present only when the launch URL
+  // carries `?features=<url>`. Independent of the `?story=` test hook.
+  // When set, the synchronous inline boot below is skipped and the async
+  // URL boot runs in the effect further down.
+  const featuresUrl = useMemo<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    // Tests inject data directly via `inlineData` — never URL-boot then.
+    if (inlineData) return null;
+    return new URLSearchParams(window.location.search).get('features');
+  }, [inlineData]);
+
   // Seed the store SYNCHRONOUSLY on first render via useState's lazy
   // initializer. If we did this in useEffect, `BriefingMap` would mount
   // first with empty scenes — picking the default center/zoom — and
@@ -64,8 +75,14 @@ export const App: FC<AppProps> = ({ inlineData, disableDevFixture = false }) => 
   // showing the whole continent before settling. Seeding before any
   // child mounts means `BriefingMap` reads the right Scene 0 viewport
   // on first paint.
+  //
+  // The URL-boot path (#273) is inherently async, so it cannot seed
+  // here — it runs through the loading→ready/error lifecycle in the
+  // effect below. We skip the synchronous inline boot when URL-boot is
+  // active so the two paths never both seed.
   useState<void>(() => {
     if (typeof window === 'undefined') return;
+    if (featuresUrl) return;
     const result = bootBriefingRenderer(useBriefingStore.getState(), {
       inlineData,
       disableDevFixture,
@@ -74,6 +91,15 @@ export const App: FC<AppProps> = ({ inlineData, disableDevFixture = false }) => 
       setBootState('error', result.message);
     }
   });
+
+  // #273 async URL-boot. Only runs when `?features=` is present. The store
+  // starts in `loading`; on success it seeds to `ready`/`empty`, on failure
+  // it transitions to the visible `error` state (FR-008). The store writes
+  // are idempotent so an unmount mid-fetch needs no extra guard.
+  useEffect(() => {
+    if (!featuresUrl) return;
+    void bootBriefingRendererFromUrl(useBriefingStore.getState(), featuresUrl);
+  }, [featuresUrl]);
 
   // App-level `P` listener — single, lifetime-stable. See the hook for
   // the full rationale.

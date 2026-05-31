@@ -1,31 +1,41 @@
 /**
- * Public barrel for the briefing-zip export service.
+ * Barrel for the briefing-zip export core.
  *
- * All exports here are pure / injectable helpers. The VS Code command
- * orchestrator at `apps/vscode/src/commands/exportStoryboardAsBriefingZip.ts`
- * wires them up against the real VS Code APIs.
+ * The pure packing logic now lives in the shared `@debrief/briefing-export`
+ * package (#273, FR-016) so the VS Code and web-shell hosts share one
+ * implementation. This barrel re-exports it unchanged; the VS Code host
+ * adapter (`createDefaultExportHostDeps` in
+ * `apps/vscode/src/commands/exportStoryboardAsBriefingZip.ts`) wires the
+ * orchestrator against the real VS Code APIs.
  */
 
 export {
   scopeStoryboard,
   StoryboardNotFoundError,
-} from './scopeStoryboard';
-export type { ScopedFeatureCollection } from './scopeStoryboard';
+  buildItemJson,
+  computeTileCoverage,
+  injectInlineData,
+  assembleZip,
+  tileKeyOf,
+  fetchTiles,
+  exportBriefingZip,
+} from '@debrief/briefing-export';
 
-export { buildItemJson } from './buildItemJson';
-export type { BriefingItemJson, StacItemMinimal } from './buildItemJson';
-
-export { computeTileCoverage } from './computeTileCoverage';
-export type { TileCoord, TileCoverageInput, TileCoverageOutput } from './computeTileCoverage';
-
-export { injectInlineData } from './injectInlineData';
-export type { InjectableInlineData, InjectionResult } from './injectInlineData';
-
-export { assembleZip, tileKeyOf } from './zipAssembler';
-export type { ZipAssemblerInput, ZipAssemblerOutput } from './zipAssembler';
-
-export { fetchTiles } from './fetchTiles';
-export type { FetchTilesInput, FetchTilesOutput } from './fetchTiles';
-
-export { exportBriefingZip } from './export';
-export type { ExportBriefingZipInput, ExportBriefingZipOutput, ExportDeps } from './export';
+export type {
+  ScopedFeatureCollection,
+  BriefingItemJson,
+  StacItemMinimal,
+  TileCoord,
+  TileCoverageInput,
+  TileCoverageOutput,
+  InjectableInlineData,
+  InjectionResult,
+  ZipAssemblerInput,
+  ZipAssemblerOutput,
+  FetchTilesInput,
+  FetchTilesOutput,
+  ExportBriefingZipInput,
+  ExportBriefingZipOutput,
+  ExportDeps,
+  BriefingConfigForExport,
+} from '@debrief/briefing-export';

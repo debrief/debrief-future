@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { injectInlineData } from '@/services/briefingZipExport';
+import { injectInlineData } from '../index';
 
 const template = `<!doctype html>
 <html lang="en">

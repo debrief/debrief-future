@@ -134,5 +134,7 @@ describe('exportStoryboardAsBriefingZip', () => {
     expect(callArgs[1]).toBeInstanceOf(Uint8Array);
     expect((callArgs[1] as Uint8Array).length).toBeGreaterThan(0);
     expect(deps.showInfo).toHaveBeenCalled();
-  });
+    // This path does real JSZip assembly (~4.8s solo) and tips over the 5s
+    // default under full-suite load — give it head-room to avoid CI flakes.
+  }, 15_000);
 });

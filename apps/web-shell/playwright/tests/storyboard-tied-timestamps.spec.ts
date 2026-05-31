@@ -15,6 +15,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test, expect } from '@playwright/test';
 import { StoryboardPanelPage } from '../pages/StoryboardPanelPage';
+import { openCapturablePlot } from '../helpers/openCapturablePlot';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,47 +29,10 @@ test.describe('Storyboard — tied-timestamp captures (#259)', () => {
   test.setTimeout(120_000);
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/?storyboardPanel=1');
-    await expect(page.locator('.web-shell--welcome')).toBeVisible({
-      timeout: 10_000,
-    });
-    await page
-      .locator('[data-testid="exercise-list-item-row"]')
-      .first()
-      .waitFor({ state: 'visible', timeout: 10_000 });
-    await page
-      .locator('[data-testid="exercise-list-item-row"]')
-      .first()
-      .dblclick();
-    await expect(page.locator('.web-shell--analysis')).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(page.locator('.leaflet-container')).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(page.locator('[data-testid="time-controller"]')).toBeVisible({
-      timeout: 10_000,
-    });
-    await expect(
-      page.locator('[data-testid="storyboard-panel-rail"]'),
-    ).toBeVisible({ timeout: 10_000 });
-
-    // Force a Leaflet moveend by panning a few px so the viewport lands
-    // in the session store before we try to capture.
-    const map = page.locator('.leaflet-container');
-    const box = await map.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 2 + 10, box.y + box.height / 2);
-      await page.mouse.up();
-    }
-    await page.waitForFunction(
-      () =>
-        window.__sessionStore?.getState().viewport !== null &&
-        window.__sessionStore?.getState().currentTime !== null,
-      { timeout: 60_000 },
-    );
+    // Open a track-bearing, temporal plot deterministically (the recency
+    // .first() row can be a non-temporal areas plot whose missing currentTime
+    // hangs capture setup — see helpers/openCapturablePlot.ts).
+    await openCapturablePlot(page);
   });
 
   test('three captures at one instant land in capture order with monotonic creation_order', async ({

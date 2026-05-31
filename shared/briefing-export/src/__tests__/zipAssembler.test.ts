@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import JSZip from 'jszip';
-import { assembleZip, tileKeyOf } from '@/services/briefingZipExport';
+import { assembleZip, tileKeyOf } from '../index';
 
 function bytes(s: string): Uint8Array {
   return new TextEncoder().encode(s);

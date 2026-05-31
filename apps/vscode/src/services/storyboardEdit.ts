@@ -21,6 +21,7 @@ import {
   getStoryboard,
   isSceneFeature,
   isStoryboardFeature,
+  getPlotFeatureId,
   readSceneWithStaleness,
   renameStoryboard as crudRenameStoryboard,
   restoreScene as crudRestoreScene,
@@ -1186,17 +1187,18 @@ function plotHasAnyStoryboard(plot: StoryboardPlot): boolean {
  * Collect IDs of plot features that can RESOLVE a scene's
  * `visible_feature_ids` entry. Excludes Storyboard and Scene features
  * (those carry their own provenance / structure, never the underlying
- * plot data a Scene references). Uses `properties.id` as the canonical
- * id (matches #216/#217 capture behaviour — Scene's visibleFeatureIds
- * come from `props.id` on each iterated feature).
+ * plot data a Scene references). Uses the **top-level GeoJSON `id`** as the
+ * canonical identity (ADR-038) — the same source capture now records into
+ * `visible_feature_ids`. (The prior implementation read `properties.id`,
+ * which is absent on data features, so it would have failed to resolve
+ * every captured Track once capture was fixed.)
  */
 function collectResolvableFeatureIds(plot: StoryboardPlot): Set<string> {
   const set = new Set<string>();
   for (const f of plot.features) {
     if (isStoryboardFeature(f) || isSceneFeature(f)) {continue;}
-    const props = (f as { properties?: { id?: unknown } | null }).properties;
-    const id = props?.id;
-    if (typeof id === 'string' && id.length > 0) {
+    const id = getPlotFeatureId(f);
+    if (id !== undefined) {
       set.add(id);
     }
   }

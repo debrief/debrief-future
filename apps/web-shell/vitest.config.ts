@@ -24,6 +24,16 @@ export default defineConfig({
       // leaflet / react-dom and breaks Node ESM resolution under jsdom).
       // The pure helpers (storyboard/activeStoryboardSelection) work
       // directly from source; runtime in the browser uses the bundle.
+      // #273 — keep briefing-export + the storyboard subpath on source so
+      // unit tests resolve the pure core without the Leaflet barrel.
+      '@debrief/briefing-export': path.resolve(
+        __dirname,
+        '../../shared/briefing-export/src/index.ts',
+      ),
+      '@debrief/components/storyboard': path.resolve(
+        __dirname,
+        '../../shared/components/src/storyboard/index.ts',
+      ),
       '@debrief/components': path.resolve(
         __dirname,
         '../../shared/components/src/index.ts',

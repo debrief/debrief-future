@@ -101,6 +101,16 @@ jobs:
         if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         run: task typecheck
 
+      # #273: this job runs the test sub-commands directly (the #191 debug
+      # split below) which bypasses `task test`'s `deps: [build]`, so nothing
+      # is built. The web-shell Playwright run serves the briefing-renderer as
+      # a static dist under /briefing-renderer/ (the live-preview E2E opens it
+      # in a new tab); without a build that dist is absent and the spec fails.
+      # Build the renderer + the cross-package dists the tests resolve.
+      - name: Build workspace for E2E
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
+        run: pnpm --filter @debrief/utils --filter @debrief/schemas --filter @debrief/session-state --filter @debrief/stac-writer --filter @debrief/components --filter @debrief/briefing-export --filter @debrief/briefing-renderer build
+
       - name: Run tests
         if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         # TEMPORARY (#191 PR debug) — split task test into its sub-commands

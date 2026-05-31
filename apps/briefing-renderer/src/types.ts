@@ -62,6 +62,14 @@ export interface BriefingConfig {
    * showing missing-tile placeholders.
    */
   maxBundledZoom: number;
+  /**
+   * Optional basemap tile-URL template (`{z}/{x}/{y}`). Set only by the
+   * live-preview URL-boot path (#273) to point at an online basemap; the
+   * air-gapped inline/zip path leaves it unset so `BriefingMap` falls back
+   * to the bundled local tiles (`./tiles/{z}/{x}/{y}.png`). Keeping it
+   * optional means the offline path is byte-identical to before #273.
+   */
+  tileLayerUrl?: string;
 }
 
 /**
