@@ -131,9 +131,9 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Consolidate #237's writer (sequenced — three commits)
 
-- [ ] T052 **Commit A (delegation)**: leave `apps/web-shell/src/services/activeStoryboardPersistence.ts` in place but have its two functions call into the shared helper; behaviour and call sites unchanged. Verify #237's Vitest + Playwright still pass. File: `apps/web-shell/src/services/activeStoryboardPersistence.ts`.
-- [ ] T053 **Commit B (re-point)**: re-point web-shell call sites identified in T003 to import from `@debrief/session-state` directly. Files: `apps/web-shell/src/StoryboardPanelMount.tsx` (and `shared/components/src/storyboardPlayback/service.ts` if it writes).
-- [ ] T054 **Commit C (delete)**: delete `apps/web-shell/src/services/activeStoryboardPersistence.ts` and re-point or retire `apps/web-shell/src/services/__tests__/activeStoryboardPersistence.test.ts` (a thin smoke test against the helper if it covered anything not already in Phase 2). Files: `apps/web-shell/src/services/activeStoryboardPersistence.ts` (DELETED), `apps/web-shell/src/services/__tests__/activeStoryboardPersistence.test.ts` (DELETED/REPOINTED).
+- [x] T052 **Commit A (delegation)**: leave `apps/web-shell/src/services/activeStoryboardPersistence.ts` in place but have its two functions call into the shared helper; behaviour and call sites unchanged. Verify #237's Vitest + Playwright still pass. File: `apps/web-shell/src/services/activeStoryboardPersistence.ts`.
+- [x] T053 **Commit B (re-point)**: re-point web-shell call sites identified in T003 to import from `@debrief/session-state` directly. Files: `apps/web-shell/src/StoryboardPanelMount.tsx` (and `shared/components/src/storyboardPlayback/service.ts` if it writes).
+- [x] T054 **Commit C (delete)**: delete `apps/web-shell/src/services/activeStoryboardPersistence.ts` and re-point or retire `apps/web-shell/src/services/__tests__/activeStoryboardPersistence.test.ts` (a thin smoke test against the helper if it covered anything not already in Phase 2). Files: `apps/web-shell/src/services/activeStoryboardPersistence.ts` (DELETED), `apps/web-shell/src/services/__tests__/activeStoryboardPersistence.test.ts` (DELETED/REPOINTED).
 
 ### Wire active_storyboard into VS Code (read + write via the helper)
 
