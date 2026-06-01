@@ -16,6 +16,8 @@ export { getStoryboard, getScene, getActiveStoryboardDefault, getMostRecentlyMod
 export type { StaleReadResult } from './queries';
 export { detectMissingDataForScene } from './missing-data';
 export type { MissingDataClassification, PlotTimeRange as StoryboardPlotTimeRange, } from './missing-data';
+export { detectSceneOverlaps, overlapPairKey } from './overlap';
+export type { OverlapPartner } from './overlap';
 export { canonicaliseVisibleFeatureIds, computeFeatureSetHash, } from './hash';
 export { validatePlot, flavourCheck } from './validate';
 export { isActiveStoryboardSelection, getActiveStoryboardSelection, setActiveStoryboardSelection, ACTIVE_STORYBOARD_FEATURE_ID, ACTIVE_STORYBOARD_STATE_TYPE, } from './activeStoryboardSelection';
