@@ -14,6 +14,7 @@ import type {
   TextAnnotation,
   VectorAnnotation,
   PolyAnnotation,
+  RawGeoJSONFeature,
 } from './types.js';
 
 /**
@@ -45,6 +46,37 @@ export type DebriefFeature =
 export interface DebriefFeatureCollection {
   type: 'FeatureCollection';
   features: DebriefFeature[];
+}
+
+/**
+ * Permissive ingress / parse-boundary feature.
+ *
+ * Structurally derived from the schema-generated {@link RawGeoJSONFeature} with
+ * `geometry` widened to admit `null` — the only difference required for the
+ * genuine ingress boundaries (REP import, MCP tool results, on-disk GeoJSON,
+ * the session-state→stac adapter, and the host→webview message DTOs).
+ *
+ * A `geometry: null` feature is an RFC 7946 "unlocated" feature; these
+ * legitimately exist in the domain (SYSTEM_RECORD, STORYBOARD, NarrativeEntry)
+ * and must be preserved, not dropped, through these boundaries.
+ *
+ * Derived via `Omit` + intersection (Constitution Article IV.5) so it cannot
+ * silently drift when `RawGeoJSONFeature` grows a field — fields are NOT
+ * re-listed by name. `RawGeoJSONFeature` is assignable to `IngressFeature`
+ * (only `geometry` is widened); the typed coordinate union is retained (same
+ * trust level ADR-021 accepts at parse boundaries — no new runtime validation).
+ */
+export type IngressFeature =
+  Omit<RawGeoJSONFeature, 'geometry'> & { geometry: RawGeoJSONFeature['geometry'] | null };
+
+/**
+ * Permissive ingress / parse-boundary FeatureCollection — the collection
+ * counterpart to {@link IngressFeature}.
+ */
+export interface IngressFeatureCollection {
+  type: 'FeatureCollection';
+  features: IngressFeature[];
+  bbox?: number[];
 }
 
 /**

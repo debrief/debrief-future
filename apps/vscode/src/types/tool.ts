@@ -202,8 +202,14 @@ export class ToolMatchService {
   }
 }
 
-// Canonical Safe GeoJSON types from @debrief/utils (T02)
-import type { SafeFeatureCollection } from '@debrief/utils';
+// Result-carrying GeoJSON collection type from @debrief/schemas (#212).
+// IngressFeatureCollection (schema-derived, geometry may be null) rather than
+// RawGeoJSONFeatureCollection: a ResultLayer / ToolExecutionResult is populated
+// unconditionally from the MCP tool-result parse boundary (an Ingress boundary
+// per spec FR-005) and flows on to the host→webview message DTOs (also Ingress,
+// FR-006). Typing it Ingress keeps the whole result pipeline cast-free and
+// preserves the RFC-7946 null-geometry channel end-to-end (SC-004).
+import type { IngressFeatureCollection } from '@debrief/schemas';
 
 /**
  * Tool execution state
@@ -290,7 +296,7 @@ export interface ResultLayer {
   executionId: string;
 
   /** GeoJSON FeatureCollection of results */
-  features: SafeFeatureCollection;
+  features: IngressFeatureCollection;
 
   /** Layer styling configuration */
   style: LayerStyle;
@@ -359,7 +365,7 @@ export interface ToolExecutionResult {
   success: boolean;
 
   /** Result features (if success) */
-  features?: SafeFeatureCollection;
+  features?: IngressFeatureCollection;
 
   /** Error message (if failed) */
   error?: string;

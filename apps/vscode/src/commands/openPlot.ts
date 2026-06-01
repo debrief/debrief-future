@@ -25,7 +25,7 @@ import { MapPanel } from '../webview/mapPanel';
 import { isTrackFeature, isReferenceLocation } from '@debrief/components';
 import type { DebriefFeature } from '@debrief/components';
 import { parseStacUri, buildStacUri } from '../types/stac';
-import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
+import type { IngressFeature, IngressFeatureCollection } from '@debrief/schemas';
 
 /** Extract a display name from a DebriefFeature. Uses type-specific property names. */
 function featureDisplayName(f: DebriefFeature): string {
@@ -40,23 +40,24 @@ function featureDisplayName(f: DebriefFeature): string {
   return props.label ?? props.name ?? props.text ?? String(f.id);
 }
 
-/** Adapt a SafeFeature to a loosely-typed record for session-state log service. */
-function safeFeatureToRecord(f: SafeFeature): Record<string, unknown> {
+/** Adapt an IngressFeature to a loosely-typed record for session-state log service. */
+function safeFeatureToRecord(f: IngressFeature): Record<string, unknown> {
   return { type: f.type, id: f.id, geometry: f.geometry, properties: f.properties };
 }
 
 /**
- * Adapt a GeoJsonFeatureCollection (session-state type) to SafeFeatureCollection
+ * Adapt a GeoJsonFeatureCollection (session-state type) to IngressFeatureCollection
  * (stacService type). The shapes are structurally equivalent; geometry:unknown
- * narrows to SafeGeometry via assertion on each feature.
+ * narrows to the schema-derived ingress geometry (which admits null for SYSTEM /
+ * storyboard features) via assertion on each feature.
  */
-function toSafeFC(fc: { type: string; features: Array<{ type: string; geometry: unknown; properties: Record<string, unknown> | null; id?: string | number }> }): SafeFeatureCollection {
+function toIngressFC(fc: { type: string; features: Array<{ type: string; geometry: unknown; properties: Record<string, unknown> | null; id?: string | number }> }): IngressFeatureCollection {
   return {
     type: 'FeatureCollection',
-    features: fc.features.map((f): SafeFeature => ({
+    features: fc.features.map((f): IngressFeature => ({
       type: 'Feature',
       id: f.id,
-      geometry: f.geometry as SafeGeometry | null,
+      geometry: f.geometry as IngressFeature['geometry'],
       properties: f.properties,
     })),
   };
@@ -313,7 +314,7 @@ export function createOpenPlotCommand(
 
       // Phase 6: replay deps (Feature: 076-replay-tune)
       writeGeoJson: async (sp, ip, fc) => {
-        await stacService.writeGeoJson(sp, ip, toSafeFC(fc));
+        await stacService.writeGeoJson(sp, ip, toIngressFC(fc));
       },
 
       executeTool: async (toolId, featureIds, params, activityId, timestamp) => {
@@ -323,7 +324,7 @@ export function createOpenPlotCommand(
         const fc = await stacService.loadGeoJsonForItem(store.path, itemPath);
         if (!fc) { return { success: false, duration_ms: Date.now() - startMs }; }
 
-        // SafeFeature already has id?: string | number
+        // IngressFeature already has id?: string | number
         const allFeatures = fc.features;
         const features = allFeatures.filter(
           (f) => featureIds.includes(String(f.id ?? f.properties?.['id']))
@@ -341,7 +342,7 @@ export function createOpenPlotCommand(
         // Helper: stamp the original activityId and timestamp on Python-generated
         // provenance so the timeline shows one entry per original activity at
         // its original position, not duplicates sorted to the end.
-        const stampProvenance = (f: SafeFeature): void => {
+        const stampProvenance = (f: IngressFeature): void => {
           if (!activityId) { return; }
           const props = f.properties;
           if (!props || !Array.isArray(props.provenance)) { return; }
@@ -382,7 +383,7 @@ export function createOpenPlotCommand(
         } else {
           // Additive: append new features, stamping original activityId
           for (const f of result.features.features) {
-            const sf: SafeFeature = { type: 'Feature', id: f.id, geometry: f.geometry, properties: f.properties };
+            const sf: IngressFeature = { type: 'Feature', id: f.id, geometry: f.geometry, properties: f.properties };
             stampProvenance(sf);
             fc.features.push(sf);
           }
@@ -458,7 +459,7 @@ export function createOpenPlotCommand(
           return stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
         },
         writeGeoJson: async (sp, ip, fc) => {
-          await stacService.writeGeoJson(sp, ip, toSafeFC(fc));
+          await stacService.writeGeoJson(sp, ip, toIngressFC(fc));
         },
         markDirty: () => {
           const activeSession = sessionManager.getActiveSession();

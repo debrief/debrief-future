@@ -14,7 +14,7 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
 import type { ParseResult, ParseWarning } from '../types/import';
-import type { SafeFeature } from '@debrief/utils';
+import type { IngressFeature } from '@debrief/schemas';
 import { RepParseError } from '../types/import';
 
 export class IoService {
@@ -87,8 +87,8 @@ export class IoService {
     try {
       const result = await this.callDebriefIo(filePath);
 
-      const rawFeatures = result.features as SafeFeature[] | undefined;
-      const features: SafeFeature[] = rawFeatures ?? [];
+      const rawFeatures = result.features as IngressFeature[] | undefined;
+      const features: IngressFeature[] = rawFeatures ?? [];
 
       const rawWarnings = result.warnings as Array<Record<string, unknown>> | undefined;
       const warnings: ParseWarning[] = (rawWarnings ?? []).map((w) => ({

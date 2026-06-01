@@ -502,7 +502,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
                   properties: { __datasets: payload.datasets },
                 },
                 // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
-              ] as unknown as Array<import('@debrief/utils').SafeFeature>,
+              ] as unknown as Array<import('@debrief/schemas').RawGeoJSONFeature>,
             },
           },
           sourceFeatureIds: ['e2e-track-1', 'e2e-track-2'],

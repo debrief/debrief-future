@@ -15,7 +15,7 @@ import type { IoService } from '../services/ioService';
 import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import { DuplicateImportError } from '../types/import';
 import type { ParseResult } from '../types/import';
-import type { SafeFeature } from '@debrief/utils';
+import type { IngressFeature } from '@debrief/schemas';
 
 interface ImportRepArgs {
   fsPath?: string;
@@ -241,7 +241,7 @@ async function createNewPlotFromRep(
 
       // Merge all features
       const allFeatures = parseResults.flatMap((r) =>
-        r.features.flatMap((f: SafeFeature) => {
+        r.features.flatMap((f: IngressFeature) => {
           if (!f.geometry) { return []; }
           return [{
             type: 'Feature' as const,
@@ -406,7 +406,7 @@ async function importRepFile(
 
         // Store features
         progress.report({ message: 'Storing features...' });
-        const safeFeatures = parseResult.features.flatMap((f: SafeFeature) => {
+        const safeFeatures = parseResult.features.flatMap((f: IngressFeature) => {
           if (!f.geometry) { return []; }
           return [{
             type: 'Feature' as const,

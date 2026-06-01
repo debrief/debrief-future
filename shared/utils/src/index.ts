@@ -57,9 +57,6 @@ export {
 // Types
 export type {
   Bounds,
-  SafeGeometry,
-  SafeFeature,
-  SafeFeatureCollection,
   PointShape,
   PositionStyle,
   PositionStyleOverride,

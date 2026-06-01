@@ -12,10 +12,10 @@
 
 import { expectTypeOf } from 'vitest';
 import { calculateBounds } from '../src/bounds.js';
-import type { SafeFeature } from '../src/types.js';
 import type {
   DebriefFeature,
   DebriefFeatureCollection,
+  IngressFeature,
   RawGeoJSONFeature,
   RawGeoJSONFeatureCollection,
 } from '@debrief/schemas';
@@ -24,9 +24,10 @@ import type {
 const debriefFeatures: DebriefFeature[] = [];
 expectTypeOf(calculateBounds).toBeCallableWith(debriefFeatures);
 
-// (b) SafeFeature[] assigns — SafeFeature has geometry: SafeGeometry | null
-const safeFeatures: SafeFeature[] = [];
-expectTypeOf(calculateBounds).toBeCallableWith(safeFeatures);
+// (b) IngressFeature[] assigns — schema-derived permissive boundary feature
+//     (geometry: RawGeoJSONFeature['geometry'] | null)
+const ingressFeatures: IngressFeature[] = [];
+expectTypeOf(calculateBounds).toBeCallableWith(ingressFeatures);
 
 // (c) RawGeoJSONFeature[] assigns — parse-boundary feature family (FR-016)
 const rawFeatures: RawGeoJSONFeature[] = [];

@@ -5,7 +5,7 @@
  * point-in-polygon testing. Step 4 of the E03 buffer zone analysis chain.
  */
 
-import type { SafeFeature } from '@debrief/utils';
+import type { IngressFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 /** Default color for points outside all zones. */
@@ -86,12 +86,12 @@ function getZoneColor(zoneInfo: ZoneMetadata): string {
 }
 
 export function execute(
-  features: SafeFeature[],
+  features: IngressFeature[],
   _params: Record<string, unknown>,
-): SafeFeature[] {
+): IngressFeature[] {
   // Find reference and zone features
-  let refFeature: SafeFeature | null = null;
-  let zoneFeature: SafeFeature | null = null;
+  let refFeature: IngressFeature | null = null;
+  let zoneFeature: IngressFeature | null = null;
 
   for (const feature of features) {
     const props = feature.properties;
@@ -146,7 +146,7 @@ export function execute(
 
   // Handle empty coordinates
   if (coordinates.length === 0) {
-    const classified = JSON.parse(JSON.stringify(refFeature)) as SafeFeature;
+    const classified = JSON.parse(JSON.stringify(refFeature)) as IngressFeature;
     if (!classified.properties) {
       classified.properties = {};
     }
@@ -187,7 +187,7 @@ export function execute(
   }
 
   // Build classified feature (deep copy of original with updated metadata)
-  const classified = JSON.parse(JSON.stringify(refFeature)) as SafeFeature;
+  const classified = JSON.parse(JSON.stringify(refFeature)) as IngressFeature;
   if (!classified.properties) {
     classified.properties = {};
   }

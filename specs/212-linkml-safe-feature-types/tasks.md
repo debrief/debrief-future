@@ -40,8 +40,8 @@ Feature type: **schema-adjacent TypeScript type refactor** (Tech Debt / Infrastr
 
 **Goal**: Establish a green baseline and confirm the migration inventory is still accurate before touching code.
 
-- [ ] T001 Confirm a green baseline on the feature branch — run `task verify` (lint + typecheck + test) and record that it passes before any change
-- [ ] T002 [P] Re-confirm the `Safe*` usage inventory matches `evidence/audit-gap-report.md` (the branch may have moved): `grep -rn "Safe\(Feature\|Geometry\|FeatureCollection\)" apps/ shared/ services/ --include="*.ts" --include="*.tsx" --exclude-dir=node_modules` — reconcile any new/removed site with the gap report before proceeding
+- [x] T001 Confirm a green baseline on the feature branch — run `task verify` (lint + typecheck + test) and record that it passes before any change
+- [x] T002 [P] Re-confirm the `Safe*` usage inventory matches `evidence/audit-gap-report.md` (the branch may have moved): `grep -rn "Safe\(Feature\|Geometry\|FeatureCollection\)" apps/ shared/ services/ --include="*.ts" --include="*.tsx" --exclude-dir=node_modules` — reconcile any new/removed site with the gap report before proceeding
 
 **Checkpoint**: baseline green; inventory current.
 
@@ -59,9 +59,9 @@ Feature type: **schema-adjacent TypeScript type refactor** (Tech Debt / Infrastr
 
 **Goal**: Introduce the schema-derived permissive boundary type so every consumer has a target before any `Safe*` reference is changed. **This phase blocks US2, US3, and US4.**
 
-- [ ] T004 Add `IngressFeature` (`Omit<RawGeoJSONFeature,'geometry'> & { geometry: RawGeoJSONFeature['geometry'] | null }`) and `IngressFeatureCollection` to the hand-maintained companion module `shared/schemas/src/generated/typescript/unions.ts` (doc-comment the RFC-7946-unlocated rationale; do NOT re-list fields — Article IV.5)
-- [ ] T005 Ensure the new types are re-exported from the package surface so `import type { IngressFeature, IngressFeatureCollection } from '@debrief/schemas'` resolves `shared/schemas/src/generated/typescript/index.ts`
-- [ ] T006 [test] Add derivation type-test: `expectTypeOf<RawGeoJSONFeature>().toMatchTypeOf<IngressFeature>()` and `expectTypeOf<IngressFeature['geometry']>().toEqualTypeOf<RawGeoJSONFeature['geometry'] | null>()` `shared/schemas/tests/ingress-feature.test-d.ts`
+- [x] T004 Add `IngressFeature` (`Omit<RawGeoJSONFeature,'geometry'> & { geometry: RawGeoJSONFeature['geometry'] | null }`) and `IngressFeatureCollection` to the hand-maintained companion module `shared/schemas/src/generated/typescript/unions.ts` (doc-comment the RFC-7946-unlocated rationale; do NOT re-list fields — Article IV.5)
+- [x] T005 Ensure the new types are re-exported from the package surface so `import type { IngressFeature, IngressFeatureCollection } from '@debrief/schemas'` resolves `shared/schemas/src/generated/typescript/index.ts`
+- [x] T006 [test] Add derivation type-test: `expectTypeOf<RawGeoJSONFeature>().toMatchTypeOf<IngressFeature>()` and `expectTypeOf<IngressFeature['geometry']>().toEqualTypeOf<RawGeoJSONFeature['geometry'] | null>()` `shared/schemas/tests/ingress-feature.test-d.ts`
 
 **Checkpoint**: `pnpm --filter @debrief/schemas typecheck && test` passes; `task schema:check-drift` still green (confirms `unions.ts` is hand-maintained, not generator output — FR-009 / SC-006). `Safe*` still present elsewhere; nothing migrated yet.
 
@@ -73,16 +73,16 @@ Feature type: **schema-adjacent TypeScript type refactor** (Tech Debt / Infrastr
 
 > Retarget existing **named-type** casts only (`as SafeFeatureCollection` → `as IngressFeatureCollection`). Introduce no `as Record` / `as unknown` / inline-object cast (Article XV.7). Per-site line numbers: `data-model.md` migration map.
 
-- [ ] T007 [P] `ParseResult.features: SafeFeature[]` → `IngressFeature[]` (REP parse-boundary contract) `apps/vscode/src/types/import.ts`
-- [ ] T008 [P] `result.features as SafeFeature[]` → `as IngressFeature[]` (debrief-io subprocess JSON boundary) `apps/vscode/src/services/ioService.ts`
-- [ ] T009 [P] MCP-result parse boundary: accumulators, return-type fields, and `JSON.parse(...) as SafeFeatureCollection[...]` → `IngressFeature*` `apps/vscode/src/services/calcService.ts`
-- [ ] T010 [P] `AddResultLayerMessage.layer.features` and `UpdatePlotFeaturesMessage.features` → `IngressFeatureCollection` (Article IV.5 / FR-006 — boundary DTO references a schema-derived type) `apps/vscode/src/webview/messages.ts`
-- [ ] T011 [P] `toSafeFC` → `toIngressFC`; `geometry: f.geometry as SafeGeometry | null` → `as IngressFeature['geometry']`; keep null handling for SYSTEM/storyboard features `apps/vscode/src/commands/openPlot.ts`
-- [ ] T012 [P] `toSafeFeatures` → `toIngressFeatures`; rework the inline-object cast `f.geometry as { coordinates: unknown }` into a named-type cast/guard (R3 / XV.7 — clears a #277-tracked inline cast) `apps/web-shell/src/mocks/calcService.ts`
-- [ ] T013 [P] `ToolExecuteFn` signature + `attachLogEntry` / `validateToolOutput` / `executeTool` params: `SafeFeature[]` → `IngressFeature[]` (preserve existing inline `eslint-disable`d bridge casts; do not expand into #277) `apps/web-shell/src/services/toolService.ts`
-- [ ] T014 [P] Consumer rename `SafeFeature` → `IngressFeature`; KEEP the existing `if (!f.geometry)` null-guards and named-type coordinate casts (no logic change) `apps/vscode/src/commands/importRep.ts`
-- [ ] T015 [P] Consumer rename `SafeFeature*` → `IngressFeature*`; keep the null-guard (`:1582`) and the pre-existing `DebriefFeature` bridge (`:1157`) untouched `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T016 [P] `execute(features: SafeFeature[])` → `IngressFeature[]`; keep the null/type guards (the throw on null geometry stays correct) `apps/vscode/src/tools/reference/classification/pointInZoneClassifier.ts`
+- [x] T007 [P] `ParseResult.features: SafeFeature[]` → `IngressFeature[]` (REP parse-boundary contract) `apps/vscode/src/types/import.ts`
+- [x] T008 [P] `result.features as SafeFeature[]` → `as IngressFeature[]` (debrief-io subprocess JSON boundary) `apps/vscode/src/services/ioService.ts`
+- [x] T009 [P] MCP-result parse boundary: accumulators, return-type fields, and `JSON.parse(...) as SafeFeatureCollection[...]` → `IngressFeature*` `apps/vscode/src/services/calcService.ts`
+- [x] T010 [P] `AddResultLayerMessage.layer.features` and `UpdatePlotFeaturesMessage.features` → `IngressFeatureCollection` (Article IV.5 / FR-006 — boundary DTO references a schema-derived type) `apps/vscode/src/webview/messages.ts`
+- [x] T011 [P] `toSafeFC` → `toIngressFC`; `geometry: f.geometry as SafeGeometry | null` → `as IngressFeature['geometry']`; keep null handling for SYSTEM/storyboard features `apps/vscode/src/commands/openPlot.ts`
+- [x] T012 [P] `toSafeFeatures` → `toIngressFeatures`; rework the inline-object cast `f.geometry as { coordinates: unknown }` into a named-type cast/guard (R3 / XV.7 — clears a #277-tracked inline cast) `apps/web-shell/src/mocks/calcService.ts`
+- [x] T013 [P] `ToolExecuteFn` signature + `attachLogEntry` / `validateToolOutput` / `executeTool` params: `SafeFeature[]` → `IngressFeature[]` (preserve existing inline `eslint-disable`d bridge casts; do not expand into #277) `apps/web-shell/src/services/toolService.ts`
+- [x] T014 [P] Consumer rename `SafeFeature` → `IngressFeature`; KEEP the existing `if (!f.geometry)` null-guards and named-type coordinate casts (no logic change) `apps/vscode/src/commands/importRep.ts`
+- [x] T015 [P] Consumer rename `SafeFeature*` → `IngressFeature*`; keep the null-guard (`:1582`) and the pre-existing `DebriefFeature` bridge (`:1157`) untouched `apps/vscode/src/webview/mapPanel.ts`
+- [x] T016 [P] `execute(features: SafeFeature[])` → `IngressFeature[]`; keep the null/type guards (the throw on null geometry stays correct) `apps/vscode/src/tools/reference/classification/pointInZoneClassifier.ts`
 
 **Checkpoint**: all permissive-boundary + webview-DTO references are `IngressFeature*`; `Safe*` now remains only in `@debrief/utils` (definition), `stacService`, the result-carrying clean-swap sites, and the bounds type-test — all handled in Phase 5.
 
@@ -92,14 +92,14 @@ Feature type: **schema-adjacent TypeScript type refactor** (Tech Debt / Infrastr
 
 **Independent test**: `grep -rn "Safe\(Feature\|Geometry\|FeatureCollection\)" apps/ shared/ services/` returns nothing; the regression guard fails on a planted `interface SafeFeature {}`; `pnpm -r typecheck` and `pnpm lint` pass.
 
-- [ ] T017 [P] `ResultLayer.features` + `ToolExecutionResult.features?`: `SafeFeatureCollection` → `RawGeoJSONFeatureCollection` (result-carrying) `apps/vscode/src/types/tool.ts`
-- [ ] T018 [P] Clean-swap the `__datasets` E2E hook literal + its type: `SafeFeature` → `RawGeoJSONFeature` `apps/vscode/src/extension.ts`
-- [ ] T019 [P] Tool output (well-formed MultiPolygon): return type + construction `SafeFeature[]` → `RawGeoJSONFeature[]`, and update its test `apps/web-shell/src/tools/sensor/detection/bufferZoneGenerator.ts`
-- [ ] T020 `stacService`: (a) `loadGeoJson`/`loadSnapshotGeoJson`/`writeGeoJson`/`addFeatures` + the `JSON.parse(content) as SafeFeatureCollection` cast → `IngressFeature*` (disk boundary); (b) **delete** `calculateBboxFromFeatures` + `extractCoordinates` and compute the bbox via `calculateBounds` from `@debrief/utils` (removes the `SafeGeometry` dependency + three `as number[]*` casts; fixes the latent Multi*-geometry bbox bug — VR-3) `apps/vscode/src/services/stacService.ts`
-- [ ] T021 [P][test] Replace the `SafeFeature[]` assignability case (lines 15, 28) with an `IngressFeature[]` case — **must precede T024** `shared/utils/tests/bounds.types.test-d.ts`
-- [ ] T022 [P] Update the module-header doc comments that list `SafeFeature` as a supported family → reference `IngressFeature` `shared/utils/src/bounds.ts`
-- [ ] T023 Extend the regression guard to also fail on a hand-written `interface`/`type` `Safe(Feature|Geometry|FeatureCollection)` (keep the existing `GeoJSONFeature` check; update the diagnostic to point at `RawGeoJSONFeature` / `IngressFeature`) — FR-007 `scripts/check-no-geojson-feature.sh`
-- [ ] T024 **Remove** the `SafeFeature` / `SafeGeometry` / `SafeFeatureCollection` definitions from `shared/utils/src/types.ts` **and** their re-exports from `shared/utils/src/index.ts` — **GATED: run only after T007–T023 (no `Safe*` reference remains)** `shared/utils/src/types.ts`
+- [x] T017 [P] `ResultLayer.features` + `ToolExecutionResult.features?`: `SafeFeatureCollection` → `RawGeoJSONFeatureCollection` (result-carrying) `apps/vscode/src/types/tool.ts`
+- [x] T018 [P] Clean-swap the `__datasets` E2E hook literal + its type: `SafeFeature` → `RawGeoJSONFeature` `apps/vscode/src/extension.ts`
+- [x] T019 [P] Tool output (well-formed MultiPolygon): return type + construction `SafeFeature[]` → `RawGeoJSONFeature[]`, and update its test `apps/web-shell/src/tools/sensor/detection/bufferZoneGenerator.ts`
+- [x] T020 `stacService`: (a) `loadGeoJson`/`loadSnapshotGeoJson`/`writeGeoJson`/`addFeatures` + the `JSON.parse(content) as SafeFeatureCollection` cast → `IngressFeature*` (disk boundary); (b) **delete** `calculateBboxFromFeatures` + `extractCoordinates` and compute the bbox via `calculateBounds` from `@debrief/utils` (removes the `SafeGeometry` dependency + three `as number[]*` casts; fixes the latent Multi*-geometry bbox bug — VR-3) `apps/vscode/src/services/stacService.ts`
+- [x] T021 [P][test] Replace the `SafeFeature[]` assignability case (lines 15, 28) with an `IngressFeature[]` case — **must precede T024** `shared/utils/tests/bounds.types.test-d.ts`
+- [x] T022 [P] Update the module-header doc comments that list `SafeFeature` as a supported family → reference `IngressFeature` `shared/utils/src/bounds.ts`
+- [x] T023 Extend the regression guard to also fail on a hand-written `interface`/`type` `Safe(Feature|Geometry|FeatureCollection)` (keep the existing `GeoJSONFeature` check; update the diagnostic to point at `RawGeoJSONFeature` / `IngressFeature`) — FR-007 `scripts/check-no-geojson-feature.sh`
+- [x] T024 **Remove** the `SafeFeature` / `SafeGeometry` / `SafeFeatureCollection` definitions from `shared/utils/src/types.ts` **and** their re-exports from `shared/utils/src/index.ts` — **GATED: run only after T007–T023 (no `Safe*` reference remains)** `shared/utils/src/types.ts`
 
 **Checkpoint**: no hand-written `Safe*` feature type exists or is exported; guard active; `task verify` typecheck + lint green.
 
@@ -109,14 +109,14 @@ Feature type: **schema-adjacent TypeScript type refactor** (Tech Debt / Infrastr
 
 **Independent test**: full CI (lint + typecheck + unit + Playwright E2E) green; a `geometry: null` feature round-trips intact; `calculateBounds` includes Multi* geometry.
 
-- [ ] T025 [P][test] Add/confirm a unit test that `calculateBounds` returns correct bounds for a `MultiPolygon` feature (the coverage `stacService` now inherits — VR-3) `shared/utils/tests/bounds.test.ts`
-- [ ] T026 [P][test] Add a test that a `geometry: null` feature (SYSTEM_RECORD / STORYBOARD / NarrativeEntry) survives a migrated boundary intact (e.g. `toIngressFC` / `stacService` load→write round-trip) — VR-1 / SC-004 `apps/vscode/src/commands/__tests__/openPlot.test.ts`
-- [ ] T027 Run the full unit suite + type tests — `uv run pytest && pnpm --filter '!@debrief/web-shell' test && pnpm -r typecheck` — all green
+- [x] T025 [P][test] Add/confirm a unit test that `calculateBounds` returns correct bounds for a `MultiPolygon` feature (the coverage `stacService` now inherits — VR-3) `shared/utils/tests/bounds.test.ts`
+- [x] T026 [P][test] Add a test that a `geometry: null` feature (SYSTEM_RECORD / STORYBOARD / NarrativeEntry) survives a migrated boundary intact (e.g. `toIngressFC` / `stacService` load→write round-trip) — VR-1 / SC-004 `apps/vscode/src/commands/__tests__/openPlot.test.ts`
+- [x] T027 Run the full unit suite + type tests — `uv run pytest && pnpm --filter '!@debrief/web-shell' test && pnpm -r typecheck` — all green
 - [ ] T028 Run the existing web-shell Playwright E2E (plot load + tool execution + REP import) as the behaviour-preservation regression — `cd apps/web-shell && node run-playwright.mjs <existing-spec>` — confirm a result layer (incl. a null-geometry feature) renders unchanged
 
   > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — do NOT skip this because browsers "can't install." The project bundles Linux Chromium via `@sparticuz/chromium`; `run-playwright.mjs` extracts + wires it. See `docs/project_notes/playwright-installation-research.md`.
 
-- [ ] T029 Lint + guard verification — `pnpm lint && bash scripts/check-no-geojson-feature.sh` — no new `as Record`/`as unknown`/inline-object casts; guard passes clean and (spot-check) rejects a planted `interface SafeFeature {}`
+- [x] T029 Lint + guard verification — `pnpm lint && bash scripts/check-no-geojson-feature.sh` — no new `as Record`/`as unknown`/inline-object casts; guard passes clean and (spot-check) rejects a planted `interface SafeFeature {}`
 
 **Checkpoint**: `task verify` + web-shell E2E green; null-geometry preserved; no schema drift (`task schema:check-drift`).
 

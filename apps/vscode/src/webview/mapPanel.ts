@@ -36,7 +36,6 @@ import {
   type DrawingMode,
 } from '@debrief/session-state';
 import { DuplicateImportError } from '../types/import';
-import type { SafeFeature } from '@debrief/utils';
 import {
   calculateBounds,
   mergeBounds,
@@ -45,7 +44,7 @@ import {
 } from '@debrief/utils';
 import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@debrief/components';
 import { isTrackFeature } from '@debrief/components';
-import type { TrackProperties, Viewport, SceneFeature } from '@debrief/schemas';
+import type { IngressFeature, TrackProperties, Viewport, SceneFeature } from '@debrief/schemas';
 import type { SceneRectangleSnapshot } from './messages';
 
 // eslint-disable-next-line no-restricted-syntax -- VS Code-local MapPanel is the extension host wrapper; name collides with @debrief/components.MapPanel (React component). Follow-up to rename the host class, #214 scope-adjacent
@@ -1154,7 +1153,7 @@ export class MapPanel {
     for (const rl of this.resultLayers) {
       if (!rl.artifactHref) {
         for (const f of rl.features.features) {
-          // eslint-disable-next-line no-restricted-syntax -- SafeFeature → DebriefFeature bridge
+          // eslint-disable-next-line no-restricted-syntax -- RawGeoJSONFeature → DebriefFeature bridge
           allFeatures.push(f as unknown as DebriefFeature);
         }
       }
@@ -1579,7 +1578,7 @@ export class MapPanel {
       });
 
       // Convert to the format StacService expects
-      const safeFeatures = parseResult.features.flatMap((f: SafeFeature) => {
+      const safeFeatures = parseResult.features.flatMap((f: IngressFeature) => {
         if (!f.geometry) { return []; }
         return [{
           type: 'Feature' as const,
