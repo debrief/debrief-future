@@ -13,8 +13,12 @@ import type {
   ToolResultForLog,
   ExpandedToolResultFields,
   RecordStoryboardEditInput,
+  RecordVisibilityChangeInput,
 } from './types.js';
-import { STORYBOARD_EDIT_TOOL_SENTINEL } from './types.js';
+import {
+  STORYBOARD_EDIT_TOOL_SENTINEL,
+  VISIBILITY_CHANGE_TOOL_SENTINEL,
+} from './types.js';
 
 /**
  * Convert milliseconds to ISO 8601 duration string.
@@ -279,5 +283,48 @@ export function buildStoryboardEditLogEntry(
     generated_result_id: null,
     tune: null,
     rationale: input.summary,
+  };
+}
+
+/**
+ * Build a LogEntry for a per-feature visibility change (feature 261, FR-013).
+ *
+ * Pure — no I/O. The entry attaches to the affected feature's own
+ * `properties.provenance[]` and is bounded to saved states (FR-021): it is
+ * produced when the `visible` flag is written into the FeatureCollection, not on
+ * every transient in-memory toggle. The `was_generated_by.tool` sentinel marks
+ * it as a visibility transition distinct from tool / file-save / storyboard-edit
+ * records; `rationale` carries the human-readable summary for the LogPanel.
+ *
+ * No `activity_type` is set — the `ActivityType` enum (`snapshot`/`tool`/`tune`)
+ * has no visibility member, and consumers treat an absent value as `tool`; the
+ * sentinel tool name is the discriminator, so no schema change is required.
+ */
+export function buildVisibilityChangeLogEntry(
+  input: RecordVisibilityChangeInput,
+): LogEntry {
+  const param = (value: unknown): ParameterValue => ({
+    value,
+    default: false,
+    tunable: false,
+  });
+  const wasGeneratedBy: WasGeneratedBy = {
+    tool: VISIBILITY_CHANGE_TOOL_SENTINEL,
+    tool_version: '1',
+    parameters: {
+      actor: param(input.actor),
+      visible: param(input.visible),
+    },
+  };
+  return {
+    activity_id: generateActivityId(),
+    timestamp: input.timestamp,
+    was_generated_by: wasGeneratedBy,
+    used: [input.feature_id],
+    generated: [input.feature_id],
+    execution_duration: 'PT0S',
+    generated_result_id: null,
+    tune: null,
+    rationale: input.visible ? 'Feature shown' : 'Feature hidden',
   };
 }

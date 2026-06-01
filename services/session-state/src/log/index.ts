@@ -63,10 +63,15 @@ export type {
 
 export {
   buildLogEntry,
+  buildVisibilityChangeLogEntry,
   msToIsoDuration,
   generateActivityId,
   extractActivityIdFromOutputFeatures,
 } from './entryBuilder.js';
+
+// Feature 261 (FR-013) — per-feature visibility-change provenance.
+export { VISIBILITY_CHANGE_TOOL_SENTINEL } from './types.js';
+export type { RecordVisibilityChangeInput } from './types.js';
 
 export { assembleTimeline } from './timeline.js';
 

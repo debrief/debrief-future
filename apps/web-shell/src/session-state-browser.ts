@@ -9,6 +9,11 @@
 // Types
 export * from '../../../services/session-state/src/types/index.js';
 
+// Log provenance builders (Feature 261, FR-013) — pure, browser-safe.
+export {
+  buildVisibilityChangeLogEntry,
+} from '../../../services/session-state/src/log/entryBuilder.js';
+
 // Store
 export {
   createSessionStore,
@@ -67,6 +72,8 @@ export {
   writeSystemStateIntoFeatureCollection,
   readHiddenFeatureIds,
   applyVisibilityToFeatureCollection,
+  activeStoryboardIdToInput,
+  activeStoryboardVariantToId,
   buildWriteInputFromStore,
   applyStateToFeatures,
   mirrorViewStateIntoFeatures,
@@ -83,6 +90,7 @@ export {
   type ActiveStoryboardVariant,
   type SystemStateMap,
   type SystemStateWriteInput,
+  type PlotFeatureCollection as SystemStatePlotFeatureCollection,
   // spec 267 — tolerant playhead-clamp diagnostic returned by the load path.
   type PlayheadClampDiagnostic,
 } from '../../../services/session-state/src/system-state/index.js';

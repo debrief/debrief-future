@@ -201,6 +201,31 @@ export interface RecordStoryboardEditInput {
   readonly pairActivityId: string | null;
 }
 
+/**
+ * Sentinel tool name on per-feature visibility-change provenance entries
+ * (feature 261, FR-013). Distinct from the tool / file-save / storyboard-edit
+ * sentinels so #176's LogPanel can recognise a hide/reveal transition.
+ *
+ * Visibility transitions are recorded on the *affected feature's own*
+ * provenance log, bounded to saved states (FR-021) — appended when the
+ * visibility flag is written into the FeatureCollection, not on every transient
+ * in-memory toggle. The resulting log growth is an accepted rough edge with
+ * compaction deferred (FR-014 / NG-003).
+ */
+export const VISIBILITY_CHANGE_TOOL_SENTINEL = 'debrief.visibilityChange';
+
+/** Input for {@link buildVisibilityChangeLogEntry} (feature 261, FR-013). */
+export interface RecordVisibilityChangeInput {
+  /** Id of the feature whose visibility changed (snake_case per ADR-010). */
+  readonly feature_id: string;
+  /** The feature's new visibility — `true` = shown, `false` = hidden. */
+  readonly visible: boolean;
+  /** Human actor recorded in provenance. */
+  readonly actor: string;
+  /** ISO-8601 timestamp of the change. */
+  readonly timestamp: string;
+}
+
 export interface LogService {
   recordToolResult(
     toolResult: ToolResultForLog,
