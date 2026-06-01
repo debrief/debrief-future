@@ -795,6 +795,7 @@
     "prelint": "pnpm --filter @debrief/session-state build && pnpm --filter @debrief/utils build",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --ext ts --fix",
+    "typecheck": "tsc --noEmit",
     "test": "npm run test:unit",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",

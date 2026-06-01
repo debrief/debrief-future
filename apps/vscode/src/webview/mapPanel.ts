@@ -1582,10 +1582,9 @@ export class MapPanel {
         if (!f.geometry) { return []; }
         return [{
           type: 'Feature' as const,
-          geometry: {
-            type: f.geometry.type,
-            coordinates: f.geometry.coordinates as number[] | number[][],
-          },
+          // f.geometry is a typed RawGeoJSONFeature geometry post null-guard —
+          // pass it through directly (no reconstruction / coordinate cast).
+          geometry: f.geometry,
           properties: f.properties,
         }];
       });

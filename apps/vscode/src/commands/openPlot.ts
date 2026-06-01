@@ -63,6 +63,30 @@ function toIngressFC(fc: { type: string; features: Array<{ type: string; geometr
   };
 }
 
+/** Minimal session-state GeoJSON feature shape (matches `@debrief/session-state`
+ *  `GeoJsonFeature`): geometry erased to `unknown`, properties required-nullable. */
+type SessionGeoJsonFC = {
+  type: 'FeatureCollection';
+  features: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> | null; id?: string | number }>;
+};
+
+/** Adapt an IngressFeatureCollection (geometry may be null, properties optional)
+ *  back to the session-state GeoJsonFeatureCollection shape. The only structural
+ *  gap is `properties`, which the schema-derived type leaves optional
+ *  (`Record | null | undefined`) but session-state requires as `Record | null`. */
+function toGeoJsonFC(fc: IngressFeatureCollection | null): SessionGeoJsonFC | null {
+  if (!fc) { return null; }
+  return {
+    type: 'FeatureCollection',
+    features: fc.features.map((f) => ({
+      type: 'Feature' as const,
+      geometry: f.geometry,
+      properties: f.properties ?? null,
+      id: f.id,
+    })),
+  };
+}
+
 
 interface OpenPlotArgs {
   uri?: string;
@@ -401,17 +425,7 @@ export function createOpenPlotCommand(
       },
 
       loadSnapshot: async (sp, ip, assetFilename) => {
-        const fc = await stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
-        if (!fc) { return null; }
-        return {
-          type: fc.type as 'FeatureCollection',
-          features: fc.features.map((f): { type: 'Feature'; geometry: unknown; properties: Record<string, unknown> | null; id?: string | number } => ({
-            type: f.type,
-            geometry: f.geometry,
-            properties: f.properties,
-            id: f.id,
-          })),
-        };
+        return toGeoJsonFC(await stacService.loadSnapshotGeoJson(sp, ip, assetFilename));
       },
 
       resolveToolVersion: (toolId) => {
@@ -451,12 +465,12 @@ export function createOpenPlotCommand(
       // Wire SnapshotService for action bar snapshot button (Feature: 074)
       const snapshotService = createSnapshotService({
         loadGeoJson: async (sp: string, ip: string) => {
-          return stacService.loadGeoJsonForItem(sp, ip);
+          return toGeoJsonFC(await stacService.loadGeoJsonForItem(sp, ip));
         },
         writeSnapshotAsset: (sp, ip, fn, data) =>
           stacService.writeSnapshotAsset(sp, ip, fn, data),
         loadSnapshotGeoJson: async (sp, ip, assetFilename) => {
-          return stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
+          return toGeoJsonFC(await stacService.loadSnapshotGeoJson(sp, ip, assetFilename));
         },
         writeGeoJson: async (sp, ip, fc) => {
           await stacService.writeGeoJson(sp, ip, toIngressFC(fc));
