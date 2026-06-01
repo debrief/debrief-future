@@ -9,7 +9,7 @@ tags: [tracer-bullet, storyboard, components]
 excerpt: "A passive, dismissible warning when two time-range Storyboard Scenes accidentally cover the same stretch of time."
 ---
 
-![A Storyboard panel showing two Scene rows each carrying a small warning badge that reads "Overlaps with Scene B" and "Overlaps with Scene A", with a dismiss control beside each — the other Scene rows stay clean](screenshots/overlap-light.png)
+![A Storyboard panel showing two Scene rows each carrying a small warning badge that reads "Overlaps with Scene B" and "Overlaps with Scene A", with a dismiss control beside each — the other Scene rows stay clean](../evidence/screenshots/overlap-light.png)
 
 ## What We're Building
 
@@ -33,20 +33,20 @@ This is a follow-up to #263, which shipped time-range Scenes but left overlap de
 
 The warning is a per-row badge naming the conflicting Scene. Two overlapping Scenes each warn about the other; the non-overlapping range Scene and the instant Scene below stay clean.
 
-![Storyboard panel in light theme — two overlapping Scene rows each carry a warning naming the other; the clean rows below carry none](screenshots/overlap-light.png)
+![Storyboard panel in light theme — two overlapping Scene rows each carry a warning naming the other; the clean rows below carry none](../evidence/screenshots/overlap-light.png)
 *Light theme. "Approach run" (10:00–10:30) and "Egress leg" (10:15–10:45) overlap; each names the other. "Final approach" and the instant "Contact datum" stay clean.*
 
 The badge inherits the theming of the existing stale-indicator slot, so it lands correctly across all three theme variants without any new colour work.
 
-![Same Storyboard panel rendered in dark theme with the two overlap warnings](screenshots/overlap-dark.png)
+![Same Storyboard panel rendered in dark theme with the two overlap warnings](../evidence/screenshots/overlap-dark.png)
 *Dark theme.*
 
-![Same Storyboard panel rendered in the VS Code theme with the two overlap warnings](screenshots/overlap-vscode.png)
+![Same Storyboard panel rendered in the VS Code theme with the two overlap warnings](../evidence/screenshots/overlap-vscode.png)
 *VS Code theme.*
 
 Clicking **Dismiss** on either badge clears the warning on both rows at once. Nothing in the plot changes — the Scene windows are untouched.
 
-![Storyboard panel after clicking Dismiss — both overlap warnings gone, all rows clean](screenshots/overlap-after-dismiss.png)
+![Storyboard panel after clicking Dismiss — both overlap warnings gone, all rows clean](../evidence/screenshots/overlap-after-dismiss.png)
 *After dismiss. Pair this with the light-theme shot above as a before/after: a static pair stands in for an interaction GIF, as `ffmpeg` is unavailable in the capture environment.*
 
 ## Try It Yourself
