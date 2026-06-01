@@ -16,6 +16,7 @@ import { FeatureList } from '../FeatureList';
 import { FormatMenu } from '../FormatMenu';
 import { GeometryDialog } from '../GeometryDialog';
 import { PropertiesPanelDispatch } from '../PropertiesPanel/PropertiesPanelDispatch';
+import { StoryboardPanel } from '../panels/StoryboardPanel';
 import { resolveEditingMode } from '../PropertiesPanel/selectionMode';
 import { saveStagedEdits } from '../PropertiesPanel/saveStagedEdits';
 import type { FieldKey, FieldValue } from '../PropertiesPanel';
@@ -222,6 +223,10 @@ export function ActivityPanel({
   onCollapseStateChange,
   // Communication
   onMessage,
+  // Storyboard section (optional 5th pane) — rendered as a child
+  // StoryboardPanel, exactly like the Time Controller / Tools / Layers /
+  // Properties sections above. The host supplies the StoryboardPanel props.
+  storyboard,
   className,
 }: ActivityPanelProps) {
   const [internalCollapseState, setInternalCollapseState] = useState(DEFAULT_COLLAPSE_STATE);
@@ -722,6 +727,30 @@ export function ActivityPanel({
           />
         </SectionErrorBoundary>
       </PaneSection>
+
+      {/* Storyboard — 5th section, a child StoryboardPanel rendered by this
+          component (like the sections above). The host passes the live
+          StoryboardPanel props via `storyboard`; when omitted, no section
+          renders. The sidebar reads as a single flat list (Time Controller,
+          Tools, Layers, Properties, Storyboard). */}
+      {storyboard && (
+        <PaneSection
+          title="Storyboard"
+          icon="device-camera-video"
+          collapsed={collapseState.storyboardCollapsed ?? false}
+          onToggle={() => toggleSection('storyboardCollapsed')}
+          layout="flexible"
+          // Floor the flexible share so the empty-state (and its "Create
+          // storyboard" button) is never clipped when the panel is short and
+          // multiple flexible sections compete. Populated storyboards scroll
+          // internally within the section above this floor.
+          style={{ minHeight: 200 }}
+        >
+          <SectionErrorBoundary sectionName="Storyboard">
+            <StoryboardPanel {...storyboard} />
+          </SectionErrorBoundary>
+        </PaneSection>
+      )}
     </div>
   );
 }

@@ -3,7 +3,7 @@
  *
  * Captures three theme variants (light, dark, vscode) for each of the
  * three rail states the spec calls out:
- *   1. Empty state with the primary Capture Scene button
+ *   1. Empty state with the primary Create storyboard button
  *   2. First-capture naming row open (map + time controller still
  *      visible — this is the spec's signature visual)
  *   3. Duplicate-timestamp collision banner anchored to a Scene row
@@ -113,12 +113,12 @@ test.describe('Storyboard rail — visual evidence (#235)', () => {
     test(`empty-state screenshot — ${theme}`, async ({ page }) => {
       await loadAnalysisView(page);
       await applyTheme(page, theme);
-      // Ensure the empty-state copy + Capture button render in the rail.
+      // Ensure the empty-state copy + Create storyboard button render.
       await expect(
         page.locator('[data-testid="storyboard-empty-state"]'),
       ).toBeVisible();
       await expect(
-        page.locator('[data-testid="capture-scene-button"]'),
+        page.locator('[data-testid="create-storyboard-button"]'),
       ).toBeVisible();
       await page.screenshot({
         path: resolve(
@@ -132,7 +132,7 @@ test.describe('Storyboard rail — visual evidence (#235)', () => {
     test(`naming-row screenshot — ${theme}`, async ({ page }) => {
       await loadAnalysisView(page);
       await applyTheme(page, theme);
-      await page.locator('[data-testid="capture-scene-button"]').click();
+      await page.locator('[data-testid="capture-button"]').click();
       await expect(
         page.locator('[data-testid="storyboard-naming-row"]'),
       ).toBeVisible({ timeout: 5000 });

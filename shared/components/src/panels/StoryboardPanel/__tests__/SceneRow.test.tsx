@@ -39,63 +39,30 @@ describe('SceneRow — #217 baseline click behaviour', () => {
   });
 });
 
-describe('SceneRow — #230 chevron disclosure (FR-001)', () => {
-  it('renders the chevron when onExpandToggle is provided', () => {
-    const onExpandToggle = vi.fn();
+describe('SceneRow — no inline chevron', () => {
+  it('never renders the expand chevron (edit is via the ⋯ menu / double-click)', () => {
     render(
       <SceneRow
         scene={makeScene()}
         onClick={vi.fn()}
-        onExpandToggle={onExpandToggle}
+        onExpandToggle={vi.fn()}
+        editFormOpen
       />,
     );
-    expect(screen.getByTestId('scene-row-chevron')).toBeInTheDocument();
-  });
-
-  it('does NOT render the chevron without the handler (#217 fallback)', () => {
-    render(<SceneRow scene={makeScene()} onClick={vi.fn()} />);
     expect(screen.queryByTestId('scene-row-chevron')).toBeNull();
   });
 
-  it('chevron click fires onExpandToggle but NOT onClick', () => {
-    const onClick = vi.fn();
-    const onExpandToggle = vi.fn();
+  it('reflects an open edit dialog via data-edit-form-open', () => {
     render(
       <SceneRow
         scene={makeScene()}
-        onClick={onClick}
-        onExpandToggle={onExpandToggle}
-      />,
-    );
-    fireEvent.click(screen.getByTestId('scene-row-chevron'));
-    expect(onExpandToggle).toHaveBeenCalledWith('scene-1');
-    // The chevron stops propagation so the row's onClick must not fire.
-    expect(onClick).not.toHaveBeenCalled();
-  });
-
-  it('aria-expanded reflects editFormOpen', () => {
-    const { rerender } = render(
-      <SceneRow
-        scene={makeScene()}
         onClick={vi.fn()}
         onExpandToggle={vi.fn()}
-        editFormOpen={false}
+        editFormOpen
       />,
     );
-    expect(screen.getByTestId('scene-row-chevron')).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    );
-    rerender(
-      <SceneRow
-        scene={makeScene()}
-        onClick={vi.fn()}
-        onExpandToggle={vi.fn()}
-        editFormOpen={true}
-      />,
-    );
-    expect(screen.getByTestId('scene-row-chevron')).toHaveAttribute(
-      'aria-expanded',
+    expect(screen.getByTestId('scene-row')).toHaveAttribute(
+      'data-edit-form-open',
       'true',
     );
   });

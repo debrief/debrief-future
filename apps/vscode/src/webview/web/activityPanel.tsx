@@ -9,6 +9,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ActivityPanel } from '@debrief/components';
 import { Bootstrap } from './_bootstrap';
+import { useStoryboardPanelProps } from './storyboardPanelApp';
 
 // Import codicon font CSS for vscrui icons (esbuild loads as text string)
 import codiconCss from 'vscrui/dist/codicon.css';
@@ -208,6 +209,11 @@ function ActivityPanelApp(): React.ReactElement {
     vscode.postMessage(message);
   }, []);
 
+  // Storyboard is the 5th section of the shared ActivityPanel — build its
+  // live props (reducer + postMessage wiring) and hand them to ActivityPanel,
+  // which renders the child <StoryboardPanel/>.
+  const storyboard = useStoryboardPanelProps(vscode);
+
   return (
     <div className="activity-panel-webview">
       <ActivityPanel
@@ -229,6 +235,7 @@ function ActivityPanelApp(): React.ReactElement {
         collapseState={collapseState}
         onCollapseStateChange={handleCollapseChange}
         onMessage={handleMessage}
+        storyboard={storyboard}
       />
     </div>
   );

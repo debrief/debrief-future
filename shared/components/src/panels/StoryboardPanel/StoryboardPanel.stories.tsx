@@ -113,6 +113,100 @@ export const Capturing: Story = {
   },
 };
 
+// ─── #271 — overlap warning for time-range Scenes ─────────────────────
+
+const OVERLAP_SCENES: SceneRowViewModel[] = [
+  makeSceneRow('scene-1', '2026-04-20T10:00:00.000Z', 'Approach run'),
+  makeSceneRow('scene-2', '2026-04-20T10:15:00.000Z', 'Egress leg'),
+  makeSceneRow('scene-3', '2026-04-20T11:00:00.000Z', 'Final approach'),
+  makeSceneRow('scene-4', '2026-04-20T11:30:00.000Z', 'Contact datum'),
+];
+
+/** Minimal per-row edit view-model carrying just the overlap warning. */
+function overlapVm(
+  sceneId: string,
+  title: string,
+  timestamp: string,
+  overlapsWith: ReadonlyArray<{ sceneId: string; title: string }> = [],
+): import('./types').SceneEditViewModel {
+  return {
+    sceneId,
+    title,
+    description: null,
+    timestamp,
+    titleIsEditing: false,
+    editFormOpen: false,
+    pendingDelete: false,
+    stale: false,
+    unresolvedFeatureIds: [],
+    missingData: { kind: 'ok' },
+    overlapsWith,
+  };
+}
+
+// Static overlap relationships for the story (mirrors what a host's
+// `detectSceneOverlaps` would return for OVERLAP_SCENES).
+const OVERLAP_PARTNERS: Record<string, ReadonlyArray<{ sceneId: string; title: string }>> = {
+  'scene-1': [{ sceneId: 'scene-2', title: 'Egress leg' }],
+  'scene-2': [{ sceneId: 'scene-1', title: 'Approach run' }],
+};
+
+function pairKey(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+/**
+ * Interactive panel that mirrors a host's dismissal handling: clicking
+ * Dismiss adds the pair to local state, which removes the warning from both
+ * rows on the next render. Used by both the screenshot and dismiss E2E.
+ */
+function OverlapWarningStory(): React.ReactElement {
+  const [dismissed, setDismissed] = React.useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
+  const sceneEditViewModels: Record<string, import('./types').SceneEditViewModel> = {};
+  for (const row of OVERLAP_SCENES) {
+    const partners = (OVERLAP_PARTNERS[row.sceneId] ?? []).filter(
+      (p) => !dismissed.has(pairKey(row.sceneId, p.sceneId)),
+    );
+    sceneEditViewModels[row.sceneId] = overlapVm(
+      row.sceneId,
+      row.title,
+      row.timestampIso,
+      partners,
+    );
+  }
+  return (
+    <StoryboardPanel
+      scenes={OVERLAP_SCENES}
+      activeStoryboardName="Exercise Alpha"
+      captureInFlight={false}
+      onCaptureClick={() => undefined}
+      onSceneRowClick={() => undefined}
+      sceneEditViewModels={sceneEditViewModels}
+      onSceneOverlapDismiss={(sceneId, partnerSceneIds): void => {
+        setDismissed((prev) => {
+          const next = new Set(prev);
+          for (const partnerId of partnerSceneIds) {
+            next.add(pairKey(sceneId, partnerId));
+          }
+          return next;
+        });
+      }}
+    />
+  );
+}
+
+/**
+ * Two time-range Scenes whose windows overlap (Approach run 10:00–10:30 and
+ * Egress leg 10:15–10:45) each carry a passive warning naming the other.
+ * The non-overlapping time-range Scene and the instant Scene stay clean.
+ * Clicking Dismiss clears the warning on both rows.
+ */
+export const WithOverlapWarnings: Story = {
+  render: () => <OverlapWarningStory />,
+};
+
 // ─── #273 — live Preview control variants ─────────────────────────────
 
 /**
@@ -430,7 +524,7 @@ export const WithEditForm: StoryObj<InteractiveStoryArgs> = {
     docs: {
       description: {
         story:
-          'Click the chevron on a row to expand its inline edit form. Submit persists the new title via the reducer; Cancel discards. Driven by the shared `useStoryOnlyMockHandlers` helper (Feature 234, ADR-027).',
+          'Choose "Edit scene…" from a row\'s ⋯ menu (or double-click the row) to open the edit dialog. Save persists the new title/description via the reducer; Cancel discards. Driven by the shared `useStoryOnlyMockHandlers` helper (Feature 234, ADR-027).',
       },
     },
   },
@@ -522,17 +616,18 @@ export const WithMissingDataRemediation: StoryObj<InteractiveStoryArgs> = {
 // ─────────────────────────────────────────────────────────────────────
 
 /**
- * The empty rail with the primary Capture Scene affordance — the entry
- * point that replaces the legacy `Press Ctrl/Cmd+Alt+C on the map…`
- * empty-state copy from #216.
+ * The empty rail with the primary "Create storyboard" affordance — the
+ * name-first entry point. (The header still carries a "Capture" button for
+ * the capture-first flow.)
  */
-export const EmptyWithCaptureButton: Story = {
+export const EmptyWithCreateButton: Story = {
   args: {
     scenes: [],
     activeStoryboardName: null,
     captureInFlight: false,
     onCaptureClick: () => undefined,
     onSceneRowClick: () => undefined,
+    onCreateStoryboard: () => undefined,
   },
 };
 

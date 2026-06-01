@@ -11,7 +11,11 @@
  * #216 consumers keep compiling unchanged (plan.md design-fix 3).
  */
 
+import type { ReactNode } from "react";
 import type { SceneFeature } from "@debrief/schemas";
+import type { OverlapPartner } from "../../storyboard/overlap";
+
+export type { OverlapPartner };
 
 export interface SceneRowViewModel {
   /** ULID of the Scene. */
@@ -90,6 +94,14 @@ export interface SceneEditViewModel {
     | { readonly kind: 'ok' }
     | { readonly kind: 'missing-features'; readonly ids: readonly string[] }
     | { readonly kind: 'out-of-range'; readonly scenario: 'before-start' | 'after-end' };
+  /**
+   * #271 — time-range Scenes (in the same Storyboard) whose windows overlap
+   * this Scene's window, AFTER session dismissals are applied. Empty or
+   * omitted ⇒ no overlap warning. Optional + defaulted so existing fixtures
+   * and hosts compile unchanged. Populated by each host from the shared
+   * `detectSceneOverlaps` helper.
+   */
+  readonly overlapsWith?: readonly OverlapPartner[];
 }
 
 /**
@@ -160,6 +172,10 @@ export interface StoryboardPanelProps {
   /** Fires on row click; #217 wires this to the playback service's
    *  click-to-select transport. */
   onSceneRowClick(sceneId: string): void;
+  /** Optional host-supplied banner rendered at the very top of the panel
+   *  (e.g. web-shell's "session-only — captures won't persist" notice).
+   *  Kept generic so the shared panel carries no host-specific concepts. */
+  readonly banner?: ReactNode;
 
   // ── NEW in #217 — all optional + defaulted (design-fix 3) ───────────
 
@@ -226,6 +242,16 @@ export interface StoryboardPanelProps {
   onSceneCopyToOtherClicked?(sceneId: string): void;
   onSceneRefreshThumbnailClicked?(sceneId: string): void;
   onStoryboardRefreshAllStaleClicked?(storyboardId: string): void;
+
+  // ── NEW in #271 — overlap warning dismissal ─────────────────────────
+  /**
+   * Fires when the analyst dismisses the overlap warning on a Scene row.
+   * Carries every partner Scene named on that badge so the host can mark
+   * each unordered pair dismissed (session-scoped, not persisted). The
+   * panel does NOT track dismissal state — the host owns it and reflects
+   * the result back via `SceneEditViewModel.overlapsWith` on the next push.
+   */
+  onSceneOverlapDismiss?(sceneId: string, partnerSceneIds: readonly string[]): void;
   onStoryboardNameRenameCommit?(storyboardId: string, newName: string): void;
   onStoryboardDescriptionSubmit?(storyboardId: string, description: string | null): void;
 

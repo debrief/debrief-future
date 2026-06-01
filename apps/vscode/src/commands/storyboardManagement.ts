@@ -76,6 +76,13 @@ export function registerStoryboardManagementCommands(
   sessionManager: ManagementSessionManager,
 ): vscode.Disposable {
   const disposables: vscode.Disposable[] = [
+    // "Storyboard: Show Panel" — the Storyboard now renders as a section
+    // inside the Activity panel (UX-review flatten), so revealing it means
+    // focusing the Activity view. (Previously this command id was declared
+    // in package.json but never registered.)
+    vscode.commands.registerCommand('debrief.storyboard.openPanel', () => {
+      void vscode.commands.executeCommand('debrief.activityPanel.focus');
+    }),
     vscode.commands.registerCommand('debrief.storyboard.create', async () => {
       const documentUri = sessionManager.getActiveDocumentUri();
       if (!documentUri) {return;}
@@ -114,7 +121,7 @@ export function registerStoryboardManagementCommands(
       await service.renameStoryboard(documentUri, activeId, trimmed);
     }),
 
-    vscode.commands.registerCommand('debrief.storyboard.delete', async () => {
+    vscode.commands.registerCommand('debrief.storyboard.delete', async (arg?: { skipConfirm?: boolean }) => {
       const documentUri = sessionManager.getActiveDocumentUri();
       if (!documentUri) {return;}
       const snapshot = service.getSnapshot(documentUri);
@@ -126,7 +133,10 @@ export function registerStoryboardManagementCommands(
       if (!active) {return;}
       const sceneCount = snapshot.scenes.length;
 
-      if (sceneCount > 0) {
+      // The Storyboard panel header confirms inline before sending the
+      // request, so it passes `skipConfirm` to avoid a redundant modal.
+      // Command-palette invocation (no arg) still confirms via modal.
+      if (sceneCount > 0 && arg?.skipConfirm !== true) {
         const pluralise = sceneCount === 1 ? 'Scene' : 'Scenes';
         const message = `Delete Storyboard "${active.name}" and its ${sceneCount} ${pluralise}?`;
         const choice = await vscode.window.showWarningMessage(

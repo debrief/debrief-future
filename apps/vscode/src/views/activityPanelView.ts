@@ -148,6 +148,14 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   private _resultsPanelService?: ResultsPanelService;
   private _getCurrentPlotKey?: () => { storePath: string; itemPath: string } | undefined;
 
+  // UX-review flatten: the Storyboard renders as a section inside this
+  // webview. The Storyboard provider attaches to our webview (it posts +
+  // listens on it) rather than owning its own view.
+  private _storyboardProvider?: {
+    attachWebview(webview: vscode.Webview): void;
+    detachWebview(): void;
+  };
+
   constructor(
     extensionUri: vscode.Uri,
     private readonly _sessionManager: SessionManager,
@@ -176,6 +184,22 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     this._stacService = stacService;
     this._resultsPanelService = resultsPanelService;
     this._getCurrentPlotKey = getCurrentPlotKey;
+  }
+
+  /**
+   * Register the Storyboard provider so it can attach to this webview when
+   * the Activity view resolves (UX-review flatten — the Storyboard renders
+   * as the 5th section of the Activity panel).
+   */
+  public setStoryboardProvider(provider: {
+    attachWebview(webview: vscode.Webview): void;
+    detachWebview(): void;
+  }): void {
+    this._storyboardProvider = provider;
+    // If the view is already live, attach immediately.
+    if (this._view) {
+      provider.attachWebview(this._view.webview);
+    }
   }
 
   /**
@@ -545,6 +569,16 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
           void this._handlePropertiesCommit(message);
           break;
       }
+    });
+
+    // UX-review flatten: let the Storyboard provider attach to this webview
+    // so the Storyboard section posts + receives on the same channel. The
+    // attach registers its own message listener; unknown message types are
+    // ignored by both switches, so there is no cross-talk.
+    this._storyboardProvider?.attachWebview(webviewView.webview);
+
+    webviewView.onDidDispose(() => {
+      this._storyboardProvider?.detachWebview();
     });
   }
 

@@ -48,19 +48,22 @@ test.describe('Storyboard edit harness — smoke', () => {
     await saveScreenshot(page, 'storyboard-panel-default.png');
   });
 
-  test('chevron toggles inline edit form (FR-001 / FR-004)', async ({
+  test('overflow Edit opens the edit dialog (single-open invariant)', async ({
     page,
   }) => {
     const harness = new StoryboardEditPage(page);
     await harness.open();
-    await harness.chevronFor('sceneA').click();
-    await expect(page.locator('[data-testid="scene-edit-form"]')).toBeVisible();
+    await harness.openEditDialog('sceneA');
+    await expect(harness.editDialog()).toBeVisible();
     await expect(harness.sceneRow('sceneA')).toHaveAttribute(
       'data-edit-form-open',
       'true',
     );
-    // Open a different row — first form should close (FR-004).
-    await harness.chevronFor('sceneB').click();
+    await saveScreenshot(page, 'storyboard-edit-form-open.png');
+    // Close, then open a different row — only one Scene's dialog is ever open.
+    await page.locator('[data-testid="scene-edit-dialog-cancel"]').click();
+    await expect(harness.editDialog()).toBeHidden();
+    await harness.openEditDialog('sceneB');
     await expect(harness.sceneRow('sceneA')).not.toHaveAttribute(
       'data-edit-form-open',
       'true',
@@ -69,7 +72,6 @@ test.describe('Storyboard edit harness — smoke', () => {
       'data-edit-form-open',
       'true',
     );
-    await saveScreenshot(page, 'storyboard-edit-form-open.png');
   });
 
   test('overflow menu opens on right-click and lists six actions (FR-003)', async ({
@@ -142,10 +144,10 @@ test.describe('Storyboard edit harness — smoke', () => {
     await harness.open({
       missingData: { sceneC: ['track-alpha', 'track-bravo'] },
     });
-    // Expand sceneC so the edit form shows the missing-data panel.
-    await harness.chevronFor('sceneC').click();
+    // Open sceneC's edit dialog so it shows the missing-data panel.
+    await harness.openEditDialog('sceneC');
     await expect(
-      page.locator('[data-testid="scene-edit-form-missing-data"]'),
+      page.locator('[data-testid="scene-edit-dialog-missing-data"]'),
     ).toBeVisible();
     await saveScreenshot(page, 'storyboard-missing-data-remediation.png');
   });
@@ -172,19 +174,20 @@ test.describe('Storyboard edit harness — smoke', () => {
 // FR-043: dual knobs.
 
 test.describe('Storyboard edit harness — extended scenarios (#234 US5)', () => {
-  test('inline scene rename — type new title, blur → outbound + state updated', async ({
+  test('scene rename via edit dialog — type new title, Save → outbound + state updated', async ({
     page,
   }) => {
     const harness = new StoryboardEditPage(page);
     await harness.open();
-    await harness.chevronFor('sceneA').click();
+    await harness.openEditDialog('sceneA');
     const titleInput = page.locator(
-      '[data-testid="scene-edit-form-title-input"]',
+      '[data-testid="scene-edit-dialog-title-input"]',
     );
     await titleInput.fill('Renamed via E2E');
-    await titleInput.blur();
-    // The form's commit fires on blur. Assert the new title surfaces in
-    // the row + an outbound rename message was recorded.
+    // The dialog commits title + description together on Save.
+    await page.locator('[data-testid="scene-edit-dialog-save"]').click();
+    // Assert the new title surfaces in the row + an outbound rename message
+    // was recorded.
     await expect(harness.sceneRow('sceneA')).toContainText('Renamed via E2E');
     const outbound = await harness.outboundMessages();
     expect(
@@ -202,14 +205,12 @@ test.describe('Storyboard edit harness — extended scenarios (#234 US5)', () =>
   }) => {
     const harness = new StoryboardEditPage(page);
     await harness.open();
-    await harness.chevronFor('sceneB').click();
+    await harness.openEditDialog('sceneB');
     const desc = page.locator(
-      '[data-testid="scene-edit-form-description-textarea"]',
+      '[data-testid="scene-edit-dialog-description-textarea"]',
     );
     await desc.fill('**Brief:** held bearing 060°, contact lost.');
-    await page
-      .locator('[data-testid="scene-edit-form-save-description"]')
-      .click();
+    await page.locator('[data-testid="scene-edit-dialog-save"]').click();
     const outbound = await harness.outboundMessages();
     expect(
       outbound.some(

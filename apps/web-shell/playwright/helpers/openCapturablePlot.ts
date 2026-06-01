@@ -38,7 +38,7 @@ export async function openCapturablePlot(page: Page): Promise<void> {
     timeout: 15_000,
   });
   await expect(
-    page.locator('[data-testid="storyboard-panel-rail"]'),
+    page.locator('[data-testid="storyboard-panel"]'),
   ).toBeVisible({ timeout: 15_000 });
 
   // Force a Leaflet moveend (the headless browser sometimes misses the

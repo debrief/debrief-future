@@ -1,20 +1,21 @@
 /**
- * Webview entrypoint for the Storyboard panel (Features 216 + 217 + 218 + 230).
+ * Reusable Storyboard webview app (Features 216 + 217 + 218 + 230 + 235).
  *
- * Mounts the presentational `<StoryboardPanel/>` from `@debrief/components`
- * and wires its event handlers to VS Code's `postMessage` channel through
- * the shared `useStoryboardEditReducer` hook (feature 230). The hook is
- * the single source of truth for panel-local display state (which row's
- * edit form is open, which overflow menu is anchored where, inbound stale
- * flags, pending undo toasts).
+ * Extracted from the former standalone `storyboardPanel.tsx` entry so it can
+ * be embedded as the 5th "Storyboard" section of the Activity webview (UX
+ * review: flatten the Debrief sidebar into a single list of collapsible
+ * sections). It mounts the presentational `<StoryboardPanel/>` and wires its
+ * handlers to VS Code's `postMessage` channel via `useStoryboardEditReducer`.
+ *
+ * Unlike the old entry, this module does NOT call `acquireVsCodeApi()` or
+ * mount a React root — the host (`activityPanel.tsx`) owns the single
+ * `acquireVsCodeApi()` instance and React root, and passes the API in. This
+ * keeps a single VS Code API per webview (calling `acquireVsCodeApi()` twice
+ * throws).
  */
 
-import React, { useCallback, useEffect } from 'react';
-import { createRoot } from 'react-dom/client';
-import {
-  StoryboardPanel,
-  useStoryboardEditReducer,
-} from '@debrief/components';
+import { useCallback, useEffect } from 'react';
+import { useStoryboardEditReducer } from '@debrief/components';
 import type {
   SceneRowViewModel,
   StoryboardOptionViewModel,
@@ -25,14 +26,12 @@ import type {
   StaleFlagEntry,
   NamingRowPushState,
   CollisionBannerPushState,
+  StoryboardPanelProps,
 } from '@debrief/components';
-import { Bootstrap } from './_bootstrap';
 
-interface AcquiredVsCodeApi {
+export interface StoryboardPanelVsCodeApi {
   postMessage(message: unknown): void;
 }
-
-declare function acquireVsCodeApi(): AcquiredVsCodeApi;
 
 interface ScenesMessage {
   type: 'scenes';
@@ -95,9 +94,16 @@ type ExtensionMessage =
   | SceneStaleFlagsUpdatedMessage
   | SceneUndoToastShownMessage;
 
-const vscode = acquireVsCodeApi();
-
-function StoryboardPanelApp(): React.ReactElement {
+/**
+ * Builds the live {@link StoryboardPanelProps} bundle for the VS Code host:
+ * runs the edit reducer, processes inbound extension messages, and wires every
+ * callback to `postMessage`. The shared `ActivityPanel` renders the actual
+ * `<StoryboardPanel>` from these props (Storyboard is a child section of the
+ * Activity panel, like Tools / Layers / Properties).
+ */
+export function useStoryboardPanelProps(
+  vscode: StoryboardPanelVsCodeApi,
+): StoryboardPanelProps {
   const {
     state,
     dispatch,
@@ -170,47 +176,56 @@ function StoryboardPanelApp(): React.ReactElement {
     window.addEventListener('message', handler);
     vscode.postMessage({ type: 'ready' });
     return () => window.removeEventListener('message', handler);
-  }, [dispatch]);
+  }, [dispatch, vscode]);
 
   const onCaptureClick = useCallback(() => {
     vscode.postMessage({ type: 'capture-clicked' });
-  }, []);
+  }, [vscode]);
 
-  const onSceneRowClick = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-row-clicked', sceneId });
-  }, []);
+  const onSceneRowClick = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-row-clicked', sceneId });
+    },
+    [vscode],
+  );
 
   // #273 — live preview of the active storyboard. The active id travels
   // with the message so the host previews exactly what the panel shows.
   const activeStoryboardId = state.activeStoryboardId;
   const onPreview = useCallback(() => {
     if (activeStoryboardId === null) return;
-    vscode.postMessage({ type: 'preview-clicked', storyboardId: activeStoryboardId });
-  }, [activeStoryboardId]);
+    vscode.postMessage({
+      type: 'preview-clicked',
+      storyboardId: activeStoryboardId,
+    });
+  }, [activeStoryboardId, vscode]);
 
   const onTransportForward = useCallback(() => {
     vscode.postMessage({ type: 'transport-forward-clicked' });
-  }, []);
+  }, [vscode]);
 
   const onTransportBackward = useCallback(() => {
     vscode.postMessage({ type: 'transport-backward-clicked' });
-  }, []);
+  }, [vscode]);
 
-  const onActiveStoryboardChange = useCallback((storyboardId: string) => {
-    vscode.postMessage({ type: 'active-storyboard-changed', storyboardId });
-  }, []);
+  const onActiveStoryboardChange = useCallback(
+    (storyboardId: string) => {
+      vscode.postMessage({ type: 'active-storyboard-changed', storyboardId });
+    },
+    [vscode],
+  );
 
   const onCreateStoryboard = useCallback(() => {
     vscode.postMessage({ type: 'create-storyboard-requested' });
-  }, []);
+  }, [vscode]);
 
   const onRenameStoryboard = useCallback(() => {
     vscode.postMessage({ type: 'rename-storyboard-requested' });
-  }, []);
+  }, [vscode]);
 
   const onDeleteStoryboard = useCallback(() => {
     vscode.postMessage({ type: 'delete-storyboard-requested' });
-  }, []);
+  }, [vscode]);
 
   // ─── #230 — edit-suite outbound postMessage handlers ─────────────
   const onSceneRowExpandToggle = useCallback(
@@ -232,7 +247,7 @@ function StoryboardPanelApp(): React.ReactElement {
       });
       closeEditForm();
     },
-    [closeEditForm],
+    [closeEditForm, vscode],
   );
 
   const onSceneDescriptionSubmit = useCallback(
@@ -244,32 +259,50 @@ function StoryboardPanelApp(): React.ReactElement {
       });
       closeEditForm();
     },
-    [closeEditForm],
+    [closeEditForm, vscode],
   );
 
-  const onSceneDeleteRequested = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-delete-requested', sceneId });
-  }, []);
+  const onSceneDeleteRequested = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-delete-requested', sceneId });
+    },
+    [vscode],
+  );
 
-  const onSceneUndoDeleteClicked = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-undo-delete-clicked', sceneId });
-  }, []);
+  const onSceneUndoDeleteClicked = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-undo-delete-clicked', sceneId });
+    },
+    [vscode],
+  );
 
-  const onSceneUpdateToCurrentClicked = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-update-to-current-clicked', sceneId });
-  }, []);
+  const onSceneUpdateToCurrentClicked = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-update-to-current-clicked', sceneId });
+    },
+    [vscode],
+  );
 
-  const onSceneDuplicateClicked = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-duplicate-clicked', sceneId });
-  }, []);
+  const onSceneDuplicateClicked = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-duplicate-clicked', sceneId });
+    },
+    [vscode],
+  );
 
-  const onSceneCopyToOtherClicked = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-copy-to-other-clicked', sceneId });
-  }, []);
+  const onSceneCopyToOtherClicked = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-copy-to-other-clicked', sceneId });
+    },
+    [vscode],
+  );
 
-  const onSceneRefreshThumbnailClicked = useCallback((sceneId: string) => {
-    vscode.postMessage({ type: 'scene-refresh-thumbnail-clicked', sceneId });
-  }, []);
+  const onSceneRefreshThumbnailClicked = useCallback(
+    (sceneId: string) => {
+      vscode.postMessage({ type: 'scene-refresh-thumbnail-clicked', sceneId });
+    },
+    [vscode],
+  );
 
   const onStoryboardRefreshAllStaleClicked = useCallback(
     (storyboardId: string) => {
@@ -278,7 +311,7 @@ function StoryboardPanelApp(): React.ReactElement {
         storyboardId,
       });
     },
-    [],
+    [vscode],
   );
 
   const onStoryboardNameRenameCommit = useCallback(
@@ -289,7 +322,7 @@ function StoryboardPanelApp(): React.ReactElement {
         newName,
       });
     },
-    [],
+    [vscode],
   );
 
   const onStoryboardDescriptionSubmit = useCallback(
@@ -300,7 +333,7 @@ function StoryboardPanelApp(): React.ReactElement {
         description,
       });
     },
-    [],
+    [vscode],
   );
 
   // ─── #235 — naming row + collision banner handlers ───────────────────
@@ -316,91 +349,88 @@ function StoryboardPanelApp(): React.ReactElement {
       type: 'naming-row-confirm',
       name: slice.pendingName.trim(),
     });
-  }, [state.namingRow]);
+  }, [state.namingRow, vscode]);
 
   const onNamingRowCancel = useCallback(() => {
     vscode.postMessage({ type: 'naming-row-cancel' });
-  }, []);
+  }, [vscode]);
 
-  const onCollisionReplace = useCallback((conflictingSceneId: string) => {
-    vscode.postMessage({ type: 'collision-replace', conflictingSceneId });
-  }, []);
+  const onCollisionReplace = useCallback(
+    (conflictingSceneId: string) => {
+      vscode.postMessage({ type: 'collision-replace', conflictingSceneId });
+    },
+    [vscode],
+  );
 
   const onCollisionOffset = useCallback(() => {
     vscode.postMessage({ type: 'collision-offset' });
-  }, []);
+  }, [vscode]);
 
   const onCollisionCancel = useCallback(() => {
     vscode.postMessage({ type: 'collision-cancel' });
-  }, []);
+  }, [vscode]);
 
-  // Theme is sourced from the parent <Bootstrap> wrapper (#220) — the
-  // local `state.theme` is retained only because the reducer's existing
-  // shape accepts it; it no longer drives the React tree.
-
-  return (
-    <>
-      <StoryboardPanel
-        scenes={state.sceneRows}
-        activeStoryboardName={state.activeStoryboardName}
-        captureInFlight={state.captureInFlight}
-        onCaptureClick={onCaptureClick}
-        onSceneRowClick={onSceneRowClick}
-        onPreview={onPreview}
-        canPreview={state.activeStoryboardId !== null && state.sceneRows.length > 0}
-        storyboards={
-          state.storyboards.length > 0 ? state.storyboards : undefined
-        }
-        activeStoryboardId={state.activeStoryboardId}
-        currentSceneId={state.currentSceneId}
-        transport={state.transport}
-        onTransportForward={onTransportForward}
-        onTransportBackward={onTransportBackward}
-        onActiveStoryboardChange={onActiveStoryboardChange}
-        onCreateStoryboard={onCreateStoryboard}
-        onRenameStoryboard={onRenameStoryboard}
-        onDeleteStoryboard={onDeleteStoryboard}
-        sceneEditViewModels={sceneEditViewModels}
-        storyboardEditViewModel={state.storyboardEditViewModel ?? undefined}
-        pendingUndoToast={state.pendingUndoToast}
-        overflowMenuOpenFor={state.overflowMenuOpenFor}
-        overflowMenuAnchorRect={state.overflowMenuAnchorRect}
-        onSceneRowExpandToggle={onSceneRowExpandToggle}
-        onSceneOverflowMenuOpen={openOverflowMenu}
-        onSceneOverflowMenuClose={closeOverflowMenu}
-        onSceneEditFormCancel={onSceneEditFormCancel}
-        onSceneTitleRenameCommit={onSceneTitleRenameCommit}
-        onSceneDescriptionSubmit={onSceneDescriptionSubmit}
-        onSceneDeleteRequested={onSceneDeleteRequested}
-        onSceneUndoDeleteClicked={onSceneUndoDeleteClicked}
-        onSceneUpdateToCurrentClicked={onSceneUpdateToCurrentClicked}
-        onSceneDuplicateClicked={onSceneDuplicateClicked}
-        onSceneCopyToOtherClicked={onSceneCopyToOtherClicked}
-        onSceneRefreshThumbnailClicked={onSceneRefreshThumbnailClicked}
-        onStoryboardRefreshAllStaleClicked={
-          onStoryboardRefreshAllStaleClicked
-        }
-        onStoryboardNameRenameCommit={onStoryboardNameRenameCommit}
-        onStoryboardDescriptionSubmit={onStoryboardDescriptionSubmit}
-        onUndoToastDismiss={dismissUndoToast}
-        namingRowViewModel={namingRowViewModel}
-        collisionBannerViewModel={collisionBannerViewModel}
-        onNamingRowTextChanged={onNamingRowTextChanged}
-        onNamingRowConfirm={onNamingRowConfirm}
-        onNamingRowCancel={onNamingRowCancel}
-        onCollisionReplace={onCollisionReplace}
-        onCollisionOffset={onCollisionOffset}
-        onCollisionCancel={onCollisionCancel}
-      />
-    </>
+  // #271 — overlap warning dismissal.
+  const onSceneOverlapDismiss = useCallback(
+    (sceneId: string, partnerSceneIds: readonly string[]) => {
+      vscode.postMessage({
+        type: 'scene-overlap-dismiss',
+        sceneId,
+        partnerSceneIds,
+      });
+    },
+    [vscode],
   );
-}
 
-const rootEl = document.getElementById('root');
-if (rootEl) {
-  createRoot(rootEl).render(
-    <Bootstrap>
-      <StoryboardPanelApp />
-    </Bootstrap>
-  );
+  return {
+    scenes: state.sceneRows,
+    activeStoryboardName: state.activeStoryboardName,
+    captureInFlight: state.captureInFlight,
+    onCaptureClick,
+    onSceneRowClick,
+    onPreview,
+    canPreview:
+      state.activeStoryboardId !== null && state.sceneRows.length > 0,
+    storyboards:
+      state.storyboards.length > 0 ? state.storyboards : undefined,
+    activeStoryboardId: state.activeStoryboardId,
+    currentSceneId: state.currentSceneId,
+    transport: state.transport,
+    onTransportForward,
+    onTransportBackward,
+    onActiveStoryboardChange,
+    onCreateStoryboard,
+    onRenameStoryboard,
+    onDeleteStoryboard,
+    sceneEditViewModels,
+    storyboardEditViewModel: state.storyboardEditViewModel ?? undefined,
+    pendingUndoToast: state.pendingUndoToast,
+    overflowMenuOpenFor: state.overflowMenuOpenFor,
+    overflowMenuAnchorRect: state.overflowMenuAnchorRect,
+    onSceneRowExpandToggle,
+    onSceneOverflowMenuOpen: openOverflowMenu,
+    onSceneOverflowMenuClose: closeOverflowMenu,
+    onSceneEditFormCancel,
+    onSceneTitleRenameCommit,
+    onSceneDescriptionSubmit,
+    onSceneDeleteRequested,
+    onSceneUndoDeleteClicked,
+    onSceneUpdateToCurrentClicked,
+    onSceneDuplicateClicked,
+    onSceneCopyToOtherClicked,
+    onSceneRefreshThumbnailClicked,
+    onStoryboardRefreshAllStaleClicked,
+    onStoryboardNameRenameCommit,
+    onStoryboardDescriptionSubmit,
+    onUndoToastDismiss: dismissUndoToast,
+    namingRowViewModel,
+    collisionBannerViewModel,
+    onNamingRowTextChanged,
+    onNamingRowConfirm,
+    onNamingRowCancel,
+    onCollisionReplace,
+    onCollisionOffset,
+    onCollisionCancel,
+    onSceneOverlapDismiss,
+  };
 }
