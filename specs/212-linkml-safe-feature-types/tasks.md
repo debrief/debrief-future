@@ -137,7 +137,7 @@ Depends on Phases 3–6 complete. Produces the evidence + media that back the PR
 
 ### PR Creation
 
-- [ ] T035 Create PR and publish blog: run `/speckit.pr` (finalises PR #662 with evidence; publishes `shipped-post.md` to debrief.github.io)
+- [x] T035 Create PR and publish blog: run `/speckit.pr` (finalises PR #662 with evidence; publishes `shipped-post.md` to debrief.github.io)
 
 **Task T035 must run last** — it depends on every evidence (T030–T033) and media (T034) task being complete.
 
