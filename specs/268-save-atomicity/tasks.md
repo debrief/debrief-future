@@ -40,8 +40,8 @@ This is an **infrastructure / reliability** feature with **no new UI** (the only
 
 Documents the design decision and provides the shared fault-injection scaffolding the story phases reuse. No new package or build config.
 
-- [ ] T001 Record an ADR for the filesystem **save-journal / commit-marker** decision (stage → journal → apply → clear; reconcile rolls back before the journal, forward after) with the rejected alternatives from research.md `docs/project_notes/decisions.md`
-- [ ] T002 [P] Add a shared host-level fault-injection helper — a `StacWriter` wrapper that throws a `StacWriterError` on the Nth underlying write — for the saveSession/open integration tests `apps/vscode/tests/unit/helpers/saveFaultInjection.ts`
+- [x] T001 Record an ADR for the filesystem **save-journal / commit-marker** decision (stage → journal → apply → clear; reconcile rolls back before the journal, forward after) with the rejected alternatives from research.md `docs/project_notes/decisions.md`
+- [x] T002 [P] Add a shared host-level fault-injection helper — a `StacWriter` wrapper that throws a `StacWriterError` on the Nth underlying write — for the saveSession/open integration tests `apps/vscode/tests/unit/helpers/saveFaultInjection.ts`
 
 **Checkpoint**: design recorded; test scaffolding ready. (Adaptor-internal tests inject failures at the `node:fs` / IndexedDB seam inline — see their tasks.)
 
@@ -52,10 +52,10 @@ Extend the shared boundary contract. After this phase the monorepo type-checks w
 
 **⚠️ No story can be implemented until this phase is complete** — both adaptors and both call sites depend on the interface and the `SaveJournal` shape.
 
-- [ ] T003 Add `commitPlotSave` + `reconcilePlotSave` method signatures and the `CommitPlotSaveInput`/`CommitPlotSaveResult`/`ReconcilePlotSaveInput`/`ReconcilePlotSaveResult` types to the `StacWriter` interface, matching `contracts/stac-writer-commit.ts` — `thumbnails` MUST be `Pick<WritePlotThumbnailPairInput, 'largePngBase64' | 'smallPngBase64'>` (Article IV.5, no re-listing) `shared/stac-writer/src/interface.ts`
-- [ ] T004 [P] Add the internal FS-only `SaveJournal` type (`version`, `stacItemPath`, `createdAtMs`, `renames[]`) and a typed `parseSaveJournal()` validator that narrows untyped JSON with no `any` (Article XV.5) `apps/vscode/src/services/saveJournal.ts`
-- [ ] T005 Add stub implementations of `commitPlotSave`/`reconcilePlotSave` (throwing "not yet implemented") to every non-adaptor `StacWriter` test double / mock so the workspace type-checks; find them with a search for `satisfies StacWriter` / `: StacWriter` `shared/components/src` + `apps/vscode/tests` + `apps/web-shell/src` (test doubles only)
-- [ ] T006 [P][test] Type-contract test asserting `CommitPlotSaveInput.thumbnails` stays structurally derived from `WritePlotThumbnailPairInput` (compile-time `Pick` guard) so the boundary type cannot silently drift `shared/stac-writer/src/__tests__/commitPlotSave.types.test.ts`
+- [x] T003 Add `commitPlotSave` + `reconcilePlotSave` method signatures and the `CommitPlotSaveInput`/`CommitPlotSaveResult`/`ReconcilePlotSaveInput`/`ReconcilePlotSaveResult` types to the `StacWriter` interface, matching `contracts/stac-writer-commit.ts` — `thumbnails` MUST be `Pick<WritePlotThumbnailPairInput, 'largePngBase64' | 'smallPngBase64'>` (Article IV.5, no re-listing) `shared/stac-writer/src/interface.ts`
+- [x] T004 [P] Add the internal FS-only `SaveJournal` type (`version`, `stacItemPath`, `createdAtMs`, `renames[]`) and a typed `parseSaveJournal()` validator that narrows untyped JSON with no `any` (Article XV.5) `apps/vscode/src/services/saveJournal.ts`
+- [x] T005 Add stub implementations of `commitPlotSave`/`reconcilePlotSave` (throwing "not yet implemented") to every non-adaptor `StacWriter` test double / mock so the workspace type-checks; find them with a search for `satisfies StacWriter` / `: StacWriter` — NONE found (all test doubles use `Partial<StacWriter>` or the `saveFaultInjection` Proxy, which auto-covers new methods)
+- [x] T006 [P][test] Type-contract test asserting `CommitPlotSaveInput.thumbnails` stays structurally derived from `WritePlotThumbnailPairInput` (compile-time `Pick` guard) so the boundary type cannot silently drift `shared/stac-writer/src/__tests__/commitPlotSave.types.test.ts`
 
 **Checkpoint**: interface extended, `SaveJournal` typed, workspace green (`pnpm -r typecheck`).
 
