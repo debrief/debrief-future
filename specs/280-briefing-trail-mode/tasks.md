@@ -119,7 +119,7 @@ per scene as the viewer navigates between them within one session (FR-005).
 
 ### Media Content
 
-- [ ] T016 Create the feature blog post via the Content Specialist (`.claude/agents/media/content.md`): copy `What We're Building` / `How It Fits` / `Key Decisions` **verbatim** from `evidence/opening-context.md`, place the before/after Hook (`trail-start.png` → `trail-growth.png`) at the top, and write Screenshots / By the Numbers / Lessons Learned / What's Next from evidence. Bug-fix sizing — judgement call, lean full given the visual before/after. No Storybook section (no story). `specs/280-briefing-trail-mode/media/shipped-post.md`
+- [x] T016 Create the feature blog post via the Content Specialist (`.claude/agents/media/content.md`): copy `What We're Building` / `How It Fits` / `Key Decisions` **verbatim** from `evidence/opening-context.md`, place the before/after Hook (`trail-start.png` → `trail-growth.png`) at the top, and write Screenshots / By the Numbers / Lessons Learned / What's Next from evidence. Bug-fix sizing — judgement call, lean full given the visual before/after. No Storybook section (no story). `specs/280-briefing-trail-mode/media/shipped-post.md`
 
 ### PR Creation
 
