@@ -1,3 +1,4 @@
+import { ReactNode } from '../../../../../node_modules/.pnpm/react@18.3.1/node_modules/react';
 import { SceneFeature } from '../../../../schemas/src/generated/typescript/index.ts';
 import { OverlapPartner } from '../../storyboard/overlap';
 
@@ -162,6 +163,10 @@ export interface StoryboardPanelProps {
     /** Fires on row click; #217 wires this to the playback service's
      *  click-to-select transport. */
     onSceneRowClick(sceneId: string): void;
+    /** Optional host-supplied banner rendered at the very top of the panel
+     *  (e.g. web-shell's "session-only — captures won't persist" notice).
+     *  Kept generic so the shared panel carries no host-specific concepts. */
+    readonly banner?: ReactNode;
     /** All Storyboards on the plot. When provided and non-empty, the panel
      *  renders the `StoryboardHeader` dropdown; when undefined or empty, the
      *  panel keeps the #216 static header (`activeStoryboardName` label). */

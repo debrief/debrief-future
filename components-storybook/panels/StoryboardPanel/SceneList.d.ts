@@ -8,17 +8,11 @@ export interface SceneListProps {
     readonly currentSceneId?: string | null;
     onSceneRowClick(sceneId: string): void;
     readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
-    onSceneTitleRenameCommit?(sceneId: string, newTitle: string): void;
-    onSceneDescriptionSubmit?(sceneId: string, description: string | null): void;
-    onSceneDeleteRequested?(sceneId: string): void;
-    onSceneUpdateToCurrentClicked?(sceneId: string): void;
-    onSceneDuplicateClicked?(sceneId: string): void;
-    onSceneCopyToOtherClicked?(sceneId: string): void;
     onSceneRefreshThumbnailClicked?(sceneId: string): void;
-    onSceneEditFormCancel?(sceneId: string): void;
+    /** Opens the per-Scene edit dialog (double-click shortcut). */
     onSceneRowExpandToggle?(sceneId: string): void;
     onSceneOverflowMenuOpen?(sceneId: string, anchorRect: DOMRect): void;
     onSceneOverlapDismiss?(sceneId: string, partnerSceneIds: readonly string[]): void;
 }
-export declare function SceneList({ scenes, captureInFlight, currentSceneId, onSceneRowClick, sceneEditViewModels, onSceneTitleRenameCommit, onSceneDescriptionSubmit, onSceneDeleteRequested, onSceneUpdateToCurrentClicked, onSceneDuplicateClicked, onSceneCopyToOtherClicked, onSceneRefreshThumbnailClicked, onSceneEditFormCancel, onSceneRowExpandToggle, onSceneOverflowMenuOpen, onSceneOverlapDismiss, }: SceneListProps): React.ReactElement;
+export declare function SceneList({ scenes, captureInFlight, currentSceneId, onSceneRowClick, sceneEditViewModels, onSceneRefreshThumbnailClicked, onSceneRowExpandToggle, onSceneOverflowMenuOpen, onSceneOverlapDismiss, }: SceneListProps): React.ReactElement;
 //# sourceMappingURL=SceneList.d.ts.map

@@ -1,4 +1,5 @@
 import { DebriefFeature } from '../utils/types';
+import { StoryboardPanelProps } from '../panels/StoryboardPanel/types';
 import { DisplayMode, PlaybackState } from '../../../schemas/src/generated/typescript/index.ts';
 import { MatchResult, ToolParameter } from '../ToolMatch/types';
 import { AssociatedFile } from '../LayersToolbar/types';
@@ -14,6 +15,9 @@ export interface ActivityPanelCollapseState {
     toolsCollapsed: boolean;
     layersCollapsed: boolean;
     propertiesCollapsed: boolean;
+    /** Storyboard section (rendered only when `storyboardSlot` is provided).
+     *  Optional so existing collapse-state literals keep compiling. */
+    storyboardCollapsed?: boolean;
 }
 /**
  * Default collapse state - all sections expanded.
@@ -214,6 +218,14 @@ export interface ActivityPanelProps {
     onPropertiesPanelSaveResult?: (result: SaveStagedEditsResult) => void;
     /** Callback for messages sent to the host */
     onMessage?: (message: ActivityPanelMessage) => void;
+    /**
+     * Props for the child `StoryboardPanel`, rendered as a 5th collapsible
+     * section — exactly like the Time Controller / Tools / Layers / Properties
+     * sections above. The host supplies the live data + callbacks (scenes,
+     * transport, capture/edit handlers); ActivityPanel owns the rendering.
+     * When omitted, no Storyboard section renders.
+     */
+    storyboard?: StoryboardPanelProps;
     /** CSS class name */
     className?: string;
 }

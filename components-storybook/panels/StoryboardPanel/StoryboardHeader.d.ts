@@ -7,7 +7,6 @@ export interface StoryboardHeaderProps {
     onActiveStoryboardChange(storyboardId: string): void;
     onCreateStoryboard?(): void;
     onRenameStoryboard?(): void;
-    onDeleteStoryboard?(): void;
 }
-export declare function StoryboardHeader({ storyboards, activeStoryboardId, onActiveStoryboardChange, onCreateStoryboard, onRenameStoryboard, onDeleteStoryboard, }: StoryboardHeaderProps): React.ReactElement | null;
+export declare function StoryboardHeader({ storyboards, activeStoryboardId, onActiveStoryboardChange, onCreateStoryboard, onRenameStoryboard, }: StoryboardHeaderProps): React.ReactElement | null;
 //# sourceMappingURL=StoryboardHeader.d.ts.map
