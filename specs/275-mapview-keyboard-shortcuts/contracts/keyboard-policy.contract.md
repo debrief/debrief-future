@@ -42,7 +42,7 @@ On `register(entry)`:
 | `registry` has no entry for `entry.key` | add it; if `LEAFLET_RESERVED_KEYS.has(entry.key)` → `console.warn` (dev only) that the key is Leaflet-reserved |
 | `registry` already has an entry for `entry.key` | **keep the incumbent**; `console.warn` (dev only): ``duplicate map keyboard shortcut for "<key>": "<incoming.description>" ignored; already claimed by "<existing.description>"`` |
 
-- Warnings are emitted only in development builds (guarded via the bundler's `NODE_ENV`/`import.meta.env.DEV`); production webviews stay quiet.
+- Warnings are emitted whenever `process.env.NODE_ENV !== 'production'` (review decision 3A) — so they fire in development **and** under the vitest runner (`NODE_ENV='test'`), making C10/C11 testable without env-stubbing, while production webviews stay quiet.
 - Warnings never throw and never prevent the map from rendering — surfacing, not failing-hard (proportionality; Article I.3 "no silent failures" satisfied by the warn).
 - The authoritative registry of *intended* ownership is **ADR-039**; `RESERVED_MAP_SHORTCUT_KEYS` mirrors it for tests.
 

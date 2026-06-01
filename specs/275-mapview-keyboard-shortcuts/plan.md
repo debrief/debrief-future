@@ -10,6 +10,16 @@ Codify the map keyboard-shortcut decisions that PR #260 made once, inline, for t
 
 No new runtime dependencies; no schema change; no service/persistence touch. This is a frontend component-library refactor + a governance ADR.
 
+## Review Outcomes (`/speckit.review`, 2026-06-01)
+
+A compressed plan review (mode C) accepted three refinements, folded into the artifacts below:
+
+- **1A — robust listener binding.** `MapKeyboardShortcutProvider` takes the resolved wrapper **element** (`container: HTMLElement | null`), which MapView captures via a callback ref into state; the bind effect keys on `[container]` so the single `keydown` listener can never silently fail to attach (Article I.3). Supersedes the earlier `containerRef: RefObject` sketch.
+- **2A — auto-repeat fix applies to `L` too.** The new ignore-auto-repeat default (research D6) is applied to the migrated `L` shortcut, not just new ones; **FR-010 is amended** to record it as the single intentional behavioural refinement (holding `L` toggles once, not repeatedly). #260's tests are unaffected.
+- **3A — testable conflict-warning guard.** The duplicate / Leaflet-reserved-key `console.warn` is guarded by `process.env.NODE_ENV !== 'production'` (fires in dev and under vitest, silent in prod), so contracts C10/C11 are testable without env-stubbing.
+
+**Deferred follow-ups captured in `BACKLOG.md`:** #280 (migrate TimeController onto the convention), #281 (reserved-key registry ↔ ADR-039 drift guard), #282 (map keyboard-shortcuts help overlay). No constitution violations were found; scope was confirmed (provider/context retained — its purpose is making shortcut #2 cheap).
+
 ## Technical Context
 
 **Language/Version**: TypeScript 5.x (strict mode, Article XV), React 18.x
@@ -70,7 +80,7 @@ shared/components/src/
 │   └── __tests__/
 │       └── useMapKeyboardShortcut.test.tsx  # NEW — US1 unit tests (focus, modifiers, typing, non-letter, repeat, unmount, conflict, multi-shortcut)
 ├── MapView/
-│   ├── MapView.tsx                          # MODIFIED — add containerRef, wrap subtree in provider, replace inline handleRootKeyDown with an internal <ViewportLockShortcut/> that calls the hook
+│   ├── MapView.tsx                          # MODIFIED — capture wrapper via callback ref into state (1A), wrap subtree in provider, replace inline handleRootKeyDown with an internal <ViewportLockShortcut/> that calls the hook
 │   └── __tests__/
 │       ├── keyboardShortcut.test.tsx        # UNCHANGED — #260 `L` regression (must stay green — FR-010)
 │       └── viewportLock.test.tsx            # UNCHANGED — #260 lock regression

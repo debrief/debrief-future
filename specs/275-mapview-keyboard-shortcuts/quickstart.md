@@ -51,8 +51,9 @@ useMapKeyboardShortcut('f', toggleFullscreen, { allowModifiers: true, descriptio
 
 ```tsx
 // inside MapView.tsx
-<MapKeyboardShortcutProvider containerRef={containerRef}>
-  <div className="debrief-mapview" ref={containerRef} tabIndex={0}>
+const [mapEl, setMapEl] = useState<HTMLElement | null>(null); // callback-ref capture (review 1A)
+<MapKeyboardShortcutProvider container={mapEl}>
+  <div className="debrief-mapview" ref={setMapEl} tabIndex={0}>
     <MapContainer>{/* … */}</MapContainer>
     <ViewportLockShortcut
       enabled={!!onViewportLockChange}

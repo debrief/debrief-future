@@ -116,15 +116,20 @@ export interface MapKeyboardShortcutContextValue {
 ```ts
 export interface MapKeyboardShortcutProviderProps {
   /** The focusable map wrapper to attach the single keydown listener to.
-   *  MapView passes the ref of its existing `.debrief-mapview` div. */
-  containerRef: React.RefObject<HTMLElement>;
+   *  MapView captures its `.debrief-mapview` element via a callback ref into
+   *  state and passes the resolved element here (review decision 1A). Passing
+   *  the element — not a RefObject — lets the provider's effect key on it, so
+   *  the listener (re)binds whenever the element appears or changes; there is
+   *  no silent bind-failure if the ref isn't populated when the effect first
+   *  runs (Article I.3). */
+  container: HTMLElement | null;
   children: React.ReactNode;
 }
 ```
 **Behaviour**
-- On mount (and when `containerRef.current` becomes available), attach one `keydown` listener; on unmount, remove it (no leaks).
+- In a `useEffect` keyed on `[container]`: when `container` is non-null, attach one `keydown` listener; clean up (remove it) on change/unmount (no leaks). A null `container` is a no-op until the element resolves — the callback-ref capture (1A) re-runs the effect the moment the element mounts.
 - The listener: normalize `event.key`; look up the registry; if an *enabled* entry exists, apply its resolved policy (modifiers, repeat, text-entry guard); if all pass, optionally `preventDefault()` and invoke `handler(event)` exactly once.
-- Defensive: if `containerRef.current` lacks a `tabIndex`, the provider may set `tabIndex = 0` so focusability is guaranteed (FR-003). (MapView already sets it, so this is belt-and-braces.)
+- Defensive: if `container` lacks a `tabIndex`, the provider may set `tabIndex = 0` so focusability is guaranteed (FR-003). (MapView already sets it, so this is belt-and-braces.)
 
 ---
 
@@ -164,7 +169,7 @@ export const LEAFLET_RESERVED_KEYS: ReadonlySet<NormalizedKey>;
 
 ```
 MapView
- └─ <MapKeyboardShortcutProvider containerRef> ── owns ──▶ ShortcutRegistry (Map<NormalizedKey, ShortcutEntry>)
+ └─ <MapKeyboardShortcutProvider container> ── owns ──▶ ShortcutRegistry (Map<NormalizedKey, ShortcutEntry>)
        │                                                        ▲
        │ provides context                                       │ register / unregister
        ▼                                                        │
