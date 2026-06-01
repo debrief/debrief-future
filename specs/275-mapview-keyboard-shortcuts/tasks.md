@@ -27,7 +27,7 @@ This is a **Library/SDK** feature (a hook + provider). Per the quality rubric: c
 
 | Artifact | Description | Created When |
 |----------|-------------|--------------|
-| `media/shipped-post.md` | Feature post: first three sections verbatim from `evidence/opening-context.md`, remaining sections from evidence; before/after Hook | Polish phase |
+| `media/shipped-post.md` | Feature post: first three sections verbatim from `evidence/opening-context.md`, remaining sections from evidence; before/after Hook; **a "what's bound / what's reserved" shortcuts table** (live `L` + reserved candidates + Leaflet off-limits) drawn from the ADR-039 registry | Polish phase |
 
 ### PR Creation
 
@@ -124,7 +124,7 @@ This is a **Library/SDK** feature (a hook + provider). Per the quality rubric: c
 
 ### Media Content
 
-- [ ] T021 Create the feature blog post via the Content Specialist — first three sections (What We're Building / How It Fits / Key Decisions) copied **verbatim** from `evidence/opening-context.md`, the before/after table as the Hook, "By the Numbers" from `test-summary.md`, plus Lessons Learned / What's Next `specs/275-mapview-keyboard-shortcuts/media/shipped-post.md`
+- [ ] T021 Create the feature blog post via the Content Specialist — first three sections (What We're Building / How It Fits / Key Decisions) copied **verbatim** from `evidence/opening-context.md`, the before/after table as the Hook, a **"What's bound, what's reserved" shortcuts table** (a *Live* `L` row + reserved candidate keys `/` `[` `]` + a Leaflet-off-limits sub-table for ↑↓←→ / `+` `-` / `Esc`, drawn from the ADR-039 registry so post and ADR can't drift; honest status column — only `L` is live; TimeController Space/arrows deliberately excluded as the #281 follow-up), "By the Numbers" from `test-summary.md`, plus Lessons Learned / What's Next `specs/275-mapview-keyboard-shortcuts/media/shipped-post.md`
 
 ### PR Creation
 
