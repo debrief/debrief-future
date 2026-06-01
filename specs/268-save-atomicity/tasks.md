@@ -156,7 +156,7 @@ Extend the shared boundary contract. After this phase the monorepo type-checks w
 
 ### PR Creation
 
-- [ ] T031 Create PR and publish blog: run `/speckit.pr` (updates the existing feature PR #658 with evidence and opens the debrief.github.io blog PR)
+- [x] T031 Feature PR #658 updated with the full implementation + evidence (title/body rewritten via GitHub MCP — in-session scope is `debrief/debrief-future` only). Blog publish to debrief.github.io is the dev's manual follow-up via `/publish-future-post`
 
 **Task T031 must run last** — it depends on every evidence and media task above being complete.
 
