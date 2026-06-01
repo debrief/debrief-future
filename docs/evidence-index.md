@@ -29,3 +29,4 @@ Tracks evidence artifacts captured for each feature. Used to assess coverage and
 | 142-vscode-e2e-webview-reliability | 6 | md, sh, txt, png | 2026-03-18 | current | [#548](https://github.com/debrief/debrief-future/pull/548) |
 | 247-lazy-mobile-bundle | 8 | md, png | 2026-05-07 | current | [#601](https://github.com/debrief/debrief-future/pull/601) |
 | 192-properties-panel-feature-edit | 19 | md, png | 2026-05-20 | current | [#641](https://github.com/debrief/debrief-future/pull/641) |
+| 271-scene-overlap-warning | 8 | md, png | 2026-05-31 | current | [#654](https://github.com/debrief/debrief-future/pull/654) |

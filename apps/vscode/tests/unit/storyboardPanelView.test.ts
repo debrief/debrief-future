@@ -488,3 +488,166 @@ describe('StoryboardPanelViewProvider — edit dispatcher', () => {
     expect(typeof sinkArg.postMessage).toBe('function');
   });
 });
+
+// ─── #271 — overlap warnings ──────────────────────────────────────────
+
+function timeRangeScene(
+  id: string,
+  storyboardId: string,
+  start: string,
+  end: string,
+): DebriefFeature {
+  return {
+    type: 'Feature',
+    id,
+    geometry: { type: 'Polygon', coordinates: [] },
+    properties: {
+      kind: 'STORYBOARD_SCENE',
+      id,
+      storyboard_id: storyboardId,
+      title: `Title for ${id}`,
+      timestamp: start,
+      viewport: { center: [0, 0], zoom: 8, bearing: 0 },
+      viewport_end: { center: [0, 0], zoom: 9, bearing: 0 },
+      time_range: { start, end },
+      visible_feature_ids: [],
+      feature_set_hash: 'abc',
+      thumbnail_asset_ref: `scene-thumbnail-${id}`,
+      transition_duration_ms: 500,
+      creation_order: _sceneFeatureCounter++,
+    },
+  } as unknown as DebriefFeature;
+}
+
+interface ScenesPost {
+  type: 'scenes';
+  sceneEditViewModels: Record<
+    string,
+    { overlapsWith?: ReadonlyArray<{ sceneId: string; title: string }> }
+  >;
+}
+
+function lastScenesPost(posts: unknown[]): ScenesPost {
+  const found = [...posts]
+    .reverse()
+    .find((p): p is ScenesPost => (p as { type?: string }).type === 'scenes');
+  expect(found).toBeDefined();
+  return found!;
+}
+
+function overlapPartnerIds(post: ScenesPost, sceneId: string): string[] {
+  return (post.sceneEditViewModels[sceneId]?.overlapsWith ?? [])
+    .map((p) => p.sceneId)
+    .sort();
+}
+
+describe('StoryboardPanelViewProvider — overlap warnings (#271)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('populates mutual overlapsWith for overlapping time-range Scenes; clean rows have none', () => {
+    const sessionManager = makeSessionManager();
+    const features: DebriefFeature[] = [
+      storyboardFeature('sb-1', 'Alpha'),
+      timeRangeScene('A', 'sb-1', '2026-04-20T10:00:00.000Z', '2026-04-20T10:30:00.000Z'),
+      timeRangeScene('B', 'sb-1', '2026-04-20T10:15:00.000Z', '2026-04-20T10:45:00.000Z'),
+      // Non-overlapping time-range Scene.
+      timeRangeScene('C', 'sb-1', '2026-04-20T11:00:00.000Z', '2026-04-20T11:10:00.000Z'),
+      // Instant Scene whose timestamp sits inside A's window.
+      sceneFeature('I', 'sb-1', '2026-04-20T10:10:00.000Z'),
+      // Touching endpoint with C — contiguous handoff, not an overlap.
+      timeRangeScene('D', 'sb-1', '2026-04-20T11:10:00.000Z', '2026-04-20T11:20:00.000Z'),
+    ];
+    const provider = new StoryboardPanelViewProvider(extensionUri, sessionManager);
+    provider.setMapPanelResolver(() => makeMapPanelStub(features));
+    const { webview, posts } = makeWebview();
+    const { messageHandler } = resolveView(provider, webview);
+    messageHandler?.({ type: 'ready' });
+
+    const post = lastScenesPost(posts);
+    expect(overlapPartnerIds(post, 'A')).toEqual(['B']);
+    expect(overlapPartnerIds(post, 'B')).toEqual(['A']);
+    expect(overlapPartnerIds(post, 'C')).toEqual([]);
+    expect(overlapPartnerIds(post, 'D')).toEqual([]);
+    expect(overlapPartnerIds(post, 'I')).toEqual([]);
+  });
+
+  it('does not compare Scenes across Storyboards', () => {
+    const sessionManager = makeSessionManager();
+    const features: DebriefFeature[] = [
+      storyboardFeature('sb-1', 'Alpha'),
+      storyboardFeature('sb-2', 'Bravo'),
+      timeRangeScene('A', 'sb-1', '2026-04-20T10:00:00.000Z', '2026-04-20T10:30:00.000Z'),
+      timeRangeScene('B', 'sb-2', '2026-04-20T10:15:00.000Z', '2026-04-20T10:45:00.000Z'),
+    ];
+    const provider = new StoryboardPanelViewProvider(extensionUri, sessionManager);
+    provider.setMapPanelResolver(() => makeMapPanelStub(features));
+    const { webview, posts } = makeWebview();
+    const { messageHandler } = resolveView(provider, webview);
+    messageHandler?.({ type: 'ready' });
+    const post = lastScenesPost(posts);
+    // sb-1 is the active (only first) storyboard; A has no in-storyboard partner.
+    expect(overlapPartnerIds(post, 'A')).toEqual([]);
+  });
+
+  it('scene-overlap-dismiss clears the warning on both rows without touching Scene data', () => {
+    const sessionManager = makeSessionManager();
+    const features: DebriefFeature[] = [
+      storyboardFeature('sb-1', 'Alpha'),
+      timeRangeScene('A', 'sb-1', '2026-04-20T10:00:00.000Z', '2026-04-20T10:30:00.000Z'),
+      timeRangeScene('B', 'sb-1', '2026-04-20T10:15:00.000Z', '2026-04-20T10:45:00.000Z'),
+    ];
+    const provider = new StoryboardPanelViewProvider(extensionUri, sessionManager);
+    provider.setMapPanelResolver(() => makeMapPanelStub(features));
+    const { webview, posts } = makeWebview();
+    const { messageHandler } = resolveView(provider, webview);
+    messageHandler?.({ type: 'ready' });
+    expect(overlapPartnerIds(lastScenesPost(posts), 'A')).toEqual(['B']);
+
+    messageHandler?.({
+      type: 'scene-overlap-dismiss',
+      sceneId: 'A',
+      partnerSceneIds: ['B'],
+    });
+    const post = lastScenesPost(posts);
+    expect(overlapPartnerIds(post, 'A')).toEqual([]);
+    expect(overlapPartnerIds(post, 'B')).toEqual([]);
+  });
+
+  it('re-warns a dismissed pair after it resolves and re-overlaps (prune, FR-009)', () => {
+    const sessionManager = makeSessionManager();
+    const overlapping: DebriefFeature[] = [
+      storyboardFeature('sb-1', 'Alpha'),
+      timeRangeScene('A', 'sb-1', '2026-04-20T10:00:00.000Z', '2026-04-20T10:30:00.000Z'),
+      timeRangeScene('B', 'sb-1', '2026-04-20T10:15:00.000Z', '2026-04-20T10:45:00.000Z'),
+    ];
+    // Same Scenes but B moved so the windows no longer overlap.
+    const resolved: DebriefFeature[] = [
+      storyboardFeature('sb-1', 'Alpha'),
+      timeRangeScene('A', 'sb-1', '2026-04-20T10:00:00.000Z', '2026-04-20T10:30:00.000Z'),
+      timeRangeScene('B', 'sb-1', '2026-04-20T11:00:00.000Z', '2026-04-20T11:30:00.000Z'),
+    ];
+    let current = overlapping;
+    const provider = new StoryboardPanelViewProvider(extensionUri, sessionManager);
+    provider.setMapPanelResolver(() => makeMapPanelStub(current));
+    const { webview, posts } = makeWebview();
+    const { messageHandler } = resolveView(provider, webview);
+    messageHandler?.({ type: 'ready' });
+
+    // Dismiss the overlap.
+    messageHandler?.({ type: 'scene-overlap-dismiss', sceneId: 'A', partnerSceneIds: ['B'] });
+    expect(overlapPartnerIds(lastScenesPost(posts), 'A')).toEqual([]);
+
+    // Resolve the overlap (B moved away) and refresh — prunes the dismissal.
+    current = resolved;
+    provider.refresh();
+    expect(overlapPartnerIds(lastScenesPost(posts), 'A')).toEqual([]);
+
+    // Re-create the same overlap — it warns afresh because the stale
+    // dismissal key was pruned.
+    current = overlapping;
+    provider.refresh();
+    expect(overlapPartnerIds(lastScenesPost(posts), 'A')).toEqual(['B']);
+  });
+});
