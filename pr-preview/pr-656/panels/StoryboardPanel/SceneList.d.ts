@@ -12,6 +12,7 @@ export interface SceneListProps {
     /** Opens the per-Scene edit dialog (double-click shortcut). */
     onSceneRowExpandToggle?(sceneId: string): void;
     onSceneOverflowMenuOpen?(sceneId: string, anchorRect: DOMRect): void;
+    onSceneOverlapDismiss?(sceneId: string, partnerSceneIds: readonly string[]): void;
 }
-export declare function SceneList({ scenes, captureInFlight, currentSceneId, onSceneRowClick, sceneEditViewModels, onSceneRefreshThumbnailClicked, onSceneRowExpandToggle, onSceneOverflowMenuOpen, }: SceneListProps): React.ReactElement;
+export declare function SceneList({ scenes, captureInFlight, currentSceneId, onSceneRowClick, sceneEditViewModels, onSceneRefreshThumbnailClicked, onSceneRowExpandToggle, onSceneOverflowMenuOpen, onSceneOverlapDismiss, }: SceneListProps): React.ReactElement;
 //# sourceMappingURL=SceneList.d.ts.map

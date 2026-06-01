@@ -1,6 +1,8 @@
 import { ReactNode } from '../../../../../node_modules/.pnpm/react@18.3.1/node_modules/react';
 import { SceneFeature } from '../../../../schemas/src/generated/typescript/index.ts';
+import { OverlapPartner } from '../../storyboard/overlap';
 
+export type { OverlapPartner };
 export interface SceneRowViewModel {
     /** ULID of the Scene. */
     readonly sceneId: string;
@@ -87,6 +89,14 @@ export interface SceneEditViewModel {
         readonly kind: 'out-of-range';
         readonly scenario: 'before-start' | 'after-end';
     };
+    /**
+     * #271 — time-range Scenes (in the same Storyboard) whose windows overlap
+     * this Scene's window, AFTER session dismissals are applied. Empty or
+     * omitted ⇒ no overlap warning. Optional + defaulted so existing fixtures
+     * and hosts compile unchanged. Populated by each host from the shared
+     * `detectSceneOverlaps` helper.
+     */
+    readonly overlapsWith?: readonly OverlapPartner[];
 }
 /**
  * Storyboard-level edit view-model (#218 data-model §4).
@@ -204,6 +214,14 @@ export interface StoryboardPanelProps {
     onSceneCopyToOtherClicked?(sceneId: string): void;
     onSceneRefreshThumbnailClicked?(sceneId: string): void;
     onStoryboardRefreshAllStaleClicked?(storyboardId: string): void;
+    /**
+     * Fires when the analyst dismisses the overlap warning on a Scene row.
+     * Carries every partner Scene named on that badge so the host can mark
+     * each unordered pair dismissed (session-scoped, not persisted). The
+     * panel does NOT track dismissal state — the host owns it and reflects
+     * the result back via `SceneEditViewModel.overlapsWith` on the next push.
+     */
+    onSceneOverlapDismiss?(sceneId: string, partnerSceneIds: readonly string[]): void;
     onStoryboardNameRenameCommit?(storyboardId: string, newName: string): void;
     onStoryboardDescriptionSubmit?(storyboardId: string, description: string | null): void;
     /** Which row's overflow menu is currently open. `null` = no menu open. */
