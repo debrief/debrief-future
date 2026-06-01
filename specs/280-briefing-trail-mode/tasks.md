@@ -111,9 +111,9 @@ per scene as the viewer navigates between them within one session (FR-005).
 
 ### Evidence Collection
 
-- [ ] T013 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — include YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) and the key Trail/Full/legacy scenarios verified. `specs/280-briefing-trail-mode/evidence/test-summary.md`
-- [ ] T014 Create usage demonstration — how a Trail scene grows in an exported briefing (dev walkthrough + the `displayCoords` contract in plain terms), mapped to Success Criteria. `specs/280-briefing-trail-mode/evidence/usage-example.md`
-- [ ] T015 [P] Capture a trail-growth interaction GIF (< 5s, < 2MB) from the Playwright run (the slider scrubbing while the track grows). `specs/280-briefing-trail-mode/evidence/screenshots/interaction.gif`
+- [x] T013 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — include YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) and the key Trail/Full/legacy scenarios verified. `specs/280-briefing-trail-mode/evidence/test-summary.md`
+- [x] T014 Create usage demonstration — how a Trail scene grows in an exported briefing (dev walkthrough + the `displayCoords` contract in plain terms), mapped to Success Criteria. `specs/280-briefing-trail-mode/evidence/usage-example.md`
+- [x] T015 [P] Capture a trail-growth interaction GIF (< 5s, < 2MB) from the Playwright run (the slider scrubbing while the track grows). `specs/280-briefing-trail-mode/evidence/screenshots/interaction.gif`
 
 > Growth stills (`trail-start.png` / `trail-growth.png` / `trail-end.png`) are produced by T008 and live in `evidence/screenshots/`.
 
