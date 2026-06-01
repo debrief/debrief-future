@@ -139,16 +139,16 @@ Extend the shared boundary contract. After this phase the monorepo type-checks w
 
 ### Verification
 
-- [ ] T025 Run the full gate (`task verify` = ruff + pyright + ESLint + tsc + pytest + vitest); all green before evidence capture. Confirm SC-004 informally (a normal save still feels instant) and confirm no Article IV ESLint regression
-- [ ] T026 [test] Web-shell happy-path E2E smoke — edit a plot, **Save**, reopen, assert it loads coherently with the new state (regression guard for FR-011; no fault injection — that lives in unit/integration) `apps/web-shell/playwright/tests/save-atomicity.spec.ts`
+- [x] T025 Run the full gate (`task verify` = ruff + pyright + ESLint + tsc + pytest + vitest); all green before evidence capture. Confirm SC-004 informally (a normal save still feels instant) and confirm no Article IV ESLint regression
+- [x] T026 [test] Web-shell happy-path E2E smoke — edit a plot, **Save**, reopen, assert it loads coherently with the new state (regression guard for FR-011; no fault injection — that lives in unit/integration) `apps/web-shell/playwright/tests/save-atomicity.spec.ts`
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip T026. The project bundles Linux Chromium via `@sparticuz/chromium`; the CDN download 403 is expected and worked around. Run `cd apps/web-shell && node run-playwright.mjs save-atomicity`. Details: `docs/project_notes/playwright-installation-research.md`.
 
 ### Evidence Collection
 
-- [ ] T027 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed/failed/skipped`, `coverage_pct`); body notes the SC-004 save-duration observation `specs/268-save-atomicity/evidence/test-summary.md`
-- [ ] T028 Create the usage demonstration — a save that fails mid-write leaving the plot intact, and an interrupted save auto-recovering on open (code/test excerpts + expected behaviour) `specs/268-save-atomicity/evidence/usage-example.md`
-- [ ] T029 [P] Capture the fault-injection matrix — a table of each injected failure point (stage / journal / apply × VS Code fs and web-shell idb) → observed coherent outcome, citing the tests that prove it (SC-001/002/003/005) `specs/268-save-atomicity/evidence/fault-injection-matrix.md`
+- [x] T027 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed/failed/skipped`, `coverage_pct`); body notes the SC-004 save-duration observation `specs/268-save-atomicity/evidence/test-summary.md`
+- [x] T028 Create the usage demonstration — a save that fails mid-write leaving the plot intact, and an interrupted save auto-recovering on open (code/test excerpts + expected behaviour) `specs/268-save-atomicity/evidence/usage-example.md`
+- [x] T029 [P] Capture the fault-injection matrix — a table of each injected failure point (stage / journal / apply × VS Code fs and web-shell idb) → observed coherent outcome, citing the tests that prove it (SC-001/002/003/005) `specs/268-save-atomicity/evidence/fault-injection-matrix.md`
 
 ### Media Content
 
