@@ -5,6 +5,8 @@
 **Status**: Draft
 **Input**: Add SYSTEM kind discriminator for storing non-spatial system state (viewports, selections) as GeoJSON Features
 
+> **Superseded shape (spec-261 / #249):** The `state.spatial` viewport originally defined here as `bbox`/`zoom`/`center` was later unified onto a single `viewport: ViewportPolygon` (+ optional `rotation`). The spatial examples in this spec have been updated to reflect that current shape; see `specs/261-session-state-systemstate/`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Save Plot with Viewport State (Priority: P1)
@@ -17,7 +19,7 @@ An analyst working on a complex plot adjusts the map view to focus on a specific
 
 **Acceptance Scenarios**:
 
-1. **Given** a plot with the map zoomed to a specific area, **When** the user saves the plot, **Then** the spatial viewport (bbox, zoom) is stored as a SYSTEM feature with id `state.spatial`
+1. **Given** a plot with the map zoomed to a specific area, **When** the user saves the plot, **Then** the spatial viewport (ViewportPolygon) is stored as a SYSTEM feature with id `state.spatial`
 2. **Given** a plot with a time range filter applied, **When** the user saves the plot, **Then** the temporal viewport (start/end times) is stored as a SYSTEM feature with id `state.temporal`
 3. **Given** a saved plot with viewport state, **When** the user opens the plot, **Then** the application can retrieve the SYSTEM features by their known IDs
 
@@ -78,7 +80,7 @@ A developer integrating with Debrief's data model needs to create or validate SY
 
 - **SYSTEM Feature**: A GeoJSON Feature with `kind: "SYSTEM"` storing non-spatial application state. Distinguished by null geometry and reserved `state.*` feature IDs.
 - **Temporal Viewport** (`state.temporal`): Stores the visible time range with `start` and `end` ISO8601 timestamps in properties.
-- **Spatial Viewport** (`state.spatial`): Stores the visible map extent with `bbox` (array of 4 coordinates) and optional `zoom` level in properties.
+- **Spatial Viewport** (`state.spatial`): Stores the visible map extent as a `viewport` (a 4-corner `ViewportPolygon` carrying an optional `zoom`) plus optional `rotation` in properties.
 - **Selection State** (`state.selection`): Stores an array of selected feature IDs in properties.
 
 ## Success Criteria *(mandatory)*

@@ -31,7 +31,8 @@ function deps(overrides: Record<string, unknown> = {}) {
   const server = {
     setFeatures: vi.fn(),
     start: vi.fn().mockResolvedValue(54321),
-    getPreviewUrl: vi.fn().mockReturnValue('http://127.0.0.1:54321/?features=/features.geojson'),
+    getPreviewUrl: vi.fn().mockReturnValue('http://127.0.0.1:54321/?features=features.geojson'),
+    trustExternalHost: vi.fn(),
   };
   return {
     server,
@@ -51,8 +52,19 @@ describe('previewStoryboard', () => {
     const served = JSON.parse((d.server.setFeatures as ReturnType<typeof vi.fn>).mock.calls[0]![0]);
     expect(served.features.some((f: { properties?: { kind?: string } }) => f.properties?.kind === 'STORYBOARD')).toBe(true);
     expect(d.server.start).toHaveBeenCalled();
-    expect(d.asExternalUri).toHaveBeenCalledWith('http://127.0.0.1:54321/?features=/features.geojson');
-    expect(d.openExternal).toHaveBeenCalledWith('http://127.0.0.1:54321/?features=/features.geojson');
+    expect(d.asExternalUri).toHaveBeenCalledWith('http://127.0.0.1:54321/?features=features.geojson');
+    expect(d.openExternal).toHaveBeenCalledWith('http://127.0.0.1:54321/?features=features.geojson');
+    expect(d.showError).not.toHaveBeenCalled();
+  });
+
+  it('C-B7: trusts the proxied host asExternalUri resolved to (Heroku/Remote)', async () => {
+    const externalUrl = 'https://debrief-preview-pr-656.herokuapp.com/proxy/54321/?features=features.geojson';
+    const d = deps({ asExternalUri: vi.fn().mockResolvedValue(externalUrl) });
+    await previewStoryboard({ storyboardId: STORYBOARD_ID }, d);
+    // The server must be told the external host *before* the tab is opened, so
+    // the proxied request (foreign Host) is not 403'd as DNS-rebinding.
+    expect(d.server.trustExternalHost).toHaveBeenCalledWith(externalUrl);
+    expect(d.openExternal).toHaveBeenCalledWith(externalUrl);
     expect(d.showError).not.toHaveBeenCalled();
   });
 

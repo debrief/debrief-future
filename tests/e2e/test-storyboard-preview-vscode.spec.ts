@@ -360,7 +360,7 @@ test.describe('#273 — Storyboard Capture + Preview in VS Code (manual evidence
 
     const rp = await context.newPage();
     await rp.setViewportSize({ width: 1280, height: 720 });
-    await rp.goto(`http://127.0.0.1:${port}/?features=/features.geojson`, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+    await rp.goto(`http://127.0.0.1:${port}/?features=features.geojson`, { waitUntil: 'domcontentloaded', timeout: 20_000 });
 
     const map = rp.locator('[data-testid="briefing-map"]');
     const err = rp.locator('[data-testid="briefing-error"]');

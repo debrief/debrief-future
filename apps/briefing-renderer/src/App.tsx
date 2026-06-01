@@ -19,6 +19,7 @@
 import { type FC, useEffect, useMemo, useState } from 'react';
 import { useBriefingStore } from './store';
 import { bootBriefingRenderer, bootBriefingRendererFromUrl } from './boot';
+import { resolveFeaturesUrl } from './loaders/resolveFeaturesUrl';
 import { runBrowserProbes, UNSUPPORTED_BROWSER_BANNER } from './probes/browserProbes';
 import { BriefingMap } from './components/BriefingMap';
 import { MinimalChrome } from './components/MinimalChrome';
@@ -58,14 +59,18 @@ export const App: FC<AppProps> = ({ inlineData, disableDevFixture = false }) => 
   }, []);
 
   // #273 live-preview URL-boot hook — present only when the launch URL
-  // carries `?features=<url>`. Independent of the `?story=` test hook.
-  // When set, the synchronous inline boot below is skipped and the async
-  // URL boot runs in the effect further down.
+  // carries `?features=<url>`, OR (Remote/code-server tunnels) when the
+  // preview server injected `window.__BRIEFING_PREVIEW_FEATURES__`. The
+  // latter exists because code-server's `asExternalUri` rewrite to
+  // `/proxy/<port>/` drops the launch query, so the server hands the
+  // features location off via an injected global instead. Independent of
+  // the `?story=` test hook. When set, the synchronous inline boot below is
+  // skipped and the async URL boot runs in the effect further down.
   const featuresUrl = useMemo<string | null>(() => {
     if (typeof window === 'undefined') return null;
     // Tests inject data directly via `inlineData` — never URL-boot then.
     if (inlineData) return null;
-    return new URLSearchParams(window.location.search).get('features');
+    return resolveFeaturesUrl(window);
   }, [inlineData]);
 
   // Seed the store SYNCHRONOUSLY on first render via useState's lazy

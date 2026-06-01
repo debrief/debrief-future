@@ -35,7 +35,7 @@ SystemState features store application state alongside spatial data using Point 
 
 Three state variants are supported:
 - `state.temporal` - Time viewport (start/end times)
-- `state.spatial` - Map viewport (bbox, zoom, center)
+- `state.spatial` - Map viewport (ViewportPolygon + rotation)
 - `state.selection` - Selected feature IDs
 
 ## Generated Artifacts

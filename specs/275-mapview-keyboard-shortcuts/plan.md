@@ -18,7 +18,7 @@ A compressed plan review (mode C) accepted three refinements, folded into the ar
 - **2A — auto-repeat fix applies to `L` too.** The new ignore-auto-repeat default (research D6) is applied to the migrated `L` shortcut, not just new ones; **FR-010 is amended** to record it as the single intentional behavioural refinement (holding `L` toggles once, not repeatedly). #260's tests are unaffected.
 - **3A — testable conflict-warning guard.** The duplicate / Leaflet-reserved-key `console.warn` is guarded by `process.env.NODE_ENV !== 'production'` (fires in dev and under vitest, silent in prod), so contracts C10/C11 are testable without env-stubbing.
 
-**Deferred follow-ups captured in `BACKLOG.md`:** #280 (migrate TimeController onto the convention), #281 (reserved-key registry ↔ ADR-039 drift guard), #282 (map keyboard-shortcuts help overlay). No constitution violations were found; scope was confirmed (provider/context retained — its purpose is making shortcut #2 cheap).
+**Deferred follow-ups captured in `BACKLOG.md`:** #281 (migrate TimeController onto the convention), #282 (reserved-key registry ↔ ADR-039 drift guard), #283 (map keyboard-shortcuts help overlay). No constitution violations were found; scope was confirmed (provider/context retained — its purpose is making shortcut #2 cheap).
 
 ## Technical Context
 
