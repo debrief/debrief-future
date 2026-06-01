@@ -3,7 +3,7 @@
 ## Python (Pydantic)
 
 ```python
-from debrief_schemas import SystemState, SystemStateProperties, GeoJSONEmptyPoint
+from debrief_schemas import SystemState, SystemStateProperties, GeoJSONEmptyPoint, ViewportPolygon, Coordinate
 
 # Create temporal viewport state
 temporal_state = SystemState(
@@ -26,9 +26,16 @@ spatial_state = SystemState(
     properties=SystemStateProperties(
         kind="SYSTEM",
         state_type="spatial",
-        bbox=[-5.5, 49.5, 1.5, 55.0],
-        zoom=8.5,
-        center=[-2.0, 52.25]
+        viewport=ViewportPolygon(
+            coordinates=[
+                Coordinate(longitude=-5.5, latitude=55.0),
+                Coordinate(longitude=1.5, latitude=55.0),
+                Coordinate(longitude=1.5, latitude=49.5),
+                Coordinate(longitude=-5.5, latitude=49.5),
+            ],
+            zoom=8.5,
+        ),
+        rotation=0
     )
 )
 

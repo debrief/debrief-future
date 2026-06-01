@@ -39,7 +39,7 @@
 
 **Rationale**:
 - `state.temporal`: `start_time` (datetime), `end_time` (datetime)
-- `state.spatial`: `bbox` (array of 4 floats), `zoom` (optional float)
+- `state.spatial`: `viewport` (`ViewportPolygon` — 4 corners + optional `zoom`), `rotation` (optional float)
 - `state.selection`: `selected_ids` (array of strings)
 - Using `state_type` discriminator within properties enables type-safe access
 - Follows same pattern as existing kind discriminator for feature types
