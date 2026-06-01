@@ -85,5 +85,5 @@ The change stayed inside its blast radius. The full suites at the same SHA came 
 
 Two threads stay open. Scene-capture still performs an eager, best-effort write of `features.geojson` outside the new commit path — a deliberate, documented deferral, since that single-file write is superseded by Save Session and isn't part of the save unit. Folding it under the same atomic-commit discipline would close the last raw write that bypasses the boundary. And the web-shell's standalone create path could grow a richer-metadata atomic create once it regains UI callers; today the committed create case is covered, but the fuller metadata story waits on a consumer that needs it.
 
-→ [See the code](https://github.com/debrief/debrief-future/pull/268)
+→ [See the code](https://github.com/debrief/debrief-future/pull/658)
 → ADR-039 in `docs/project_notes/decisions.md` records the decision.
