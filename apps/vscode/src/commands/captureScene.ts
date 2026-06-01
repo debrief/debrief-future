@@ -438,7 +438,9 @@ async function captureSceneInner(
     // when something did, so we issue it unconditionally on the success
     // path.
     mapPanel.flyToViewport({ center, zoom, bearing: 0 }, 0);
-    void deps.executeCommand('debrief.storyboardPanel.focus');
+    // Storyboard now lives inside the Activity panel — reveal that view so
+    // the captured scene is visible (UX-review flatten).
+    void deps.executeCommand('debrief.activityPanel.focus');
     return { status: 'captured', scene: result.scene };
   } catch (err) {
     // #259 — createScene no longer throws DuplicateTimestampError; any

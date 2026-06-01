@@ -61,10 +61,23 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
    * Public accessor for the active webview (#220 theme relay).
    */
   public get webview(): vscode.Webview | undefined {
-    return this.view?.webview;
+    return this.activeWebview;
+  }
+
+  /**
+   * The webview this provider posts to. After the UX-review flatten the
+   * Storyboard renders as a section *inside* the Activity webview, so the
+   * provider no longer owns a view — it attaches to the Activity webview
+   * via {@link attachWebview}. The legacy `this.view` path is retained for
+   * completeness (the view is no longer registered in package.json).
+   */
+  private get activeWebview(): vscode.Webview | undefined {
+    return this.attachedWebview ?? this.view?.webview;
   }
 
   private view: vscode.WebviewView | undefined;
+  private attachedWebview: vscode.Webview | undefined;
+  private attachedMessageDisposable: vscode.Disposable | undefined;
   private webviewReady = false;
   private pendingMessages: ExtensionToStoryboardPanelMessage[] = [];
   private sessionChangeDisposable: vscode.Disposable | undefined;
@@ -163,8 +176,41 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     });
   }
 
+  /**
+   * Attach to a host-owned webview (the Activity webview). The Activity
+   * provider builds the HTML + sets `webview.options`; this provider only
+   * posts messages and registers its own `onDidReceiveMessage` listener.
+   * VS Code permits multiple listeners per webview, and neither switch
+   * throws on unrecognised message types, so the two providers coexist on
+   * one webview without cross-talk. The webview JS posts `{type:'ready'}`
+   * once mounted, which flushes any queued messages + triggers a refresh.
+   */
+  public attachWebview(webview: vscode.Webview): void {
+    this.attachedWebview = webview;
+    this.webviewReady = false;
+    this.authorisedStoreRoot = null;
+    this.attachedMessageDisposable?.dispose();
+    this.attachedMessageDisposable = webview.onDidReceiveMessage(
+      (message: StoryboardPanelMessage) => {
+        this.handleMessage(message);
+      },
+    );
+  }
+
+  /**
+   * Detach from the host webview (called when the Activity view disposes).
+   */
+  public detachWebview(): void {
+    this.attachedMessageDisposable?.dispose();
+    this.attachedMessageDisposable = undefined;
+    this.attachedWebview = undefined;
+    this.webviewReady = false;
+    this.authorisedStoreRoot = null;
+  }
+
   public refresh(): void {
-    if (!this.view) {return;}
+    const webview = this.activeWebview;
+    if (!webview) {return;}
     const plotFeatures = this.getMapPanel()?.getCurrentFeatures() ?? [];
     const plot: StoryboardPlot = plotFromFeatures(plotFeatures);
     const activeStoryboard = getActiveStoryboardDefault(plot);
@@ -173,7 +219,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     const scenes: SceneRowViewModel[] = this.computeSceneRowViewModels(
       plot,
       activeId,
-      this.view.webview,
+      webview,
     );
     // #230 T017 — enrich refresh payload with edit view-models so the
     // panel reducer hydrates without round-trips.
@@ -413,9 +459,10 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   private resolveThumbnailHrefForActiveItem(sceneId: string): string {
-    if (!this.view) {return '';}
+    const webview = this.activeWebview;
+    if (!webview) {return '';}
     const stacItemPath = this.getStacItemDirectory();
-    return this.resolveThumbnailHref(this.view.webview, stacItemPath, sceneId);
+    return this.resolveThumbnailHref(webview, stacItemPath, sceneId);
   }
 
   public setCaptureInFlight(inFlight: boolean): void {
@@ -572,9 +619,13 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
    * we only re-set `webview.options` when the active store changes.
    */
   private authoriseStoreRoot(storePath: string): void {
-    if (!this.view) {return;}
+    const webview = this.activeWebview;
+    if (!webview) {return;}
     if (this.authorisedStoreRoot === storePath) {return;}
-    this.view.webview.options = {
+    // Re-set the (shared) webview's resource roots to include the STAC store
+    // where scene thumbnails live. We keep dist + node_modules so the Activity
+    // bundle + codicons continue to resolve after we widen the roots.
+    webview.options = {
       enableScripts: true,
       localResourceRoots: [
         vscode.Uri.joinPath(this.extensionUri, 'dist'),
@@ -634,7 +685,11 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
         void vscode.commands.executeCommand('debrief.storyboard.rename');
         break;
       case 'delete-storyboard-requested':
-        void vscode.commands.executeCommand('debrief.storyboard.delete');
+        // The panel header confirms inline before sending this, so skip the
+        // command's native modal to avoid a double confirm.
+        void vscode.commands.executeCommand('debrief.storyboard.delete', {
+          skipConfirm: true,
+        });
         break;
       case 'log':
         if (message.level === 'error') {
@@ -837,17 +892,19 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   private post(message: ExtensionToStoryboardPanelMessage): void {
-    if (this.view && this.webviewReady) {
-      void this.view.webview.postMessage(message);
+    const webview = this.activeWebview;
+    if (webview && this.webviewReady) {
+      void webview.postMessage(message);
     } else {
       this.pendingMessages.push(message);
     }
   }
 
   private flushPending(): void {
-    if (!this.view) {return;}
+    const webview = this.activeWebview;
+    if (!webview) {return;}
     for (const msg of this.pendingMessages) {
-      void this.view.webview.postMessage(msg);
+      void webview.postMessage(msg);
     }
     this.pendingMessages = [];
   }

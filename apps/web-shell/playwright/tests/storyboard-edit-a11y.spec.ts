@@ -60,14 +60,10 @@ interface Surface {
 const SURFACES: ReadonlyArray<Surface> = [
   {
     id: 'with-edit-form',
-    label: 'WithEditForm — inline edit form expanded on sceneA',
+    label: 'WithEditDialog — edit dialog open on sceneA',
     setup: async (harness): Promise<void> => {
       await harness.open();
-      await harness.chevronFor('sceneA').click();
-      await harness.page.waitForSelector(
-        '[data-testid="scene-edit-form"]',
-        { state: 'visible', timeout: 5_000 },
-      );
+      await harness.openEditDialog('sceneA');
     },
   },
   {
@@ -97,13 +93,9 @@ const SURFACES: ReadonlyArray<Surface> = [
       await harness.open({
         missingData: { 'sceneC': ['track-alpha', 'track-bravo'] },
       });
-      // Open the edit form for the missing-data row so the remediation
+      // Open the edit dialog for the missing-data row so the remediation
       // affordance is in the DOM at audit time.
-      await harness.chevronFor('sceneC').click();
-      await harness.page.waitForSelector(
-        '[data-testid="scene-edit-form"]',
-        { state: 'visible', timeout: 5_000 },
-      );
+      await harness.openEditDialog('sceneC');
     },
   },
   {

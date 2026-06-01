@@ -376,11 +376,11 @@ export function createStoryboardHandlers(
     },
 
     onDeleteStoryboard(storyboardId: string): void {
-      // Phase 5 deferred: cascade-delete preview + inline confirm.
-      // This MVP version performs the cascade immediately and surfaces
-      // the count via notify(). The undo path for cascade delete is
-      // tracked as a follow-up — analysts who need it should re-import
-      // the plot from disk.
+      // Confirmation is handled inline by the StoryboardPanel header's
+      // two-step "Delete storyboard?" confirm before this fires, so the
+      // cascade runs immediately here and surfaces the count via notify().
+      // The undo path for cascade delete is tracked as a follow-up —
+      // analysts who need it should re-import the plot from disk.
       void applyAndPush(async () => {
         const plot = packagePlot(deps.getFeatureCollection().features);
         const result = await deleteStoryboard(plot, {

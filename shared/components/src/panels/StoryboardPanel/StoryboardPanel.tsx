@@ -14,19 +14,20 @@
  * tokens so the panel works unmodified in Storybook.
  */
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { SceneList } from './SceneList';
 import { TransportRow } from './TransportRow';
 import { StoryboardHeader } from './StoryboardHeader';
 import { UndoToast } from './UndoToast';
 import { NamingRow } from './NamingRow';
 import { CollisionBanner } from './CollisionBanner';
+import { SceneEditDialog } from './SceneEditDialog';
 import {
   SceneOverflowMenu,
   type SceneOverflowAction,
   type SceneOverflowMenuItem,
 } from './SceneOverflowMenu';
-import type { StoryboardPanelProps } from './types';
+import type { SceneEditViewModel, StoryboardPanelProps } from './types';
 
 const EMPTY_STATE_COPY = 'No storyboards yet.';
 
@@ -34,7 +35,7 @@ const EMPTY_STORYBOARD_COPY =
   'No Scenes yet. Press Ctrl/Cmd+Alt+C on the map to capture one.';
 
 const OVERFLOW_MENU_ITEMS: readonly SceneOverflowMenuItem[] = [
-  { id: 'edit-description', label: 'Edit description' },
+  { id: 'edit-description', label: 'Edit scene…' },
   { id: 'update-to-current', label: 'Update to current' },
   { id: 'duplicate', label: 'Duplicate' },
   { id: 'copy-to-other', label: 'Copy to other storyboard' },
@@ -48,6 +49,7 @@ export function StoryboardPanel({
   captureInFlight,
   onCaptureClick,
   onSceneRowClick,
+  banner,
   storyboards,
   activeStoryboardId,
   currentSceneId,
@@ -97,6 +99,14 @@ export function StoryboardPanel({
   onPreview,
   canPreview,
 }: StoryboardPanelProps): React.ReactElement {
+  // Inline two-step confirm for the header "Delete storyboard" button.
+  // Reset whenever the active storyboard changes so a pending confirm never
+  // carries across to a different storyboard.
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  useEffect(() => {
+    setConfirmingDelete(false);
+  }, [activeStoryboardId, activeStoryboardName]);
+
   const isEmptyNoStoryboard =
     activeStoryboardName === null && scenes.length === 0 && !captureInFlight;
   const isEmptyStoryboard =
@@ -122,6 +132,17 @@ export function StoryboardPanel({
       scenes.find((s) => s.sceneId === overflowMenuOpenFor)?.title ?? ''
     );
   }, [overflowMenuOpenFor, scenes]);
+
+  // The single Scene whose edit dialog is open (driven by the reducer's
+  // single-edit-form invariant, surfaced via `editFormOpen`).
+  const editDialogVm = useMemo<SceneEditViewModel | null>(() => {
+    if (!sceneEditViewModels) return null;
+    for (const s of scenes) {
+      const vm = sceneEditViewModels[s.sceneId];
+      if (vm?.editFormOpen) return vm;
+    }
+    return null;
+  }, [scenes, sceneEditViewModels]);
 
   const handleOverflowAction = (
     action: SceneOverflowAction,
@@ -160,6 +181,7 @@ export function StoryboardPanel({
         minHeight: 0,
       }}
     >
+      {banner}
       <header
         className="storyboard-panel__header"
         style={{
@@ -261,6 +283,60 @@ export function StoryboardPanel({
               Preview
             </button>
           )}
+          {activeStoryboardName !== null &&
+            onDeleteStoryboard &&
+            (confirmingDelete ? (
+              <div
+                data-testid="delete-storyboard-confirm-row"
+                role="group"
+                aria-label="Confirm delete storyboard"
+                onKeyDown={(e): void => {
+                  if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setConfirmingDelete(false);
+                  }
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <span style={{ fontSize: 12 }}>Delete storyboard?</span>
+                <button
+                  type="button"
+                  data-testid="delete-storyboard-confirm"
+                  onClick={(): void => {
+                    onDeleteStoryboard();
+                    setConfirmingDelete(false);
+                  }}
+                  style={{
+                    padding: '4px 10px',
+                    background: 'var(--vscode-errorForeground, #c72e2e)',
+                    color: '#fff',
+                    border: 'none',
+                  }}
+                >
+                  Delete
+                </button>
+                <button
+                  type="button"
+                  data-testid="delete-storyboard-cancel"
+                  onClick={(): void => setConfirmingDelete(false)}
+                  style={{ padding: '4px 10px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                data-testid="delete-storyboard-button"
+                aria-label="Delete storyboard"
+                title="Delete storyboard"
+                onClick={(): void => setConfirmingDelete(true)}
+                className="storyboard-panel__delete"
+                style={{ padding: '4px 8px' }}
+              >
+                <span aria-hidden="true">🗑</span>
+              </button>
+            ))}
           <button
             type="button"
             data-testid="capture-button"
@@ -281,7 +357,6 @@ export function StoryboardPanel({
           onActiveStoryboardChange={onActiveStoryboardChange}
           onCreateStoryboard={onCreateStoryboard}
           onRenameStoryboard={onRenameStoryboard}
-          onDeleteStoryboard={onDeleteStoryboard}
         />
       )}
 
@@ -326,25 +401,27 @@ export function StoryboardPanel({
           }}
         >
           <span>{EMPTY_STATE_COPY}</span>
-          <button
-            type="button"
-            data-testid="capture-scene-button"
-            aria-label="Capture scene"
-            onClick={onCaptureClick}
-            onKeyDown={(e): void => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onCaptureClick();
-              }
-            }}
-            style={{
-              padding: '6px 14px',
-              fontSize: 13,
-              fontWeight: 600,
-            }}
-          >
-            Capture Scene
-          </button>
+          {onCreateStoryboard && (
+            <button
+              type="button"
+              data-testid="create-storyboard-button"
+              aria-label="Create storyboard"
+              onClick={(): void => onCreateStoryboard()}
+              onKeyDown={(e): void => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onCreateStoryboard();
+                }
+              }}
+              style={{
+                padding: '6px 14px',
+                fontSize: 13,
+                fontWeight: 600,
+              }}
+            >
+              Create storyboard
+            </button>
+          )}
         </div>
       ) : isEmptyStoryboard ? (
         <div
@@ -373,14 +450,7 @@ export function StoryboardPanel({
             currentSceneId={currentSceneId ?? null}
             onSceneRowClick={onSceneRowClick}
             sceneEditViewModels={sceneEditViewModels}
-            onSceneTitleRenameCommit={onSceneTitleRenameCommit}
-            onSceneDescriptionSubmit={onSceneDescriptionSubmit}
-            onSceneDeleteRequested={onSceneDeleteRequested}
-            onSceneUpdateToCurrentClicked={onSceneUpdateToCurrentClicked}
-            onSceneDuplicateClicked={onSceneDuplicateClicked}
-            onSceneCopyToOtherClicked={onSceneCopyToOtherClicked}
             onSceneRefreshThumbnailClicked={onSceneRefreshThumbnailClicked}
-            onSceneEditFormCancel={onSceneEditFormCancel}
             onSceneRowExpandToggle={onSceneRowExpandToggle}
             onSceneOverflowMenuOpen={onSceneOverflowMenuOpen}
             onSceneOverlapDismiss={onSceneOverlapDismiss}
@@ -418,6 +488,29 @@ export function StoryboardPanel({
             onClose={onSceneOverflowMenuClose}
           />
         )}
+
+      {editDialogVm && (
+        <SceneEditDialog
+          sceneId={editDialogVm.sceneId}
+          title={editDialogVm.title}
+          description={editDialogVm.description}
+          timestamp={editDialogVm.timestamp}
+          missingData={editDialogVm.missingData}
+          onSave={(title, description): void => {
+            if (title !== editDialogVm.title) {
+              onSceneTitleRenameCommit?.(editDialogVm.sceneId, title);
+            }
+            if (description !== (editDialogVm.description ?? null)) {
+              onSceneDescriptionSubmit?.(editDialogVm.sceneId, description);
+            }
+            onSceneEditFormCancel?.(editDialogVm.sceneId);
+          }}
+          onUpdateToCurrent={(): void =>
+            onSceneUpdateToCurrentClicked?.(editDialogVm.sceneId)
+          }
+          onCancel={(): void => onSceneEditFormCancel?.(editDialogVm.sceneId)}
+        />
+      )}
     </div>
   );
 }

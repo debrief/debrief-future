@@ -84,7 +84,7 @@ import {
   StoryboardEditHarness,
   parseHarnessQueryString,
 } from './StoryboardEditHarness';
-import { StoryboardPanelMount } from './StoryboardPanelMount';
+import { useStoryboardPanelProps } from './StoryboardPanelMount';
 
 const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
 
@@ -1549,6 +1549,29 @@ export default function App() {
     }
   }, [playback, store, handleRunTool, handleFileSelect, allFeatures]);
 
+  // Storyboard is the 5th section of the shared ActivityPanel — build its
+  // live StoryboardPanel props here (reducer, capture/edit handlers, session
+  // badge) and hand them to ActivityPanel, which renders the child panel.
+  const emptyFeatureCollection = useMemo<FeatureCollection>(
+    () => ({ type: 'FeatureCollection', features: [] }),
+    [],
+  );
+  const setStoryboardFeatureCollection = useCallback(
+    (fc: FeatureCollection) =>
+      setCurrentPlot((p) => (p === null ? p : { ...p, features: fc })),
+    [],
+  );
+  const getStoryboardMapContainer = useCallback(
+    () => document.querySelector('.leaflet-container') as HTMLElement | null,
+    [],
+  );
+  const storyboardPanelProps = useStoryboardPanelProps({
+    sessionStore: store,
+    featureCollection: currentPlot?.features ?? emptyFeatureCollection,
+    setFeatureCollection: setStoryboardFeatureCollection,
+    getMapContainer: getStoryboardMapContainer,
+  });
+
   // --- Panel workspace infrastructure ---
   // Create panel registry once (stable reference)
   const panelRegistry = useMemo(() => createDefaultRegistry(), []);
@@ -1652,6 +1675,10 @@ export default function App() {
       isPlotReadOnly: state.isReadOnly,
       plotReadOnlyReason: state.readOnlyReason,
       onMessage: handleActivityMessage,
+      // Storyboard is the 5th section of the shared ActivityPanel. Pass its
+      // live props so web-shell matches VS Code (ActivityPanel renders the
+      // child StoryboardPanel rather than a separate rail).
+      storyboard: storyboardPanelEnabled ? storyboardPanelProps : undefined,
     } : null,
     mapViewProps: currentPlot ? {
       features: visibleFeatures,
@@ -1724,6 +1751,7 @@ export default function App() {
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
     handleSchemaRequest, handleDisableToggle, handleRationaleUpdate,
     handleFileSelect, treeRefreshKey, chartContextProps, savedResultFiles, highlightedFilePaths,
+    storyboardPanelProps,
   ]);
 
   // Context wrapper for the GoldenLayout bridge — wraps each panel in PanelContextProvider
@@ -1948,17 +1976,10 @@ export default function App() {
     );
   }
 
-  // Render analysis view
-  const showStoryboardRail =
-    currentPlot !== null && !isMobile && storyboardPanelEnabled;
+  // Render analysis view. The Storyboard is now the 5th section of the
+  // shared ActivityPanel (no separate rail / grid column).
   return (
-    <div
-      className={
-        showStoryboardRail
-          ? 'web-shell web-shell--analysis web-shell--with-storyboard-rail'
-          : 'web-shell web-shell--analysis'
-      }
-    >
+    <div className="web-shell web-shell--analysis">
       <header className="web-shell__header">
         <button
           type="button"
@@ -2044,35 +2065,9 @@ export default function App() {
             onLayoutReset={() => setLayoutResetCount(c => c + 1)}
           />
         )}
-        {/* #235 Storyboard panel rail — rendered as a 2nd grid column
-          * inside .web-shell__main. The CSS class
-          * `.web-shell--with-storyboard-rail` switches main to display:
-          * grid with template `1fr 360px`. Each cell becomes its own
-          * sizing context, so GoldenLayout's panel-workspace and our
-          * rail both get explicit height + width without the flex
-          * collapse that we hit during initial integration. */}
-        {showStoryboardRail && (
-          <aside
-            className="web-shell__storyboard-rail"
-            data-testid="storyboard-panel-rail"
-            aria-label="Storyboard panel"
-          >
-            <StoryboardPanelMount
-              sessionStore={store}
-              featureCollection={currentPlot!.features}
-              setFeatureCollection={(fc) =>
-                setCurrentPlot((p) =>
-                  p === null ? p : { ...p, features: fc },
-                )
-              }
-              getMapContainer={() =>
-                document.querySelector(
-                  '.leaflet-container',
-                ) as HTMLElement | null
-              }
-            />
-          </aside>
-        )}
+        {/* #235 Storyboard now renders as the 5th section *inside* the
+          * shared ActivityPanel (see activityPanelProps.storyboardSlot),
+          * matching VS Code — no separate rail. */}
       </main>
     </div>
   );

@@ -11,6 +11,7 @@
  * #216 consumers keep compiling unchanged (plan.md design-fix 3).
  */
 
+import type { ReactNode } from "react";
 import type { SceneFeature } from "@debrief/schemas";
 import type { OverlapPartner } from "../../storyboard/overlap";
 
@@ -171,6 +172,10 @@ export interface StoryboardPanelProps {
   /** Fires on row click; #217 wires this to the playback service's
    *  click-to-select transport. */
   onSceneRowClick(sceneId: string): void;
+  /** Optional host-supplied banner rendered at the very top of the panel
+   *  (e.g. web-shell's "session-only — captures won't persist" notice).
+   *  Kept generic so the shared panel carries no host-specific concepts. */
+  readonly banner?: ReactNode;
 
   // ── NEW in #217 — all optional + defaulted (design-fix 3) ───────────
 

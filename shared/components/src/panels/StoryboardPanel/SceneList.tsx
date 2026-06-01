@@ -1,13 +1,14 @@
 /**
  * Renders the list of Scene rows for the active Storyboard (Feature 216).
- * Prepends a pending row when `captureInFlight` is true. Feature 218
- * additions: renders `<SceneEditForm>` inline beneath a row when
- * `sceneEditViewModels[sceneId]?.editFormOpen === true`.
+ * Prepends a pending row when `captureInFlight` is true.
+ *
+ * Per-Scene editing is no longer inline — the ⋯ overflow menu's "Edit" item
+ * (and a double-click shortcut) opens a `SceneEditDialog` rendered by the
+ * parent `StoryboardPanel`. This list only renders rows + the stale badge.
  */
 
 import React from 'react';
 import { SceneRow } from './SceneRow';
-import { SceneEditForm } from './SceneEditForm';
 import { StaleBadge } from './StaleBadge';
 import { OverlapBadge } from './OverlapBadge';
 import type { SceneEditViewModel, SceneRowViewModel } from './types';
@@ -19,18 +20,12 @@ export interface SceneListProps {
   readonly currentSceneId?: string | null;
   onSceneRowClick(sceneId: string): void;
 
-  // ── #218 edit-suite optional props (panel-driven) ────────────────
+  // ── edit-suite view-models (drive stale badge + dialog-open marker) ──
   readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
-  onSceneTitleRenameCommit?(sceneId: string, newTitle: string): void;
-  onSceneDescriptionSubmit?(sceneId: string, description: string | null): void;
-  onSceneDeleteRequested?(sceneId: string): void;
-  onSceneUpdateToCurrentClicked?(sceneId: string): void;
-  onSceneDuplicateClicked?(sceneId: string): void;
-  onSceneCopyToOtherClicked?(sceneId: string): void;
   onSceneRefreshThumbnailClicked?(sceneId: string): void;
-  onSceneEditFormCancel?(sceneId: string): void;
 
-  // ── #230 chevron + right-click affordances (panel-driven) ─────────
+  // ── row affordances (panel-driven) ───────────────────────────────
+  /** Opens the per-Scene edit dialog (double-click shortcut). */
   onSceneRowExpandToggle?(sceneId: string): void;
   onSceneOverflowMenuOpen?(sceneId: string, anchorRect: DOMRect): void;
 
@@ -53,14 +48,7 @@ export function SceneList({
   currentSceneId,
   onSceneRowClick,
   sceneEditViewModels,
-  onSceneTitleRenameCommit,
-  onSceneDescriptionSubmit,
-  onSceneDeleteRequested,
-  onSceneUpdateToCurrentClicked,
-  onSceneDuplicateClicked,
-  onSceneCopyToOtherClicked,
   onSceneRefreshThumbnailClicked,
-  onSceneEditFormCancel,
   onSceneRowExpandToggle,
   onSceneOverflowMenuOpen,
   onSceneOverlapDismiss,
@@ -106,6 +94,10 @@ export function SceneList({
                 }
               />
             )}
+            {/* #271 overlap badge — kept. The inline SceneEditForm that
+                main still renders here was replaced on this branch by the
+                SceneEditDialog (opened by the parent), so it is intentionally
+                not rendered inline. */}
             {editVm?.overlapsWith !== undefined &&
               editVm.overlapsWith.length > 0 && (
                 <OverlapBadge
@@ -119,35 +111,6 @@ export function SceneList({
                   }
                 />
               )}
-            {editVm?.editFormOpen && (
-              <SceneEditForm
-                sceneId={scene.sceneId}
-                title={editVm.title}
-                description={editVm.description}
-                timestamp={editVm.timestamp}
-                missingData={editVm.missingData}
-                onTitleRenameCommit={(newTitle): void =>
-                  onSceneTitleRenameCommit?.(scene.sceneId, newTitle)
-                }
-                onDescriptionSubmit={(description): void =>
-                  onSceneDescriptionSubmit?.(scene.sceneId, description)
-                }
-                onUpdateToCurrent={(): void =>
-                  onSceneUpdateToCurrentClicked?.(scene.sceneId)
-                }
-                onDuplicate={(): void =>
-                  onSceneDuplicateClicked?.(scene.sceneId)
-                }
-                onCopyToOther={(): void =>
-                  onSceneCopyToOtherClicked?.(scene.sceneId)
-                }
-                onDelete={(): void => onSceneDeleteRequested?.(scene.sceneId)}
-                onRefreshThumbnail={(): void =>
-                  onSceneRefreshThumbnailClicked?.(scene.sceneId)
-                }
-                onCancel={(): void => onSceneEditFormCancel?.(scene.sceneId)}
-              />
-            )}
           </React.Fragment>
         );
       })}

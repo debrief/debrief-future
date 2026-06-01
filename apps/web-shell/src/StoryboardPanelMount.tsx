@@ -30,7 +30,6 @@ import React, {
 } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import {
-  StoryboardPanel,
   composeSceneEditViewModels,
   detectSceneOverlaps,
   overlapPairKey,
@@ -43,6 +42,7 @@ import {
   type SceneEditViewModel,
   type StoryboardOptionViewModel,
   type StoryboardPlot,
+  type StoryboardPanelProps,
 } from '@debrief/components';
 import {
   persistActiveStoryboardId,
@@ -153,13 +153,13 @@ function computeStoryboardOptions(
   return opts;
 }
 
-export function StoryboardPanelMount({
+export function useStoryboardPanelProps({
   sessionStore,
   featureCollection,
   setFeatureCollection,
   getMapContainer,
   actor = 'web-shell-user',
-}: StoryboardPanelMountProps): React.ReactElement {
+}: StoryboardPanelMountProps): StoryboardPanelProps {
   // ─── Web panel host (singleton per mount) ────────────────────────
   const hostRef = useRef<WebPanelHost | null>(null);
   if (hostRef.current === null) {
@@ -639,100 +639,79 @@ export function StoryboardPanelMount({
     [],
   );
 
-  return (
+  // FR-WEB-029a session-only badge → rendered at the top of StoryboardPanel
+  // via the generic `banner` slot (the shared panel carries no host concepts).
+  const banner = hasSessionOnlyContent ? (
     <div
-      data-testid="storyboard-panel-mount"
+      data-testid="storyboard-session-only-badge"
+      role="status"
       style={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: 0,
+        padding: '4px 10px',
+        fontSize: 11,
+        background:
+          'var(--vscode-editorWarning-background, rgba(255, 197, 61, 0.15))',
+        color: 'var(--vscode-editorWarning-foreground, #bf8803)',
+        borderBottom: '1px solid var(--vscode-panel-border, #3c3c3c)',
       }}
     >
-      {hasSessionOnlyContent && (
-        <div
-          data-testid="storyboard-session-only-badge"
-          role="status"
-          style={{
-            padding: '4px 10px',
-            fontSize: 11,
-            background:
-              'var(--vscode-editorWarning-background, rgba(255, 197, 61, 0.15))',
-            color:
-              'var(--vscode-editorWarning-foreground, #bf8803)',
-            borderBottom:
-              '1px solid var(--vscode-panel-border, #3c3c3c)',
-          }}
-        >
-          {badgeMessage}
-        </div>
-      )}
-      <div style={{ flex: 1, minHeight: 0 }}>
-        <StoryboardPanel
-          scenes={sceneRows}
-          activeStoryboardName={activeStoryboardName}
-          captureInFlight={state.captureInFlight}
-          onCaptureClick={handleCaptureClick}
-          onSceneRowClick={handleSceneRowClick}
-          // Spec 260 — viewport lock padlock in the panel header.
-          viewportLocked={viewportLocked}
-          onViewportLockToggle={handleViewportLockToggle}
-          hasActivePlot={true}
-          // #273 — live Preview (disabled when the active storyboard is empty).
-          onPreview={handlePreview}
-          canPreview={activeStoryboardId !== null && sceneRows.length > 0}
-          storyboards={
-            storyboardOptions.length > 0 ? storyboardOptions : undefined
-          }
-          activeStoryboardId={activeStoryboardId}
-          currentSceneId={state.currentSceneId}
-          transport={state.transport}
-          onActiveStoryboardChange={onActiveStoryboardChange}
-          onCreateStoryboard={onCreateStoryboard}
-          onRenameStoryboard={noopWithLog('onRenameStoryboard')}
-          onDeleteStoryboard={(): void => {
-            if (activeStoryboardId !== null) {
-              handlers.onDeleteStoryboard(activeStoryboardId);
-            }
-          }}
-          sceneEditViewModels={sceneEditViewModels}
-          // Phase 4 wired handlers — direct CRUD calls against the live
-          // FeatureCollection. The panel-local edit-form lifecycle
-          // (open/close) lives in the reducer; these props are the
-          // commit callbacks invoked when the user confirms.
-          onSceneTitleRenameCommit={handlers.onSceneTitleRenameCommit}
-          onSceneDescriptionSubmit={handlers.onSceneDescriptionSubmit}
-          onSceneDeleteRequested={handlers.onSceneDeleteRequested}
-          onSceneUndoDeleteClicked={handlers.onSceneUndoDeleteClicked}
-          onSceneRefreshThumbnailClicked={
-            handlers.onSceneRefreshThumbnailClicked
-          }
-          onStoryboardNameRenameCommit={handlers.onStoryboardNameRenameCommit}
-          onStoryboardDescriptionSubmit={
-            handlers.onStoryboardDescriptionSubmit
-          }
-          onSceneUpdateToCurrentClicked={
-            handlers.onSceneUpdateToCurrentClicked
-          }
-          // Still deferred (need additional UI):
-          onSceneDuplicateClicked={noopWithLog('onSceneDuplicateClicked')}
-          onSceneCopyToOtherClicked={noopWithLog(
-            'onSceneCopyToOtherClicked',
-          )}
-          onStoryboardRefreshAllStaleClicked={noopWithLog(
-            'onStoryboardRefreshAllStaleClicked',
-          )}
-          namingRowViewModel={namingRowViewModel}
-          collisionBannerViewModel={collisionBannerViewModel}
-          onNamingRowTextChanged={onNamingRowTextChanged}
-          onNamingRowConfirm={onNamingRowConfirm}
-          onNamingRowCancel={onNamingRowCancel}
-          onCollisionReplace={onCollisionReplace}
-          onCollisionOffset={onCollisionOffset}
-          onCollisionCancel={onCollisionCancel}
-          onSceneOverlapDismiss={handleOverlapDismiss}
-        />
-      </div>
+      {badgeMessage}
     </div>
-  );
+  ) : undefined;
+
+  return {
+    scenes: sceneRows,
+    activeStoryboardName,
+    captureInFlight: state.captureInFlight,
+    onCaptureClick: handleCaptureClick,
+    onSceneRowClick: handleSceneRowClick,
+    banner,
+    // Spec 260 — viewport lock padlock in the panel header.
+    viewportLocked,
+    onViewportLockToggle: handleViewportLockToggle,
+    hasActivePlot: true,
+    // #273 — live Preview (disabled when the active storyboard is empty).
+    onPreview: handlePreview,
+    canPreview: activeStoryboardId !== null && sceneRows.length > 0,
+    storyboards:
+      storyboardOptions.length > 0 ? storyboardOptions : undefined,
+    activeStoryboardId,
+    currentSceneId: state.currentSceneId,
+    transport: state.transport,
+    onActiveStoryboardChange,
+    onCreateStoryboard,
+    onRenameStoryboard: noopWithLog('onRenameStoryboard'),
+    onDeleteStoryboard: (): void => {
+      if (activeStoryboardId !== null) {
+        handlers.onDeleteStoryboard(activeStoryboardId);
+      }
+    },
+    sceneEditViewModels,
+    // Phase 4 wired handlers — direct CRUD calls against the live
+    // FeatureCollection. The panel-local edit-form lifecycle (open/close)
+    // lives in the reducer; these props are the commit callbacks.
+    onSceneTitleRenameCommit: handlers.onSceneTitleRenameCommit,
+    onSceneDescriptionSubmit: handlers.onSceneDescriptionSubmit,
+    onSceneDeleteRequested: handlers.onSceneDeleteRequested,
+    onSceneUndoDeleteClicked: handlers.onSceneUndoDeleteClicked,
+    onSceneRefreshThumbnailClicked: handlers.onSceneRefreshThumbnailClicked,
+    onStoryboardNameRenameCommit: handlers.onStoryboardNameRenameCommit,
+    onStoryboardDescriptionSubmit: handlers.onStoryboardDescriptionSubmit,
+    onSceneUpdateToCurrentClicked: handlers.onSceneUpdateToCurrentClicked,
+    // Still deferred (need additional UI):
+    onSceneDuplicateClicked: noopWithLog('onSceneDuplicateClicked'),
+    onSceneCopyToOtherClicked: noopWithLog('onSceneCopyToOtherClicked'),
+    onStoryboardRefreshAllStaleClicked: noopWithLog(
+      'onStoryboardRefreshAllStaleClicked',
+    ),
+    namingRowViewModel,
+    collisionBannerViewModel,
+    onNamingRowTextChanged,
+    onNamingRowConfirm,
+    onNamingRowCancel,
+    onCollisionReplace,
+    onCollisionOffset,
+    onCollisionCancel,
+    // #271 — overlap warning dismissal.
+    onSceneOverlapDismiss: handleOverlapDismiss,
+  };
 }
