@@ -135,6 +135,9 @@ importers:
       '@debrief/session-state':
         specifier: workspace:*
         version: link:../../services/session-state
+      '@debrief/utils':
+        specifier: workspace:*
+        version: link:../../shared/utils
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4

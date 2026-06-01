@@ -52,8 +52,8 @@ interaction GIF — not theme-variant screenshots (the renderer is not theme-dri
 
 **Goal**: Make the canonical trail-slice helper available to the renderer.
 
-- [ ] T001 Add `"@debrief/utils": "workspace:*"` to dependencies `apps/briefing-renderer/package.json`
-- [ ] T002 Run `pnpm install` from repo root to link the workspace dep, then confirm `import { sliceTrackToTime } from '@debrief/utils'` type-resolves in the renderer (`pnpm --filter @debrief/briefing-renderer typecheck`)
+- [x] T001 Add `"@debrief/utils": "workspace:*"` to dependencies `apps/briefing-renderer/package.json`
+- [x] T002 Run `pnpm install` from repo root to link the workspace dep, then confirm `import { sliceTrackToTime } from '@debrief/utils'` type-resolves in the renderer (`pnpm --filter @debrief/briefing-renderer typecheck`)
 
 **Checkpoint**: `@debrief/utils` resolves from the briefing renderer.
 
@@ -64,9 +64,9 @@ interaction GIF — not theme-variant screenshots (the renderer is not theme-dri
 
 **⚠️ Tests-first (Article VII)**: write T003 before T004; T004 makes it pass.
 
-- [ ] T003 [test] Unit tests for the pure helpers — Contract A (`displayCoords`: full mode returns whole track at any time; trail mode grows; pre-start → `[]`; post-end → full; nearest-sample boundary; monotonic-growth property) and Contract B (`classifyTemporalTrack`: valid LineString+parallel timestamps qualifies; missing/mismatched-length/unparseable timestamps and non-LineString do not). Tests fail until T004. `apps/briefing-renderer/src/components/__tests__/trackDisplay.test.ts`
-- [ ] T004 Implement the pure helpers `classifyTemporalTrack(feature) -> TemporalTrack | null` (reuse the SAME validity gate as the existing dot: array timestamps, `coords.length === timestamps.length`, ≥2 points, all `Date.parse` finite) and `displayCoords(coords, epochsMs, isTrail, nowMs)` (delegates to `sliceTrackToTime` from `@debrief/utils` when `isTrail`, else returns full coords). Strict types, no `any`. `apps/briefing-renderer/src/components/trackDisplay.ts`
-- [ ] T005 [P] Extend the dev fixture: set `display_mode: 'trail'` on the existing time-range scene (so slider scrubbing reveals growth) and `display_mode: 'full'` on one other scene; **keep the 4-scene count** so `briefing-zip-playback.spec.ts` ("1 / 4") stays green; leave the remaining scenes' `display_mode` absent (free legacy coverage); confirm the trail scene's track carries parallel `properties.timestamps`. `apps/briefing-renderer/src/fixtures/dev-fixture.ts`
+- [x] T003 [test] Unit tests for the pure helpers — Contract A (`displayCoords`: full mode returns whole track at any time; trail mode grows; pre-start → `[]`; post-end → full; nearest-sample boundary; monotonic-growth property) and Contract B (`classifyTemporalTrack`: valid LineString+parallel timestamps qualifies; missing/mismatched-length/unparseable timestamps and non-LineString do not). Tests fail until T004. `apps/briefing-renderer/src/components/__tests__/trackDisplay.test.ts`
+- [x] T004 Implement the pure helpers `classifyTemporalTrack(feature) -> TemporalTrack | null` (reuse the SAME validity gate as the existing dot: array timestamps, `coords.length === timestamps.length`, ≥2 points, all `Date.parse` finite) and `displayCoords(coords, epochsMs, isTrail, nowMs)` (delegates to `sliceTrackToTime` from `@debrief/utils` when `isTrail`, else returns full coords). Strict types, no `any`. `apps/briefing-renderer/src/components/trackDisplay.ts`
+- [x] T005 [P] Extend the dev fixture: set `display_mode: 'trail'` on the existing time-range scene (so slider scrubbing reveals growth) and `display_mode: 'full'` on one other scene; **keep the 4-scene count** so `briefing-zip-playback.spec.ts` ("1 / 4") stays green; leave the remaining scenes' `display_mode` absent (free legacy coverage); confirm the trail scene's track carries parallel `properties.timestamps`. `apps/briefing-renderer/src/fixtures/dev-fixture.ts`
 
 **Checkpoint**: `pnpm --filter @debrief/briefing-renderer test` — helper unit tests pass; fixture exposes a Trail, a Full, and a legacy scene.
 
@@ -79,9 +79,9 @@ start up to the current playback time, trailing the moving dot (FR-001, FR-004).
 scene, scrub the slider start→end — the visible track length increases and at the
 end equals the full track.
 
-- [ ] T006 Wire trail rendering into the map: derive `isTrail` from `currentScene.properties.display_mode === 'trail'`; partition the scene's visible line features via `classifyTemporalTrack` into temporal tracks vs other lines/areas; render each temporal track as a **stable-keyed** react-leaflet `Polyline` (one stable key per track id) whose `positions` are `displayCoords(coords, epochsMs, isTrail, currentTime)` mapped to Leaflet lat/lng — so positions update in place with no re-key teardown; style to match the current track style (colour from properties, weight 3, opacity 0.85); keep non-temporal lines/areas in the existing `GeoJSON` layer; add a `data-testid="trail-layer"` (or per-track attribute) so tests can measure rendered vertices. `apps/briefing-renderer/src/components/BriefingMap.tsx`
-- [ ] T007 Refactor the moving-dot (`timeMarkers`) to consume the same `classifyTemporalTrack` result as the trail, so dot and trail share one validity gate (a track shows both or neither — FR-004, FR-007 consistency). Same file, sequential after T006. `apps/briefing-renderer/src/components/BriefingMap.tsx`
-- [ ] T008 [test] Playwright growth test (Contract C1–C3): navigate to built `dist/index.html`, advance to the Trail scene, sample the rendered trail length (vertex count via `data-testid`) at slider start / mid / end and assert strictly increasing; capture evidence PNGs `trail-start.png`, `trail-growth.png`, `trail-end.png` directly into `specs/280-briefing-trail-mode/evidence/screenshots/`. `apps/briefing-renderer/playwright/tests/briefing-zip-trail-mode.spec.ts`
+- [x] T006 Wire trail rendering into the map: derive `isTrail` from `currentScene.properties.display_mode === 'trail'`; partition the scene's visible line features via `classifyTemporalTrack` into temporal tracks vs other lines/areas; render each temporal track as a **stable-keyed** react-leaflet `Polyline` (one stable key per track id) whose `positions` are `displayCoords(coords, epochsMs, isTrail, currentTime)` mapped to Leaflet lat/lng — so positions update in place with no re-key teardown; style to match the current track style (colour from properties, weight 3, opacity 0.85); keep non-temporal lines/areas in the existing `GeoJSON` layer; add a `data-testid="trail-layer"` (or per-track attribute) so tests can measure rendered vertices. `apps/briefing-renderer/src/components/BriefingMap.tsx`
+- [x] T007 Refactor the moving-dot (`timeMarkers`) to consume the same `classifyTemporalTrack` result as the trail, so dot and trail share one validity gate (a track shows both or neither — FR-004, FR-007 consistency). Same file, sequential after T006. `apps/briefing-renderer/src/components/BriefingMap.tsx`
+- [x] T008 [test] Playwright growth test (Contract C1–C3): navigate to built `dist/index.html`, advance to the Trail scene, sample the rendered trail length (vertex count via `data-testid`) at slider start / mid / end and assert strictly increasing; capture evidence PNGs `trail-start.png`, `trail-growth.png`, `trail-end.png` directly into `specs/280-briefing-trail-mode/evidence/screenshots/`. `apps/briefing-renderer/playwright/tests/briefing-zip-trail-mode.spec.ts`
 
 **Checkpoint**: US1 delivered — run `cd apps/briefing-renderer && node run-playwright.mjs briefing-zip-trail-mode`; the trail visibly grows and the three growth screenshots are written. **This is the MVP** — the reported defect no longer reproduces.
 
@@ -92,9 +92,9 @@ track at every playback position, unchanged from today (FR-002, FR-003) — the
 regression guard. The implementation already handles this via the same render
 path, so this phase is **tests only**.
 
-- [ ] T009 [P][test] Unit test: `displayCoords(..., isTrail=false, ...)` returns the full track at start/mid/end times; the mode predicate maps `'full'`, `undefined`, and an unrecognised value all to "not trail" (FR-002/FR-003 + safe-default edge case). Extend `apps/briefing-renderer/src/components/__tests__/trackDisplay.test.ts`
-- [ ] T010 [test] Playwright assertions (Contract C4–C5): on the Full scene, rendered track length is constant at slider start/mid/end; on a legacy (display_mode-absent) scene, the full track shows and no console error is emitted. Extend `apps/briefing-renderer/playwright/tests/briefing-zip-trail-mode.spec.ts`
-- [ ] T011 [test] Regression check — run the existing renderer suites and confirm they stay green with the fixture's new `display_mode` values: `briefing-zip-playback.spec.ts` ("1 / 4", slider visibility) and `briefing-zip-screenshots.spec.ts` (evidence states). Adjust only assertions genuinely invalidated by display_mode and document any change. `apps/briefing-renderer/playwright/tests/`
+- [x] T009 [P][test] Unit test: `displayCoords(..., isTrail=false, ...)` returns the full track at start/mid/end times; the mode predicate maps `'full'`, `undefined`, and an unrecognised value all to "not trail" (FR-002/FR-003 + safe-default edge case). Extend `apps/briefing-renderer/src/components/__tests__/trackDisplay.test.ts`
+- [x] T010 [test] Playwright assertions (Contract C4–C5): on the Full scene, rendered track length is constant at slider start/mid/end; on a legacy (display_mode-absent) scene, the full track shows and no console error is emitted. Extend `apps/briefing-renderer/playwright/tests/briefing-zip-trail-mode.spec.ts`
+- [x] T011 [test] Regression check — run the existing renderer suites and confirm they stay green with the fixture's new `display_mode` values: `briefing-zip-playback.spec.ts` ("1 / 4", slider visibility) and `briefing-zip-screenshots.spec.ts` (evidence states). Adjust only assertions genuinely invalidated by display_mode and document any change. `apps/briefing-renderer/playwright/tests/`
 
 **Checkpoint**: Full + legacy paths proven unchanged; no regression in the #264 air-gapped suite.
 
@@ -103,7 +103,7 @@ path, so this phase is **tests only**.
 **Story goal**: A briefing mixing Trail and Full scenes applies the correct mode
 per scene as the viewer navigates between them within one session (FR-005).
 
-- [ ] T012 [test] Playwright composition test: on the Trail scene advancing the slider grows the track; navigating to the Full scene shows the complete track at all positions; returning to the Trail scene grows again from its time origin. Extend `apps/briefing-renderer/playwright/tests/briefing-zip-trail-mode.spec.ts`
+- [x] T012 [test] Playwright composition test: on the Trail scene advancing the slider grows the track; navigating to the Full scene shows the complete track at all positions; returning to the Trail scene grows again from its time origin. Extend `apps/briefing-renderer/playwright/tests/briefing-zip-trail-mode.spec.ts`
 
 **Checkpoint**: All three user stories covered; per-scene mode re-evaluation proven across navigation.
 

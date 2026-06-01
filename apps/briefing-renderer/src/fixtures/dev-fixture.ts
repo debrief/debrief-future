@@ -127,6 +127,13 @@ interface SceneDef {
   zoom: number;
   visibleIds: string[];
   /**
+   * Captured per-Scene track display mode (#258 / #280). `'trail'` makes
+   * time-stamped tracks grow up to the playback time; `'full'` shows the
+   * whole track. Left undefined to model a legacy/pre-#258 Scene (the
+   * renderer treats absent as Full).
+   */
+  displayMode?: 'full' | 'trail';
+  /**
    * If set, the Scene becomes a time-range Scene (#263). The slider
    * binds to this range during the Scene; the viewport interpolates
    * from `(centerLon, centerLat, zoom)` → `endViewport` in lock-step
@@ -161,7 +168,9 @@ function makeScene(def: SceneDef): SceneFeature {
     },
     transition_duration_ms: def.timeRange?.durationMs ?? 1500,
     visible_feature_ids: def.visibleIds,
-    displayMode: 'full',
+    // #258 / #280: emit the canonical snake_case `display_mode` slot only
+    // when the Scene captured one — leaving it absent models a legacy Scene.
+    ...(def.displayMode !== undefined ? { display_mode: def.displayMode } : {}),
   };
   const timeRangeProperties = def.timeRange
     ? {
@@ -230,6 +239,8 @@ export function buildDevFixture(): LoadedInlineData {
       centerLat: 51,
       zoom: 5,
       visibleIds: [TRACK_ALPHA_ID, TRACK_BRAVO_ID, REF_DOVER_ID, REF_BREST_ID],
+      // Captured in Full mode — the overview shows each vessel's whole route.
+      displayMode: 'full',
     }),
     makeScene({
       index: 1,
@@ -253,17 +264,19 @@ export function buildDevFixture(): LoadedInlineData {
     }),
     makeScene({
       index: 3,
-      title: 'Diverge & close — slider-driven scrub (#263)',
+      title: 'Trail scrub — the snail-trail grows (#280)',
       description:
-        'Time-range Scene (#263). The slider binds to the closing-phase time window; the viewport interpolates Dover Strait → North Sea in lock-step with the slider as both tracks separate. Drag the slider to rewind the climax.',
+        'Trail-mode time-range Scene (#258 / #280). The slider binds to the whole exercise window; as it advances each track grows from its start up to the playback time — a snail-trail trailing the moving dot — while the viewport interpolates Dover Strait → North Sea in lock-step. Drag the slider to watch the trails grow and shrink.',
       centerLon: 1.5,
       centerLat: 51.2,
       zoom: 6,
       visibleIds: [TRACK_ALPHA_ID, TRACK_BRAVO_ID, REF_DOVER_ID, REF_BREST_ID],
-      // Closing 60-minute window (last hour of the 4-hour exercise),
-      // panning Dover Strait → southern North Sea.
+      // Captured in Trail mode (#280) — the headline demo for this feature.
+      displayMode: 'trail',
+      // Bind the slider to the full exercise window so the trail grows from
+      // near-zero at the start to the complete track at the end.
       timeRange: {
-        startIso: new Date(T0 + 180 * 60 * 1000).toISOString(),
+        startIso: new Date(T0).toISOString(),
         endIso: new Date(T_END).toISOString(),
         endLon: 3,
         endLat: 52.5,

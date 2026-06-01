@@ -16,6 +16,8 @@ import 'leaflet/dist/leaflet.css';
     forceEmpty: () => void;
     forceError: (msg: string) => void;
     forceHalt: () => void;
+    gotoScene: (index: number) => void;
+    setTime: (epochMs: number) => void;
   };
 }).__briefingTestHelpers__ = {
   forceEmpty: () => useBriefingStore.setState({ bootState: 'empty', scenes: [] }),
@@ -30,6 +32,11 @@ import 'leaflet/dist/leaflet.css';
         message: 'Synthetic halt for screenshot capture',
       },
     }),
+  // #280 trail-mode evidence helpers — drive the active Scene and playback
+  // clock directly so the Playwright growth test can sample the rendered
+  // trail at exact times (including on instant Scenes that have no slider).
+  gotoScene: (index: number) => useBriefingStore.getState().setCurrentSceneIndex(index),
+  setTime: (epochMs: number) => useBriefingStore.getState().setCurrentTime(epochMs),
 };
 
 const container = document.getElementById('briefing-root');
