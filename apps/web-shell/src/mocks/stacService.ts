@@ -479,7 +479,7 @@ export function createMockStacService(): MockStacService {
         await writer.commitPlotSave({
           ctx,
           stacItemPath: itemPath,
-          featureCollection: input.geojson as unknown as RawGeoJSONFeatureCollection,
+          featureCollection: input.geojson as RawGeoJSONFeatureCollection,
         });
         // Register in the in-memory catalog so the next render pass shows it.
         itemMap.set(itemPath, item);

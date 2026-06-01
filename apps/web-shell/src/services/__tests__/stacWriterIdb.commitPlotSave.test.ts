@@ -94,9 +94,7 @@ describe('stacWriterIdb.commitPlotSave (#268 US1)', () => {
 
     const stored = await w.readStoredItem(ITEM_PATH);
     expect(stored?.kind).toBe('standalone');
-    expect((stored?.record.assets as Record<string, { href: string }>).data?.href).toBe(
-      `idb:${ITEM_PATH}::data`,
-    );
+    expect(stored?.record.assets?.['data']?.href).toBe(`idb:${ITEM_PATH}::data`);
     const payload = await w.readPayload(ITEM_PATH);
     expect(JSON.parse(payload ?? 'null')).toMatchObject({ type: 'FeatureCollection' });
     expect((JSON.parse(payload ?? 'null') as RawGeoJSONFeatureCollection).features[0]?.properties)

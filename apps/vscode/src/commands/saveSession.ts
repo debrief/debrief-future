@@ -144,10 +144,10 @@ export function createSaveSessionCommand(
     // `features` is the loose host boundary shape (SystemState features folded
     // in); commitPlotSave only serialises the collection, so we cross the
     // RFC-7946 parse boundary here.
-    const featureCollection = {
-      type: 'FeatureCollection' as const,
-      features,
-    } as unknown as RawGeoJSONFeatureCollection;
+    const featureCollection: RawGeoJSONFeatureCollection = {
+      type: 'FeatureCollection',
+      features: features as RawGeoJSONFeatureCollection['features'],
+    };
 
     try {
       const writer = getStacWriter(storePath);
