@@ -1,0 +1,78 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "dcf875ba-6424-40ec-a89e-adcbd211e25a",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            30.923572222222223,
+            5.1826388888888895
+          ],
+          [
+            30.923572222222223,
+            5.1826388888888895
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "MAYO",
+        "platform_name": "MAYO",
+        "track_type": "CONTACT",
+        "start_time": "2009-04-22T18:02:54.410000+00:00",
+        "end_time": "2009-04-22T18:02:54.410000+00:00",
+        "positions": [
+          {
+            "time": "2009-04-22T18:02:54.410000+00:00",
+            "course": 290.0,
+            "speed": 4.35,
+            "depth": 18.32
+          },
+          {
+            "time": "2009-04-22T18:02:54.410000+00:00",
+            "course": 290.0,
+            "speed": 4.35,
+            "depth": 18.32
+          }
+        ],
+        "style": {
+          "line": {
+            "color": "#0000FF"
+          },
+          "point": {
+            "shape": "circle",
+            "radius": 3.0,
+            "fill_color": "#0000FF",
+            "color": "#0000FF"
+          }
+        },
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "d428ea91-2a22-4d8f-812f-9aec20414975",
+            "timestamp": "2026-04-13T23:12:33.855672Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dcf875ba-6424-40ec-a89e-adcbd211e25a"
+            ],
+            "execution_duration": "PT0.00007S"
+          }
+        ]
+      }
+    }
+  ]
+}
