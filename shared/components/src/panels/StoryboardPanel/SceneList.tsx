@@ -10,6 +10,7 @@
 import React from 'react';
 import { SceneRow } from './SceneRow';
 import { StaleBadge } from './StaleBadge';
+import { OverlapBadge } from './OverlapBadge';
 import type { SceneEditViewModel, SceneRowViewModel } from './types';
 
 export interface SceneListProps {
@@ -27,6 +28,9 @@ export interface SceneListProps {
   /** Opens the per-Scene edit dialog (double-click shortcut). */
   onSceneRowExpandToggle?(sceneId: string): void;
   onSceneOverflowMenuOpen?(sceneId: string, anchorRect: DOMRect): void;
+
+  // ── #271 overlap warning dismissal ────────────────────────────────
+  onSceneOverlapDismiss?(sceneId: string, partnerSceneIds: readonly string[]): void;
 }
 
 const PENDING_SCENE: SceneRowViewModel = {
@@ -47,6 +51,7 @@ export function SceneList({
   onSceneRefreshThumbnailClicked,
   onSceneRowExpandToggle,
   onSceneOverflowMenuOpen,
+  onSceneOverlapDismiss,
 }: SceneListProps): React.ReactElement {
   return (
     // 234 US3 fix (FR-022): role="list" was rejected by axe-core
@@ -89,6 +94,23 @@ export function SceneList({
                 }
               />
             )}
+            {/* #271 overlap badge — kept. The inline SceneEditForm that
+                main still renders here was replaced on this branch by the
+                SceneEditDialog (opened by the parent), so it is intentionally
+                not rendered inline. */}
+            {editVm?.overlapsWith !== undefined &&
+              editVm.overlapsWith.length > 0 && (
+                <OverlapBadge
+                  sceneId={scene.sceneId}
+                  overlapsWith={editVm.overlapsWith}
+                  onDismiss={(): void =>
+                    onSceneOverlapDismiss?.(
+                      scene.sceneId,
+                      editVm.overlapsWith!.map((p) => p.sceneId),
+                    )
+                  }
+                />
+              )}
           </React.Fragment>
         );
       })}

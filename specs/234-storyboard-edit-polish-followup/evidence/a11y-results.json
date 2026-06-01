@@ -1,62 +1,6 @@
 {
-  "capturedAt": "2026-05-31T15:48:08.896Z",
+  "capturedAt": "2026-05-31T17:28:12.949Z",
   "axeVersion": "4.8.5",
-  "gitSha": "f785036",
-  "surfaces": [
-    {
-      "surface": "with-edit-form",
-      "label": "WithEditDialog — edit dialog open on sceneA",
-      "axeVersion": "4.8.5",
-      "counts": {
-        "fail": 0,
-        "warn": 0,
-        "ignore": 0
-      },
-      "violations": []
-    },
-    {
-      "surface": "with-undo-toast",
-      "label": "WithUndoToast — overflow → Delete → Undo toast visible",
-      "axeVersion": "4.8.5",
-      "counts": {
-        "fail": 0,
-        "warn": 0,
-        "ignore": 0
-      },
-      "violations": []
-    },
-    {
-      "surface": "with-stale-badge",
-      "label": "WithStaleBadge — sceneB stale badge visible",
-      "axeVersion": "4.8.5",
-      "counts": {
-        "fail": 0,
-        "warn": 0,
-        "ignore": 0
-      },
-      "violations": []
-    },
-    {
-      "surface": "with-missing-data",
-      "label": "WithMissingDataRemediation — sceneC missing-features state",
-      "axeVersion": "4.8.5",
-      "counts": {
-        "fail": 0,
-        "warn": 0,
-        "ignore": 0
-      },
-      "violations": []
-    },
-    {
-      "surface": "overflow-menu-open",
-      "label": "OverflowMenuOpen — right-click overflow menu floating on sceneA",
-      "axeVersion": "4.8.5",
-      "counts": {
-        "fail": 0,
-        "warn": 0,
-        "ignore": 0
-      },
-      "violations": []
-    }
-  ]
+  "gitSha": "e75e86e",
+  "surfaces": []
 }

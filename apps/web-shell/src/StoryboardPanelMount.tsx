@@ -31,12 +31,15 @@ import React, {
 import type { Feature, FeatureCollection } from 'geojson';
 import {
   composeSceneEditViewModels,
+  detectSceneOverlaps,
+  overlapPairKey,
   formatDtg,
   isSceneFeature,
   isStoryboardFeature,
   getActiveStoryboardDefault,
   useStoryboardEditReducer,
   type SceneRowViewModel,
+  type SceneEditViewModel,
   type StoryboardOptionViewModel,
   type StoryboardPlot,
   type StoryboardPanelProps,
@@ -294,9 +297,68 @@ export function useStoryboardPanelProps({
     hostSnapshot.collisionBanner,
   ]);
 
-  const sceneEditViewModels = useMemo(
+  const baseSceneEditViewModels = useMemo(
     () => composeSceneEditViewModels(state),
     [state],
+  );
+
+  // ─── #271 — time-range overlap warnings ──────────────────────────────
+  // Session-scoped, un-persisted set of dismissed overlap pair keys.
+  const [dismissedOverlapPairs, setDismissedOverlapPairs] = React.useState<
+    ReadonlySet<string>
+  >(() => new Set());
+
+  const overlapsByScene = useMemo(
+    () =>
+      activeStoryboardId !== null
+        ? detectSceneOverlaps(plot, activeStoryboardId, dismissedOverlapPairs)
+        : new Map<string, readonly { sceneId: string; title: string }[]>(),
+    [plot, activeStoryboardId, dismissedOverlapPairs],
+  );
+
+  // Prune dismissed keys that no longer correspond to an active overlap, so a
+  // pair pulled apart and later re-overlapped warns afresh (FR-009 / C4.4).
+  useEffect(() => {
+    if (dismissedOverlapPairs.size === 0) return;
+    const activePairs = new Set<string>();
+    if (activeStoryboardId !== null) {
+      for (const [sceneId, partners] of detectSceneOverlaps(
+        plot,
+        activeStoryboardId,
+      )) {
+        for (const partner of partners) {
+          activePairs.add(overlapPairKey(sceneId, partner.sceneId));
+        }
+      }
+    }
+    let changed = false;
+    const next = new Set<string>();
+    for (const key of dismissedOverlapPairs) {
+      if (activePairs.has(key)) next.add(key);
+      else changed = true;
+    }
+    if (changed) setDismissedOverlapPairs(next);
+  }, [plot, activeStoryboardId, dismissedOverlapPairs]);
+
+  const sceneEditViewModels = useMemo(() => {
+    const merged: Record<string, SceneEditViewModel> = {};
+    for (const [id, vm] of Object.entries(baseSceneEditViewModels)) {
+      merged[id] = { ...vm, overlapsWith: overlapsByScene.get(id) ?? [] };
+    }
+    return merged;
+  }, [baseSceneEditViewModels, overlapsByScene]);
+
+  const handleOverlapDismiss = useCallback(
+    (_sceneId: string, partnerSceneIds: readonly string[]) => {
+      setDismissedOverlapPairs((prev) => {
+        const next = new Set(prev);
+        for (const partnerId of partnerSceneIds) {
+          next.add(overlapPairKey(_sceneId, partnerId));
+        }
+        return next;
+      });
+    },
+    [],
   );
 
   // ─── Scene-row click handler — Spec #258 ───────────────────────────
@@ -649,5 +711,7 @@ export function useStoryboardPanelProps({
     onCollisionReplace,
     onCollisionOffset,
     onCollisionCancel,
+    // #271 — overlap warning dismissal.
+    onSceneOverlapDismiss: handleOverlapDismiss,
   };
 }

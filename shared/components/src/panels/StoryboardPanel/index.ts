@@ -17,6 +17,8 @@ export { UndoToast } from './UndoToast';
 export type { UndoToastProps, UndoToastState } from './UndoToast';
 export { StaleBadge } from './StaleBadge';
 export type { StaleBadgeProps } from './StaleBadge';
+export { OverlapBadge } from './OverlapBadge';
+export type { OverlapBadgeProps } from './OverlapBadge';
 export { SceneOverflowMenu } from './SceneOverflowMenu';
 export type {
   SceneOverflowMenuProps,
@@ -33,6 +35,7 @@ export type {
   StoryboardEditViewModel,
   NamingRowViewModel,
   CollisionBannerViewModel,
+  OverlapPartner,
 } from './types';
 export {
   useStoryboardEditReducer,

@@ -93,6 +93,8 @@ export function StoryboardPanel({
   viewportLocked = false,
   onViewportLockToggle,
   hasActivePlot = true,
+  // #271 — overlap warning dismissal
+  onSceneOverlapDismiss,
   // #273 — live Preview
   onPreview,
   canPreview,
@@ -451,6 +453,7 @@ export function StoryboardPanel({
             onSceneRefreshThumbnailClicked={onSceneRefreshThumbnailClicked}
             onSceneRowExpandToggle={onSceneRowExpandToggle}
             onSceneOverflowMenuOpen={onSceneOverflowMenuOpen}
+            onSceneOverlapDismiss={onSceneOverlapDismiss}
           />
         </div>
       )}

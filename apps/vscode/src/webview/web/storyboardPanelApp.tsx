@@ -370,6 +370,18 @@ export function useStoryboardPanelProps(
     vscode.postMessage({ type: 'collision-cancel' });
   }, [vscode]);
 
+  // #271 — overlap warning dismissal.
+  const onSceneOverlapDismiss = useCallback(
+    (sceneId: string, partnerSceneIds: readonly string[]) => {
+      vscode.postMessage({
+        type: 'scene-overlap-dismiss',
+        sceneId,
+        partnerSceneIds,
+      });
+    },
+    [vscode],
+  );
+
   return {
     scenes: state.sceneRows,
     activeStoryboardName: state.activeStoryboardName,
@@ -419,5 +431,7 @@ export function useStoryboardPanelProps(
     onCollisionReplace,
     onCollisionOffset,
     onCollisionCancel,
+    onSceneOverlapDismiss,
   };
+}
 }
