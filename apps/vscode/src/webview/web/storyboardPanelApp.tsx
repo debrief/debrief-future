@@ -14,11 +14,8 @@
  * throws).
  */
 
-import React, { useCallback, useEffect } from 'react';
-import {
-  StoryboardPanel,
-  useStoryboardEditReducer,
-} from '@debrief/components';
+import { useCallback, useEffect } from 'react';
+import { useStoryboardEditReducer } from '@debrief/components';
 import type {
   SceneRowViewModel,
   StoryboardOptionViewModel,
@@ -29,6 +26,7 @@ import type {
   StaleFlagEntry,
   NamingRowPushState,
   CollisionBannerPushState,
+  StoryboardPanelProps,
 } from '@debrief/components';
 
 export interface StoryboardPanelVsCodeApi {
@@ -96,11 +94,16 @@ type ExtensionMessage =
   | SceneStaleFlagsUpdatedMessage
   | SceneUndoToastShownMessage;
 
-export function StoryboardPanelApp({
-  vscode,
-}: {
-  vscode: StoryboardPanelVsCodeApi;
-}): React.ReactElement {
+/**
+ * Builds the live {@link StoryboardPanelProps} bundle for the VS Code host:
+ * runs the edit reducer, processes inbound extension messages, and wires every
+ * callback to `postMessage`. The shared `ActivityPanel` renders the actual
+ * `<StoryboardPanel>` from these props (Storyboard is a child section of the
+ * Activity panel, like Tools / Layers / Properties).
+ */
+export function useStoryboardPanelProps(
+  vscode: StoryboardPanelVsCodeApi,
+): StoryboardPanelProps {
   const {
     state,
     dispatch,
@@ -367,56 +370,54 @@ export function StoryboardPanelApp({
     vscode.postMessage({ type: 'collision-cancel' });
   }, [vscode]);
 
-  return (
-    <StoryboardPanel
-      scenes={state.sceneRows}
-      activeStoryboardName={state.activeStoryboardName}
-      captureInFlight={state.captureInFlight}
-      onCaptureClick={onCaptureClick}
-      onSceneRowClick={onSceneRowClick}
-      onPreview={onPreview}
-      canPreview={
-        state.activeStoryboardId !== null && state.sceneRows.length > 0
-      }
-      storyboards={state.storyboards.length > 0 ? state.storyboards : undefined}
-      activeStoryboardId={state.activeStoryboardId}
-      currentSceneId={state.currentSceneId}
-      transport={state.transport}
-      onTransportForward={onTransportForward}
-      onTransportBackward={onTransportBackward}
-      onActiveStoryboardChange={onActiveStoryboardChange}
-      onCreateStoryboard={onCreateStoryboard}
-      onRenameStoryboard={onRenameStoryboard}
-      onDeleteStoryboard={onDeleteStoryboard}
-      sceneEditViewModels={sceneEditViewModels}
-      storyboardEditViewModel={state.storyboardEditViewModel ?? undefined}
-      pendingUndoToast={state.pendingUndoToast}
-      overflowMenuOpenFor={state.overflowMenuOpenFor}
-      overflowMenuAnchorRect={state.overflowMenuAnchorRect}
-      onSceneRowExpandToggle={onSceneRowExpandToggle}
-      onSceneOverflowMenuOpen={openOverflowMenu}
-      onSceneOverflowMenuClose={closeOverflowMenu}
-      onSceneEditFormCancel={onSceneEditFormCancel}
-      onSceneTitleRenameCommit={onSceneTitleRenameCommit}
-      onSceneDescriptionSubmit={onSceneDescriptionSubmit}
-      onSceneDeleteRequested={onSceneDeleteRequested}
-      onSceneUndoDeleteClicked={onSceneUndoDeleteClicked}
-      onSceneUpdateToCurrentClicked={onSceneUpdateToCurrentClicked}
-      onSceneDuplicateClicked={onSceneDuplicateClicked}
-      onSceneCopyToOtherClicked={onSceneCopyToOtherClicked}
-      onSceneRefreshThumbnailClicked={onSceneRefreshThumbnailClicked}
-      onStoryboardRefreshAllStaleClicked={onStoryboardRefreshAllStaleClicked}
-      onStoryboardNameRenameCommit={onStoryboardNameRenameCommit}
-      onStoryboardDescriptionSubmit={onStoryboardDescriptionSubmit}
-      onUndoToastDismiss={dismissUndoToast}
-      namingRowViewModel={namingRowViewModel}
-      collisionBannerViewModel={collisionBannerViewModel}
-      onNamingRowTextChanged={onNamingRowTextChanged}
-      onNamingRowConfirm={onNamingRowConfirm}
-      onNamingRowCancel={onNamingRowCancel}
-      onCollisionReplace={onCollisionReplace}
-      onCollisionOffset={onCollisionOffset}
-      onCollisionCancel={onCollisionCancel}
-    />
-  );
+  return {
+    scenes: state.sceneRows,
+    activeStoryboardName: state.activeStoryboardName,
+    captureInFlight: state.captureInFlight,
+    onCaptureClick,
+    onSceneRowClick,
+    onPreview,
+    canPreview:
+      state.activeStoryboardId !== null && state.sceneRows.length > 0,
+    storyboards:
+      state.storyboards.length > 0 ? state.storyboards : undefined,
+    activeStoryboardId: state.activeStoryboardId,
+    currentSceneId: state.currentSceneId,
+    transport: state.transport,
+    onTransportForward,
+    onTransportBackward,
+    onActiveStoryboardChange,
+    onCreateStoryboard,
+    onRenameStoryboard,
+    onDeleteStoryboard,
+    sceneEditViewModels,
+    storyboardEditViewModel: state.storyboardEditViewModel ?? undefined,
+    pendingUndoToast: state.pendingUndoToast,
+    overflowMenuOpenFor: state.overflowMenuOpenFor,
+    overflowMenuAnchorRect: state.overflowMenuAnchorRect,
+    onSceneRowExpandToggle,
+    onSceneOverflowMenuOpen: openOverflowMenu,
+    onSceneOverflowMenuClose: closeOverflowMenu,
+    onSceneEditFormCancel,
+    onSceneTitleRenameCommit,
+    onSceneDescriptionSubmit,
+    onSceneDeleteRequested,
+    onSceneUndoDeleteClicked,
+    onSceneUpdateToCurrentClicked,
+    onSceneDuplicateClicked,
+    onSceneCopyToOtherClicked,
+    onSceneRefreshThumbnailClicked,
+    onStoryboardRefreshAllStaleClicked,
+    onStoryboardNameRenameCommit,
+    onStoryboardDescriptionSubmit,
+    onUndoToastDismiss: dismissUndoToast,
+    namingRowViewModel,
+    collisionBannerViewModel,
+    onNamingRowTextChanged,
+    onNamingRowConfirm,
+    onNamingRowCancel,
+    onCollisionReplace,
+    onCollisionOffset,
+    onCollisionCancel,
+  };
 }

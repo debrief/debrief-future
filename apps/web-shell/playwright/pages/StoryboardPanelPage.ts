@@ -29,7 +29,7 @@ export class StoryboardPanelPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.rail = page.locator('[data-testid="storyboard-panel-rail"]');
+    this.rail = page.locator('[data-testid="storyboard-panel"]');
     // The empty-state now leads with "Create storyboard"; the always-present
     // header "Capture" button drives the capture-first flow (incl. first
     // capture, which prompts the naming row). Tests capture via this button.

@@ -49,6 +49,7 @@ export function StoryboardPanel({
   captureInFlight,
   onCaptureClick,
   onSceneRowClick,
+  banner,
   storyboards,
   activeStoryboardId,
   currentSceneId,
@@ -178,6 +179,7 @@ export function StoryboardPanel({
         minHeight: 0,
       }}
     >
+      {banner}
       <header
         className="storyboard-panel__header"
         style={{

@@ -67,7 +67,7 @@ async function openFirstPlot(page: import('@playwright/test').Page): Promise<voi
     timeout: 20000,
   });
   await expect(
-    page.locator('[data-testid="storyboard-panel-rail"]'),
+    page.locator('[data-testid="storyboard-panel"]'),
   ).toBeVisible({ timeout: 15000 });
 }
 
@@ -105,14 +105,14 @@ test.describe('#236 — IndexedDB persistence + capability badge', () => {
     // Verify the storyboard rail has content (a Storyboard heading
     // shows after the create lands) AND the badge is hidden.
     await page
-      .locator('[data-testid="storyboard-panel-rail"]')
+      .locator('[data-testid="storyboard-panel"]')
       .getByText('Persistence demo')
       .first()
       .waitFor({ state: 'visible', timeout: 10_000 });
     const badge = page.locator('[data-testid="storyboard-session-only-badge"]');
     await expect(badge).toBeHidden();
 
-    await page.locator('[data-testid="storyboard-panel-rail"]').screenshot({
+    await page.locator('[data-testid="storyboard-panel"]').screenshot({
       path: join(SCREENSHOTS_DIR, 'after-no-badge.png'),
     });
   });
@@ -161,10 +161,10 @@ test.describe('#236 — IndexedDB persistence + capability badge', () => {
     // pre-#236 state (always shown when storyboard content existed),
     // so before-session-only-badge.png and private-mode-badge.png are
     // visually equivalent. Filenames retained for the blog post + PR.
-    await page.locator('[data-testid="storyboard-panel-rail"]').screenshot({
+    await page.locator('[data-testid="storyboard-panel"]').screenshot({
       path: join(SCREENSHOTS_DIR, 'private-mode-badge.png'),
     });
-    await page.locator('[data-testid="storyboard-panel-rail"]').screenshot({
+    await page.locator('[data-testid="storyboard-panel"]').screenshot({
       path: join(SCREENSHOTS_DIR, 'before-session-only-badge.png'),
     });
   });

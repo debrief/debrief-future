@@ -69,7 +69,7 @@ async function openFirstPlot(page: Page): Promise<void> {
     timeout: 20000,
   });
   await expect(
-    page.locator('[data-testid="storyboard-panel-rail"]'),
+    page.locator('[data-testid="storyboard-panel"]'),
   ).toBeVisible({ timeout: 15000 });
   await expect(page.locator('.leaflet-container')).toBeVisible({
     timeout: 15000,
@@ -95,7 +95,7 @@ async function captureFirstStoryboard(page: Page, name: string): Promise<void> {
       /* tolerate slower naming-row teardown */
     });
   await page
-    .locator('[data-testid="storyboard-panel-rail"]')
+    .locator('[data-testid="storyboard-panel"]')
     .getByText(name)
     .first()
     .waitFor({ state: 'visible', timeout: 10_000 });
@@ -182,7 +182,7 @@ test.describe('#237 — Active-storyboard selection persistence', () => {
     const defaultValue = await dropdown.inputValue();
 
     // Capture a screenshot of the default state.
-    await page.locator('[data-testid="storyboard-panel-rail"]').screenshot({
+    await page.locator('[data-testid="storyboard-panel"]').screenshot({
       path: resolve(EVIDENCE_DIR, 'before-default-fallback.png'),
     });
 
@@ -201,7 +201,7 @@ test.describe('#237 — Active-storyboard selection persistence', () => {
     }).toPass({ timeout: 5_000 });
 
     // Capture a screenshot of the restored state.
-    await page.locator('[data-testid="storyboard-panel-rail"]').screenshot({
+    await page.locator('[data-testid="storyboard-panel"]').screenshot({
       path: resolve(EVIDENCE_DIR, 'after-restored-selection.png'),
     });
 
@@ -220,7 +220,7 @@ test.describe('#237 — Active-storyboard selection persistence', () => {
     // The panel should render without errors and the rail should be
     // visible.
     await expect(
-      page.locator('[data-testid="storyboard-panel-rail"]'),
+      page.locator('[data-testid="storyboard-panel"]'),
     ).toBeVisible();
 
     // No persistence write is expected for a single-storyboard plot

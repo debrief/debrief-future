@@ -5,8 +5,8 @@
  * which combines time control, tools, and layers sections.
  */
 
-import type { ReactNode } from 'react';
 import type { DebriefFeature } from '../utils/types';
+import type { StoryboardPanelProps } from '../panels/StoryboardPanel/types';
 import type { DisplayMode, PlaybackState } from '@debrief/schemas';
 import type { MatchResult, ToolParameter } from '../ToolMatch/types';
 import type { AssociatedFile } from '../LayersToolbar/types';
@@ -210,12 +210,13 @@ export interface ActivityPanelProps {
 
   // Storyboard section (UX review: flatten the sidebar into a single list).
   /**
-   * Optional Storyboard content rendered as a 5th collapsible section at the
-   * bottom of the panel. The host composes the `StoryboardPanel` (with all its
-   * wiring) and passes it here; ActivityPanel stays ignorant of its internals.
+   * Props for the child `StoryboardPanel`, rendered as a 5th collapsible
+   * section — exactly like the Time Controller / Tools / Layers / Properties
+   * sections above. The host supplies the live data + callbacks (scenes,
+   * transport, capture/edit handlers); ActivityPanel owns the rendering.
    * When omitted, no Storyboard section renders.
    */
-  storyboardSlot?: ReactNode;
+  storyboard?: StoryboardPanelProps;
 
   /** CSS class name */
   className?: string;
