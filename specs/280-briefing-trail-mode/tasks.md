@@ -123,7 +123,7 @@ per scene as the viewer navigates between them within one session (FR-005).
 
 ### PR Creation
 
-- [ ] T017 Create PR and publish blog: run `/speckit.pr` (updates existing PR #661 with the implementation + evidence, and opens the blog PR on debrief.github.io)
+- [x] T017 Create PR and publish blog: run `/speckit.pr` (updates existing PR #661 with the implementation + evidence, and opens the blog PR on debrief.github.io)
 
 **Task T017 must run last — it depends on every evidence and media task being complete.**
 
