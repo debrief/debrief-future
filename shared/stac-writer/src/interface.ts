@@ -40,6 +40,9 @@ export interface StoreContext {
 // have to update their import paths.
 
 export type { StacAsset, StacItem };
+// Re-export the generated parse-boundary FeatureCollection so consumers can
+// import it alongside CommitPlotSaveInput without a second import path.
+export type { RawGeoJSONFeatureCollection };
 
 // Re-export the LinkML-derived PropertiesProvenanceEntry so downstream
 // consumers see no change — same name, same import path, plus the schema

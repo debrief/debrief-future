@@ -15,6 +15,7 @@ export type {
   PatchItemInput,
   PatchItemResult,
   PropertiesProvenanceEntry,
+  RawGeoJSONFeatureCollection,
   ReconcilePlotSaveInput,
   ReconcilePlotSaveResult,
   StacAsset,
