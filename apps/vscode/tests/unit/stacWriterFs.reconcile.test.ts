@@ -24,7 +24,7 @@ import {
 } from '../../src/services/saveJournal';
 
 const ITEM_REL = 'core--boat1/item.json';
-const TOKEN = 'abcdef0123456789';
+const tmpTag = 'abcdef0123456789';
 
 const ctx: StoreContext = {
   kind: 'fs',
@@ -82,8 +82,8 @@ describe('stacWriterFs.reconcilePlotSave (#268 US3)', () => {
 
   it('stray temps but NO journal → rolled-back: originals kept, temps removed', async () => {
     // Interrupted BEFORE the commit point: staged temps exist, no journal.
-    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${TOKEN}.tmp`), 'FC_V2\n');
-    fs.writeFileSync(path.join(itemDir, `item.json.save-${TOKEN}.tmp`), 'ITEM_V2\n');
+    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${tmpTag}.tmp`), 'FC_V2\n');
+    fs.writeFileSync(path.join(itemDir, `item.json.save-${tmpTag}.tmp`), 'ITEM_V2\n');
 
     const result = await writer().reconcilePlotSave({ ctx, stacItemPath: ITEM_REL });
 
@@ -96,11 +96,11 @@ describe('stacWriterFs.reconcilePlotSave (#268 US3)', () => {
 
   it('journal + pending renames → rolled-forward: new version applied, journal gone', async () => {
     // Interrupted AFTER the commit point: temps staged + journal present.
-    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${TOKEN}.tmp`), 'FC_V2\n');
-    fs.writeFileSync(path.join(itemDir, `item.json.save-${TOKEN}.tmp`), 'ITEM_V2\n');
+    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${tmpTag}.tmp`), 'FC_V2\n');
+    fs.writeFileSync(path.join(itemDir, `item.json.save-${tmpTag}.tmp`), 'ITEM_V2\n');
     writeJournal([
-      { temp: `features.geojson.save-${TOKEN}.tmp`, final: 'features.geojson' },
-      { temp: `item.json.save-${TOKEN}.tmp`, final: 'item.json' },
+      { temp: `features.geojson.save-${tmpTag}.tmp`, final: 'features.geojson' },
+      { temp: `item.json.save-${tmpTag}.tmp`, final: 'item.json' },
     ]);
 
     const result = await writer().reconcilePlotSave({ ctx, stacItemPath: ITEM_REL });
@@ -115,10 +115,10 @@ describe('stacWriterFs.reconcilePlotSave (#268 US3)', () => {
   it('roll-forward is idempotent when some renames already applied', async () => {
     // features temp already consumed (rename happened), item temp still pending.
     fs.writeFileSync(featuresPath, 'FC_V2\n'); // features already applied
-    fs.writeFileSync(path.join(itemDir, `item.json.save-${TOKEN}.tmp`), 'ITEM_V2\n');
+    fs.writeFileSync(path.join(itemDir, `item.json.save-${tmpTag}.tmp`), 'ITEM_V2\n');
     writeJournal([
-      { temp: `features.geojson.save-${TOKEN}.tmp`, final: 'features.geojson' }, // temp missing
-      { temp: `item.json.save-${TOKEN}.tmp`, final: 'item.json' },
+      { temp: `features.geojson.save-${tmpTag}.tmp`, final: 'features.geojson' }, // temp missing
+      { temp: `item.json.save-${tmpTag}.tmp`, final: 'item.json' },
     ]);
 
     const result = await writer().reconcilePlotSave({ ctx, stacItemPath: ITEM_REL });
@@ -131,8 +131,8 @@ describe('stacWriterFs.reconcilePlotSave (#268 US3)', () => {
   });
 
   it('a second reconcile after a roll-forward is a clean no-op (idempotent)', async () => {
-    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${TOKEN}.tmp`), 'FC_V2\n');
-    writeJournal([{ temp: `features.geojson.save-${TOKEN}.tmp`, final: 'features.geojson' }]);
+    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${tmpTag}.tmp`), 'FC_V2\n');
+    writeJournal([{ temp: `features.geojson.save-${tmpTag}.tmp`, final: 'features.geojson' }]);
 
     const first = await writer().reconcilePlotSave({ ctx, stacItemPath: ITEM_REL });
     expect(first.outcome).toBe('rolled-forward');
@@ -143,7 +143,7 @@ describe('stacWriterFs.reconcilePlotSave (#268 US3)', () => {
   });
 
   it('a malformed journal is treated as no usable journal → rolled-back, leftovers cleared', async () => {
-    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${TOKEN}.tmp`), 'FC_V2\n');
+    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${tmpTag}.tmp`), 'FC_V2\n');
     fs.writeFileSync(path.join(itemDir, SAVE_JOURNAL_FILENAME), '{ not valid json');
 
     const result = await writer().reconcilePlotSave({ ctx, stacItemPath: ITEM_REL });

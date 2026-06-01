@@ -22,7 +22,7 @@ import {
 } from '../../src/services/saveJournal';
 
 const ITEM_REL = 'core--boat1/item.json';
-const TOKEN = '0011223344556677';
+const tmpTag = '0011223344556677';
 
 describe('reconcileBeforeOpen — open-path integration (#268 US3)', () => {
   let storePath: string;
@@ -48,15 +48,15 @@ describe('reconcileBeforeOpen — open-path integration (#268 US3)', () => {
 
   it('rolls a committed-but-unapplied save forward and notifies once', async () => {
     // Interrupted AFTER the commit point: staged temps + journal present.
-    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${TOKEN}.tmp`), 'FC_V2\n');
-    fs.writeFileSync(path.join(itemDir, `item.json.save-${TOKEN}.tmp`), 'ITEM_V2\n');
+    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${tmpTag}.tmp`), 'FC_V2\n');
+    fs.writeFileSync(path.join(itemDir, `item.json.save-${tmpTag}.tmp`), 'ITEM_V2\n');
     const journal: SaveJournal = {
       version: SAVE_JOURNAL_VERSION,
       stacItemPath: ITEM_REL,
       createdAtMs: 1_700_000_000_000,
       renames: [
-        { temp: `features.geojson.save-${TOKEN}.tmp`, final: 'features.geojson' },
-        { temp: `item.json.save-${TOKEN}.tmp`, final: 'item.json' },
+        { temp: `features.geojson.save-${tmpTag}.tmp`, final: 'features.geojson' },
+        { temp: `item.json.save-${tmpTag}.tmp`, final: 'item.json' },
       ],
     };
     fs.writeFileSync(path.join(itemDir, SAVE_JOURNAL_FILENAME), `${JSON.stringify(journal)}\n`);
@@ -76,7 +76,7 @@ describe('reconcileBeforeOpen — open-path integration (#268 US3)', () => {
 
   it('restores the last-good version when interrupted before the commit point', async () => {
     // Staged temps but NO journal → pre-commit → roll back to last-good.
-    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${TOKEN}.tmp`), 'FC_V2\n');
+    fs.writeFileSync(path.join(itemDir, `features.geojson.save-${tmpTag}.tmp`), 'FC_V2\n');
 
     const showWarning = vi.fn();
     const result = await reconcileBeforeOpen(getStacWriter, storePath, ITEM_REL, showWarning);
