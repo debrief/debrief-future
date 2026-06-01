@@ -15,7 +15,9 @@ export {
 export {
   readHiddenFeatureIds,
   applyVisibilityToFeatureCollection,
+  applyVisibilityWithProvenance,
 } from './visibility.js';
+export type { VisibilityProvenanceOptions } from './visibility.js';
 export {
   temporalSliceToInput,
   temporalVariantToSlice,

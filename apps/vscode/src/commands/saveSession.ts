@@ -119,8 +119,15 @@ export function createSaveSessionCommand(
     // view-state (viewport, time window/playhead, selection) is upserted as
     // SystemState features and per-feature visibility is set, then the whole
     // FeatureCollection is written. NO `.debrief-session` sidecar is written.
+    //
+    // FR-013/FR-021: visibility transitions are recorded on the affected
+    // feature's own provenance, bounded to this saved state — passing the actor
+    // makes `applyStateToFeatures` append a visibility-change LogEntry to every
+    // feature whose visibility differs from the on-disk FeatureCollection.
     try {
-      const features = applyStateToFeatures(mapPanel.getCurrentFeatures(), state);
+      const features = applyStateToFeatures(mapPanel.getCurrentFeatures(), state, {
+        actor: sessionManager.actor,
+      });
       storeFeatureCollection(storePath, plotUri, features);
     } catch (err) {
       void vscode.window.showErrorMessage(

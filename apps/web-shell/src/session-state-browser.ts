@@ -9,6 +9,15 @@
 // Types
 export * from '../../../services/session-state/src/types/index.js';
 
+// Log provenance builders (Feature 261, FR-013) — pure, browser-safe.
+export {
+  buildVisibilityChangeLogEntry,
+} from '../../../services/session-state/src/log/entryBuilder.js';
+export {
+  VISIBILITY_CHANGE_TOOL_SENTINEL,
+  type RecordVisibilityChangeInput,
+} from '../../../services/session-state/src/log/types.js';
+
 // Store
 export {
   createSessionStore,

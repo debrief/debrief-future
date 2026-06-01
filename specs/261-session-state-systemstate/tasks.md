@@ -197,7 +197,7 @@ This is a **Schema Change** + **Library/SDK** + **VS Code Extension Workflow** f
 
 ### Visibility provenance (FR-013/FR-014/R-012)
 
-- [ ] T083 When a feature's visibility toggles, append a `LogEntry` to that feature's own `provenance` via the existing `LogService` (`buildLogEntry`), so the transition is recorded in the in-memory FC and persists on the next save. Wire at the host visibility-toggle handler. Files: the visibility-toggle handler(s) in `apps/vscode/src/` and `apps/web-shell/src/` (confirm exact module).
+- [x] T083 When a feature's visibility toggles, append a `LogEntry` to that feature's own `provenance` via the existing `LogService` (`buildLogEntry`), so the transition is recorded in the in-memory FC and persists on the next save. Wire at the host visibility-toggle handler. Files: the visibility-toggle handler(s) in `apps/vscode/src/` and `apps/web-shell/src/` (confirm exact module).
 
 ### Tests + E2E (SC-004)
 
