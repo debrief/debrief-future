@@ -13,10 +13,6 @@ export * from '../../../services/session-state/src/types/index.js';
 export {
   buildVisibilityChangeLogEntry,
 } from '../../../services/session-state/src/log/entryBuilder.js';
-export {
-  VISIBILITY_CHANGE_TOOL_SENTINEL,
-  type RecordVisibilityChangeInput,
-} from '../../../services/session-state/src/log/types.js';
 
 // Store
 export {
