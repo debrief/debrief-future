@@ -218,6 +218,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Python 3.11 (services, schema-build tooling, + LinkML ≥ 1.7.0 (schema source + (223-linkml-stac-catalog)
 - TypeScript 5.x (strict mode) — no new technology; amends spec-261's `@debrief/session-state` `SystemState` load layer (`validate.ts`, reconciliation, `load.ts`) + host notification surfaces. No schema change, no new dependency. (267-tolerant-playhead-import)
 - TypeScript 5.x (strict), Node 20 runtime (VS Code extension host); React 18.x (renderer + panel) + `@debrief/components` (StoryboardPanel), `@debrief/stac-writer` (web-shell reads), `@debrief/schemas` (LinkML types — consumed, not changed), JSZip 3.10.1 (already present), VS Code Extension API ^1.85.0, `react-leaflet`/Leaflet (renderer map), Vite 5.x (web-shell + renderer) (273-storyboard-preview-button)
+- Python 3.11 (`generate.py` post-processor), TypeScript 5.x (generated types + consumers) — no new technology; extends the existing LinkML `gen-typescript` post-processor to emit `debrief:`-prefixed extension-property slot keys (256-prefix-aware-stac-typing)
 
 ## Before Pushing
 
@@ -301,5 +302,6 @@ Each wrapper:
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 256-prefix-aware-stac-typing: Extends the LinkML `gen-typescript` post-processor (`shared/schemas/scripts/generate.py`) to emit `StacExtensionProperties` slot keys under their on-disk `debrief:` prefix (derived from `slot_uri`), so the STAC writers' `props['debrief:*']` access sites gain typed slots. Typing-only — no schema change, no on-disk change, no new dependency; reuses the existing `src/generated` drift gate.
 - 267-tolerant-playhead-import: Relaxes spec-261 FR-018 strict-on-import for one recoverable case — orphaned playhead (out-of-window `current_time`) clamps to nearest window edge + non-blocking notification; incoherent window (`start>end`) still hard-fails. No schema change, no new dependency.
 - 273-storyboard-preview-button: Added TypeScript 5.x (strict), Node 20 runtime (VS Code extension host); React 18.x (renderer + panel) + `@debrief/components` (StoryboardPanel), `@debrief/stac-writer` (web-shell reads), `@debrief/schemas` (LinkML types — consumed, not changed), JSZip 3.10.1 (already present), VS Code Extension API ^1.85.0, `react-leaflet`/Leaflet (renderer map), Vite 5.x (web-shell + renderer)
