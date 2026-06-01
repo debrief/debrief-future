@@ -112,7 +112,7 @@ Feature type: **schema-adjacent TypeScript type refactor** (Tech Debt / Infrastr
 - [x] T025 [P][test] Add/confirm a unit test that `calculateBounds` returns correct bounds for a `MultiPolygon` feature (the coverage `stacService` now inherits — VR-3) `shared/utils/tests/bounds.test.ts`
 - [x] T026 [P][test] Add a test that a `geometry: null` feature (SYSTEM_RECORD / STORYBOARD / NarrativeEntry) survives a migrated boundary intact (e.g. `toIngressFC` / `stacService` load→write round-trip) — VR-1 / SC-004 `apps/vscode/src/commands/__tests__/openPlot.test.ts`
 - [x] T027 Run the full unit suite + type tests — `uv run pytest && pnpm --filter '!@debrief/web-shell' test && pnpm -r typecheck` — all green
-- [ ] T028 Run the existing web-shell Playwright E2E (plot load + tool execution + REP import) as the behaviour-preservation regression — `cd apps/web-shell && node run-playwright.mjs <existing-spec>` — confirm a result layer (incl. a null-geometry feature) renders unchanged
+- [x] T028 Run the existing web-shell Playwright E2E (plot load + tool execution + REP import) as the behaviour-preservation regression — `cd apps/web-shell && node run-playwright.mjs <existing-spec>` — confirm a result layer (incl. a null-geometry feature) renders unchanged
 
   > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — do NOT skip this because browsers "can't install." The project bundles Linux Chromium via `@sparticuz/chromium`; `run-playwright.mjs` extracts + wires it. See `docs/project_notes/playwright-installation-research.md`.
 
@@ -126,14 +126,14 @@ Depends on Phases 3–6 complete. Produces the evidence + media that back the PR
 
 ### Evidence Collection
 
-- [ ] T030 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`); body lists key scenarios (null-geometry preserved, Multi* bbox, guard) `specs/212-linkml-safe-feature-types/evidence/test-summary.md`
-- [ ] T031 Create the usage demonstration — `IngressFeature` derivation in use + one migrated boundary shown before/after, with a `geometry: null` example surviving `specs/212-linkml-safe-feature-types/evidence/usage-example.md`
-- [ ] T032 [P] Capture the regression-guard output (clean run + rejection of a planted `interface SafeFeature {}`) `specs/212-linkml-safe-feature-types/evidence/guard-validation.txt`
-- [ ] T033 [P] Capture the bbox before/after — old `extractCoordinates` (Point/Line/Polygon only) vs `calculateBounds` (all seven) on a MultiPolygon feature `specs/212-linkml-safe-feature-types/evidence/bbox-fix-before-after.md`
+- [x] T030 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`); body lists key scenarios (null-geometry preserved, Multi* bbox, guard) `specs/212-linkml-safe-feature-types/evidence/test-summary.md`
+- [x] T031 Create the usage demonstration — `IngressFeature` derivation in use + one migrated boundary shown before/after, with a `geometry: null` example surviving `specs/212-linkml-safe-feature-types/evidence/usage-example.md`
+- [x] T032 [P] Capture the regression-guard output (clean run + rejection of a planted `interface SafeFeature {}`) `specs/212-linkml-safe-feature-types/evidence/guard-validation.txt`
+- [x] T033 [P] Capture the bbox before/after — old `extractCoordinates` (Point/Line/Polygon only) vs `calculateBounds` (all seven) on a MultiPolygon feature `specs/212-linkml-safe-feature-types/evidence/bbox-fix-before-after.md`
 
 ### Media Content
 
-- [ ] T034 Create the feature blog post via the Content Specialist (`.claude/agents/media/content.md`): title prefixed `Building `; first three sections (What We're Building / How It Fits / Key Decisions) copied **verbatim** from `evidence/opening-context.md`; add By the Numbers / Lessons Learned / What's Next from evidence `specs/212-linkml-safe-feature-types/media/shipped-post.md`
+- [x] T034 Create the feature blog post via the Content Specialist (`.claude/agents/media/content.md`): title prefixed `Building `; first three sections (What We're Building / How It Fits / Key Decisions) copied **verbatim** from `evidence/opening-context.md`; add By the Numbers / Lessons Learned / What's Next from evidence `specs/212-linkml-safe-feature-types/media/shipped-post.md`
 
 ### PR Creation
 
