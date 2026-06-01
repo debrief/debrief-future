@@ -152,7 +152,7 @@ Extend the shared boundary contract. After this phase the monorepo type-checks w
 
 ### Media Content
 
-- [ ] T030 Create the feature blog post via the Content Specialist agent — copy `What We're Building` / `How It Fits` / `Key Decisions` **verbatim** from `evidence/opening-context.md`, lift the mermaid Hook to the top, and write `By the Numbers` (from test-summary), `Lessons Learned`, `What's Next` from evidence; track `[credibility]` `specs/268-save-atomicity/media/shipped-post.md`
+- [x] T030 Create the feature blog post via the Content Specialist agent — copy `What We're Building` / `How It Fits` / `Key Decisions` **verbatim** from `evidence/opening-context.md`, lift the mermaid Hook to the top, and write `By the Numbers` (from test-summary), `Lessons Learned`, `What's Next` from evidence; track `[credibility]` `specs/268-save-atomicity/media/shipped-post.md`
 
 ### PR Creation
 
