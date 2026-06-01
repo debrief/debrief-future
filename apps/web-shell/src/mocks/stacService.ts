@@ -311,6 +311,26 @@ export function createMockStacService(): MockStacService {
     },
 
     async getPlotData(itemPath: string): Promise<FeatureCollection> {
+      // #268 — reconcile any interrupted save BEFORE the read. On the browser
+      // host IndexedDB transactions are atomic (a tab kill discards an
+      // uncommitted transaction), so this is a clean no-op; it honours the
+      // boundary contract symmetrically with the desktop host and surfaces a
+      // change notification if a future orphan-prune ever recovers state.
+      const reconcileWriter = getActiveStacWriter();
+      if (reconcileWriter) {
+        try {
+          const reconciliation = await reconcileWriter.reconcilePlotSave({
+            ctx: { kind: 'idb', nowMs: () => Date.now(), randomId: () => '' },
+            stacItemPath: itemPath,
+          });
+          if (reconciliation.recovered) {
+            for (const listener of listeners) listener(itemPath);
+          }
+        } catch {
+          // Reconcile must never block opening a plot.
+        }
+      }
+
       // Check cache first (includes bundled fallback data)
       const cached = geojsonCache.get(itemPath);
       if (cached) return cached;

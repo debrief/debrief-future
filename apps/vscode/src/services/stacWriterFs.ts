@@ -53,6 +53,7 @@ import { StacWriterError, pathGuard, validateSceneId } from '@debrief/stac-write
 import {
   SAVE_JOURNAL_FILENAME,
   SAVE_JOURNAL_VERSION,
+  parseSaveJournal,
   type SaveJournal,
   type SaveJournalRename,
 } from './saveJournal';
@@ -386,16 +387,48 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
       };
     },
 
-    // eslint-disable-next-line @typescript-eslint/require-await -- StacWriter interface mandates Promise return; reconcile implementation lands in #268 Phase 5.
+    // eslint-disable-next-line @typescript-eslint/require-await -- StacWriter interface mandates Promise return; this adaptor wraps synchronous Node fs.
     async reconcilePlotSave(
       input: ReconcilePlotSaveInput,
     ): Promise<ReconcilePlotSaveResult> {
-      // Real roll-back / roll-forward logic lands in #268 Phase 5 (T020).
-      void input;
-      throw new StacWriterError(
-        'write-failed',
-        'reconcilePlotSave: not yet implemented',
-      );
+      pathGuard('reconcilePlotSave.stacItemPath', input.stacItemPath);
+      const itemDir = path.dirname(path.join(storePath, input.stacItemPath));
+      if (!fs.existsSync(itemDir)) {
+        return { recovered: false, outcome: 'clean' };
+      }
+      const journalPath = path.join(itemDir, SAVE_JOURNAL_FILENAME);
+
+      // ── Journal present → interrupted AFTER the commit point → roll FORWARD.
+      if (fs.existsSync(journalPath)) {
+        let journal: SaveJournal | null = null;
+        try {
+          journal = parseSaveJournal(JSON.parse(fs.readFileSync(journalPath, 'utf8')));
+        } catch {
+          journal = null;
+        }
+        if (journal !== null) {
+          // Re-apply pending renames (idempotent — a missing temp is already
+          // applied), then drop the journal: the new coherent version (FR-007).
+          applyJournalRenames(itemDir, journal);
+          fs.rmSync(journalPath, { force: true });
+          cleanupTemps(listSaveTemps(itemDir));
+          return { recovered: true, outcome: 'rolled-forward' };
+        }
+        // Malformed/unknown-version journal: we cannot trust the renames, so
+        // discard it and any staged temps, keeping the last-good originals.
+        fs.rmSync(journalPath, { force: true });
+        cleanupTemps(listSaveTemps(itemDir));
+        return { recovered: true, outcome: 'rolled-back' };
+      }
+
+      // ── No journal → interrupted BEFORE the commit point (or clean).
+      const strays = listSaveTemps(itemDir);
+      if (strays.length === 0) {
+        return { recovered: false, outcome: 'clean' };
+      }
+      // Discard the staged temps, keep the originals = last-good (FR-008).
+      cleanupTemps(strays);
+      return { recovered: true, outcome: 'rolled-back' };
     },
 
     async patchItem(input: PatchItemInput): Promise<PatchItemResult> {
@@ -793,6 +826,28 @@ function applyJournalRenames(itemDir: string, journal: SaveJournal): void {
     }
     fs.renameSync(tempAbs, path.join(itemDir, rename.final));
   }
+}
+
+/**
+ * List absolute paths of this feature's save leftovers in an item directory:
+ * staged artefact temps (`<final>.save-<hex>.tmp`) and the journal's own
+ * atomic-write temp (`.save-journal.json.<pid>.<hex>.tmp`). Used by reconcile
+ * to discard pre-commit debris. Other `.tmp` files are left untouched.
+ */
+function listSaveTemps(itemDir: string): string[] {
+  let names: string[];
+  try {
+    names = fs.readdirSync(itemDir);
+  } catch {
+    return [];
+  }
+  return names
+    .filter(
+      (name) =>
+        /\.save-[0-9a-f]+\.tmp$/.test(name) ||
+        /^\.save-journal\.json\..*\.tmp$/.test(name),
+    )
+    .map((name) => path.join(itemDir, name));
 }
 
 /** Best-effort removal of staged temp files (pre-commit rollback). */

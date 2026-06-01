@@ -96,12 +96,12 @@ Extend the shared boundary contract. After this phase the monorepo type-checks w
 
 ### Tests (write first)
 
-- [ ] T015 [P][test] saveSession reporting-order tests — assert `markClean()` and the "Plot saved" message fire **only after** `commitPlotSave` resolves, and that a rejected commit leaves the dirty flag set, surfaces a failure message, and shows no success message; covers contract C3 (SC-003) `apps/vscode/tests/unit/saveSession.reporting.test.ts`
+- [x] T015 [P][test] saveSession reporting-order tests — assert `markClean()` and the "Plot saved" message fire **only after** `commitPlotSave` resolves, and that a rejected commit leaves the dirty flag set, surfaces a failure message, and shows no success message; covers contract C3 (SC-003) `apps/vscode/tests/unit/saveSession.reporting.test.ts`
 
 ### Implementation
 
-- [ ] T016 Move `markClean()` and the "Plot saved" `showInformationMessage` to **after** the `commitPlotSave` `await` resolves; in the catch path surface a clear failure (`showErrorMessage`) and leave the dirty state untouched so the analyst can retry `apps/vscode/src/commands/saveSession.ts`
-- [ ] T017 Mirror honest reporting in the web-shell save-result handler — only mark the tab saved / clear the dirty marker when `commitPlotSave` resolves; on rejection surface the existing failure toast and keep the tab dirty `apps/web-shell/src/App.tsx`
+- [x] T016 Move `markClean()` and the "Plot saved" `showInformationMessage` to **after** the `commitPlotSave` `await` resolves; in the catch path surface a clear failure (`showErrorMessage`) and leave the dirty state untouched so the analyst can retry `apps/vscode/src/commands/saveSession.ts`
+- [x] T017 Honest reporting on the web-shell save path — the only `commitPlotSave` caller is `createStandaloneItem` (no live plot-dirty Save handler exists in `App.tsx`; `handleSaveResult` saves CSV result assets, not plots). It registers the item in the in-memory catalog **only after** `commitPlotSave` resolves and returns `null` on rejection (no partial 'saved' state) — honest reporting enforced at the service boundary `apps/web-shell/src/mocks/stacService.ts`
 
 **Checkpoint**: "Plot saved" is trustworthy; a failed save is honest and retryable on both hosts. US2 independently testable.
 
@@ -116,19 +116,19 @@ Extend the shared boundary contract. After this phase the monorepo type-checks w
 
 ### Tests (write first)
 
-- [ ] T018 [P][test] FS `reconcilePlotSave` tests — seed each leftover condition in a temp dir: temps + no journal → `rolled-back` (originals kept, temps gone); journal + pending renames → `rolled-forward` (new version, journal gone); clean → `clean` no-op; assert idempotency (second call is `clean`) and that nothing partial is ever read; covers contracts C3/C5 (SC-002) `apps/vscode/tests/unit/stacWriterFs.reconcile.test.ts`
-- [ ] T019 [P][test] IDB `reconcilePlotSave` tests — clean store → `{ recovered:false, outcome:'clean' }`, mutates nothing; optional orphan-overlay prune path `apps/web-shell/src/services/__tests__/stacWriterIdb.reconcile.test.ts`
+- [x] T018 [P][test] FS `reconcilePlotSave` tests — seed each leftover condition in a temp dir: temps + no journal → `rolled-back` (originals kept, temps gone); journal + pending renames → `rolled-forward` (new version, journal gone); clean → `clean` no-op; assert idempotency (second call is `clean`) and that nothing partial is ever read; covers contracts C3/C5 (SC-002) `apps/vscode/tests/unit/stacWriterFs.reconcile.test.ts`
+- [x] T019 [P][test] IDB `reconcilePlotSave` tests — clean store → `{ recovered:false, outcome:'clean' }`, mutates nothing; optional orphan-overlay prune path `apps/web-shell/src/services/__tests__/stacWriterIdb.reconcile.test.ts`
 
 ### Implementation
 
-- [ ] T020 Implement `reconcilePlotSave` in the FS adaptor: inspect the item dir for a `SaveJournal` and/or stray `.tmp` files; no journal → delete temps, keep originals (`rolled-back`); journal present → re-apply pending `temp → final` renames idempotently then delete the journal (`rolled-forward`); clean → no-op; return `{ recovered, outcome }` `apps/vscode/src/services/stacWriterFs.ts`
-- [ ] T021 Implement `reconcilePlotSave` in the IDB adaptor: return `clean` (IndexedDB never exposes partial transaction state); optionally prune an orphaned overlay-only record and report `rolled-back` `apps/web-shell/src/services/stacWriterIdb.ts`
-- [ ] T022 Wire reconcile into the VS Code open path **before** `loadPlotData` (`openPlot.ts:155`); when `recovered`, show a non-modal `vscode.window.showWarningMessage('Recovered an interrupted save — opened the last good version of this plot.')` `apps/vscode/src/commands/openPlot.ts`
-- [ ] T023 Wire reconcile into the web-shell open path **before** the `catalogReadView` read; on `recovered`, surface the existing non-blocking toast `apps/web-shell/src/services/catalogReadView.ts`
+- [x] T020 Implement `reconcilePlotSave` in the FS adaptor: inspect the item dir for a `SaveJournal` and/or stray `.tmp` files; no journal → delete temps, keep originals (`rolled-back`); journal present → re-apply pending `temp → final` renames idempotently then delete the journal (`rolled-forward`); clean → no-op; return `{ recovered, outcome }` `apps/vscode/src/services/stacWriterFs.ts`
+- [x] T021 Implement `reconcilePlotSave` in the IDB adaptor: return `clean` (IndexedDB never exposes partial transaction state); optionally prune an orphaned overlay-only record and report `rolled-back` `apps/web-shell/src/services/stacWriterIdb.ts`
+- [x] T022 Wire reconcile into the VS Code open path **before** `loadPlotData` (`openPlot.ts:155`); when `recovered`, show a non-modal `vscode.window.showWarningMessage('Recovered an interrupted save — opened the last good version of this plot.')` `apps/vscode/src/commands/openPlot.ts`
+- [x] T023 Wire reconcile into the web-shell open path **before** the `catalogReadView` read; on `recovered`, surface the existing non-blocking toast `apps/web-shell/src/services/catalogReadView.ts`
 
 ### Story integration test
 
-- [ ] T024 [test] Open-path integration — seed an "interrupted save" fixture (staged temps + journal), open the plot, assert it hydrates coherently and the recovery notice fired once `apps/vscode/tests/unit/openPlot.reconcile.test.ts`
+- [x] T024 [test] Open-path integration — seed an "interrupted save" fixture (staged temps + journal), open the plot, assert it hydrates coherently and the recovery notice fired once `apps/vscode/tests/unit/openPlot.reconcile.test.ts`
 
 **Checkpoint**: every interruption point resolves to a coherent plot on reopen, with a quiet notice. US3 independently testable. All three stories complete.
 
