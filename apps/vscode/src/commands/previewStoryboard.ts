@@ -27,6 +27,8 @@ export interface PreviewStoryboardDeps {
     setFeatures(featuresJson: string): void;
     start(): Promise<number>;
     getPreviewUrl(): string;
+    /** Trust the (possibly proxied) host `asExternalUri` resolved to (C-B7). */
+    trustExternalHost(externalUrl: string): void;
   };
   /** Wraps `vscode.env.asExternalUri` (loopback → tunnel-correct URL). */
   asExternalUri(url: string): Promise<string>;
@@ -73,6 +75,12 @@ export async function previewStoryboard(
     deps.showError(`Could not resolve the preview URL: ${(e as Error).message}`);
     return;
   }
+
+  // Under a Remote/Codespaces/code-server tunnel, `asExternalUri` rewrites the
+  // loopback to a public host that the proxy then forwards to the server as a
+  // foreign `Host`. Trust that exact host so the server's loopback allowlist
+  // (the local DNS-rebinding defence) does not 403 the legitimate request.
+  deps.server.trustExternalHost(externalUrl);
 
   const opened = await deps.openExternal(externalUrl);
   if (!opened) {

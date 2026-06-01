@@ -1694,10 +1694,26 @@ regress.
    network access but *not* DNS rebinding, where a malicious page resolves an
    attacker-controlled domain to `127.0.0.1` and reaches the server from its own
    origin — arriving as an ordinary local request carrying a *foreign* `Host`
-   header. The server enforces a **`Host` allowlist**: only `127.0.0.1[:<port>]`
-   is served; anything else gets `403`. With the ephemeral lifetime,
-   OS-assigned port, and read-only scope, this closes the loopback attack
-   surface (Article X).
+   header. The server enforces a **`Host` allowlist**: loopback names
+   (`127.0.0.1`/`localhost`/`[::1]`) are served; foreign hosts get `403`. With
+   the ephemeral lifetime, OS-assigned port, and read-only scope, this closes
+   the loopback attack surface (Article X).
+
+   **Tunnel exception (amended 2026-06-01).** Under a Remote/Codespaces/
+   code-server tunnel, `asExternalUri` rewrites the loopback to a *public* host
+   (e.g. `<app>.herokuapp.com/proxy/<port>/`) and the proxy forwards that
+   foreign `Host` to the server — which the strict allowlist `403`ed, so the
+   Preview tab showed a bare **"Forbidden"** under Heroku code-server. The
+   command now registers the `asExternalUri` host via `trustExternalHost`, and
+   the server additionally accepts it. This does not weaken the defence: in a
+   tunnel the server is bound to the *remote* host's loopback, reachable only
+   through the authenticated tunnel, so a browser cannot reach it by rebinding
+   (rebinding hits the *browser machine's* loopback, not the container's). The
+   non-tunneled local case registers nothing and keeps the strict allowlist.
+   Relatedly, the launch URL's `features` value is **relative**
+   (`?features=features.geojson`) so it resolves under the proxy path-prefix
+   (`/proxy/<port>/`) instead of escaping to the proxy root. See `bugs.md`
+   2026-06-01.
 
 3. **Web-shell hands off via a same-origin blob URL.** Web-shell scopes the
    active storyboard, builds a `Blob`, and opens the renderer (served

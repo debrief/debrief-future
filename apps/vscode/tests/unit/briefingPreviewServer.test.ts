@@ -88,19 +88,47 @@ describe('BriefingPreviewServer', () => {
     expect(JSON.parse(res.body)).toEqual(JSON.parse(FEATURES));
   });
 
-  it('getPreviewUrl points the renderer at the served features', () => {
-    expect(server.getPreviewUrl()).toBe(`http://127.0.0.1:${port}/?features=/features.geojson`);
+  it('getPreviewUrl points the renderer at the served features (relative — proxy-safe)', () => {
+    // Relative so it survives a proxy path-prefix (e.g. code-server
+    // `/proxy/<port>/`); an absolute `/features.geojson` would escape it.
+    expect(server.getPreviewUrl()).toBe(`http://127.0.0.1:${port}/?features=features.geojson`);
   });
 
-  it('C-B7: accepts the loopback Host and rejects a foreign Host with 403', async () => {
+  it('C-B7: accepts loopback names and rejects a foreign Host with 403', async () => {
     const ok = await request('/', `127.0.0.1:${port}`);
     expect(ok.status).toBe(200);
+
+    const okLocalhost = await request('/', `localhost:${port}`);
+    expect(okLocalhost.status).toBe(200);
 
     const rebind = await request('/features.geojson', 'evil.example.com');
     expect(rebind.status).toBe(403);
 
     const rebindBareName = await request('/', 'attacker.test');
     expect(rebindBareName.status).toBe(403);
+  });
+
+  it('C-B7: trusts the host asExternalUri produced under a tunnel (Heroku/code-server)', async () => {
+    // Simulates `asExternalUri` rewriting the loopback to a code-server proxy
+    // URL; the proxy forwards the public Host to this loopback server.
+    server.trustExternalHost(`https://debrief-preview-pr-656.herokuapp.com/proxy/${port}/?features=features.geojson`);
+
+    const proxied = await request('/', 'debrief-preview-pr-656.herokuapp.com');
+    expect(proxied.status).toBe(200);
+
+    // Port-tolerant (some proxies forward Host with an explicit :443).
+    const withPort = await request('/features.geojson', 'debrief-preview-pr-656.herokuapp.com:443');
+    expect(withPort.status).toBe(200);
+
+    // Only the registered host is trusted — other foreign hosts still 403.
+    const stillBlocked = await request('/', 'evil.example.com');
+    expect(stillBlocked.status).toBe(403);
+  });
+
+  it('C-B7: a loopback external URL registers nothing (strict allowlist intact)', async () => {
+    server.trustExternalHost(`http://127.0.0.1:${port}/?features=features.geojson`);
+    const stillBlocked = await request('/', 'evil.example.com');
+    expect(stillBlocked.status).toBe(403);
   });
 
   it('blocks path traversal outside the static root', async () => {
