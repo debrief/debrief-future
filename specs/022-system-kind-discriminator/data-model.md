@@ -82,9 +82,8 @@ Extends SystemStateProperties for spatial viewport state.
 |-------|------|----------|-------------|
 | `kind` | FeatureKindEnum | Yes | "SYSTEM" |
 | `state_type` | SystemStateTypeEnum | Yes | "spatial" |
-| `bbox` | float[4] | Yes | [minLon, minLat, maxLon, maxLat] |
-| `zoom` | float | No | Map zoom level |
-| `center` | float[2] | No | [lon, lat] center point |
+| `viewport` | ViewportPolygon | Yes | 4-corner polygon [NW, NE, SE, SW], each `{longitude, latitude}`, with optional `zoom` |
+| `rotation` | float | No | Map rotation in degrees (0-360) |
 
 ### SelectionStateProperties (NEW)
 
@@ -114,7 +113,7 @@ GeoJSON Feature for system state storage.
 3. **Kind Consistency**: `properties.kind` must equal `"SYSTEM"`
 4. **State Type Validity**: `properties.state_type` must be valid enum value
 5. **Temporal Range**: `start_time` must be before or equal to `end_time`
-6. **Bbox Validity**: `bbox` must have exactly 4 values in valid coordinate ranges
+6. **Viewport Validity**: `viewport.coordinates` must contain exactly 4 corners, each within valid coordinate ranges
 
 ## State Transitions
 

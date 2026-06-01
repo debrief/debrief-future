@@ -34,7 +34,7 @@ permitted `state_type` value.
       temporal:
         description: Time viewport state (start/end times)
       spatial:
-        description: Map viewport state (bbox, zoom)
+        description: Map viewport state (ViewportPolygon)
       selection:
         description: Feature selection state (selected IDs)
       active_storyboard:                        # ← NEW
