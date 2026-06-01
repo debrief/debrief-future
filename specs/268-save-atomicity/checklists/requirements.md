@@ -37,6 +37,8 @@
 
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`.
 - **UI Feature Validation items only apply if the spec contains a "User Interface Flow" section** — this spec does not, so those items are skipped (marked N/A), not failed.
-- Key informed-guess assumptions a reviewer may want to confirm during `/speckit.clarify`:
-  1. **Scope spans both hosts** (desktop filesystem + browser storage), enforced at the shared persistence boundary — chosen because the two hosts share that boundary and would otherwise carry identical partial-write risk (FR-009). A narrower "desktop-only" scope is the main alternative.
-  2. **Commit mechanism is left open** (staging+atomic-move vs. last-good recovery file) — deliberately deferred to `/speckit.plan` as a design decision; the spec fixes only the observable outcome.
+- Clarifications resolved (Session 2026-06-01 — see spec `## Clarifications`):
+  1. **Scope confirmed: both hosts** (desktop filesystem + browser storage), enforced at the shared persistence boundary (FR-009).
+  2. **Recovery UX confirmed: auto-restore last-good + non-blocking notice** — no analyst prompt, so the feature stays non-UI (FR-008).
+  3. **Reliability target confirmed: atomicity with a coherent fallback** — no guaranteed power-loss durability of the newest save (FR-005/FR-007).
+- **Commit mechanism** (staging+atomic-move vs. last-good recovery file) remains deliberately deferred to `/speckit.plan`.

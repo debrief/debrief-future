@@ -16,6 +16,14 @@ Because these writes are independently committable, a real‑world failure betwe
 
 This was a deliberately parked tech‑debt item; this specification is authored on explicit request to address it.
 
+## Clarifications
+
+### Session 2026-06-01
+
+- Q: What host scope should the atomic-save guarantee cover for this delivery? → A: Both hosts — enforced at the shared persistence boundary so the desktop (filesystem) and browser (storage) hosts both get all-or-nothing saves; the browser host covers only the writes it actually performs.
+- Q: When a plot is opened and leftovers from an interrupted/partial save are detected, how should they be resolved? → A: Automatically restore the last fully-committed version and show a non-blocking notice — the analyst is not prompted, so this remains a non-UI feature.
+- Q: For a save reported as successful, what reliability guarantee is required? → A: Atomicity with a coherent fallback — no torn/partial/inconsistent plot is ever observable; on a sudden power loss the plot may open as the last fully-committed version (the newest in-flight save can be lost). Guaranteed power-loss durability of the newest save is not required.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A failed save never corrupts my plot (Priority: P1)
@@ -46,7 +54,7 @@ As an analyst, if a save cannot fully complete, I am clearly told the save faile
 
 1. **Given** a save that fails partway, **When** the failure occurs, **Then** the analyst sees a clear failure message (not a success message).
 2. **Given** a save that fails partway, **When** the failure occurs, **Then** the plot remains marked as having unsaved changes and the analyst can immediately retry.
-3. **Given** a save that fully succeeds, **When** all writes have durably committed, **Then** — and only then — the success indication is shown and the unsaved‑changes indicator is cleared.
+3. **Given** a save that fully succeeds, **When** all of the save's writes have committed, **Then** — and only then — the success indication is shown and the unsaved‑changes indicator is cleared.
 
 ---
 
@@ -84,10 +92,10 @@ As an analyst, if a save is interrupted by something I cannot catch — a crash,
 - **FR-002**: All writes that constitute a single save (feature collection, STAC item metadata, and thumbnail/overview assets) MUST be committed as one unit; a failure in any one of them MUST prevent the others from becoming observable to a subsequent reader.
 - **FR-003**: The feature collection MUST be persisted such that a reader can never observe a partially‑written or torn file, in both the desktop and browser hosts.
 - **FR-004**: The feature‑collection write MUST go through the shared persistence boundary rather than a direct storage call, so it is subject to the same atomicity (and provenance/guard) guarantees as the other writes in the save.
-- **FR-005**: The system MUST NOT indicate a save as successful — i.e. MUST NOT clear the unsaved‑changes indicator or show a success message — unless every write that makes up the save has durably committed.
+- **FR-005**: The system MUST NOT indicate a save as successful — i.e. MUST NOT clear the unsaved‑changes indicator or show a success message — unless every write that makes up the save has committed (all of the save's writes atomically in place and observable as the new state). Guaranteed power-loss durability of the newest save is not required — see FR-007.
 - **FR-006**: When a save cannot complete, the system MUST surface a clear failure to the analyst, MUST retain the in‑editor changes so the analyst can retry, and MUST leave the previously‑persisted version intact and openable.
-- **FR-007**: If a save is interrupted by an uncatchable process termination, the next time the plot is opened the system MUST present a single coherent plot (the last committed version, or the new version if it had committed) and MUST NOT present a torn feature file or a plot whose features and metadata/thumbnails disagree.
-- **FR-008**: If an interruption left recoverable partial state, opening the plot MUST reconcile to a single coherent state and MUST inform the analyst, non‑blockingly, that a partial save was recovered.
+- **FR-007**: If a save is interrupted by an uncatchable process termination, the next time the plot is opened the system MUST present a single coherent plot (the last committed version, or the new version if it had committed) and MUST NOT present a torn feature file or a plot whose features and metadata/thumbnails disagree. The system is NOT required to guarantee that the newest in-flight save survives a power loss — only that whatever opens is coherent.
+- **FR-008**: If an interruption left recoverable partial state, opening the plot MUST **automatically** restore the last fully-committed state — without prompting the analyst — and MUST inform the analyst, non‑blockingly, that a partial save was recovered.
 - **FR-009**: The atomicity guarantee MUST be enforced at the shared persistence boundary so that it holds for whichever writes each host performs (desktop filesystem and browser storage) and so neither host can silently regress it.
 - **FR-010**: A rejected or invalid new state (failing validation, quota, or permission *before* any commit) MUST NOT modify, truncate, or delete the existing persisted plot.
 - **FR-011**: A normal, non‑failing save MUST remain functionally unchanged for the analyst — same artefacts produced, no new mandatory steps, and no perceptible regression in save responsiveness for typical plots.
@@ -112,7 +120,8 @@ As an analyst, if a save is interrupted by something I cannot catch — a crash,
 
 - Scope is the existing single‑plot "Save" flow. The analyst‑facing behaviour of a successful save is unchanged; only its failure/interruption behaviour and its commit boundary change.
 - "Atomic from the analyst's perspective" means no externally‑observable partial state. It does **not** require an OS‑level transactional filesystem — a stage‑then‑commit sequence or a recovery‑on‑open mechanism are both acceptable ways to meet the requirements.
-- The guarantee applies to whichever writes each host actually performs. The browser host currently performs a subset (it does not write plot thumbnails); the guarantee still applies to the writes it does perform.
+- Scope covers **both hosts** (desktop filesystem and browser storage), enforced at the shared persistence boundary (confirmed in Clarifications). The guarantee applies to whichever writes each host actually performs; the browser host currently performs a subset (it does not write plot thumbnails), and the guarantee still applies to the writes it does perform.
+- The required guarantee is atomicity and coherence, **not** guaranteed durability of the newest save against a sudden power loss (confirmed in Clarifications). On power loss a coherent earlier version may open; a best-effort flush is sufficient.
 - Single‑file atomicity and per‑transaction storage atomicity primitives already exist at the persistence boundary and can be built upon; this feature adds *multi‑write* (cross‑artefact) atomicity, not a new low‑level write primitive.
 - A plot is saved by a single writer at a time; simultaneous saves of the same plot from two editors are not a supported scenario.
 
