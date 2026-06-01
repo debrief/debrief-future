@@ -434,4 +434,3 @@ export function useStoryboardPanelProps(
     onSceneOverlapDismiss,
   };
 }
-}
