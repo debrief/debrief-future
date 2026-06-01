@@ -1710,10 +1710,17 @@ regress.
    through the authenticated tunnel, so a browser cannot reach it by rebinding
    (rebinding hits the *browser machine's* loopback, not the container's). The
    non-tunneled local case registers nothing and keeps the strict allowlist.
-   Relatedly, the launch URL's `features` value is **relative**
-   (`?features=features.geojson`) so it resolves under the proxy path-prefix
-   (`/proxy/<port>/`) instead of escaping to the proxy root. See `bugs.md`
-   2026-06-01.
+
+   Two related proxy-path issues were fixed in the same pass: (a) the launch
+   URL's `features` value is now **relative** (`?features=features.geojson`)
+   so it resolves under the proxy path-prefix (`/proxy/<port>/`) instead of
+   escaping to the proxy root; and (b) code-server's `asExternalUri` rewrite
+   **drops the query string** entirely, so the preview server now also injects
+   the features location into the served `index.html` as a global
+   (`window.__BRIEFING_PREVIEW_FEATURES__`), which the renderer reads (via
+   `resolveFeaturesUrl`) when `?features` is absent. Without (b) the renderer
+   loaded but played its dev fixture instead of the active storyboard. See
+   `bugs.md` 2026-06-01.
 
 3. **Web-shell hands off via a same-origin blob URL.** Web-shell scopes the
    active storyboard, builds a `Blob`, and opens the renderer (served

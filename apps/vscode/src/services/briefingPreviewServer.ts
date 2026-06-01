@@ -51,9 +51,29 @@ const LOOPBACK = '127.0.0.1';
 /** Loopback host *names* (any port) — the strict, rebinding-safe allowlist. */
 const LOOPBACK_NAMES: ReadonlySet<string> = new Set(['127.0.0.1', 'localhost', '[::1]']);
 
+/**
+ * Path the renderer fetches the scoped features from (this server serves them
+ * at `/features.geojson`). *Relative* — no leading slash — so it resolves
+ * against the renderer's document URL and survives a proxy path-prefix
+ * (code-server's `/proxy/<port>/`).
+ */
+const PREVIEW_FEATURES_PATH = 'features.geojson';
+
 /** Lower-cased hostname with any trailing `:port` removed (IPv6-bracket safe). */
 function hostnameOf(hostHeader: string): string {
   return hostHeader.replace(/:\d+$/, '').toLowerCase();
+}
+
+/**
+ * Inject the features location into the served renderer HTML as a global. The
+ * launch URL also carries `?features=`, but code-server's `asExternalUri`
+ * rewrite to `/proxy/<port>/` drops the query — without this the renderer
+ * would see no `?features` and fall back to its dev fixture (showing the wrong
+ * storyboard). The renderer reads this global when `?features` is absent.
+ */
+function injectPreviewFeaturesMarker(html: string): string {
+  const marker = `<script>window.__BRIEFING_PREVIEW_FEATURES__=${JSON.stringify(PREVIEW_FEATURES_PATH)};</script>`;
+  return html.includes('</head>') ? html.replace('</head>', `${marker}</head>`) : marker + html;
 }
 
 export interface BriefingPreviewServerOptions {
@@ -113,7 +133,9 @@ export class BriefingPreviewServer {
     // own document URL — correct both at the loopback root and behind a proxy
     // path-prefix (e.g. code-server's `/proxy/<port>/`). An absolute
     // `/features.geojson` would escape that prefix and hit the proxy root.
-    return `http://${LOOPBACK}:${this.port}/?features=features.geojson`;
+    // (Under code-server this query is dropped by `asExternalUri`; the served
+    // index.html also injects the same path as a global — see serveStatic.)
+    return `http://${LOOPBACK}:${this.port}/?features=${PREVIEW_FEATURES_PATH}`;
   }
 
   /**
@@ -202,6 +224,13 @@ export class BriefingPreviewServer {
         return;
       }
       const ext = path.extname(resolved).toLowerCase();
+      if (ext === '.html') {
+        // Hand the features location to the renderer via an injected global,
+        // immune to the proxy dropping the launch `?features=` query (C-B4).
+        res.writeHead(200, { 'Content-Type': MIME_TYPES['.html']! });
+        res.end(injectPreviewFeaturesMarker(data.toString('utf8')));
+        return;
+      }
       res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] ?? 'application/octet-stream' });
       res.end(data);
     });

@@ -21,7 +21,10 @@ const FEATURES = JSON.stringify({
 
 beforeEach(async () => {
   staticRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'briefing-preview-'));
-  fs.writeFileSync(path.join(staticRoot, 'index.html'), '<!doctype html><title>Briefing</title>');
+  fs.writeFileSync(
+    path.join(staticRoot, 'index.html'),
+    '<!doctype html><html><head><title>Briefing</title></head><body><div id="briefing-root"></div></body></html>',
+  );
   fs.mkdirSync(path.join(staticRoot, 'assets'));
   fs.writeFileSync(path.join(staticRoot, 'assets', 'app.js'), 'console.log("briefing");');
   server = new BriefingPreviewServer({ staticRoot });
@@ -72,6 +75,15 @@ describe('BriefingPreviewServer', () => {
     expect(res.status).toBe(200);
     expect(res.body).toContain('Briefing');
     expect(res.contentType).toMatch(/text\/html/);
+  });
+
+  it('C-B4: injects the features location as a global (proxy drops the query)', async () => {
+    const res = await request('/');
+    // The renderer reads this when the launch `?features=` query is stripped
+    // by code-server's asExternalUri rewrite — without it, it dev-fixtures.
+    expect(res.body).toContain('window.__BRIEFING_PREVIEW_FEATURES__="features.geojson"');
+    // Injected into <head> so it runs before the deferred module script.
+    expect(res.body.indexOf('__BRIEFING_PREVIEW_FEATURES__')).toBeLessThan(res.body.indexOf('</head>'));
   });
 
   it('C-B3: serves renderer assets with the right MIME type', async () => {
