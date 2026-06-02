@@ -3,11 +3,6 @@
 # Slot: tool_version 
 
 
-_Semantic version of the tool (e.g., 1.2.0)._
-
-
-
-
 
 URI: [debrief:slot/tool_version](https://debrief.info/schemas/slot/tool_version)
 Alias: tool_version
@@ -23,6 +18,7 @@ Alias: tool_version
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [WasGeneratedBy](../classes/WasGeneratedBy.md) | Identifies the tool and its parameters for a specific invocation |  no  |
+| [ToolExecutionResultForReplay](../classes/ToolExecutionResultForReplay.md) | Minimal tool-execution result returned by the Replay Engine's `execute_tool` ... |  no  |
 
 
 
@@ -33,8 +29,6 @@ Alias: tool_version
 
 * Range: [String](../types/String.md)
 
-* Required: True
-
 
 
 
@@ -42,13 +36,6 @@ Alias: tool_version
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -68,15 +55,11 @@ Alias: tool_version
 <details>
 ```yaml
 name: tool_version
-description: Semantic version of the tool (e.g., 1.2.0).
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: tool_version
-owner: WasGeneratedBy
 domain_of:
 - WasGeneratedBy
+- ToolExecutionResultForReplay
 range: string
-required: true
 
 ```
 </details>

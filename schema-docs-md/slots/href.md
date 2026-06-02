@@ -17,8 +17,10 @@ Alias: href
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [ToolResultAnnotations](../classes/ToolResultAnnotations.md) | Annotations for MCP tool result content items |  no  |
 | [SceneThumbnailAssetEntry](../classes/SceneThumbnailAssetEntry.md) | A single STAC Item asset entry produced by Storyboarding (#216) for one |  no  |
+| [ToolResultAnnotations](../classes/ToolResultAnnotations.md) | Annotations for MCP tool result content items |  no  |
+| [StacAsset](../classes/StacAsset.md) | A single asset entry within `assets[<key>]` |  no  |
+| [StacLink](../classes/StacLink.md) | A single link entry within `links[]` |  no  |
 
 
 
@@ -57,6 +59,8 @@ Alias: href
 name: href
 alias: href
 domain_of:
+- StacLink
+- StacAsset
 - ToolResultAnnotations
 - SceneThumbnailAssetEntry
 range: string

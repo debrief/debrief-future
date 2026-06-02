@@ -3,11 +3,6 @@
 # Slot: max 
 
 
-_Maximum number of features of this kind allowed. Must be >= min if both specified. Null means no upper limit._
-
-
-
-
 
 URI: [debrief:slot/max](https://debrief.info/schemas/slot/max)
 Alias: max
@@ -22,6 +17,7 @@ Alias: max
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
+| [MCPSelectionRequirement](../classes/MCPSelectionRequirement.md) | Predicate describing what feature selection a tool needs (e |  no  |
 | [SelectionRequirement](../classes/SelectionRequirement.md) | A constraint specifying which feature kinds a tool accepts, with minimum and ... |  no  |
 
 
@@ -31,9 +27,7 @@ Alias: max
 
 ## Properties
 
-* Range: [Integer](../types/Integer.md)
-
-* Minimum Value: 0
+* Range: [String](../types/String.md)
 
 
 
@@ -42,13 +36,6 @@ Alias: max
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -68,17 +55,11 @@ Alias: max
 <details>
 ```yaml
 name: max
-description: Maximum number of features of this kind allowed. Must be >= min if both
-  specified. Null means no upper limit.
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: max
-owner: SelectionRequirement
 domain_of:
 - SelectionRequirement
-range: integer
-required: false
-minimum_value: 0
+- MCPSelectionRequirement
+range: string
 
 ```
 </details>

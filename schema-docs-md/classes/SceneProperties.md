@@ -23,7 +23,31 @@ URI: [debrief:class/SceneProperties](https://debrief.info/schemas/class/ScenePro
       BaseFeatureProperties <|-- SceneProperties
         click BaseFeatureProperties href "../../classes/BaseFeatureProperties/"
       
+      SceneProperties : _polygon_source
+        
+          
+    
+        
+        
+        SceneProperties --> "0..1" PolygonSourceEnum : _polygon_source
+        click PolygonSourceEnum href "../../enums/PolygonSourceEnum/"
+    
+
+        
+      SceneProperties : creation_order
+        
       SceneProperties : description
+        
+      SceneProperties : display_mode
+        
+          
+    
+        
+        
+        SceneProperties --> "0..1" DisplayModeEnum : display_mode
+        click DisplayModeEnum href "../../enums/DisplayModeEnum/"
+    
+
         
       SceneProperties : feature_set_hash
         
@@ -59,11 +83,31 @@ URI: [debrief:class/SceneProperties](https://debrief.info/schemas/class/ScenePro
         
       SceneProperties : time_range
         
+          
+    
+        
+        
+        SceneProperties --> "0..1" TimeRange : time_range
+        click TimeRange href "../../classes/TimeRange/"
+    
+
+        
       SceneProperties : timestamp
         
       SceneProperties : title
         
       SceneProperties : transition_duration_ms
+        
+      SceneProperties : vertex_metadata
+        
+          
+    
+        
+        
+        SceneProperties --> "*" VertexMetadata : vertex_metadata
+        click VertexMetadata href "../../classes/VertexMetadata/"
+    
+
         
       SceneProperties : viewport
         
@@ -75,6 +119,19 @@ URI: [debrief:class/SceneProperties](https://debrief.info/schemas/class/ScenePro
         click Viewport href "../../classes/Viewport/"
     
 
+        
+      SceneProperties : viewport_end
+        
+          
+    
+        
+        
+        SceneProperties --> "0..1" Viewport : viewport_end
+        click Viewport href "../../classes/Viewport/"
+    
+
+        
+      SceneProperties : visible
         
       SceneProperties : visible_feature_ids
         
@@ -102,13 +159,19 @@ URI: [debrief:class/SceneProperties](https://debrief.info/schemas/class/ScenePro
 | [description](../slots/description.md) | 0..1 <br/> [String](../types/String.md) | Markdown per-scene narrative | direct |
 | [viewport](../slots/viewport.md) | 1 <br/> [Viewport](../classes/Viewport.md) | Map viewport camera state at capture time | direct |
 | [timestamp](../slots/timestamp.md) | 1 <br/> [datetime](../slots/datetime.md) | ISO-8601 instant when the Scene was captured | direct |
-| [time_range](../slots/time_range.md) | 0..1 <br/> [String](../types/String.md) | Reserved slot for v2 animated time-range Scenes | direct |
+| [creation_order](../slots/creation_order.md) | 1 <br/> [Integer](../types/Integer.md) | Per-Storyboard monotonic sequence value assigned by the platform at capture t... | direct |
+| [time_range](../slots/time_range.md) | 0..1 <br/> [TimeRange](../classes/TimeRange.md) | For instant Scenes (#215 default): MUST be absent | direct |
+| [viewport_end](../slots/viewport_end.md) | 0..1 <br/> [Viewport](../classes/Viewport.md) | Map viewport camera state at the end of a time-range Scene (#263) | direct |
 | [visible_feature_ids](../slots/visible_feature_ids.md) | 1..* <br/> [String](../types/String.md) | Stable feature IDs visible at capture | direct |
 | [feature_set_hash](../slots/feature_set_hash.md) | 1 <br/> [String](../types/String.md) | SHA-256 hex (lowercase, 64 chars) of JSON | direct |
 | [thumbnail_asset_ref](../slots/thumbnail_asset_ref.md) | 1 <br/> [String](../types/String.md) | STAC asset key (path + name within the plot's STAC item) | direct |
 | [transition_duration_ms](../slots/transition_duration_ms.md) | 1 <br/> [Integer](../types/Integer.md) | Playback transition duration in milliseconds | direct |
+| [display_mode](../slots/display_mode.md) | 0..1 <br/> [DisplayModeEnum](../enums/DisplayModeEnum.md) | Time-controller display mode at capture time (full = entire track history; tr... | direct |
+| [_polygon_source](../slots/_polygon_source.md) | 0..1 <br/> [PolygonSourceEnum](../enums/PolygonSourceEnum.md) | Provenance of the scene's stored polygon geometry (Spec #258) | direct |
 | [tags](../slots/tags.md) | * <br/> [String](../types/String.md) | Free-text labels assigned to this feature by the analyst | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
+| [visible](../slots/visible.md) | 0..1 <br/> [Boolean](../types/Boolean.md) | Whether this feature is shown on the map | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
 | [provenance](../slots/provenance.md) | * <br/> [LogEntry](../classes/LogEntry.md) | PROV-aligned provenance records (append-only log of tool operations) | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
+| [vertex_metadata](../slots/vertex_metadata.md) | * <br/> [VertexMetadata](../classes/VertexMetadata.md) | Sparse list of per-vertex metadata, keyed by `path` | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
 
 
 
@@ -119,6 +182,24 @@ URI: [debrief:class/SceneProperties](https://debrief.info/schemas/class/ScenePro
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [SceneFeature](../classes/SceneFeature.md) | [properties](../slots/properties.md) | range | [SceneProperties](../classes/SceneProperties.md) |
+
+
+
+
+## Rules
+
+
+### 
+
+| Rule Applied | Preconditions | Postconditions | Elseconditions |
+|--------------|---------------|----------------|----------------|| slot_conditions |```{'time_range': {'value_presence': 'PRESENT'}}``` |```{'viewport_end': {'value_presence': 'PRESENT'}}``` | |
+
+
+
+### 
+
+| Rule Applied | Preconditions | Postconditions | Elseconditions |
+|--------------|---------------|----------------|----------------|| slot_conditions |```{'viewport_end': {'value_presence': 'PRESENT'}}``` |```{'time_range': {'value_presence': 'PRESENT'}}``` | |
 
 
 
@@ -190,6 +271,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: FeatureKindEnum
     required: true
     equals_string: STORYBOARD_SCENE
@@ -214,11 +296,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
     pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
@@ -240,6 +326,12 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - DatasetEntry
     - SceneProperties
     - SceneThumbnailAssetEntry
@@ -255,9 +347,18 @@ attributes:
     - MultiPolygonFeatureProperties
     - Tool
     - ToolParameter
+    - StacProvider
+    - StacItemProperties
+    - StacCatalog
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - LevelDefinition
     - StoryboardProperties
     - SceneProperties
+    - MCPParamSchema
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: false
   viewport:
@@ -265,14 +366,17 @@ attributes:
     description: Map viewport camera state at capture time
     from_schema: https://debrief.info/schemas/storyboard
     domain_of:
+    - SystemStateProperties
     - SpatialSlice
     - SceneProperties
     range: Viewport
     required: true
   timestamp:
     name: timestamp
-    description: ISO-8601 instant when the Scene was captured. Drives Scene ordering
-      (ascending within a Storyboard). MUST be unique within a Storyboard.
+    description: 'ISO-8601 instant when the Scene was captured. Drives Scene ordering
+      (ascending within a Storyboard) as the primary sort key. Multiple Scenes MAY
+      share the same timestamp; ties are broken by `creation_order` ascending (see
+      #259).'
     from_schema: https://debrief.info/schemas/storyboard
     domain_of:
     - LogEntry
@@ -283,15 +387,43 @@ attributes:
     - SceneProperties
     range: datetime
     required: true
-  time_range:
-    name: time_range
-    description: Reserved slot for v2 animated time-range Scenes. MUST be absent (null)
-      in schema v1.
+  creation_order:
+    name: creation_order
+    description: 'Per-Storyboard monotonic sequence value assigned by the platform
+      at capture time. Acts as the secondary sort key for Scenes — when two Scenes
+      share a `timestamp` the one with the lower `creation_order` comes first. Unique
+      within a Storyboard; gaps are permitted (left by deletion). The platform — not
+      the client — is the source of truth. Introduced by #259; absent on pre-#259
+      plots which are rejected at load (no migration shim — Article XIV pre-release
+      freedom).'
     from_schema: https://debrief.info/schemas/storyboard
     rank: 1000
     domain_of:
     - SceneProperties
-    range: string
+    range: integer
+    required: true
+    minimum_value: 0
+  time_range:
+    name: time_range
+    description: 'For instant Scenes (#215 default): MUST be absent. For time-range
+      Scenes (#263): a TimeRange sub-record. When present, the Scene is the time-range
+      flavour and `viewport_end` MUST also be present. See cross-field rule `scene-flavour-xor-rule`.'
+    from_schema: https://debrief.info/schemas/storyboard
+    rank: 1000
+    domain_of:
+    - SceneProperties
+    range: TimeRange
+    required: false
+  viewport_end:
+    name: viewport_end
+    description: Map viewport camera state at the end of a time-range Scene (#263).
+      MUST be present if and only if `time_range` is present. Reuses the Viewport
+      sub-record (`bearing` MUST be 0). For instant Scenes this slot MUST be absent.
+    from_schema: https://debrief.info/schemas/storyboard
+    rank: 1000
+    domain_of:
+    - SceneProperties
+    range: Viewport
     required: false
   visible_feature_ids:
     name: visible_feature_ids
@@ -336,6 +468,60 @@ attributes:
     range: integer
     required: true
     minimum_value: 0
+  display_mode:
+    name: display_mode
+    description: 'Time-controller display mode at capture time (full = entire track
+      history; trail = only the tail behind each platform). Reuses DisplayModeEnum
+      from session-state.yaml. Optional for legacy compatibility (Spec #258): readers
+      MUST leave the time controller untouched when this slot is absent (FR-003).
+      Writers populate it from session.displayMode at the moment the scene is created.'
+    from_schema: https://debrief.info/schemas/storyboard
+    domain_of:
+    - SystemStateProperties
+    - SceneProperties
+    range: DisplayModeEnum
+    required: false
+  _polygon_source:
+    name: _polygon_source
+    description: 'Provenance of the scene''s stored polygon geometry (Spec #258).
+      ''bounds'' = computed from real Leaflet map bounds at capture time; ''placeholder''
+      = pre-#258 ~100m square; ''manual'' = reserved for future user-drawn rectangles.
+      Render-side consumers recompute the polygon from (viewport, map dimensions)
+      when this value is anything other than ''bounds'' (including absent, for legacy
+      scenes). The stored geometry is NEVER rewritten on read (Article III.2 source
+      preservation).'
+    from_schema: https://debrief.info/schemas/storyboard
+    rank: 1000
+    domain_of:
+    - SceneProperties
+    range: PolygonSourceEnum
+    required: false
+rules:
+- preconditions:
+    slot_conditions:
+      time_range:
+        name: time_range
+        value_presence: PRESENT
+  postconditions:
+    slot_conditions:
+      viewport_end:
+        name: viewport_end
+        value_presence: PRESENT
+  description: 'Scene flavour XOR (#263): a Scene is either the instant flavour (both
+    `time_range` and `viewport_end` absent) or the time-range flavour (both present).
+    Any other combination is rejected with `SceneFlavourXorViolation`.'
+- preconditions:
+    slot_conditions:
+      viewport_end:
+        name: viewport_end
+        value_presence: PRESENT
+  postconditions:
+    slot_conditions:
+      time_range:
+        name: time_range
+        value_presence: PRESENT
+  description: 'Scene flavour XOR (#263, reverse): if `viewport_end` is present then
+    `time_range` MUST also be present.'
 
 ```
 </details>
@@ -374,6 +560,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: FeatureKindEnum
     required: true
     equals_string: STORYBOARD_SCENE
@@ -400,11 +587,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
     pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
@@ -430,6 +621,12 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - DatasetEntry
     - SceneProperties
     - SceneThumbnailAssetEntry
@@ -447,9 +644,18 @@ attributes:
     - MultiPolygonFeatureProperties
     - Tool
     - ToolParameter
+    - StacProvider
+    - StacItemProperties
+    - StacCatalog
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - LevelDefinition
     - StoryboardProperties
     - SceneProperties
+    - MCPParamSchema
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: false
   viewport:
@@ -459,14 +665,17 @@ attributes:
     alias: viewport
     owner: SceneProperties
     domain_of:
+    - SystemStateProperties
     - SpatialSlice
     - SceneProperties
     range: Viewport
     required: true
   timestamp:
     name: timestamp
-    description: ISO-8601 instant when the Scene was captured. Drives Scene ordering
-      (ascending within a Storyboard). MUST be unique within a Storyboard.
+    description: 'ISO-8601 instant when the Scene was captured. Drives Scene ordering
+      (ascending within a Storyboard) as the primary sort key. Multiple Scenes MAY
+      share the same timestamp; ties are broken by `creation_order` ascending (see
+      #259).'
     from_schema: https://debrief.info/schemas/storyboard
     alias: timestamp
     owner: SceneProperties
@@ -479,17 +688,49 @@ attributes:
     - SceneProperties
     range: datetime
     required: true
+  creation_order:
+    name: creation_order
+    description: 'Per-Storyboard monotonic sequence value assigned by the platform
+      at capture time. Acts as the secondary sort key for Scenes — when two Scenes
+      share a `timestamp` the one with the lower `creation_order` comes first. Unique
+      within a Storyboard; gaps are permitted (left by deletion). The platform — not
+      the client — is the source of truth. Introduced by #259; absent on pre-#259
+      plots which are rejected at load (no migration shim — Article XIV pre-release
+      freedom).'
+    from_schema: https://debrief.info/schemas/storyboard
+    rank: 1000
+    alias: creation_order
+    owner: SceneProperties
+    domain_of:
+    - SceneProperties
+    range: integer
+    required: true
+    minimum_value: 0
   time_range:
     name: time_range
-    description: Reserved slot for v2 animated time-range Scenes. MUST be absent (null)
-      in schema v1.
+    description: 'For instant Scenes (#215 default): MUST be absent. For time-range
+      Scenes (#263): a TimeRange sub-record. When present, the Scene is the time-range
+      flavour and `viewport_end` MUST also be present. See cross-field rule `scene-flavour-xor-rule`.'
     from_schema: https://debrief.info/schemas/storyboard
     rank: 1000
     alias: time_range
     owner: SceneProperties
     domain_of:
     - SceneProperties
-    range: string
+    range: TimeRange
+    required: false
+  viewport_end:
+    name: viewport_end
+    description: Map viewport camera state at the end of a time-range Scene (#263).
+      MUST be present if and only if `time_range` is present. Reuses the Viewport
+      sub-record (`bearing` MUST be 0). For instant Scenes this slot MUST be absent.
+    from_schema: https://debrief.info/schemas/storyboard
+    rank: 1000
+    alias: viewport_end
+    owner: SceneProperties
+    domain_of:
+    - SceneProperties
+    range: Viewport
     required: false
   visible_feature_ids:
     name: visible_feature_ids
@@ -542,6 +783,38 @@ attributes:
     range: integer
     required: true
     minimum_value: 0
+  display_mode:
+    name: display_mode
+    description: 'Time-controller display mode at capture time (full = entire track
+      history; trail = only the tail behind each platform). Reuses DisplayModeEnum
+      from session-state.yaml. Optional for legacy compatibility (Spec #258): readers
+      MUST leave the time controller untouched when this slot is absent (FR-003).
+      Writers populate it from session.displayMode at the moment the scene is created.'
+    from_schema: https://debrief.info/schemas/storyboard
+    alias: display_mode
+    owner: SceneProperties
+    domain_of:
+    - SystemStateProperties
+    - SceneProperties
+    range: DisplayModeEnum
+    required: false
+  _polygon_source:
+    name: _polygon_source
+    description: 'Provenance of the scene''s stored polygon geometry (Spec #258).
+      ''bounds'' = computed from real Leaflet map bounds at capture time; ''placeholder''
+      = pre-#258 ~100m square; ''manual'' = reserved for future user-drawn rectangles.
+      Render-side consumers recompute the polygon from (viewport, map dimensions)
+      when this value is anything other than ''bounds'' (including absent, for legacy
+      scenes). The stored geometry is NEVER rewritten on read (Article III.2 source
+      preservation).'
+    from_schema: https://debrief.info/schemas/storyboard
+    rank: 1000
+    alias: _polygon_source
+    owner: SceneProperties
+    domain_of:
+    - SceneProperties
+    range: PolygonSourceEnum
+    required: false
   tags:
     name: tags
     description: Free-text labels assigned to this feature by the analyst
@@ -551,11 +824,27 @@ attributes:
     owner: SceneProperties
     domain_of:
     - BaseFeatureProperties
+    - VertexMetadata
     - StacExtensionProperties
     - StacItemSummary
     range: string
     required: false
     multivalued: true
+  visible:
+    name: visible
+    description: Whether this feature is shown on the map. Absent or true means visible;
+      false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist
+      (feature 261). Per-feature visibility travels with the feature inside features.geojson.
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
+    alias: visible
+    owner: SceneProperties
+    domain_of:
+    - BaseFeatureProperties
+    - SensorContact
+    - SensorData
+    range: boolean
+    required: false
   provenance:
     name: provenance
     description: PROV-aligned provenance records (append-only log of tool operations)
@@ -571,6 +860,50 @@ attributes:
     multivalued: true
     inlined: true
     inlined_as_list: true
+  vertex_metadata:
+    name: vertex_metadata
+    description: 'Sparse list of per-vertex metadata, keyed by `path`. Empty arrays
+      MUST be omitted from the serialised feature (FR-010). Duplicate `path` values
+      MUST be rejected by validators (contract §Cross-cutting #3). Every concrete
+      subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec
+      #192, contracts/vertex-metadata-slot.md.'
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
+    alias: vertex_metadata
+    owner: SceneProperties
+    domain_of:
+    - BaseFeatureProperties
+    range: VertexMetadata
+    required: false
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+rules:
+- preconditions:
+    slot_conditions:
+      time_range:
+        name: time_range
+        value_presence: PRESENT
+  postconditions:
+    slot_conditions:
+      viewport_end:
+        name: viewport_end
+        value_presence: PRESENT
+  description: 'Scene flavour XOR (#263): a Scene is either the instant flavour (both
+    `time_range` and `viewport_end` absent) or the time-range flavour (both present).
+    Any other combination is rejected with `SceneFlavourXorViolation`.'
+- preconditions:
+    slot_conditions:
+      viewport_end:
+        name: viewport_end
+        value_presence: PRESENT
+  postconditions:
+    slot_conditions:
+      time_range:
+        name: time_range
+        value_presence: PRESENT
+  description: 'Scene flavour XOR (#263, reverse): if `viewport_end` is present then
+    `time_range` MUST also be present.'
 
 ```
 </details>

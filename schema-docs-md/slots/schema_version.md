@@ -3,7 +3,7 @@
 # Slot: schema_version 
 
 
-_Schema version. Starts at 1. Monotonically non-decreasing across edits; bumped only by migrations._
+_Schema version. Bumped to 2 by #259 (relax timestamp uniqueness + add `SceneProperties.creation_order`). Pre-#259 plots carrying `schema_version: 1` are rejected at load with `UnsupportedSchemaVersionError` — no in-place migration is provided (Article XIV pre-release freedom; FR-010 in #259 spec). Monotonically non-decreasing across edits; bumped only by migrations or breaking schema changes._
 
 
 
@@ -35,7 +35,7 @@ Alias: schema_version
 
 * Required: True
 
-* Minimum Value: 1
+* Minimum Value: 2
 
 
 
@@ -70,8 +70,11 @@ Alias: schema_version
 <details>
 ```yaml
 name: schema_version
-description: Schema version. Starts at 1. Monotonically non-decreasing across edits;
-  bumped only by migrations.
+description: 'Schema version. Bumped to 2 by #259 (relax timestamp uniqueness + add
+  `SceneProperties.creation_order`). Pre-#259 plots carrying `schema_version: 1` are
+  rejected at load with `UnsupportedSchemaVersionError` — no in-place migration is
+  provided (Article XIV pre-release freedom; FR-010 in #259 spec). Monotonically non-decreasing
+  across edits; bumped only by migrations or breaking schema changes.'
 from_schema: https://debrief.info/schemas/debrief
 rank: 1000
 alias: schema_version
@@ -80,7 +83,7 @@ domain_of:
 - StoryboardProperties
 range: integer
 required: true
-minimum_value: 1
+minimum_value: 2
 
 ```
 </details>

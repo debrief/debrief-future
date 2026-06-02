@@ -166,6 +166,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: FeatureKindEnum
     required: true
     equals_string: SYSTEM_RECORD
@@ -245,6 +246,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: FeatureKindEnum
     required: true
     equals_string: SYSTEM_RECORD

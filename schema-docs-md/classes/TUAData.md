@@ -122,9 +122,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     required: true
   host_track_name:
     name: host_track_name
@@ -174,9 +177,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   host_track_name:

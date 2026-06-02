@@ -222,9 +222,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
   style:
     name: style
     description: Per-segment line styling override
@@ -403,9 +406,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
   style:
     name: style

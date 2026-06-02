@@ -55,6 +55,19 @@ URI: [debrief:class/StoryboardProperties](https://debrief.info/schemas/class/Sto
         
       StoryboardProperties : tags
         
+      StoryboardProperties : vertex_metadata
+        
+          
+    
+        
+        
+        StoryboardProperties --> "*" VertexMetadata : vertex_metadata
+        click VertexMetadata href "../../classes/VertexMetadata/"
+    
+
+        
+      StoryboardProperties : visible
+        
       
 ```
 
@@ -78,7 +91,9 @@ URI: [debrief:class/StoryboardProperties](https://debrief.info/schemas/class/Sto
 | [description](../slots/description.md) | 0..1 <br/> [String](../types/String.md) | Markdown narrative description | direct |
 | [schema_version](../slots/schema_version.md) | 1 <br/> [Integer](../types/Integer.md) | Schema version | direct |
 | [tags](../slots/tags.md) | * <br/> [String](../types/String.md) | Free-text labels assigned to this feature by the analyst | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
+| [visible](../slots/visible.md) | 0..1 <br/> [Boolean](../types/Boolean.md) | Whether this feature is shown on the map | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
 | [provenance](../slots/provenance.md) | * <br/> [LogEntry](../classes/LogEntry.md) | PROV-aligned provenance records (append-only log of tool operations) | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
+| [vertex_metadata](../slots/vertex_metadata.md) | * <br/> [VertexMetadata](../classes/VertexMetadata.md) | Sparse list of per-vertex metadata, keyed by `path` | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
 
 
 
@@ -160,6 +175,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: FeatureKindEnum
     required: true
     equals_string: STORYBOARD
@@ -184,11 +200,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
     pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
@@ -205,9 +225,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   description:
@@ -220,22 +243,34 @@ attributes:
     - MultiPolygonFeatureProperties
     - Tool
     - ToolParameter
+    - StacProvider
+    - StacItemProperties
+    - StacCatalog
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - LevelDefinition
     - StoryboardProperties
     - SceneProperties
+    - MCPParamSchema
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: false
   schema_version:
     name: schema_version
-    description: Schema version. Starts at 1. Monotonically non-decreasing across
-      edits; bumped only by migrations.
+    description: 'Schema version. Bumped to 2 by #259 (relax timestamp uniqueness
+      + add `SceneProperties.creation_order`). Pre-#259 plots carrying `schema_version:
+      1` are rejected at load with `UnsupportedSchemaVersionError` — no in-place migration
+      is provided (Article XIV pre-release freedom; FR-010 in #259 spec). Monotonically
+      non-decreasing across edits; bumped only by migrations or breaking schema changes.'
     from_schema: https://debrief.info/schemas/storyboard
     rank: 1000
     domain_of:
     - StoryboardProperties
     range: integer
     required: true
-    minimum_value: 1
+    minimum_value: 2
 
 ```
 </details>
@@ -274,6 +309,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: FeatureKindEnum
     required: true
     equals_string: STORYBOARD
@@ -300,11 +336,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
     pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
@@ -323,9 +363,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   description:
@@ -340,15 +383,27 @@ attributes:
     - MultiPolygonFeatureProperties
     - Tool
     - ToolParameter
+    - StacProvider
+    - StacItemProperties
+    - StacCatalog
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - LevelDefinition
     - StoryboardProperties
     - SceneProperties
+    - MCPParamSchema
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: false
   schema_version:
     name: schema_version
-    description: Schema version. Starts at 1. Monotonically non-decreasing across
-      edits; bumped only by migrations.
+    description: 'Schema version. Bumped to 2 by #259 (relax timestamp uniqueness
+      + add `SceneProperties.creation_order`). Pre-#259 plots carrying `schema_version:
+      1` are rejected at load with `UnsupportedSchemaVersionError` — no in-place migration
+      is provided (Article XIV pre-release freedom; FR-010 in #259 spec). Monotonically
+      non-decreasing across edits; bumped only by migrations or breaking schema changes.'
     from_schema: https://debrief.info/schemas/storyboard
     rank: 1000
     alias: schema_version
@@ -357,7 +412,7 @@ attributes:
     - StoryboardProperties
     range: integer
     required: true
-    minimum_value: 1
+    minimum_value: 2
   tags:
     name: tags
     description: Free-text labels assigned to this feature by the analyst
@@ -367,11 +422,27 @@ attributes:
     owner: StoryboardProperties
     domain_of:
     - BaseFeatureProperties
+    - VertexMetadata
     - StacExtensionProperties
     - StacItemSummary
     range: string
     required: false
     multivalued: true
+  visible:
+    name: visible
+    description: Whether this feature is shown on the map. Absent or true means visible;
+      false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist
+      (feature 261). Per-feature visibility travels with the feature inside features.geojson.
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
+    alias: visible
+    owner: StoryboardProperties
+    domain_of:
+    - BaseFeatureProperties
+    - SensorContact
+    - SensorData
+    range: boolean
+    required: false
   provenance:
     name: provenance
     description: PROV-aligned provenance records (append-only log of tool operations)
@@ -384,6 +455,24 @@ attributes:
     - SystemStateProperties
     - SystemRecordProperties
     range: LogEntry
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  vertex_metadata:
+    name: vertex_metadata
+    description: 'Sparse list of per-vertex metadata, keyed by `path`. Empty arrays
+      MUST be omitted from the serialised feature (FR-010). Duplicate `path` values
+      MUST be rejected by validators (contract §Cross-cutting #3). Every concrete
+      subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec
+      #192, contracts/vertex-metadata-slot.md.'
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
+    alias: vertex_metadata
+    owner: StoryboardProperties
+    domain_of:
+    - BaseFeatureProperties
+    range: VertexMetadata
+    required: false
     multivalued: true
     inlined: true
     inlined_as_list: true

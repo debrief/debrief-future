@@ -105,6 +105,7 @@ attributes:
     description: Human-readable axis label (e.g., "Time", "Range")
     from_schema: https://debrief.com/schemas/tool-result
     domain_of:
+    - VertexMetadata
     - PositionStyleOverride
     - SensorContact
     - TUASolution
@@ -145,6 +146,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -152,6 +159,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
   units:
@@ -181,6 +191,7 @@ attributes:
     alias: label
     owner: DatasetAxisMetadata
     domain_of:
+    - VertexMetadata
     - PositionStyleOverride
     - SensorContact
     - TUASolution
@@ -223,6 +234,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -230,6 +247,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
   units:

@@ -3,11 +3,6 @@
 # Slot: start_datetime 
 
 
-_Range start datetime (ISO 8601)_
-
-
-
-
 
 URI: [debrief:slot/start_datetime](https://debrief.info/schemas/slot/start_datetime)
 Alias: start_datetime
@@ -23,6 +18,7 @@ Alias: start_datetime
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
+| [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
 
 
 
@@ -43,13 +39,6 @@ Alias: start_datetime
 
 
 
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
-
-
-
 
 ## Mappings
 
@@ -66,15 +55,11 @@ Alias: start_datetime
 <details>
 ```yaml
 name: start_datetime
-description: Range start datetime (ISO 8601)
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: start_datetime
-owner: StacItemSummary
 domain_of:
 - StacItemSummary
+- StacItemProperties
 range: string
-required: false
 
 ```
 </details>

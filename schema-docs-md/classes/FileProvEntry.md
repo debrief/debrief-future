@@ -162,6 +162,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -169,6 +175,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: FileProvEventTypeEnum
     required: true
   timestamp:
@@ -264,6 +273,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -271,6 +286,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: FileProvEventTypeEnum
     required: true
   timestamp:

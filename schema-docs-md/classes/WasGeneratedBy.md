@@ -117,6 +117,7 @@ attributes:
     domain_of:
     - WasGeneratedBy
     - PropertiesProvenanceEntry
+    - MCPRequest
     range: string
     required: true
   tool_version:
@@ -126,6 +127,7 @@ attributes:
     rank: 1000
     domain_of:
     - WasGeneratedBy
+    - ToolExecutionResultForReplay
     range: string
     required: true
   parameters:
@@ -136,6 +138,7 @@ attributes:
     rank: 1000
     domain_of:
     - WasGeneratedBy
+    - ToolResult
     range: ParameterValue
     required: true
     multivalued: true
@@ -163,6 +166,7 @@ attributes:
     domain_of:
     - WasGeneratedBy
     - PropertiesProvenanceEntry
+    - MCPRequest
     range: string
     required: true
   tool_version:
@@ -174,6 +178,7 @@ attributes:
     owner: WasGeneratedBy
     domain_of:
     - WasGeneratedBy
+    - ToolExecutionResultForReplay
     range: string
     required: true
   parameters:
@@ -186,6 +191,7 @@ attributes:
     owner: WasGeneratedBy
     domain_of:
     - WasGeneratedBy
+    - ToolResult
     range: ParameterValue
     required: true
     multivalued: true

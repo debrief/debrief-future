@@ -3,11 +3,6 @@
 # Slot: tunable 
 
 
-_Whether this parameter can be modified during replay._
-
-
-
-
 
 URI: [debrief:slot/tunable](https://debrief.info/schemas/slot/tunable)
 Alias: tunable
@@ -23,6 +18,7 @@ Alias: tunable
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [ParameterValue](../classes/ParameterValue.md) | A typed parameter value with replay metadata |  no  |
+| [ToolParameterMeta](../classes/ToolParameterMeta.md) | Tunable parameter metadata recorded alongside a tool result for provenance |  no  |
 
 
 
@@ -31,7 +27,7 @@ Alias: tunable
 
 ## Properties
 
-* Range: [Boolean](../types/Boolean.md)
+* Range: [String](../types/String.md)
 
 
 
@@ -40,13 +36,6 @@ Alias: tunable
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -66,16 +55,11 @@ Alias: tunable
 <details>
 ```yaml
 name: tunable
-description: Whether this parameter can be modified during replay.
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
-ifabsent: 'true'
 alias: tunable
-owner: ParameterValue
 domain_of:
 - ParameterValue
-range: boolean
-required: false
+- ToolParameterMeta
+range: string
 
 ```
 </details>

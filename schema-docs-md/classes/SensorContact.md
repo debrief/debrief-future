@@ -254,6 +254,7 @@ attributes:
     description: Display label
     from_schema: https://debrief.info/schemas/geojson
     domain_of:
+    - VertexMetadata
     - PositionStyleOverride
     - SensorContact
     - TUASolution
@@ -288,8 +289,8 @@ attributes:
     name: visible
     description: Contact visibility
     from_schema: https://debrief.info/schemas/geojson
-    rank: 1000
     domain_of:
+    - BaseFeatureProperties
     - SensorContact
     - SensorData
     range: boolean
@@ -454,6 +455,7 @@ attributes:
     alias: label
     owner: SensorContact
     domain_of:
+    - VertexMetadata
     - PositionStyleOverride
     - SensorContact
     - TUASolution
@@ -494,10 +496,10 @@ attributes:
     name: visible
     description: Contact visibility
     from_schema: https://debrief.info/schemas/geojson
-    rank: 1000
     alias: visible
     owner: SensorContact
     domain_of:
+    - BaseFeatureProperties
     - SensorContact
     - SensorData
     range: boolean

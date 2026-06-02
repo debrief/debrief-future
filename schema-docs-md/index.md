@@ -66,7 +66,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 
 | Class | Description |
 | --- | --- |
-| [Any](classes/Any.md) | Permissive wildcard class used for free-form JSON object ranges (e |
+| [Any](classes/Any.md) | Wildcard class used for open-record extension-properties slots (StacItemPrope... |
 | [BaseFeatureProperties](classes/BaseFeatureProperties.md) | Abstract base for all GeoJSON feature properties classes |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[CircleAnnotationProperties](classes/CircleAnnotationProperties.md) | Properties for a CircleAnnotation |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[LineAnnotationProperties](classes/LineAnnotationProperties.md) | Properties for a LineAnnotation |
@@ -108,6 +108,13 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [LineAnnotation](classes/LineAnnotation.md) | GeoJSON Feature for line segment annotations |
 | [LineProperties](classes/LineProperties.md) | Styling schema for LineString and MultiLineString geometries |
 | [LogEntry](classes/LogEntry.md) | A PROV-aligned provenance record stored on GeoJSON features |
+| [MCPContentItem](classes/MCPContentItem.md) | A single MCP content item (resource, text, or image) |
+| [MCPErrorResponse](classes/MCPErrorResponse.md) | MCP error response envelope |
+| [MCPParamSchema](classes/MCPParamSchema.md) | JSON-Schema-like parameter fragment used inside MCPToolDefinition |
+| [MCPRequest](classes/MCPRequest.md) | MCP tool invocation envelope |
+| [MCPSelectionRequirement](classes/MCPSelectionRequirement.md) | Predicate describing what feature selection a tool needs (e |
+| [MCPToolDefinition](classes/MCPToolDefinition.md) | Static catalogue entry advertised by the MCP server |
+| [MCPToolResponse](classes/MCPToolResponse.md) | Successful MCP tool response |
 | [MeasuredArrayPosition](classes/MeasuredArrayPosition.md) | Timestamped geographic position of a towed array centre |
 | [MultiPointFeature](classes/MultiPointFeature.md) | GeoJSON Feature for multi-point tool results |
 | [MultiPolygonFeature](classes/MultiPolygonFeature.md) | GeoJSON Feature for multi-polygon tool results |
@@ -135,13 +142,23 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [SelectionRequirement](classes/SelectionRequirement.md) | A constraint specifying which feature kinds a tool accepts, with minimum and ... |
 | [SensorContact](classes/SensorContact.md) | Single sensor measurement record |
 | [SensorData](classes/SensorData.md) | Named sensor with contact measurements |
-| [SessionFile](classes/SessionFile.md) | Persisted session file format (FR-024) |
-| [SessionState](classes/SessionState.md) | Root entity containing all session state slices (FR-001, FR-002) |
 | [SnapshotLinks](classes/SnapshotLinks.md) | Doubly-linked references to adjacent snapshots |
 | [SnapshotRef](classes/SnapshotRef.md) | Reference to a snapshot file |
 | [SpatialSlice](classes/SpatialSlice.md) | Geographic view state for the map display |
+| [StacAsset](classes/StacAsset.md) | A single asset entry within `assets[<key>]` |
+| [StacCatalog](classes/StacCatalog.md) | A flat STAC Catalog (no extent, no summaries) |
+| [StacCollection](classes/StacCollection.md) | A STAC 1 |
 | [StacExtensionProperties](classes/StacExtensionProperties.md) | Extension properties added to STAC item |
+| [StacExtent](classes/StacExtent.md) | Spatial + temporal extent on a Collection |
+| [StacItem](classes/StacItem.md) | A STAC 1 |
+| [StacItemAssetDefinition](classes/StacItemAssetDefinition.md) | Item Asset Definition Object — declares the shape of an asset that child Item... |
+| [StacItemProperties](classes/StacItemProperties.md) | STAC Item `properties` block |
 | [StacItemSummary](classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |
+| [StacLink](classes/StacLink.md) | A single link entry within `links[]` |
+| [StacProvider](classes/StacProvider.md) | STAC provider entry |
+| [StacSpatialExtent](classes/StacSpatialExtent.md) | Spatial extent on a Collection |
+| [StacSummaries](classes/StacSummaries.md) | Pre-aggregated extension summaries on a Collection |
+| [StacTemporalExtent](classes/StacTemporalExtent.md) | Temporal extent on a Collection |
 | [StoryboardFeature](classes/StoryboardFeature.md) | GeoJSON Feature representing a Storyboard parent entity |
 | [SystemRecordProperties](classes/SystemRecordProperties.md) | Properties for the non-spatial system record feature |
 | [SystemState](classes/SystemState.md) | GeoJSON Feature for storing non-spatial system state |
@@ -154,14 +171,21 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [TimestampedPosition](classes/TimestampedPosition.md) | Temporal and kinematic metadata for a single track position |
 | [TimeStep](classes/TimeStep.md) | Step size for discrete time navigation (FR-008) |
 | [Tool](classes/Tool.md) | An analysis operation with a name, description, version, and selection requir... |
+| [ToolDefinition](classes/ToolDefinition.md) | Consumer-facing flattened view of a tool catalogue entry |
+| [ToolExecutionResultForReplay](classes/ToolExecutionResultForReplay.md) | Minimal tool-execution result returned by the Replay Engine's `execute_tool` ... |
 | [ToolParameter](classes/ToolParameter.md) | A configurable parameter for a tool |
+| [ToolParameterMeta](classes/ToolParameterMeta.md) | Tunable parameter metadata recorded alongside a tool result for provenance |
+| [ToolResult](classes/ToolResult.md) | Logical tool invocation result as seen by the consumer (after the MCP layer h... |
 | [ToolResultAnnotations](classes/ToolResultAnnotations.md) | Annotations for MCP tool result content items |
+| [ToolResultForLog](classes/ToolResultForLog.md) | Persisted tool-result shape written by the live tool-result logger and read b... |
+| [ToolsUpdateMessage](classes/ToolsUpdateMessage.md) | Push notification from the extension host to the activity-panel webview when ... |
 | [TrackFeature](classes/TrackFeature.md) | GeoJSON Feature representing a vessel track |
 | [TrackStyle](classes/TrackStyle.md) | Composite styling for TrackFeature, supporting both line path and position ma... |
 | [TUAData](classes/TUAData.md) | Named TUA solution collection |
 | [TUASolution](classes/TUASolution.md) | Single Target Uncertainty Area estimate |
 | [TuneAnnotation](classes/TuneAnnotation.md) | Records a parameter modification (appended, not replacing original) |
 | [VectorAnnotation](classes/VectorAnnotation.md) | GeoJSON Feature for vector annotations |
+| [VertexMetadata](classes/VertexMetadata.md) | Optional, sparse per-vertex annotation attached to a feature |
 | [Viewport](classes/Viewport.md) | Camera state sub-record inside a Scene |
 | [ViewportPolygon](classes/ViewportPolygon.md) | Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-01... |
 | [WasGeneratedBy](classes/WasGeneratedBy.md) | Identifies the tool and its parameters for a specific invocation |
@@ -172,7 +196,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 
 | Slot | Description |
 | --- | --- |
-| [$schema](slots/$schema.md) | JSON Schema URI |
+| [_polygon_source](slots/_polygon_source.md) | Provenance of the scene's stored polygon geometry (Spec #258) |
 | [active_storyboard_id](slots/active_storyboard_id.md) | Storyboard properties |
 | [activity_id](slots/activity_id.md) | Unique operation identifier (UUID v4) |
 | [activity_type](slots/activity_type.md) | Semantic kind of this provenance record |
@@ -180,8 +204,11 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [after_leg](slots/after_leg.md) | Name of following TMA leg (DYNAMIC_INFILL) |
 | [agent](slots/agent.md) | Human actor (e |
 | [ambiguous_bearing](slots/ambiguous_bearing.md) | Ambiguous bearing (second solution) in degrees |
+| [annotations](slots/annotations.md) | Debrief-specific annotations (`debrief:resultType`, `debrief:label`, `debrief... |
 | [array_centre_mode](slots/array_centre_mode.md) | How bearing line origin is calculated relative to host platform |
+| [artifact_href](slots/artifact_href.md) | Path to an exported artifact (for non-GeoJSON tool results) |
 | [asset](slots/asset.md) | Relative path to snapshot GeoJSON file |
+| [assets](slots/assets.md) | Asset map keyed by arbitrary string (`features`, `thumbnail`, `overview`, `so... |
 | [base_frequency](slots/base_frequency.md) | Base frequency in Hz (TMA segments) |
 | [bbox](slots/bbox.md) | Bounding box [minLon, minLat, maxLon, maxLat] |
 | [bearing](slots/bearing.md) | Bearing to contact in degrees (0-360) |
@@ -193,18 +220,29 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [branches](slots/branches.md) | Branch records |
 | [catalog_id](slots/catalog_id.md) | Parent catalog identifier |
 | [category](slots/category.md) | Visual category for Log Panel icon rendering |
-| [center](slots/center.md) | Map center [longitude, latitude] - for spatial state |
+| [center](slots/center.md) | Circle center as [longitude, latitude] for precise reconstruction |
 | [centre_lat](slots/centre_lat.md) | Absolute latitude (mutual exclusive with bearing/range) |
 | [centre_lon](slots/centre_lon.md) | Absolute longitude (mutual exclusive with bearing/range) |
+| [choices](slots/choices.md) | Explicit choice list for enum-typed parameters when the client cannot (or cho... |
+| [collection](slots/collection.md) | Parent Collection ID, when the Item belongs to a Collection (STAC 1 |
 | [color](slots/color.md) | Stroke color (CSS color string) |
 | [comment](slots/comment.md) | Operator note |
 | [contacts](slots/contacts.md) | Array of sensor measurements |
-| [coordinates](slots/coordinates.md) | [longitude, latitude] in degrees |
+| [content](slots/content.md) | Ordered list of content items returned by the tool |
+| [coordinates](slots/coordinates.md) | Four corners in clockwise order [NW, NE, SE, SW] |
 | [course](slots/course.md) | Course in degrees (0-360) |
+| [created](slots/created.md) | Processing-time creation timestamp (ISO 8601) |
+| [creation_order](slots/creation_order.md) | Per-Storyboard monotonic sequence value assigned by the platform at capture t... |
+| [current_time](slots/current_time.md) | Playhead position at save (ISO-8601) |
 | [currentTime](slots/currentTime.md) | Current playback/display time (FR-005) |
 | [dash_array](slots/dash_array.md) | Dash pattern (SVG format, e |
+| [data](slots/data.md) | Base64-encoded payload when type=image |
 | [data_points](slots/data_points.md) | Array of structured data records for this series |
+| [datasets](slots/datasets.md) | Optional dataset results for the Results panel (range-bearing charts, etc) |
 | [datetime](slots/datetime.md) | Creation/capture timestamp (ISO 8601) |
+| [debrief_feature_tags](slots/debrief_feature_tags.md) | Aggregated feature-level tags across all Items in the Collection |
+| [debrief_platforms](slots/debrief_platforms.md) | Aggregated per-platform metadata across all Items in the Collection |
+| [debrief_tags](slots/debrief_tags.md) | Aggregated plot-level tags across all Items in the Collection |
 | [default](slots/default.md) | Whether this is the default value |
 | [default_position_style](slots/default_position_style.md) | Default styling applied to all positions |
 | [default_value](slots/default_value.md) | Default value if not provided |
@@ -214,15 +252,18 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [direction](slots/direction.md) | 'source' or 'target' (for branch events) |
 | [dirty](slots/dirty.md) | Unsaved changes exist - ephemeral (FR-020) |
 | [disabled](slots/disabled.md) | Whether this entry is skipped during replay |
+| [display_mode](slots/display_mode.md) | Track visualization mode for this plot |
 | [display_name](slots/display_name.md) | Human-readable platform display name override |
 | [displayMode](slots/displayMode.md) | Track visualization mode (FR-011) |
-| [document](slots/document.md) | Editor state |
 | [domain](slots/domain.md) | Vessel domain override |
-| [end](slots/end.md) | End of time extent (ISO 8601) |
+| [duration_ms](slots/duration_ms.md) | Wall-clock duration of the tool invocation in milliseconds |
+| [end](slots/end.md) | End of interval |
 | [end_datetime](slots/end_datetime.md) | Range end datetime (ISO 8601) |
 | [end_time](slots/end_time.md) | Segment end timestamp (ISO8601) |
 | [epoch](slots/epoch.md) | Milliseconds since Unix epoch |
+| [error](slots/error.md) | Nested error object `{ code, message, data: { debrief:errorCategory, debrief:... |
 | [execution_duration](slots/execution_duration.md) | Wall-clock execution time in ISO 8601 duration format (e |
+| [extent](slots/extent.md) | Spatial + temporal extent |
 | [feature_id](slots/feature_id.md) | ID of the feature whose pre-operation state is captured |
 | [feature_set_hash](slots/feature_set_hash.md) | SHA-256 hex (lowercase, 64 chars) of JSON |
 | [feature_tags](slots/feature_tags.md) | Union of all feature-level tags from the plot's GeoJSON features |
@@ -233,6 +274,8 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [fill](slots/fill.md) | Whether to fill the shape |
 | [fill_color](slots/fill_color.md) | Fill color (CSS color string) |
 | [fill_opacity](slots/fill_opacity.md) | Fill transparency (0-1) |
+| [filter_end_time](slots/filter_end_time.md) | Visible-window filter end (ISO-8601) |
+| [filter_start_time](slots/filter_start_time.md) | Visible-window filter start (ISO-8601) |
 | [frequency](slots/frequency.md) | Measured frequency in Hz |
 | [generated](slots/generated.md) | Feature IDs or versioned asset paths of outputs |
 | [generated_result_id](slots/generated_result_id.md) | Stable logical identity for artifact-producing tools |
@@ -244,42 +287,55 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [host_sensor_name](slots/host_sensor_name.md) | Towed array sensor name (RELATIVE_TMA) |
 | [host_track_id](slots/host_track_id.md) | ID of track this solution is relative to (RELATIVE_TMA) |
 | [host_track_name](slots/host_track_name.md) | Name of track this TUA set relates to |
-| [href](slots/href.md) | Relative path to artifact file (REQUIRED for artifacts) |
+| [href](slots/href.md) | URI (relative or absolute) to the linked resource |
 | [id](slots/id.md) | Unique identifier (UUID recommended) |
 | [index](slots/index.md) | 0-based ordinal matching coordinates array position |
+| [input](slots/input.md) | Free-form per-tool input payload (Article XV |
+| [input_schema](slots/input_schema.md) | JSON-Schema fragment describing the tool's input payload |
 | [input_state](slots/input_state.md) | Pre-operation feature states for coordinate-mutating tools |
+| [interval](slots/interval.md) | List of `[start_datetime, end_datetime]` pairs |
+| [is_error](slots/is_error.md) | Reserved for streaming partial-error responses (additive over the live wire f... |
 | [iso](slots/iso.md) | ISO 8601 UTC format string |
+| [item_assets](slots/item_assets.md) | Optional Item-asset declarations (STAC 1 |
 | [item_path](slots/item_path.md) | Path to item |
 | [kind](slots/kind.md) | Feature type discriminator |
-| [label](slots/label.md) | Custom label text (null = use timestamp) |
+| [label](slots/label.md) | Free-text short label |
 | [label_interval](slots/label_interval.md) | ISO 8601 duration for interval-based label display |
 | [label_location](slots/label_location.md) | Label horizontal alignment |
 | [last_tool_execution](slots/last_tool_execution.md) | Last tool execution record for single-step undo |
 | [latitude](slots/latitude.md) | Latitude in degrees (-90 to 90) |
 | [legacy_style](slots/legacy_style.md) | Legacy symbol name from Debrief symbology (e |
+| [license](slots/license.md) | SPDX identifier or "other" (STAC 1 |
 | [line](slots/line.md) | Styling for the track line path |
 | [line_cap](slots/line_cap.md) | Line endpoint style |
 | [line_join](slots/line_join.md) | Line join style |
 | [line_number](slots/line_number.md) | Source line number for debugging |
 | [line_style](slots/line_style.md) | Bearing line visual style |
 | [line_thickness](slots/line_thickness.md) | Bearing line width in pixels |
+| [links](slots/links.md) | Catalog navigation links (`self`, `root`, `parent`, `derived_from`, etc |
 | [location](slots/location.md) | Array centre position [longitude, latitude] (GeoJSON coordinate order) |
 | [location_count](slots/location_count.md) | Number of reference locations in this plot |
 | [location_type](slots/location_type.md) | Type of reference |
 | [longitude](slots/longitude.md) | Longitude in degrees (-180 to 180) |
 | [max](slots/max.md) | Maximum number of features of this kind allowed |
 | [maxima](slots/maxima.md) | Semi-major axis in metres |
+| [maxTracks](slots/maxTracks.md) | Maximum number of tracks (absent = no upper limit) |
 | [measured_positions](slots/measured_positions.md) | Actual towed array positions for MEASURED array centre mode |
+| [message](slots/message.md) | Status / explanation message |
 | [metadata](slots/metadata.md) | Axis definitions and display hints |
 | [metadata_expression](slots/metadata_expression.md) | Serialised CQL2 filter expression from the filter bar, stored as an opaque JS... |
 | [metadata_filtered_ids](slots/metadata_filtered_ids.md) | Set of exercise IDs passing the current metadata filter |
 | [method](slots/method.md) | Versioned method identifier matching ^properties-panel@ |
+| [mimeType](slots/mimeType.md) | IANA media type when type=image or type=resource |
 | [min](slots/min.md) | Minimum number of features of this kind required |
+| [minFeatures](slots/minFeatures.md) | Minimum number of features required (any type) |
 | [minima](slots/minima.md) | Semi-minor axis in metres |
+| [minTracks](slots/minTracks.md) | Minimum number of tracks required |
 | [name](slots/name.md) | Human-readable segment name |
 | [nationality](slots/nationality.md) | ISO 3166-1 alpha-2 country code override (e |
 | [new_value](slots/new_value.md) | Value after tuning |
 | [next](slots/next.md) | Link to next snapshot |
+| [note](slots/note.md) | Free-text long note |
 | [offset](slots/offset.md) | Sensor offset from host platform in metres |
 | [offset_bearing](slots/offset_bearing.md) | Bearing offset in degrees (RELATIVE_TMA) |
 | [offset_range](slots/offset_range.md) | Range offset in metres (RELATIVE_TMA) |
@@ -290,10 +346,12 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [param_type](slots/param_type.md) | References a schema-defined parameter-type enum by name |
 | [parameter](slots/parameter.md) | Name of the parameter that was changed |
 | [parameters](slots/parameters.md) | Full resolved parameter set |
-| [path](slots/path.md) | Full hierarchical path |
+| [path](slots/path.md) | Structured vertex address following the selectionPath convention |
+| [payload](slots/payload.md) | Nested payload `{ tools, hasToolInventory?, hasSelection? }` |
 | [platform_id](slots/platform_id.md) | Platform/vessel identifier |
 | [platform_name](slots/platform_name.md) | Human-readable platform name |
 | [platforms](slots/platforms.md) | Fully-resolved per-platform metadata array |
+| [playback_rate](slots/playback_rate.md) | Playback speed multiplier for this plot (0 |
 | [playbackRate](slots/playbackRate.md) | Playback speed multiplier 0 |
 | [playbackState](slots/playbackState.md) | Current playback state - ephemeral (FR-010) |
 | [point](slots/point.md) | Styling for position markers |
@@ -307,24 +365,30 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [prov_entry_count](slots/prov_entry_count.md) | Number of provenance entries in the snapshot |
 | [provenance](slots/provenance.md) | PROV-aligned provenance records (append-only log of tool operations) |
 | [provenance_log](slots/provenance_log.md) | Per-commit provenance entries written by the Properties Panel |
+| [providers](slots/providers.md) | Organisations involved in producing / hosting this plot |
 | [put_label_at](slots/put_label_at.md) | Label position along bearing line |
 | [radius](slots/radius.md) | Marker radius in pixels |
 | [range](slots/range.md) | Range to contact in metres |
 | [rationale](slots/rationale.md) | Free-text analyst annotation explaining the reasoning for this operation |
+| [rel](slots/rel.md) | Link relation (`self`, `root`, `parent`, `item`, `child`, `derived_from`, etc |
 | [required](slots/required.md) | Whether parameter must be provided |
 | [requirements](slots/requirements.md) | List of selection requirements |
+| [resource](slots/resource.md) | Nested resource descriptor `{ uri, mimeType, text }` when type=resource |
+| [result_id](slots/result_id.md) | Stable result identifier (used by the activity panel) |
 | [result_layer_ids](slots/result_layer_ids.md) | IDs of the result layers produced by the tool |
 | [result_layers](slots/result_layers.md) | Accumulated tool result features |
+| [result_type](slots/result_type.md) | Hierarchical result type (e |
+| [resultLayer](slots/resultLayer.md) | Optional single result layer (e |
+| [resultLayers](slots/resultLayers.md) | Optional multiple result layers (e |
 | [resultType](slots/resultType.md) | Hierarchical result type (e |
-| [roles](slots/roles.md) | Exactly ["thumbnail"] |
-| [rotation](slots/rotation.md) | Map rotation in degrees 0-360 (FR-013) |
-| [savedAt](slots/savedAt.md) | When the session was saved (ISO 8601) |
+| [roles](slots/roles.md) | Roles played by this provider — "licensor", "producer", "processor", or "host... |
+| [rotation](slots/rotation.md) | Map rotation in degrees (0-360) |
 | [savePath](slots/savePath.md) | Last save location |
 | [schema_version](slots/schema_version.md) | Schema version |
-| [schemaVersion](slots/schemaVersion.md) | Schema version for persistence compatibility (FR-026) |
 | [segment_type](slots/segment_type.md) | Segment type discriminator |
 | [segments](slots/segments.md) | Per-segment metadata for compound tracks |
 | [selected_ids](slots/selected_ids.md) | Array of selected feature IDs - for selection state |
+| [selected_primary](slots/selected_primary.md) | Primary selection path for properties display |
 | [selection](slots/selection.md) | Currently selected features (FR-017) |
 | [sensors](slots/sensors.md) | Embedded sensor data associated with this track |
 | [series](slots/series.md) | Named data series for multi-line/multi-series charts |
@@ -333,6 +397,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [show_label](slots/show_label.md) | Whether to display labels at positions |
 | [show_symbol](slots/show_symbol.md) | Whether to display a symbol at positions |
 | [snapshot_links](slots/snapshot_links.md) | Doubly-linked snapshot chain |
+| [snapshot_timestamp](slots/snapshot_timestamp.md) | ISO-8601 UTC timestamp recorded when a snapshot asset is written |
 | [solutions](slots/solutions.md) | Array of TUA estimates |
 | [source](slots/source.md) | Origin of the edit |
 | [source_asset](slots/source_asset.md) | Relative path to the source plot file |
@@ -341,35 +406,41 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [source_path](slots/source_path.md) | Original source file path (for provenance) |
 | [source_tool](slots/source_tool.md) | Name of calculation tool that produced this result |
 | [sourceFeatures](slots/sourceFeatures.md) | IDs of input features used to generate this result |
-| [spatial](slots/spatial.md) | Geographic view state |
+| [spatial](slots/spatial.md) | Spatial extent — one or more bounding boxes |
 | [spatial_filter_active](slots/spatial_filter_active.md) | Whether the map viewport is used as a spatial filter |
 | [speed](slots/speed.md) | Speed in knots |
-| [start](slots/start.md) | Start of time extent (ISO 8601) |
+| [stac_extensions](slots/stac_extensions.md) | Optional STAC extension schema URIs |
+| [stac_version](slots/stac_version.md) | STAC version string — "1 |
+| [start](slots/start.md) | Start of interval |
 | [start_datetime](slots/start_datetime.md) | Range start datetime (ISO 8601) |
 | [start_time](slots/start_time.md) | Segment start timestamp (ISO8601) |
 | [state_type](slots/state_type.md) | Discriminator for state variant (temporal, spatial, selection, active_storybo... |
+| [step_size](slots/step_size.md) | Playback step granularity for this plot |
 | [stepSize](slots/stepSize.md) | Step size for discrete navigation (FR-008) |
 | [store_id](slots/store_id.md) | Parent store identifier (needed for URI construction) |
 | [storyboard_id](slots/storyboard_id.md) | Foreign key to parent Storyboard |
 | [stroke](slots/stroke.md) | Whether to draw outline |
+| [structured_content](slots/structured_content.md) | Reserved for top-level free-form payload (e |
 | [style](slots/style.md) | Per-segment line styling override |
+| [success](slots/success.md) | Whether the tool succeeded |
+| [summaries](slots/summaries.md) | Optional pre-aggregated extension summaries (open-record per Research R-002) |
 | [symbol](slots/symbol.md) | Shape to use for position symbols |
 | [symbol_interval](slots/symbol_interval.md) | ISO 8601 duration for interval-based symbol display |
 | [tags](slots/tags.md) | Free-text labels assigned to this feature by the analyst |
 | [target_asset](slots/target_asset.md) | Relative path to the branched plot file |
-| [temporal](slots/temporal.md) | Time-related state |
+| [temporal](slots/temporal.md) | Temporal extent — one or more start/end intervals |
 | [temporal_filter_active](slots/temporal_filter_active.md) | Whether the timeline range is used as a temporal filter |
 | [text](slots/text.md) | Narrative text content |
 | [thumbnail_asset_ref](slots/thumbnail_asset_ref.md) | STAC asset key (path + name within the plot's STAC item) |
 | [time](slots/time.md) | Position timestamp (ISO8601) |
 | [time_extent](slots/time_extent.md) | Temporal extent of the plot (start/end ISO 8601 strings) |
-| [time_range](slots/time_range.md) | Reserved slot for v2 animated time-range Scenes |
+| [time_range](slots/time_range.md) | For instant Scenes (#215 default): MUST be absent |
 | [timeFilter](slots/timeFilter.md) | Optional visible time window constraint (FR-007) |
 | [timeRange](slots/timeRange.md) | Full temporal extent of loaded data (FR-006) |
 | [timestamp](slots/timestamp.md) | When the operation occurred (ISO 8601 with timezone) |
 | [title](slots/title.md) | Plot title from STAC metadata |
 | [tool](slots/tool.md) | Tool identifier (kebab-case, e |
-| [tool_id](slots/tool_id.md) | Identifier of the tool that was executed |
+| [tool_id](slots/tool_id.md) | Identifier of the debrief-calc tool that produced this result asset |
 | [tool_version](slots/tool_version.md) | Semantic version of the tool (e |
 | [track_count](slots/track_count.md) | Number of tracks in this plot |
 | [track_id](slots/track_id.md) | Associated track identifier (optional) |
@@ -381,17 +452,21 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [type](slots/type.md) | Geometry type discriminator |
 | [unit](slots/unit.md) | Unit of the step |
 | [units](slots/units.md) | Units for the axis values (e |
+| [updated](slots/updated.md) | Processing-time last-update timestamp (ISO 8601) |
+| [url](slots/url.md) | Provider homepage / contact URL |
 | [used](slots/used.md) | Feature IDs of inputs |
 | [valid_from](slots/valid_from.md) | Start of validity period |
 | [valid_until](slots/valid_until.md) | End of validity period |
-| [value](slots/value.md) | The parameter value (any JSON type) |
+| [value](slots/value.md) | Numeric step value |
 | [version](slots/version.md) | Tool version string for provenance tracking |
 | [vertex_count](slots/vertex_count.md) | Number of unique vertices (excluding ring closure point) |
+| [vertex_metadata](slots/vertex_metadata.md) | Sparse list of per-vertex metadata, keyed by `path` |
 | [vessel_class](slots/vessel_class.md) | Full vessel classification path override using slash-separated notation (e |
 | [vessel_role](slots/vessel_role.md) | Vessel role override (parent of leaf in classification path, e |
 | [vessel_type](slots/vessel_type.md) | Vessel type override (leaf of classification path, e |
-| [viewport](slots/viewport.md) | Visible map area as 4-corner polygon (FR-012) |
-| [visible](slots/visible.md) | Contact visibility |
+| [viewport](slots/viewport.md) | Saved map viewport (ViewportPolygon) |
+| [viewport_end](slots/viewport_end.md) | Map viewport camera state at the end of a time-range Scene (#263) |
+| [visible](slots/visible.md) | Whether this feature is shown on the map |
 | [visible_feature_ids](slots/visible_feature_ids.md) | Stable feature IDs visible at capture |
 | [was_generated_by](slots/was_generated_by.md) | Tool identity and parameters for this invocation |
 | [weight](slots/weight.md) | Stroke width in pixels |
@@ -400,7 +475,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [xAxis](slots/xAxis.md) | X-axis metadata |
 | [y_value](slots/y_value.md) | Primary dependent-axis value serialised as a string (decimal or label) |
 | [yAxis](slots/yAxis.md) | Y-axis metadata |
-| [zoom](slots/zoom.md) | Map zoom level - for spatial state |
+| [zoom](slots/zoom.md) | Map zoom level for restoring the view (optional) |
 
 
 ## Enumerations
@@ -424,16 +499,22 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [LineStyleEnum](enums/LineStyleEnum.md) | Visual style for bearing lines |
 | [LocationTypeEnum](enums/LocationTypeEnum.md) | Type of reference location |
 | [MarkerSymbolEnum](enums/MarkerSymbolEnum.md) | Marker shapes for tool parameter choices (superset of PointShapeEnum) |
+| [MCPContentItemTypeEnum](enums/MCPContentItemTypeEnum.md) | Discriminator for MCPContentItem variants |
+| [MCPParamTypeEnum](enums/MCPParamTypeEnum.md) | JSON-Schema-compatible primitive types for tool parameters |
 | [NamedColorEnum](enums/NamedColorEnum.md) | Predefined named colours for styling tool parameters |
 | [NumericPresetEnum](enums/NumericPresetEnum.md) | Common numeric presets for count and distance parameters |
 | [OutputKindEnum](enums/OutputKindEnum.md) | Canonical output kind identifiers for tool result features |
 | [ParameterTypeEnum](enums/ParameterTypeEnum.md) | Names of available schema-defined parameter types |
 | [PlaybackStateEnum](enums/PlaybackStateEnum.md) | Current state of time playback |
 | [PointShapeEnum](enums/PointShapeEnum.md) | Valid shapes for point markers |
+| [PolygonSourceEnum](enums/PolygonSourceEnum.md) | Provenance of a Scene's stored polygon geometry |
 | [ReferencePointPatternEnum](enums/ReferencePointPatternEnum.md) | Generation patterns for reference point placement |
+| [ReplayStatusEnum](enums/ReplayStatusEnum.md) | Outcome of resolving a logged tool invocation at replay time |
 | [ResultCategoryEnum](enums/ResultCategoryEnum.md) | Top-level result type categories per TOOL-RESULTS |
 | [ResultTopType](enums/ResultTopType.md) | Top-level result type categories |
 | [SegmentTypeEnum](enums/SegmentTypeEnum.md) | Discriminator for track segment types within compound tracks |
+| [SessionMCPToolName](enums/SessionMCPToolName.md) | Authoritative list of session-state MCP tool names |
+| [StacTypeEnum](enums/StacTypeEnum.md) | Discriminator for STAC top-level objects |
 | [SystemStateTypeEnum](enums/SystemStateTypeEnum.md) | Discriminator for system state variants |
 | [TimeUnitEnum](enums/TimeUnitEnum.md) | Units for time step navigation |
 | [ToolCategoryEnum](enums/ToolCategoryEnum.md) | Visual category for Log Panel icon rendering |
@@ -446,7 +527,6 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | Type | Description |
 | --- | --- |
 | [Boolean](types/Boolean.md) | A binary (true or false) value |
-| [Coordinate](types/Coordinate.md) | A geographic coordinate value (longitude or latitude in degrees) |
 | [CSSColor](types/CSSColor.md) | A CSS color string (e |
 | [Curie](types/Curie.md) | a compact URI |
 | [Date](types/Date.md) | a date (year, month and day) in an idealized calendar |

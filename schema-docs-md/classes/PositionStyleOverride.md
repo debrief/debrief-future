@@ -150,8 +150,8 @@ attributes:
     name: label
     description: Custom label text (null = use timestamp)
     from_schema: https://debrief.info/schemas/styling
-    rank: 1000
     domain_of:
+    - VertexMetadata
     - PositionStyleOverride
     - SensorContact
     - TUASolution
@@ -221,10 +221,10 @@ attributes:
     name: label
     description: Custom label text (null = use timestamp)
     from_schema: https://debrief.info/schemas/styling
-    rank: 1000
     alias: label
     owner: PositionStyleOverride
     domain_of:
+    - VertexMetadata
     - PositionStyleOverride
     - SensorContact
     - TUASolution

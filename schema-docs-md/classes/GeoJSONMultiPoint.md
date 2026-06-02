@@ -50,6 +50,7 @@ URI: [debrief:class/GeoJSONMultiPoint](https://debrief.info/schemas/class/GeoJSO
 | ---  | --- | --- | --- |
 | [ReferenceLocation](../classes/ReferenceLocation.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiPoint](../classes/GeoJSONMultiPoint.md) |
 | [MultiPointFeature](../classes/MultiPointFeature.md) | [geometry](../slots/geometry.md) | range | [GeoJSONMultiPoint](../classes/GeoJSONMultiPoint.md) |
+| [StacItem](../classes/StacItem.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiPoint](../classes/GeoJSONMultiPoint.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiPoint](../classes/GeoJSONMultiPoint.md) |
 
 
@@ -124,6 +125,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -131,6 +138,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: MultiPoint
@@ -139,6 +149,7 @@ attributes:
     description: Array of [longitude, latitude] pairs
     from_schema: https://debrief.info/schemas/geojson
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -146,7 +157,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true
@@ -190,6 +200,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -197,6 +213,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: MultiPoint
@@ -207,6 +226,7 @@ attributes:
     alias: coordinates
     owner: GeoJSONMultiPoint
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -214,7 +234,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true

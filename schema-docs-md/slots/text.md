@@ -17,8 +17,9 @@ Alias: text
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [NarrativeEntryProperties](../classes/NarrativeEntryProperties.md) | Properties for a NarrativeEntry annotation |  no  |
 | [TextAnnotationProperties](../classes/TextAnnotationProperties.md) | Properties for a TextAnnotation |  no  |
+| [NarrativeEntryProperties](../classes/NarrativeEntryProperties.md) | Properties for a NarrativeEntry annotation |  no  |
+| [MCPContentItem](../classes/MCPContentItem.md) | A single MCP content item (resource, text, or image) |  no  |
 
 
 
@@ -59,6 +60,7 @@ alias: text
 domain_of:
 - NarrativeEntryProperties
 - TextAnnotationProperties
+- MCPContentItem
 range: string
 
 ```

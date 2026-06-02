@@ -17,8 +17,9 @@ Alias: datetime
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [PlotSummary](../classes/PlotSummary.md) | Projection of a STAC Item for UI consumption (e |  no  |
 | [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
+| [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
+| [PlotSummary](../classes/PlotSummary.md) | Projection of a STAC Item for UI consumption (e |  no  |
 
 
 
@@ -45,6 +46,9 @@ Alias: datetime
 | [ReferenceLocationProperties](../classes/ReferenceLocationProperties.md) | [valid_until](../slots/valid_until.md) | range | [datetime](../slots/datetime.md) |
 | [SystemStateProperties](../classes/SystemStateProperties.md) | [start_time](../slots/start_time.md) | range | [datetime](../slots/datetime.md) |
 | [SystemStateProperties](../classes/SystemStateProperties.md) | [end_time](../slots/end_time.md) | range | [datetime](../slots/datetime.md) |
+| [SystemStateProperties](../classes/SystemStateProperties.md) | [current_time](../slots/current_time.md) | range | [datetime](../slots/datetime.md) |
+| [SystemStateProperties](../classes/SystemStateProperties.md) | [filter_start_time](../slots/filter_start_time.md) | range | [datetime](../slots/datetime.md) |
+| [SystemStateProperties](../classes/SystemStateProperties.md) | [filter_end_time](../slots/filter_end_time.md) | range | [datetime](../slots/datetime.md) |
 | [LogEntry](../classes/LogEntry.md) | [timestamp](../slots/timestamp.md) | range | [datetime](../slots/datetime.md) |
 | [TuneAnnotation](../classes/TuneAnnotation.md) | [timestamp](../slots/timestamp.md) | range | [datetime](../slots/datetime.md) |
 | [NarrativeEntryProperties](../classes/NarrativeEntryProperties.md) | [time](../slots/time.md) | range | [datetime](../slots/datetime.md) |
@@ -84,6 +88,7 @@ alias: datetime
 domain_of:
 - PlotSummary
 - StacItemSummary
+- StacItemProperties
 range: string
 
 ```

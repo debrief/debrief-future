@@ -23,6 +23,7 @@ URI: [debrief:enum/DisplayModeEnum](https://debrief.info/schemas/enum/DisplayMod
 
 | Name | Description |
 | ---  | --- |
+| [display_mode](../slots/display_mode.md) | Track visualization mode for this plot |
 | [displayMode](../slots/displayMode.md) | Track visualization mode (FR-011) |
 
 

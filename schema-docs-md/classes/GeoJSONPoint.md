@@ -51,6 +51,7 @@ URI: [debrief:class/GeoJSONPoint](https://debrief.info/schemas/class/GeoJSONPoin
 | [ReferenceLocation](../classes/ReferenceLocation.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONPoint](../classes/GeoJSONPoint.md) |
 | [NarrativeEntry](../classes/NarrativeEntry.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPoint](../classes/GeoJSONPoint.md) |
 | [TextAnnotation](../classes/TextAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPoint](../classes/GeoJSONPoint.md) |
+| [StacItem](../classes/StacItem.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONPoint](../classes/GeoJSONPoint.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONPoint](../classes/GeoJSONPoint.md) |
 
 
@@ -126,6 +127,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -133,6 +140,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: Point
@@ -140,8 +150,8 @@ attributes:
     name: coordinates
     description: '[longitude, latitude] in degrees'
     from_schema: https://debrief.info/schemas/geojson
-    rank: 1000
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -149,7 +159,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true
@@ -196,6 +205,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -203,6 +218,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: Point
@@ -210,10 +228,10 @@ attributes:
     name: coordinates
     description: '[longitude, latitude] in degrees'
     from_schema: https://debrief.info/schemas/geojson
-    rank: 1000
     alias: coordinates
     owner: GeoJSONPoint
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -221,7 +239,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true

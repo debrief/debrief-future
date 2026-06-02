@@ -3,11 +3,6 @@
 # Slot: source_feature_ids 
 
 
-_IDs of the source features the tool operated on_
-
-
-
-
 
 URI: [debrief:slot/source_feature_ids](https://debrief.info/schemas/slot/source_feature_ids)
 Alias: source_feature_ids
@@ -23,6 +18,7 @@ Alias: source_feature_ids
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [LastToolExecution](../classes/LastToolExecution.md) | Record of the last tool execution, enabling single-step undo |  no  |
+| [ToolResultForLog](../classes/ToolResultForLog.md) | Persisted tool-result shape written by the live tool-result logger and read b... |  no  |
 
 
 
@@ -33,10 +29,6 @@ Alias: source_feature_ids
 
 * Range: [String](../types/String.md)
 
-* Multivalued: True
-
-* Required: True
-
 
 
 
@@ -44,13 +36,6 @@ Alias: source_feature_ids
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -70,16 +55,11 @@ Alias: source_feature_ids
 <details>
 ```yaml
 name: source_feature_ids
-description: IDs of the source features the tool operated on
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: source_feature_ids
-owner: LastToolExecution
 domain_of:
 - LastToolExecution
+- ToolResultForLog
 range: string
-required: true
-multivalued: true
 
 ```
 </details>

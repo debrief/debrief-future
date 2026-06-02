@@ -145,6 +145,7 @@ attributes:
     description: Solution label
     from_schema: https://debrief.info/schemas/geojson
     domain_of:
+    - VertexMetadata
     - PositionStyleOverride
     - SensorContact
     - TUASolution
@@ -288,6 +289,7 @@ attributes:
     alias: label
     owner: TUASolution
     domain_of:
+    - VertexMetadata
     - PositionStyleOverride
     - SensorContact
     - TUASolution

@@ -3,11 +3,6 @@
 # Slot: end_datetime 
 
 
-_Range end datetime (ISO 8601)_
-
-
-
-
 
 URI: [debrief:slot/end_datetime](https://debrief.info/schemas/slot/end_datetime)
 Alias: end_datetime
@@ -23,6 +18,7 @@ Alias: end_datetime
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
+| [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
 
 
 
@@ -43,13 +39,6 @@ Alias: end_datetime
 
 
 
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
-
-
-
 
 ## Mappings
 
@@ -66,15 +55,11 @@ Alias: end_datetime
 <details>
 ```yaml
 name: end_datetime
-description: Range end datetime (ISO 8601)
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: end_datetime
-owner: StacItemSummary
 domain_of:
 - StacItemSummary
+- StacItemProperties
 range: string
-required: false
 
 ```
 </details>

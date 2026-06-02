@@ -18,13 +18,13 @@ Alias: coordinates
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [GeoJSONLineString](../classes/GeoJSONLineString.md) | GeoJSON LineString geometry |  no  |
-| [GeoJSONMultiPolygon](../classes/GeoJSONMultiPolygon.md) | GeoJSON MultiPolygon geometry for multi-polygon tool results |  no  |
-| [ViewportPolygon](../classes/ViewportPolygon.md) | Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-01... |  no  |
+| [GeoJSONMultiLineString](../classes/GeoJSONMultiLineString.md) | GeoJSON MultiLineString geometry for compound tracks |  no  |
 | [GeoJSONMultiPoint](../classes/GeoJSONMultiPoint.md) | GeoJSON MultiPoint geometry for reference point sets |  no  |
 | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) | GeoJSON Polygon geometry |  no  |
-| [GeoJSONMultiLineString](../classes/GeoJSONMultiLineString.md) | GeoJSON MultiLineString geometry for compound tracks |  no  |
 | [GeoJSONPoint](../classes/GeoJSONPoint.md) | GeoJSON Point geometry |  no  |
 | [GeoJSONEmptyPoint](../classes/GeoJSONEmptyPoint.md) | GeoJSON Point geometry with empty coordinates (for non-spatial features) |  no  |
+| [ViewportPolygon](../classes/ViewportPolygon.md) | Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-01... |  no  |
+| [GeoJSONMultiPolygon](../classes/GeoJSONMultiPolygon.md) | GeoJSON MultiPolygon geometry for multi-polygon tool results |  no  |
 
 
 
@@ -63,6 +63,7 @@ Alias: coordinates
 name: coordinates
 alias: coordinates
 domain_of:
+- ViewportPolygon
 - GeoJSONPoint
 - GeoJSONEmptyPoint
 - GeoJSONLineString
@@ -70,7 +71,6 @@ domain_of:
 - GeoJSONMultiPoint
 - GeoJSONMultiLineString
 - GeoJSONMultiPolygon
-- ViewportPolygon
 range: string
 
 ```

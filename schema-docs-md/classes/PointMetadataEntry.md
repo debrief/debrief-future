@@ -120,9 +120,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
 
@@ -165,9 +168,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
 

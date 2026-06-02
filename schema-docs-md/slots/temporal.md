@@ -3,6 +3,11 @@
 # Slot: temporal 
 
 
+_Temporal extent — one or more start/end intervals._
+
+
+
+
 
 URI: [debrief:slot/temporal](https://debrief.info/schemas/slot/temporal)
 Alias: temporal
@@ -17,8 +22,7 @@ Alias: temporal
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SessionState](../classes/SessionState.md) | Root entity containing all session state slices (FR-001, FR-002) |  no  |
-| [SessionFile](../classes/SessionFile.md) | Persisted session file format (FR-024) |  no  |
+| [StacExtent](../classes/StacExtent.md) | Spatial + temporal extent on a Collection |  no  |
 
 
 
@@ -27,7 +31,9 @@ Alias: temporal
 
 ## Properties
 
-* Range: [String](../types/String.md)
+* Range: [StacTemporalExtent](../classes/StacTemporalExtent.md)
+
+* Required: True
 
 
 
@@ -36,6 +42,13 @@ Alias: temporal
 
 
 
+
+
+
+### Schema Source
+
+
+* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -55,11 +68,16 @@ Alias: temporal
 <details>
 ```yaml
 name: temporal
+description: Temporal extent — one or more start/end intervals.
+from_schema: https://debrief.info/schemas/debrief
+rank: 1000
 alias: temporal
+owner: StacExtent
 domain_of:
-- SessionState
-- SessionFile
-range: string
+- StacExtent
+range: StacTemporalExtent
+required: true
+inlined: true
 
 ```
 </details>

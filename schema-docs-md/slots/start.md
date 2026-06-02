@@ -58,9 +58,9 @@ Alias: start
 name: start
 alias: start
 domain_of:
-- PlotTimeExtent
 - TimeRange
 - TimeFilter
+- PlotTimeExtent
 range: string
 
 ```

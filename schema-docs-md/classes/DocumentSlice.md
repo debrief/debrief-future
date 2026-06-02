@@ -44,13 +44,6 @@ URI: [debrief:class/DocumentSlice](https://debrief.info/schemas/class/DocumentSl
 
 
 
-## Usages
-
-| used by | used in | type | used |
-| ---  | --- | --- | --- |
-| [SessionState](../classes/SessionState.md) | [document](../slots/document.md) | range | [DocumentSlice](../classes/DocumentSlice.md) |
-
-
 
 
 

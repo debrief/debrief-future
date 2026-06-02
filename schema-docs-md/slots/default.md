@@ -3,11 +3,6 @@
 # Slot: default 
 
 
-_Whether this is the default value._
-
-
-
-
 
 URI: [debrief:slot/default](https://debrief.info/schemas/slot/default)
 Alias: default
@@ -23,6 +18,7 @@ Alias: default
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [ParameterValue](../classes/ParameterValue.md) | A typed parameter value with replay metadata |  no  |
+| [ToolParameterMeta](../classes/ToolParameterMeta.md) | Tunable parameter metadata recorded alongside a tool result for provenance |  no  |
 
 
 
@@ -31,7 +27,7 @@ Alias: default
 
 ## Properties
 
-* Range: [Boolean](../types/Boolean.md)
+* Range: [String](../types/String.md)
 
 
 
@@ -40,13 +36,6 @@ Alias: default
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -66,16 +55,11 @@ Alias: default
 <details>
 ```yaml
 name: default
-description: Whether this is the default value.
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
-ifabsent: 'false'
 alias: default
-owner: ParameterValue
 domain_of:
 - ParameterValue
-range: boolean
-required: false
+- ToolParameterMeta
+range: string
 
 ```
 </details>

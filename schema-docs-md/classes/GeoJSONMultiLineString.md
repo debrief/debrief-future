@@ -49,6 +49,7 @@ URI: [debrief:class/GeoJSONMultiLineString](https://debrief.info/schemas/class/G
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [TrackFeature](../classes/TrackFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiLineString](../classes/GeoJSONMultiLineString.md) |
+| [StacItem](../classes/StacItem.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiLineString](../classes/GeoJSONMultiLineString.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiLineString](../classes/GeoJSONMultiLineString.md) |
 
 
@@ -123,6 +124,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -130,6 +137,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: MultiLineString
@@ -138,6 +148,7 @@ attributes:
     description: Array of LineString coordinate arrays
     from_schema: https://debrief.info/schemas/geojson
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -145,7 +156,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true
@@ -189,6 +199,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -196,6 +212,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: MultiLineString
@@ -206,6 +225,7 @@ attributes:
     alias: coordinates
     owner: GeoJSONMultiLineString
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -213,7 +233,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true

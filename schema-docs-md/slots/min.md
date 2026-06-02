@@ -3,11 +3,6 @@
 # Slot: min 
 
 
-_Minimum number of features of this kind required. Must be >= 0. Defaults to 0 if not specified._
-
-
-
-
 
 URI: [debrief:slot/min](https://debrief.info/schemas/slot/min)
 Alias: min
@@ -22,6 +17,7 @@ Alias: min
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
+| [MCPSelectionRequirement](../classes/MCPSelectionRequirement.md) | Predicate describing what feature selection a tool needs (e |  no  |
 | [SelectionRequirement](../classes/SelectionRequirement.md) | A constraint specifying which feature kinds a tool accepts, with minimum and ... |  no  |
 
 
@@ -31,9 +27,7 @@ Alias: min
 
 ## Properties
 
-* Range: [Integer](../types/Integer.md)
-
-* Minimum Value: 0
+* Range: [String](../types/String.md)
 
 
 
@@ -42,13 +36,6 @@ Alias: min
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -68,17 +55,11 @@ Alias: min
 <details>
 ```yaml
 name: min
-description: Minimum number of features of this kind required. Must be >= 0. Defaults
-  to 0 if not specified.
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: min
-owner: SelectionRequirement
 domain_of:
 - SelectionRequirement
-range: integer
-required: false
-minimum_value: 0
+- MCPSelectionRequirement
+range: string
 
 ```
 </details>

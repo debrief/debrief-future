@@ -49,6 +49,7 @@ URI: [debrief:class/GeoJSONMultiPolygon](https://debrief.info/schemas/class/GeoJ
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [MultiPolygonFeature](../classes/MultiPolygonFeature.md) | [geometry](../slots/geometry.md) | range | [GeoJSONMultiPolygon](../classes/GeoJSONMultiPolygon.md) |
+| [StacItem](../classes/StacItem.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiPolygon](../classes/GeoJSONMultiPolygon.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiPolygon](../classes/GeoJSONMultiPolygon.md) |
 
 
@@ -123,6 +124,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -130,6 +137,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: MultiPolygon
@@ -138,6 +148,7 @@ attributes:
     description: Array of polygon coordinate arrays (each an array of linear rings)
     from_schema: https://debrief.info/schemas/geojson
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -145,7 +156,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true
@@ -189,6 +199,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -196,6 +212,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: MultiPolygon
@@ -206,6 +225,7 @@ attributes:
     alias: coordinates
     owner: GeoJSONMultiPolygon
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -213,7 +233,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true

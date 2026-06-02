@@ -103,10 +103,10 @@ attributes:
     name: value
     description: The parameter value (any JSON type).
     from_schema: https://debrief.info/schemas/log-entry
-    rank: 1000
     domain_of:
-    - ParameterValue
     - TimeStep
+    - ParameterValue
+    - ToolParameterMeta
     range: string
     required: true
   default:
@@ -117,6 +117,7 @@ attributes:
     ifabsent: 'false'
     domain_of:
     - ParameterValue
+    - ToolParameterMeta
     range: boolean
     required: false
   tunable:
@@ -127,6 +128,7 @@ attributes:
     ifabsent: 'true'
     domain_of:
     - ParameterValue
+    - ToolParameterMeta
     range: boolean
     required: false
 
@@ -145,12 +147,12 @@ attributes:
     name: value
     description: The parameter value (any JSON type).
     from_schema: https://debrief.info/schemas/log-entry
-    rank: 1000
     alias: value
     owner: ParameterValue
     domain_of:
-    - ParameterValue
     - TimeStep
+    - ParameterValue
+    - ToolParameterMeta
     range: string
     required: true
   default:
@@ -163,6 +165,7 @@ attributes:
     owner: ParameterValue
     domain_of:
     - ParameterValue
+    - ToolParameterMeta
     range: boolean
     required: false
   tunable:
@@ -175,6 +178,7 @@ attributes:
     owner: ParameterValue
     domain_of:
     - ParameterValue
+    - ToolParameterMeta
     range: boolean
     required: false
 

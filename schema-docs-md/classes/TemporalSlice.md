@@ -113,14 +113,6 @@ URI: [debrief:class/TemporalSlice](https://debrief.info/schemas/class/TemporalSl
 
 
 
-## Usages
-
-| used by | used in | type | used |
-| ---  | --- | --- | --- |
-| [SessionState](../classes/SessionState.md) | [temporal](../slots/temporal.md) | range | [TemporalSlice](../classes/TemporalSlice.md) |
-| [SessionFile](../classes/SessionFile.md) | [temporal](../slots/temporal.md) | range | [TemporalSlice](../classes/TemporalSlice.md) |
-
-
 
 
 

@@ -95,8 +95,8 @@ attributes:
     name: path
     description: Full hierarchical path
     from_schema: https://debrief.com/schemas/tool-result
-    rank: 1000
     domain_of:
+    - VertexMetadata
     - ResultTypePath
     range: string
     required: true
@@ -120,10 +120,10 @@ attributes:
     name: path
     description: Full hierarchical path
     from_schema: https://debrief.com/schemas/tool-result
-    rank: 1000
     alias: path
     owner: ResultTypePath
     domain_of:
+    - VertexMetadata
     - ResultTypePath
     range: string
     required: true

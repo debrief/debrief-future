@@ -52,6 +52,7 @@ URI: [debrief:class/Viewport](https://debrief.info/schemas/class/Viewport)
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [SceneProperties](../classes/SceneProperties.md) | [viewport](../slots/viewport.md) | range | [Viewport](../classes/Viewport.md) |
+| [SceneProperties](../classes/SceneProperties.md) | [viewport_end](../slots/viewport_end.md) | range | [Viewport](../classes/Viewport.md) |
 
 
 
@@ -105,7 +106,6 @@ attributes:
     description: '[longitude, latitude] in degrees'
     from_schema: https://debrief.info/schemas/storyboard
     domain_of:
-    - SystemStateProperties
     - CircleAnnotationProperties
     - Viewport
     range: float
@@ -118,7 +118,6 @@ attributes:
     description: Leaflet-compatible zoom level
     from_schema: https://debrief.info/schemas/storyboard
     domain_of:
-    - SystemStateProperties
     - ViewportPolygon
     - Viewport
     range: float
@@ -157,7 +156,6 @@ attributes:
     alias: center
     owner: Viewport
     domain_of:
-    - SystemStateProperties
     - CircleAnnotationProperties
     - Viewport
     range: float
@@ -172,7 +170,6 @@ attributes:
     alias: zoom
     owner: Viewport
     domain_of:
-    - SystemStateProperties
     - ViewportPolygon
     - Viewport
     range: float

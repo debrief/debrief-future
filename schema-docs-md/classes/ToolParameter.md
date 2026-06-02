@@ -20,6 +20,8 @@ URI: [debrief:class/ToolParameter](https://debrief.info/schemas/class/ToolParame
  classDiagram
     class ToolParameter
     click ToolParameter href "../../classes/ToolParameter/"
+      ToolParameter : choices
+        
       ToolParameter : default_value
         
       ToolParameter : description
@@ -60,6 +62,7 @@ URI: [debrief:class/ToolParameter](https://debrief.info/schemas/class/ToolParame
 | [required](../slots/required.md) | 0..1 <br/> [Boolean](../types/Boolean.md) | Whether parameter must be provided | direct |
 | [default_value](../slots/default_value.md) | 0..1 <br/> [String](../types/String.md) | Default value if not provided | direct |
 | [param_type](../slots/param_type.md) | 0..1 <br/> [ParameterTypeEnum](../enums/ParameterTypeEnum.md) | References a schema-defined parameter-type enum by name | direct |
+| [choices](../slots/choices.md) | * <br/> [String](../types/String.md) | Explicit choice list for enum-typed parameters when the client cannot (or cho... | direct |
 
 
 
@@ -125,9 +128,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   type:
@@ -156,6 +162,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -163,6 +175,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
   description:
@@ -175,9 +190,18 @@ attributes:
     - MultiPolygonFeatureProperties
     - Tool
     - ToolParameter
+    - StacProvider
+    - StacItemProperties
+    - StacCatalog
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - LevelDefinition
     - StoryboardProperties
     - SceneProperties
+    - MCPParamSchema
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   required:
@@ -209,6 +233,20 @@ attributes:
     - ToolParameter
     range: ParameterTypeEnum
     required: false
+  choices:
+    name: choices
+    description: Explicit choice list for enum-typed parameters when the client cannot
+      (or chooses not to) resolve a schema-defined `param_type`. Used by both the
+      ToolMatch picker (shared/components) and the VS Code activity-panel adapter
+      (apps/vscode/src/services/mcpToolAdapter.ts). Added under spec 222 (P2) to collapse
+      the drift cluster attributed to ToolParameter (audit §3.2 rows 37 and 86).
+    from_schema: https://debrief.info/schemas/tool
+    rank: 1000
+    domain_of:
+    - ToolParameter
+    range: string
+    required: false
+    multivalued: true
 
 ```
 </details>
@@ -238,9 +276,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   type:
@@ -271,6 +312,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -278,6 +325,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
   description:
@@ -292,9 +342,18 @@ attributes:
     - MultiPolygonFeatureProperties
     - Tool
     - ToolParameter
+    - StacProvider
+    - StacItemProperties
+    - StacCatalog
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - LevelDefinition
     - StoryboardProperties
     - SceneProperties
+    - MCPParamSchema
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   required:
@@ -332,6 +391,22 @@ attributes:
     - ToolParameter
     range: ParameterTypeEnum
     required: false
+  choices:
+    name: choices
+    description: Explicit choice list for enum-typed parameters when the client cannot
+      (or chooses not to) resolve a schema-defined `param_type`. Used by both the
+      ToolMatch picker (shared/components) and the VS Code activity-panel adapter
+      (apps/vscode/src/services/mcpToolAdapter.ts). Added under spec 222 (P2) to collapse
+      the drift cluster attributed to ToolParameter (audit §3.2 rows 37 and 86).
+    from_schema: https://debrief.info/schemas/tool
+    rank: 1000
+    alias: choices
+    owner: ToolParameter
+    domain_of:
+    - ToolParameter
+    range: string
+    required: false
+    multivalued: true
 
 ```
 </details>

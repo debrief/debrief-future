@@ -51,6 +51,7 @@ URI: [debrief:class/GeoJSONLineString](https://debrief.info/schemas/class/GeoJSO
 | [TrackFeature](../classes/TrackFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONLineString](../classes/GeoJSONLineString.md) |
 | [LineAnnotation](../classes/LineAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONLineString](../classes/GeoJSONLineString.md) |
 | [VectorAnnotation](../classes/VectorAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONLineString](../classes/GeoJSONLineString.md) |
+| [StacItem](../classes/StacItem.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONLineString](../classes/GeoJSONLineString.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONLineString](../classes/GeoJSONLineString.md) |
 
 
@@ -125,6 +126,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -132,6 +139,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: LineString
@@ -140,6 +150,7 @@ attributes:
     description: Array of [longitude, latitude] pairs
     from_schema: https://debrief.info/schemas/geojson
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -147,7 +158,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true
@@ -191,6 +201,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -198,6 +214,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: LineString
@@ -208,6 +227,7 @@ attributes:
     alias: coordinates
     owner: GeoJSONLineString
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -215,7 +235,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true

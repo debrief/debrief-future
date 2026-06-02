@@ -106,22 +106,20 @@ attributes:
     name: start
     description: Start of time extent (ISO 8601)
     from_schema: https://debrief.info/schemas/stac-extension
-    rank: 1000
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: string
     required: true
   end:
     name: end
     description: End of time extent (ISO 8601)
     from_schema: https://debrief.info/schemas/stac-extension
-    rank: 1000
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: string
     required: true
 
@@ -144,26 +142,24 @@ attributes:
     name: start
     description: Start of time extent (ISO 8601)
     from_schema: https://debrief.info/schemas/stac-extension
-    rank: 1000
     alias: start
     owner: PlotTimeExtent
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: string
     required: true
   end:
     name: end
     description: End of time extent (ISO 8601)
     from_schema: https://debrief.info/schemas/stac-extension
-    rank: 1000
     alias: end
     owner: PlotTimeExtent
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: string
     required: true
 

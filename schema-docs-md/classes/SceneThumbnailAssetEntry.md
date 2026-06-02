@@ -194,6 +194,8 @@ attributes:
       (large) or ./scene-thumbnails/scene-{ULID}-sm.png (small).
     from_schema: https://debrief.info/schemas/storyboard
     domain_of:
+    - StacLink
+    - StacAsset
     - ToolResultAnnotations
     - SceneThumbnailAssetEntry
     range: string
@@ -224,6 +226,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -231,6 +239,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: image/png
@@ -239,8 +250,10 @@ attributes:
     description: Exactly ["thumbnail"]. Storyboarding-derived thumbnails are not declared
       as overview (which is reserved for plot-level overviews of dimensions 600x800).
     from_schema: https://debrief.info/schemas/storyboard
-    rank: 1000
     domain_of:
+    - StacProvider
+    - StacAsset
+    - StacItemAssetDefinition
     - SceneThumbnailAssetEntry
     range: string
     required: true
@@ -253,6 +266,12 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - DatasetEntry
     - SceneProperties
     - SceneThumbnailAssetEntry
@@ -323,6 +342,8 @@ attributes:
     alias: href
     owner: SceneThumbnailAssetEntry
     domain_of:
+    - StacLink
+    - StacAsset
     - ToolResultAnnotations
     - SceneThumbnailAssetEntry
     range: string
@@ -355,6 +376,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -362,6 +389,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: image/png
@@ -370,10 +400,12 @@ attributes:
     description: Exactly ["thumbnail"]. Storyboarding-derived thumbnails are not declared
       as overview (which is reserved for plot-level overviews of dimensions 600x800).
     from_schema: https://debrief.info/schemas/storyboard
-    rank: 1000
     alias: roles
     owner: SceneThumbnailAssetEntry
     domain_of:
+    - StacProvider
+    - StacAsset
+    - StacItemAssetDefinition
     - SceneThumbnailAssetEntry
     range: string
     required: true
@@ -388,6 +420,12 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - DatasetEntry
     - SceneProperties
     - SceneThumbnailAssetEntry

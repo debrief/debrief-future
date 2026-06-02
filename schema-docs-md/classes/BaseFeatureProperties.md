@@ -73,6 +73,19 @@ URI: [debrief:class/BaseFeatureProperties](https://debrief.info/schemas/class/Ba
         
       BaseFeatureProperties : tags
         
+      BaseFeatureProperties : vertex_metadata
+        
+          
+    
+        
+        
+        BaseFeatureProperties --> "*" VertexMetadata : vertex_metadata
+        click VertexMetadata href "../../classes/VertexMetadata/"
+    
+
+        
+      BaseFeatureProperties : visible
+        
       
 ```
 
@@ -104,7 +117,9 @@ URI: [debrief:class/BaseFeatureProperties](https://debrief.info/schemas/class/Ba
 | ---  | --- | --- | --- |
 | [kind](../slots/kind.md) | 1 <br/> [FeatureKindEnum](../enums/FeatureKindEnum.md) | Feature type discriminator | direct |
 | [tags](../slots/tags.md) | * <br/> [String](../types/String.md) | Free-text labels assigned to this feature by the analyst | direct |
+| [visible](../slots/visible.md) | 0..1 <br/> [Boolean](../types/Boolean.md) | Whether this feature is shown on the map | direct |
 | [provenance](../slots/provenance.md) | * <br/> [LogEntry](../classes/LogEntry.md) | PROV-aligned provenance records (append-only log of tool operations) | direct |
+| [vertex_metadata](../slots/vertex_metadata.md) | * <br/> [VertexMetadata](../classes/VertexMetadata.md) | Sparse list of per-vertex metadata, keyed by `path` | direct |
 
 
 
@@ -180,6 +195,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: FeatureKindEnum
     required: true
   tags:
@@ -189,11 +205,25 @@ attributes:
     rank: 1000
     domain_of:
     - BaseFeatureProperties
+    - VertexMetadata
     - StacExtensionProperties
     - StacItemSummary
     range: string
     required: false
     multivalued: true
+  visible:
+    name: visible
+    description: Whether this feature is shown on the map. Absent or true means visible;
+      false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist
+      (feature 261). Per-feature visibility travels with the feature inside features.geojson.
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
+    domain_of:
+    - BaseFeatureProperties
+    - SensorContact
+    - SensorData
+    range: boolean
+    required: false
   provenance:
     name: provenance
     description: PROV-aligned provenance records (append-only log of tool operations)
@@ -204,6 +234,22 @@ attributes:
     - SystemStateProperties
     - SystemRecordProperties
     range: LogEntry
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  vertex_metadata:
+    name: vertex_metadata
+    description: 'Sparse list of per-vertex metadata, keyed by `path`. Empty arrays
+      MUST be omitted from the serialised feature (FR-010). Duplicate `path` values
+      MUST be rejected by validators (contract §Cross-cutting #3). Every concrete
+      subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec
+      #192, contracts/vertex-metadata-slot.md.'
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
+    domain_of:
+    - BaseFeatureProperties
+    range: VertexMetadata
+    required: false
     multivalued: true
     inlined: true
     inlined_as_list: true
@@ -246,6 +292,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: FeatureKindEnum
     required: true
   tags:
@@ -257,11 +304,27 @@ attributes:
     owner: BaseFeatureProperties
     domain_of:
     - BaseFeatureProperties
+    - VertexMetadata
     - StacExtensionProperties
     - StacItemSummary
     range: string
     required: false
     multivalued: true
+  visible:
+    name: visible
+    description: Whether this feature is shown on the map. Absent or true means visible;
+      false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist
+      (feature 261). Per-feature visibility travels with the feature inside features.geojson.
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
+    alias: visible
+    owner: BaseFeatureProperties
+    domain_of:
+    - BaseFeatureProperties
+    - SensorContact
+    - SensorData
+    range: boolean
+    required: false
   provenance:
     name: provenance
     description: PROV-aligned provenance records (append-only log of tool operations)
@@ -275,6 +338,25 @@ attributes:
     - SystemRecordProperties
     range: LogEntry
     multivalued: true
+    inlined: true
+    inlined_as_list: true
+  vertex_metadata:
+    name: vertex_metadata
+    description: 'Sparse list of per-vertex metadata, keyed by `path`. Empty arrays
+      MUST be omitted from the serialised feature (FR-010). Duplicate `path` values
+      MUST be rejected by validators (contract §Cross-cutting #3). Every concrete
+      subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec
+      #192, contracts/vertex-metadata-slot.md.'
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
+    alias: vertex_metadata
+    owner: BaseFeatureProperties
+    domain_of:
+    - BaseFeatureProperties
+    range: VertexMetadata
+    required: false
+    multivalued: true
+    inlined: true
     inlined_as_list: true
 
 ```

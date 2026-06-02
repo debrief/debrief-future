@@ -3,11 +3,6 @@
 # Slot: path 
 
 
-_Full hierarchical path_
-
-
-
-
 
 URI: [debrief:slot/path](https://debrief.info/schemas/slot/path)
 Alias: path
@@ -22,6 +17,7 @@ Alias: path
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
+| [VertexMetadata](../classes/VertexMetadata.md) | Optional, sparse per-vertex annotation attached to a feature |  no  |
 | [ResultTypePath](../classes/ResultTypePath.md) | Slash-delimited hierarchical type path |  no  |
 
 
@@ -33,10 +29,6 @@ Alias: path
 
 * Range: [String](../types/String.md)
 
-* Required: True
-
-* Regex pattern: `^(mutation|addition|deletion|artifact)/[a-z_]+/[a-z_]+$`
-
 
 
 
@@ -44,13 +36,6 @@ Alias: path
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -70,16 +55,11 @@ Alias: path
 <details>
 ```yaml
 name: path
-description: Full hierarchical path
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: path
-owner: ResultTypePath
 domain_of:
+- VertexMetadata
 - ResultTypePath
 range: string
-required: true
-pattern: ^(mutation|addition|deletion|artifact)/[a-z_]+/[a-z_]+$
 
 ```
 </details>

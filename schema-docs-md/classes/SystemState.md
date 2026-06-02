@@ -139,6 +139,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -146,6 +152,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: Feature
@@ -170,11 +179,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     required: true
     pattern: ^state\.[a-z]+$
   geometry:
@@ -195,6 +208,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -218,6 +232,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -263,6 +278,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -270,6 +291,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: Feature
@@ -296,11 +320,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
     pattern: ^state\.[a-z]+$
@@ -324,6 +352,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -349,6 +378,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature

@@ -3,11 +3,6 @@
 # Slot: parameters 
 
 
-_Full resolved parameter set. Keys are parameter names, values are ParameterValue objects. May be empty dict._
-
-
-
-
 
 URI: [debrief:slot/parameters](https://debrief.info/schemas/slot/parameters)
 Alias: parameters
@@ -23,6 +18,7 @@ Alias: parameters
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [WasGeneratedBy](../classes/WasGeneratedBy.md) | Identifies the tool and its parameters for a specific invocation |  no  |
+| [ToolResult](../classes/ToolResult.md) | Logical tool invocation result as seen by the consumer (after the MCP layer h... |  no  |
 
 
 
@@ -31,11 +27,7 @@ Alias: parameters
 
 ## Properties
 
-* Range: [ParameterValue](../classes/ParameterValue.md)
-
-* Multivalued: True
-
-* Required: True
+* Range: [String](../types/String.md)
 
 
 
@@ -44,13 +36,6 @@ Alias: parameters
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -70,18 +55,11 @@ Alias: parameters
 <details>
 ```yaml
 name: parameters
-description: Full resolved parameter set. Keys are parameter names, values are ParameterValue
-  objects. May be empty dict.
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: parameters
-owner: WasGeneratedBy
 domain_of:
 - WasGeneratedBy
-range: ParameterValue
-required: true
-multivalued: true
-inlined: true
+- ToolResult
+range: string
 
 ```
 </details>

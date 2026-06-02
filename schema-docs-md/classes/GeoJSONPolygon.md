@@ -51,6 +51,7 @@ URI: [debrief:class/GeoJSONPolygon](https://debrief.info/schemas/class/GeoJSONPo
 | [CircleAnnotation](../classes/CircleAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [RectangleAnnotation](../classes/RectangleAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [PolyAnnotation](../classes/PolyAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
+| [StacItem](../classes/StacItem.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [StoryboardFeature](../classes/StoryboardFeature.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [SceneFeature](../classes/SceneFeature.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
@@ -127,6 +128,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -134,6 +141,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: Polygon
@@ -142,6 +152,7 @@ attributes:
     description: Array of linear rings (arrays of [lon, lat] pairs)
     from_schema: https://debrief.info/schemas/geojson
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -149,7 +160,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true
@@ -193,6 +203,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -200,6 +216,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: Polygon
@@ -210,6 +229,7 @@ attributes:
     alias: coordinates
     owner: GeoJSONPolygon
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -217,7 +237,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: float
     required: true
     multivalued: true

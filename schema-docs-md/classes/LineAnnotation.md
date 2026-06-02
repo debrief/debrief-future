@@ -140,6 +140,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -147,6 +153,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: Feature
@@ -171,11 +180,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     required: true
   geometry:
     name: geometry
@@ -195,6 +208,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -218,6 +232,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -264,6 +279,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -271,6 +292,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: Feature
@@ -297,11 +321,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
   geometry:
@@ -324,6 +352,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -349,6 +378,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature

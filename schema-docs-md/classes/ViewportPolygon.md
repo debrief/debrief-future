@@ -22,6 +22,15 @@ URI: [debrief:class/ViewportPolygon](https://debrief.info/schemas/class/Viewport
     click ViewportPolygon href "../../classes/ViewportPolygon/"
       ViewportPolygon : coordinates
         
+          
+    
+        
+        
+        ViewportPolygon --> "1..*" Coordinate : coordinates
+        click Coordinate href "../../classes/Coordinate/"
+    
+
+        
       ViewportPolygon : zoom
         
       
@@ -48,6 +57,7 @@ URI: [debrief:class/ViewportPolygon](https://debrief.info/schemas/class/Viewport
 
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
+| [SystemStateProperties](../classes/SystemStateProperties.md) | [viewport](../slots/viewport.md) | range | [ViewportPolygon](../classes/ViewportPolygon.md) |
 | [SpatialSlice](../classes/SpatialSlice.md) | [viewport](../slots/viewport.md) | range | [ViewportPolygon](../classes/ViewportPolygon.md) |
 
 
@@ -100,8 +110,10 @@ attributes:
   coordinates:
     name: coordinates
     description: Four corners in clockwise order [NW, NE, SE, SW]
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -109,7 +121,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: Coordinate
     required: true
     multivalued: true
@@ -118,9 +129,9 @@ attributes:
   zoom:
     name: zoom
     description: Map zoom level for restoring the view (optional)
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
     domain_of:
-    - SystemStateProperties
     - ViewportPolygon
     - Viewport
     range: float
@@ -141,10 +152,12 @@ attributes:
   coordinates:
     name: coordinates
     description: Four corners in clockwise order [NW, NE, SE, SW]
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
     alias: coordinates
     owner: ViewportPolygon
     domain_of:
+    - ViewportPolygon
     - GeoJSONPoint
     - GeoJSONEmptyPoint
     - GeoJSONLineString
@@ -152,7 +165,6 @@ attributes:
     - GeoJSONMultiPoint
     - GeoJSONMultiLineString
     - GeoJSONMultiPolygon
-    - ViewportPolygon
     range: Coordinate
     required: true
     multivalued: true
@@ -161,11 +173,11 @@ attributes:
   zoom:
     name: zoom
     description: Map zoom level for restoring the view (optional)
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
     alias: zoom
     owner: ViewportPolygon
     domain_of:
-    - SystemStateProperties
     - ViewportPolygon
     - Viewport
     range: float

@@ -3,6 +3,11 @@
 # Slot: spatial 
 
 
+_Spatial extent — one or more bounding boxes._
+
+
+
+
 
 URI: [debrief:slot/spatial](https://debrief.info/schemas/slot/spatial)
 Alias: spatial
@@ -17,8 +22,7 @@ Alias: spatial
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SessionState](../classes/SessionState.md) | Root entity containing all session state slices (FR-001, FR-002) |  no  |
-| [SessionFile](../classes/SessionFile.md) | Persisted session file format (FR-024) |  no  |
+| [StacExtent](../classes/StacExtent.md) | Spatial + temporal extent on a Collection |  no  |
 
 
 
@@ -27,7 +31,9 @@ Alias: spatial
 
 ## Properties
 
-* Range: [String](../types/String.md)
+* Range: [StacSpatialExtent](../classes/StacSpatialExtent.md)
+
+* Required: True
 
 
 
@@ -36,6 +42,13 @@ Alias: spatial
 
 
 
+
+
+
+### Schema Source
+
+
+* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -55,11 +68,16 @@ Alias: spatial
 <details>
 ```yaml
 name: spatial
+description: Spatial extent — one or more bounding boxes.
+from_schema: https://debrief.info/schemas/debrief
+rank: 1000
 alias: spatial
+owner: StacExtent
 domain_of:
-- SessionState
-- SessionFile
-range: string
+- StacExtent
+range: StacSpatialExtent
+required: true
+inlined: true
 
 ```
 </details>

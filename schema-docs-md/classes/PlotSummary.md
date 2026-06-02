@@ -150,11 +150,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
   title:
@@ -165,6 +169,12 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - DatasetEntry
     - SceneProperties
     - SceneThumbnailAssetEntry
@@ -178,6 +188,7 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
     range: string
     required: true
   item_path:
@@ -215,11 +226,12 @@ attributes:
     from_schema: https://debrief.info/schemas/stac-extension
     domain_of:
     - TrackFeature
-    - SystemStateProperties
     - MultiPointFeature
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacSpatialExtent
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     range: float
@@ -296,11 +308,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
   title:
@@ -313,6 +329,12 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - DatasetEntry
     - SceneProperties
     - SceneThumbnailAssetEntry
@@ -328,6 +350,7 @@ attributes:
     domain_of:
     - PlotSummary
     - StacItemSummary
+    - StacItemProperties
     range: string
     required: true
   item_path:
@@ -373,11 +396,12 @@ attributes:
     owner: PlotSummary
     domain_of:
     - TrackFeature
-    - SystemStateProperties
     - MultiPointFeature
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacSpatialExtent
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     range: float

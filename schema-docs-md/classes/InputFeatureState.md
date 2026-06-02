@@ -133,6 +133,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -160,6 +161,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -215,6 +217,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -244,6 +247,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature

@@ -102,7 +102,7 @@ attributes:
   epoch:
     name: epoch
     description: Milliseconds since Unix epoch
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     rank: 1000
     domain_of:
     - TimeInstant
@@ -111,7 +111,7 @@ attributes:
   iso:
     name: iso
     description: ISO 8601 UTC format string
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     rank: 1000
     domain_of:
     - TimeInstant
@@ -133,7 +133,7 @@ attributes:
   epoch:
     name: epoch
     description: Milliseconds since Unix epoch
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     rank: 1000
     alias: epoch
     owner: TimeInstant
@@ -144,7 +144,7 @@ attributes:
   iso:
     name: iso
     description: ISO 8601 UTC format string
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     rank: 1000
     alias: iso
     owner: TimeInstant

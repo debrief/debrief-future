@@ -53,14 +53,6 @@ URI: [debrief:class/SpatialSlice](https://debrief.info/schemas/class/SpatialSlic
 
 
 
-## Usages
-
-| used by | used in | type | used |
-| ---  | --- | --- | --- |
-| [SessionState](../classes/SessionState.md) | [spatial](../slots/spatial.md) | range | [SpatialSlice](../classes/SpatialSlice.md) |
-| [SessionFile](../classes/SessionFile.md) | [spatial](../slots/spatial.md) | range | [SpatialSlice](../classes/SpatialSlice.md) |
-
-
 
 
 
@@ -110,8 +102,8 @@ attributes:
     name: viewport
     description: Visible map area as 4-corner polygon (FR-012)
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     domain_of:
+    - SystemStateProperties
     - SpatialSlice
     - SceneProperties
     range: ViewportPolygon
@@ -119,8 +111,8 @@ attributes:
     name: rotation
     description: Map rotation in degrees 0-360 (FR-013)
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     domain_of:
+    - SystemStateProperties
     - SpatialSlice
     range: float
     required: true
@@ -142,10 +134,10 @@ attributes:
     name: viewport
     description: Visible map area as 4-corner polygon (FR-012)
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     alias: viewport
     owner: SpatialSlice
     domain_of:
+    - SystemStateProperties
     - SpatialSlice
     - SceneProperties
     range: ViewportPolygon
@@ -153,10 +145,10 @@ attributes:
     name: rotation
     description: Map rotation in degrees 0-360 (FR-013)
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     alias: rotation
     owner: SpatialSlice
     domain_of:
+    - SystemStateProperties
     - SpatialSlice
     range: float
     required: true

@@ -14,7 +14,7 @@ URI: [debrief:enum/SystemStateTypeEnum](https://debrief.info/schemas/enum/System
 | Value | Meaning | Description |
 | --- | --- | --- |
 | temporal | None | Time viewport state (start/end times) |
-| spatial | None | Map viewport state (bbox, zoom) |
+| spatial | None | Map viewport state (ViewportPolygon) |
 | selection | None | Feature selection state (selected IDs) |
 | active_storyboard | None | Per-plot active-Storyboard pin (#237) |
 
@@ -62,7 +62,7 @@ permissible_values:
     description: Time viewport state (start/end times)
   spatial:
     text: spatial
-    description: Map viewport state (bbox, zoom)
+    description: Map viewport state (ViewportPolygon)
   selection:
     text: selection
     description: Feature selection state (selected IDs)

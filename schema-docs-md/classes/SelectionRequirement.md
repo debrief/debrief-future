@@ -137,6 +137,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: string
     required: true
   segment_type:
@@ -157,6 +158,7 @@ attributes:
     rank: 1000
     domain_of:
     - SelectionRequirement
+    - MCPSelectionRequirement
     range: integer
     required: false
     minimum_value: 0
@@ -168,6 +170,7 @@ attributes:
     rank: 1000
     domain_of:
     - SelectionRequirement
+    - MCPSelectionRequirement
     range: integer
     required: false
     minimum_value: 0
@@ -211,6 +214,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: string
     required: true
   segment_type:
@@ -235,6 +239,7 @@ attributes:
     owner: SelectionRequirement
     domain_of:
     - SelectionRequirement
+    - MCPSelectionRequirement
     range: integer
     required: false
     minimum_value: 0
@@ -248,6 +253,7 @@ attributes:
     owner: SelectionRequirement
     domain_of:
     - SelectionRequirement
+    - MCPSelectionRequirement
     range: integer
     required: false
     minimum_value: 0

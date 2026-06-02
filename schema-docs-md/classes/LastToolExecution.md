@@ -108,9 +108,10 @@ attributes:
     name: tool_id
     description: Identifier of the tool that was executed
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     domain_of:
+    - StacAsset
     - LastToolExecution
+    - ToolResultForLog
     range: string
     required: true
   source_feature_ids:
@@ -120,6 +121,7 @@ attributes:
     rank: 1000
     domain_of:
     - LastToolExecution
+    - ToolResultForLog
     range: string
     required: true
     multivalued: true
@@ -152,11 +154,12 @@ attributes:
     name: tool_id
     description: Identifier of the tool that was executed
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     alias: tool_id
     owner: LastToolExecution
     domain_of:
+    - StacAsset
     - LastToolExecution
+    - ToolResultForLog
     range: string
     required: true
   source_feature_ids:
@@ -168,6 +171,7 @@ attributes:
     owner: LastToolExecution
     domain_of:
     - LastToolExecution
+    - ToolResultForLog
     range: string
     required: true
     multivalued: true

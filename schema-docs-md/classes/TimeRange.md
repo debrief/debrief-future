@@ -67,6 +67,7 @@ URI: [debrief:class/TimeRange](https://debrief.info/schemas/class/TimeRange)
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [TemporalSlice](../classes/TemporalSlice.md) | [timeRange](../slots/timeRange.md) | range | [TimeRange](../classes/TimeRange.md) |
+| [SceneProperties](../classes/SceneProperties.md) | [time_range](../slots/time_range.md) | range | [TimeRange](../classes/TimeRange.md) |
 
 
 
@@ -128,21 +129,23 @@ attributes:
   start:
     name: start
     description: Start of interval
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: TimeInstant
     required: true
   end:
     name: end
     description: End of interval
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: TimeInstant
     required: true
 rules:
@@ -163,25 +166,27 @@ attributes:
   start:
     name: start
     description: Start of interval
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
     alias: start
     owner: TimeRange
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: TimeInstant
     required: true
   end:
     name: end
     description: End of interval
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
     alias: end
     owner: TimeRange
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: TimeInstant
     required: true
 rules:

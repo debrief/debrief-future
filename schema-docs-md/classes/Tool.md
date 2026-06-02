@@ -144,11 +144,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
   name:
@@ -165,9 +169,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   description:
@@ -181,9 +188,18 @@ attributes:
     - MultiPolygonFeatureProperties
     - Tool
     - ToolParameter
+    - StacProvider
+    - StacItemProperties
+    - StacCatalog
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - LevelDefinition
     - StoryboardProperties
     - SceneProperties
+    - MCPParamSchema
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: false
   version:
@@ -194,7 +210,6 @@ attributes:
     rank: 1000
     domain_of:
     - Tool
-    - SessionFile
     range: string
     required: false
   requirements:
@@ -261,11 +276,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
   name:
@@ -284,9 +303,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   description:
@@ -302,9 +324,18 @@ attributes:
     - MultiPolygonFeatureProperties
     - Tool
     - ToolParameter
+    - StacProvider
+    - StacItemProperties
+    - StacCatalog
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - LevelDefinition
     - StoryboardProperties
     - SceneProperties
+    - MCPParamSchema
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: false
   version:
@@ -317,7 +348,6 @@ attributes:
     owner: Tool
     domain_of:
     - Tool
-    - SessionFile
     range: string
     required: false
   requirements:

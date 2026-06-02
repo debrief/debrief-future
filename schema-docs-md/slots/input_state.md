@@ -3,11 +3,6 @@
 # Slot: input_state 
 
 
-_Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools._
-
-
-
-
 
 URI: [debrief:slot/input_state](https://debrief.info/schemas/slot/input_state)
 Alias: input_state
@@ -22,6 +17,7 @@ Alias: input_state
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
+| [ToolResultForLog](../classes/ToolResultForLog.md) | Persisted tool-result shape written by the live tool-result logger and read b... |  no  |
 | [LogEntry](../classes/LogEntry.md) | A PROV-aligned provenance record stored on GeoJSON features |  no  |
 
 
@@ -31,9 +27,7 @@ Alias: input_state
 
 ## Properties
 
-* Range: [InputFeatureState](../classes/InputFeatureState.md)
-
-* Multivalued: True
+* Range: [String](../types/String.md)
 
 
 
@@ -42,13 +36,6 @@ Alias: input_state
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -68,20 +55,11 @@ Alias: input_state
 <details>
 ```yaml
 name: input_state
-description: Pre-operation feature states for coordinate-mutating tools. Captures
-  geometry and spatial properties as they were immediately before the operation, enabling
-  correct replay with modified parameters. Null for non-mutation tools.
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: input_state
-owner: LogEntry
 domain_of:
 - LogEntry
-range: InputFeatureState
-required: false
-multivalued: true
-inlined: true
-inlined_as_list: true
+- ToolResultForLog
+range: string
 
 ```
 </details>

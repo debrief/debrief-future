@@ -128,6 +128,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -135,6 +141,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: FeatureCollection
@@ -145,8 +154,8 @@ attributes:
     rank: 1000
     domain_of:
     - RawGeoJSONFeatureCollection
-    - SessionState
-    - SessionFile
+    - ToolResultForLog
+    - ToolExecutionResultForReplay
     range: RawGeoJSONFeature
     required: true
     multivalued: true
@@ -158,11 +167,12 @@ attributes:
     from_schema: https://debrief.info/schemas/raw-geojson
     domain_of:
     - TrackFeature
-    - SystemStateProperties
     - MultiPointFeature
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacSpatialExtent
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     range: float
@@ -209,6 +219,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -216,6 +232,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: FeatureCollection
@@ -228,8 +247,8 @@ attributes:
     owner: RawGeoJSONFeatureCollection
     domain_of:
     - RawGeoJSONFeatureCollection
-    - SessionState
-    - SessionFile
+    - ToolResultForLog
+    - ToolExecutionResultForReplay
     range: RawGeoJSONFeature
     required: true
     multivalued: true
@@ -243,11 +262,12 @@ attributes:
     owner: RawGeoJSONFeatureCollection
     domain_of:
     - TrackFeature
-    - SystemStateProperties
     - MultiPointFeature
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacSpatialExtent
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     range: float

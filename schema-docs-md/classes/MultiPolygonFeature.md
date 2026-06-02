@@ -142,6 +142,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -149,6 +155,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: Feature
@@ -173,11 +182,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     required: true
   geometry:
     name: geometry
@@ -197,6 +210,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -220,6 +234,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -231,11 +246,12 @@ attributes:
     from_schema: https://debrief.info/schemas/geojson
     domain_of:
     - TrackFeature
-    - SystemStateProperties
     - MultiPointFeature
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacSpatialExtent
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     range: float
@@ -282,6 +298,12 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
+    - StacItem
+    - StacCatalog
+    - StacLink
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
@@ -289,6 +311,9 @@ attributes:
     - StoryboardFeature
     - SceneFeature
     - SceneThumbnailAssetEntry
+    - MCPContentItem
+    - MCPParamSchema
+    - ToolsUpdateMessage
     range: string
     required: true
     equals_string: Feature
@@ -315,11 +340,15 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacCatalog
+    - StacCollection
     - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
     - SceneFeature
+    - ToolDefinition
     range: string
     required: true
   geometry:
@@ -342,6 +371,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -367,6 +397,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StacItem
     - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
@@ -380,11 +411,12 @@ attributes:
     owner: MultiPolygonFeature
     domain_of:
     - TrackFeature
-    - SystemStateProperties
     - MultiPointFeature
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - StacItem
+    - StacSpatialExtent
     - RawGeoJSONFeature
     - RawGeoJSONFeatureCollection
     range: float

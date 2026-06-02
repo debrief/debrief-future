@@ -99,7 +99,7 @@ attributes:
   longitude:
     name: longitude
     description: Longitude in degrees (-180 to 180)
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     rank: 1000
     domain_of:
     - Coordinate
@@ -110,7 +110,7 @@ attributes:
   latitude:
     name: latitude
     description: Latitude in degrees (-90 to 90)
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     rank: 1000
     domain_of:
     - Coordinate
@@ -133,7 +133,7 @@ attributes:
   longitude:
     name: longitude
     description: Longitude in degrees (-180 to 180)
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     rank: 1000
     alias: longitude
     owner: Coordinate
@@ -146,7 +146,7 @@ attributes:
   latitude:
     name: latitude
     description: Latitude in degrees (-90 to 90)
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     rank: 1000
     alias: latitude
     owner: Coordinate

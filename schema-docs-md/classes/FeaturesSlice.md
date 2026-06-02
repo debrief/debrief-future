@@ -56,14 +56,6 @@ URI: [debrief:class/FeaturesSlice](https://debrief.info/schemas/class/FeaturesSl
 
 
 
-## Usages
-
-| used by | used in | type | used |
-| ---  | --- | --- | --- |
-| [SessionState](../classes/SessionState.md) | [features](../slots/features.md) | range | [FeaturesSlice](../classes/FeaturesSlice.md) |
-| [SessionFile](../classes/SessionFile.md) | [features](../slots/features.md) | range | [FeaturesSlice](../classes/FeaturesSlice.md) |
-
-
 
 
 

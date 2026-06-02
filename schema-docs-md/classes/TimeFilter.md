@@ -100,22 +100,22 @@ attributes:
     name: start
     description: Filter start as epoch milliseconds (null/missing = unbounded on the
       start)
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: integer
     required: false
   end:
     name: end
     description: Filter end as epoch milliseconds (null/missing = unbounded on the
       end)
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: integer
     required: false
 
@@ -134,26 +134,26 @@ attributes:
     name: start
     description: Filter start as epoch milliseconds (null/missing = unbounded on the
       start)
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     alias: start
     owner: TimeFilter
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: integer
     required: false
   end:
     name: end
     description: Filter end as epoch milliseconds (null/missing = unbounded on the
       end)
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     alias: end
     owner: TimeFilter
     domain_of:
-    - PlotTimeExtent
     - TimeRange
     - TimeFilter
+    - PlotTimeExtent
     range: integer
     required: false
 

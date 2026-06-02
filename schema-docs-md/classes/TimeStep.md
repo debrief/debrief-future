@@ -57,6 +57,7 @@ URI: [debrief:class/TimeStep](https://debrief.info/schemas/class/TimeStep)
 
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
+| [SystemStateProperties](../classes/SystemStateProperties.md) | [step_size](../slots/step_size.md) | range | [TimeStep](../classes/TimeStep.md) |
 | [TemporalSlice](../classes/TemporalSlice.md) | [stepSize](../slots/stepSize.md) | range | [TimeStep](../classes/TimeStep.md) |
 
 
@@ -108,17 +109,19 @@ attributes:
   value:
     name: value
     description: Numeric step value
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
     domain_of:
-    - ParameterValue
     - TimeStep
+    - ParameterValue
+    - ToolParameterMeta
     range: float
     required: true
     minimum_value: 0
   unit:
     name: unit
     description: Unit of the step
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     rank: 1000
     domain_of:
     - TimeStep
@@ -139,19 +142,21 @@ attributes:
   value:
     name: value
     description: Numeric step value
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
     alias: value
     owner: TimeStep
     domain_of:
-    - ParameterValue
     - TimeStep
+    - ParameterValue
+    - ToolParameterMeta
     range: float
     required: true
     minimum_value: 0
   unit:
     name: unit
     description: Unit of the step
-    from_schema: https://debrief.info/schemas/session-state
+    from_schema: https://debrief.info/schemas/common
     rank: 1000
     alias: unit
     owner: TimeStep

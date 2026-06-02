@@ -115,9 +115,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   addressingMode:
@@ -139,9 +142,18 @@ attributes:
     - MultiPolygonFeatureProperties
     - Tool
     - ToolParameter
+    - StacProvider
+    - StacItemProperties
+    - StacCatalog
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - LevelDefinition
     - StoryboardProperties
     - SceneProperties
+    - MCPParamSchema
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
 
 ```
@@ -171,9 +183,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   addressingMode:
@@ -199,9 +214,18 @@ attributes:
     - MultiPolygonFeatureProperties
     - Tool
     - ToolParameter
+    - StacProvider
+    - StacItemProperties
+    - StacCatalog
+    - StacAsset
+    - StacItemAssetDefinition
+    - StacCollection
     - LevelDefinition
     - StoryboardProperties
     - SceneProperties
+    - MCPParamSchema
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
 
 ```

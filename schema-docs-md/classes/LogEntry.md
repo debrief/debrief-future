@@ -277,6 +277,7 @@ attributes:
     rank: 1000
     domain_of:
     - LogEntry
+    - ToolResultForLog
     range: InputFeatureState
     required: false
     multivalued: true
@@ -454,6 +455,7 @@ attributes:
     owner: LogEntry
     domain_of:
     - LogEntry
+    - ToolResultForLog
     range: InputFeatureState
     required: false
     multivalued: true

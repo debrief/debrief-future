@@ -161,9 +161,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     required: true
   base_frequency:
     name: base_frequency
@@ -213,6 +216,7 @@ attributes:
     description: Sensor visibility
     from_schema: https://debrief.info/schemas/geojson
     domain_of:
+    - BaseFeatureProperties
     - SensorContact
     - SensorData
     range: boolean
@@ -275,9 +279,12 @@ attributes:
     - Tool
     - ToolParameter
     - PlatformRecord
+    - StacProvider
     - LevelDefinition
     - DatasetSeries
     - StoryboardProperties
+    - MCPToolDefinition
+    - ToolDefinition
     range: string
     required: true
   base_frequency:
@@ -340,6 +347,7 @@ attributes:
     alias: visible
     owner: SensorData
     domain_of:
+    - BaseFeatureProperties
     - SensorContact
     - SensorData
     range: boolean

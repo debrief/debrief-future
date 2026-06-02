@@ -66,6 +66,19 @@ URI: [debrief:class/NarrativeEntryProperties](https://debrief.info/schemas/class
         
       NarrativeEntryProperties : track_id
         
+      NarrativeEntryProperties : vertex_metadata
+        
+          
+    
+        
+        
+        NarrativeEntryProperties --> "*" VertexMetadata : vertex_metadata
+        click VertexMetadata href "../../classes/VertexMetadata/"
+    
+
+        
+      NarrativeEntryProperties : visible
+        
       
 ```
 
@@ -90,7 +103,9 @@ URI: [debrief:class/NarrativeEntryProperties](https://debrief.info/schemas/class
 | [symbol](../slots/symbol.md) | 0..1 <br/> [String](../types/String.md) | Display symbol code from REP file | direct |
 | [style](../slots/style.md) | 1 <br/> [PointProperties](../classes/PointProperties.md) | Point styling properties for display position | direct |
 | [tags](../slots/tags.md) | * <br/> [String](../types/String.md) | Free-text labels assigned to this feature by the analyst | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
+| [visible](../slots/visible.md) | 0..1 <br/> [Boolean](../types/Boolean.md) | Whether this feature is shown on the map | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
 | [provenance](../slots/provenance.md) | * <br/> [LogEntry](../classes/LogEntry.md) | PROV-aligned provenance records (append-only log of tool operations) | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
+| [vertex_metadata](../slots/vertex_metadata.md) | * <br/> [VertexMetadata](../classes/VertexMetadata.md) | Sparse list of per-vertex metadata, keyed by `path` | [BaseFeatureProperties](../classes/BaseFeatureProperties.md) |
 
 
 
@@ -171,6 +186,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: FeatureKindEnum
     required: true
     equals_string: NARRATIVE
@@ -194,6 +210,7 @@ attributes:
     domain_of:
     - NarrativeEntryProperties
     - TextAnnotationProperties
+    - MCPContentItem
     required: true
   track_id:
     name: track_id
@@ -273,6 +290,7 @@ attributes:
     - SystemRecordProperties
     - StoryboardProperties
     - SceneProperties
+    - MCPSelectionRequirement
     range: FeatureKindEnum
     required: true
     equals_string: NARRATIVE
@@ -300,6 +318,7 @@ attributes:
     domain_of:
     - NarrativeEntryProperties
     - TextAnnotationProperties
+    - MCPContentItem
     range: string
     required: true
   track_id:
@@ -360,11 +379,27 @@ attributes:
     owner: NarrativeEntryProperties
     domain_of:
     - BaseFeatureProperties
+    - VertexMetadata
     - StacExtensionProperties
     - StacItemSummary
     range: string
     required: false
     multivalued: true
+  visible:
+    name: visible
+    description: Whether this feature is shown on the map. Absent or true means visible;
+      false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist
+      (feature 261). Per-feature visibility travels with the feature inside features.geojson.
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
+    alias: visible
+    owner: NarrativeEntryProperties
+    domain_of:
+    - BaseFeatureProperties
+    - SensorContact
+    - SensorData
+    range: boolean
+    required: false
   provenance:
     name: provenance
     description: PROV-aligned provenance records (append-only log of tool operations)
@@ -377,6 +412,24 @@ attributes:
     - SystemStateProperties
     - SystemRecordProperties
     range: LogEntry
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  vertex_metadata:
+    name: vertex_metadata
+    description: 'Sparse list of per-vertex metadata, keyed by `path`. Empty arrays
+      MUST be omitted from the serialised feature (FR-010). Duplicate `path` values
+      MUST be rejected by validators (contract §Cross-cutting #3). Every concrete
+      subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec
+      #192, contracts/vertex-metadata-slot.md.'
+    from_schema: https://debrief.info/schemas/common
+    rank: 1000
+    alias: vertex_metadata
+    owner: NarrativeEntryProperties
+    domain_of:
+    - BaseFeatureProperties
+    range: VertexMetadata
+    required: false
     multivalued: true
     inlined: true
     inlined_as_list: true

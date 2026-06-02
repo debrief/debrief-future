@@ -3,7 +3,7 @@
 # Slot: time_range 
 
 
-_Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1._
+_For instant Scenes (#215 default): MUST be absent. For time-range Scenes (#263): a TimeRange sub-record. When present, the Scene is the time-range flavour and `viewport_end` MUST also be present. See cross-field rule `scene-flavour-xor-rule`._
 
 
 
@@ -31,7 +31,7 @@ Alias: time_range
 
 ## Properties
 
-* Range: [String](../types/String.md)
+* Range: [TimeRange](../classes/TimeRange.md)
 
 
 
@@ -66,15 +66,16 @@ Alias: time_range
 <details>
 ```yaml
 name: time_range
-description: Reserved slot for v2 animated time-range Scenes. MUST be absent (null)
-  in schema v1.
+description: 'For instant Scenes (#215 default): MUST be absent. For time-range Scenes
+  (#263): a TimeRange sub-record. When present, the Scene is the time-range flavour
+  and `viewport_end` MUST also be present. See cross-field rule `scene-flavour-xor-rule`.'
 from_schema: https://debrief.info/schemas/debrief
 rank: 1000
 alias: time_range
 owner: SceneProperties
 domain_of:
 - SceneProperties
-range: string
+range: TimeRange
 required: false
 
 ```

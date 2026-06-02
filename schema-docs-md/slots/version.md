@@ -3,6 +3,11 @@
 # Slot: version 
 
 
+_Tool version string for provenance tracking. Follows semantic versioning (e.g., "1.0.0")._
+
+
+
+
 
 URI: [debrief:slot/version](https://debrief.info/schemas/slot/version)
 Alias: version
@@ -18,7 +23,6 @@ Alias: version
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [Tool](../classes/Tool.md) | An analysis operation with a name, description, version, and selection requir... |  no  |
-| [SessionFile](../classes/SessionFile.md) | Persisted session file format (FR-024) |  no  |
 
 
 
@@ -39,6 +43,13 @@ Alias: version
 
 
 
+### Schema Source
+
+
+* from schema: https://debrief.info/schemas/debrief
+
+
+
 
 ## Mappings
 
@@ -55,11 +66,16 @@ Alias: version
 <details>
 ```yaml
 name: version
+description: Tool version string for provenance tracking. Follows semantic versioning
+  (e.g., "1.0.0").
+from_schema: https://debrief.info/schemas/debrief
+rank: 1000
 alias: version
+owner: Tool
 domain_of:
 - Tool
-- SessionFile
 range: string
+required: false
 
 ```
 </details>
