@@ -1,0 +1,45 @@
+===== StacExtensionProperties (BEFORE) =====
+export interface StacExtensionProperties {
+    /** Fully-resolved per-platform metadata array. Each entry represents one platform in the plot with merged registry + override data.
+ */
+    platforms?: PlatformRecord[],
+    /** Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
+ */
+    tags?: string[],
+    /** Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
+ */
+    feature_tags?: string[],
+    /** Flat list of field names on item.properties that the analyst has overridden via the Properties Panel. Auto-derivation routines (e.g. stacService.updateTemporalMetadata) MUST skip any field whose name appears here. Sorted alphabetically on write; deduplicated.
+ */
+    overrides?: string[],
+    /** Per-commit provenance entries written by the Properties Panel. Bounded at 500 entries per item; overflow rotates to sibling provenance_log_archive.jsonl in the item directory. Append-only (Article III.3 — audit trail immutable).
+ */
+    provenance_log?: PropertiesProvenanceEntry[],
+}
+
+===== StacSummaries (BEFORE) =====
+export interface StacSummaries {
+    /** Aggregated per-platform metadata across all Items in the Collection. Same shape as StacExtensionProperties.platforms. Disk key is `debrief:platforms` (colon syntax preserved via slot_uri). */
+    debrief_platforms?: PlatformRecord[],
+    /** Aggregated plot-level tags across all Items in the Collection. Disk key is `debrief:tags`. */
+    debrief_tags?: string[],
+    /** Aggregated feature-level tags across all Items in the Collection. Disk key is `debrief:feature_tags`. */
+    debrief_feature_tags?: string[],
+    [key: string]: unknown,
+}
+
+===== StacAsset (BEFORE) =====
+export interface StacAsset {
+    /** URI to the asset. Required on `StacItem.assets[<key>]` — STAC 1.1 mandates a concrete URI on Item assets. The declaration-only shape on `StacCollection.item_assets[<key>]` (no `href`) is covered by the sibling `StacItemAssetDefinition` class. */
+    href: string,
+    /** IANA media type. */
+    type?: string,
+    /** Human-readable asset title. */
+    title?: string,
+    /** Asset description (STAC 1.1 addition). */
+    description?: string,
+    /** Asset roles — "data", "thumbnail", "overview", "source", "result", etc. */
+    roles?: string[],
+    [key: string]: unknown,
+}
+

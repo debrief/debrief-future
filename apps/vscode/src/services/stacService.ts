@@ -13,8 +13,8 @@ import type {
   StacItemSummary,
   StacCatalog,
   StacItem,
+  StacItemProperties,
   StacAsset,
-  PlatformRecord,
 } from '../types/stac';
 
 // AssociatedFile is canonically defined by `@debrief/components`; re-export
@@ -303,9 +303,9 @@ export class StacService {
             bbox: toBbox4(item.bbox),
             startDatetime,
             endDatetime,
-            platforms: (item.properties['debrief:platforms'] as PlatformRecord[] | undefined) ?? [],
-            tags: (item.properties['debrief:tags'] as string[] | undefined) ?? [],
-            featureTags: (item.properties['debrief:feature_tags'] as string[] | undefined) ?? [],
+            platforms: item.properties['debrief:platforms'] ?? [],
+            tags: item.properties['debrief:tags'] ?? [],
+            featureTags: item.properties['debrief:feature_tags'] ?? [],
             // spec 241: assets.thumbnail is the small (200x150) variant;
             // assets.overview is the large (800x600) variant.
             thumbnailHref: item.assets['thumbnail']?.href ?? null,
@@ -672,9 +672,8 @@ export class StacService {
       return true;
     }
 
-    // Fallback: Check for debrief:toolId metadata
-    const assetWithMetadata = asset as StacAsset & { 'debrief:toolId'?: string };
-    if (assetWithMetadata['debrief:toolId']) {
+    // Fallback: Check for debrief:toolId metadata (modelled StacAsset slot, #256)
+    if (asset['debrief:toolId']) {
       return true;
     }
 
@@ -1312,18 +1311,19 @@ export class StacService {
     }
     const fingerprint = fs.statSync(fullItemPath).mtimeMs;
 
-    // Step 3: merge patch into properties.
-    // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
-    const props = item.properties as Record<string, unknown>;
+    // Step 3: merge patch into properties. #256: props is typed as the
+    // LinkML-derived StacItemProperties (open via its index signature), so
+    // modelled debrief:* writes are type-checked while arbitrary/core keys
+    // still flow through the `[key: string]: unknown` index signature.
+    const props: StacItemProperties = item.properties;
     for (const [k, v] of Object.entries(patch)) {
       props[k] = v;
     }
 
     // Step 4: merge overrideFields into debrief:overrides (dedupe + sort).
-    const existingOverrides = Array.isArray(props['debrief:overrides'])
-      ? (props['debrief:overrides'] as unknown[]).filter(
-          (x): x is string => typeof x === 'string',
-        )
+    const existingOverridesVal = props['debrief:overrides'];
+    const existingOverrides = Array.isArray(existingOverridesVal)
+      ? existingOverridesVal.filter((x): x is string => typeof x === 'string')
       : [];
     const overridesSet = new Set<string>(existingOverrides);
     for (const f of overrideFields) {
@@ -1344,8 +1344,13 @@ export class StacService {
     };
 
     // Step 6: append entry; rotate oldest entries when cap exceeded.
-    const existingLog = Array.isArray(props['debrief:provenance_log'])
-      ? (props['debrief:provenance_log'] as PropertiesProvenanceEntry[])
+    // #256/#240: the slot is typed as the generated (wide) provenance entry;
+    // the writer works in the narrowed component hybrid (literal tool/method/
+    // source). Bridge persistence-type → domain-type here — a typed narrowing
+    // between two known shapes, not an untyped-bag escape.
+    const existingLogVal = props['debrief:provenance_log'];
+    const existingLog: PropertiesProvenanceEntry[] = Array.isArray(existingLogVal)
+      ? (existingLogVal as PropertiesProvenanceEntry[])
       : [];
     const log: PropertiesProvenanceEntry[] = [...existingLog, entry];
     if (log.length > PROVENANCE_LOG_CAP) {

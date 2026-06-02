@@ -122,6 +122,31 @@ def test_stac_asset_extension_keys_roundtrip() -> None:
         assert dumped[ext_key] == raw[ext_key]
 
 
+def test_stac_asset_modelled_debrief_keys_roundtrip() -> None:
+    """#256: the newly-modelled asset keys survive Py → JSON → Py byte-stable.
+
+    `debrief:toolId` / `debrief:snapshotTimestamp` are modelled as `StacAsset`
+    slots (so TS gains typed access), but their on-disk colon keys still
+    round-trip via open content — proving the schema addition is typing-only and
+    does not change the persisted shape (FR-008 / SC-004).
+    """
+    raw = {
+        "href": "./range-bearing-result.geojson",
+        "type": "application/geo+json",
+        "roles": ["result"],
+        "debrief:toolId": "range-bearing",
+        "debrief:snapshotTimestamp": "2026-06-02T12:00:00Z",
+    }
+    asset = StacAsset.model_validate(raw)
+    dumped = asset.model_dump(mode="json", by_alias=True, exclude_none=True)
+    for ext_key in ("debrief:toolId", "debrief:snapshotTimestamp"):
+        assert ext_key in dumped, f"asset round-trip dropped {ext_key!r}"
+        assert dumped[ext_key] == raw[ext_key]
+    # On-disk shape is byte-stable (no spurious snake_case `tool_id` key added).
+    assert "tool_id" not in dumped
+    assert "snapshot_timestamp" not in dumped
+
+
 def test_stac_item_properties_extension_keys_roundtrip() -> None:
     """`debrief:*` and other extension keys on properties survive Py → JSON → Py."""
     raw = json.loads(

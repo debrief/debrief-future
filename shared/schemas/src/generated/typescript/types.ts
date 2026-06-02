@@ -1814,19 +1814,19 @@ export interface PropertiesProvenanceEntry {
 export interface StacExtensionProperties {
     /** Fully-resolved per-platform metadata array. Each entry represents one platform in the plot with merged registry + override data.
  */
-    platforms?: PlatformRecord[],
+    'debrief:platforms'?: PlatformRecord[],
     /** Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
  */
-    tags?: string[],
+    'debrief:tags'?: string[],
     /** Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
  */
-    feature_tags?: string[],
+    'debrief:feature_tags'?: string[],
     /** Flat list of field names on item.properties that the analyst has overridden via the Properties Panel. Auto-derivation routines (e.g. stacService.updateTemporalMetadata) MUST skip any field whose name appears here. Sorted alphabetically on write; deduplicated.
  */
-    overrides?: string[],
+    'debrief:overrides'?: string[],
     /** Per-commit provenance entries written by the Properties Panel. Bounded at 500 entries per item; overflow rotates to sibling provenance_log_archive.jsonl in the item directory. Append-only (Article III.3 — audit trail immutable).
  */
-    provenance_log?: PropertiesProvenanceEntry[],
+    'debrief:provenance_log'?: PropertiesProvenanceEntry[],
 }
 
 
@@ -2023,6 +2023,10 @@ export interface StacAsset {
     description?: string,
     /** Asset roles — "data", "thumbnail", "overview", "source", "result", etc. */
     roles?: string[],
+    /** Identifier of the debrief-calc tool that produced this result asset. On-disk key is `debrief:toolId` (colon syntax preserved via slot_uri). Written by `addResultAsset`; read at `stacService.ts` (Feature 256 — replaces the hand-typed `asset as StacAsset & { 'debrief:toolId'?: string }` cast). */
+    'debrief:toolId'?: string,
+    /** ISO-8601 UTC timestamp recorded when a snapshot asset is written. On-disk key is `debrief:snapshotTimestamp` (colon syntax preserved via slot_uri). Written by `writeSnapshotAsset`. */
+    'debrief:snapshotTimestamp'?: string,
     [key: string]: unknown,
 }
 
@@ -2078,11 +2082,11 @@ export interface StacExtent {
  */
 export interface StacSummaries {
     /** Aggregated per-platform metadata across all Items in the Collection. Same shape as StacExtensionProperties.platforms. Disk key is `debrief:platforms` (colon syntax preserved via slot_uri). */
-    debrief_platforms?: PlatformRecord[],
+    'debrief:platforms'?: PlatformRecord[],
     /** Aggregated plot-level tags across all Items in the Collection. Disk key is `debrief:tags`. */
-    debrief_tags?: string[],
+    'debrief:tags'?: string[],
     /** Aggregated feature-level tags across all Items in the Collection. Disk key is `debrief:feature_tags`. */
-    debrief_feature_tags?: string[],
+    'debrief:feature_tags'?: string[],
     [key: string]: unknown,
 }
 

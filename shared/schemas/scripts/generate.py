@@ -552,6 +552,81 @@ def generate_jsonschema() -> bool:
         return False
 
 
+# --- Feature 256: prefix-aware STAC extension typing ----------------------
+#
+# LinkML's gen-typescript strips the `debrief:` prefix and emits each slot
+# under its bare name (`platforms`, `debrief_platforms`, `tool_id`). The STAC
+# writers read/write those fields under their on-disk colon keys
+# (`props['debrief:platforms']`), so the bare slots type nothing at the real
+# call sites. These two helpers rewrite the generated slot keys to their
+# `slot_uri` verbatim, schema-driven (never hard-coded), across the three
+# extension-bearing classes.
+
+# Maps each prefix-bearing STAC class to the LinkML source that declares it.
+_STAC_PREFIX_SOURCES: dict[str, str] = {
+    "StacExtensionProperties": "stac-extension.yaml",
+    "StacSummaries": "stac.yaml",
+    "StacAsset": "stac.yaml",
+}
+
+
+def prefix_extension_slots(block_text: str, slot_uri_map: dict[str, str]) -> str:
+    """Rewrite bare slot keys in a generated TS interface block to their slot_uri.
+
+    For every ``slot_name -> slot_uri`` in ``slot_uri_map``, the generated
+    bare-key declaration line (e.g. ``    platforms?: PlatformRecord[],``) has
+    its key rewritten to the quoted ``slot_uri``
+    (``    'debrief:platforms'?: PlatformRecord[],``). Slots absent from the map
+    (e.g. ``StacAsset.href``) are left untouched. Value types and optionality
+    markers are preserved. Pure function — no I/O — so it is unit-testable in
+    isolation (Feature 256, FR-002/FR-013).
+    """
+    import re
+
+    result = block_text
+    for slot_name, slot_uri in slot_uri_map.items():
+        # Match the property-key portion of a declaration line: leading
+        # indentation, the exact slot name, an optional `?`, then `:`.
+        pattern = re.compile(
+            rf"^(?P<indent>\s*){re.escape(slot_name)}(?P<opt>\??):",
+            re.MULTILINE,
+        )
+        result = pattern.sub(rf"\g<indent>'{slot_uri}'\g<opt>:", result)
+    return result
+
+
+def _load_extension_slot_uri_map() -> dict[str, dict[str, str]]:
+    """Return ``{class_name: {slot_name: slot_uri}}`` for prefix-bearing classes.
+
+    Reads ``slot_uri`` verbatim from the LinkML sources and keeps only slots
+    whose ``slot_uri`` carries an extension prefix (a colon CURIE), so
+    non-extension slots (``StacAsset.href``, ``type``, ``roles``) are excluded.
+    Schema-driven: a new ``debrief:*`` slot flows through with no edit here
+    (Feature 256, FR-002/FR-013).
+    """
+    import yaml
+
+    out: dict[str, dict[str, str]] = {}
+    doc_cache: dict[str, dict] = {}
+    for cls_name, source in _STAC_PREFIX_SOURCES.items():
+        if source not in doc_cache:
+            doc_cache[source] = yaml.safe_load((LINKML_DIR / source).read_text())
+        attrs = (doc_cache[source].get("classes", {}).get(cls_name, {}) or {}).get(
+            "attributes", {}
+        ) or {}
+        slot_map: dict[str, str] = {}
+        for slot_name, slot_def in attrs.items():
+            if not isinstance(slot_def, dict):
+                continue
+            slot_uri = slot_def.get("slot_uri")
+            # Extension keys carry a prefixed CURIE (`debrief:platforms`); skip
+            # the LinkML meta prefix and any unprefixed/bare slot_uri.
+            if isinstance(slot_uri, str) and ":" in slot_uri and not slot_uri.startswith("linkml:"):
+                slot_map[slot_name] = slot_uri
+        out[cls_name] = slot_map
+    return out
+
+
 def generate_typescript() -> bool:
     """Generate TypeScript interfaces from LinkML schema."""
     if not MASTER_SCHEMA.exists():
@@ -976,6 +1051,38 @@ def generate_typescript() -> bool:
             # Preserve the trailing comma convention used by gen-typescript.
             insertion = "    [key: string]: unknown,\n"
             content = content[:end] + insertion + content[end:]
+
+        # (5b) Prefix-aware extension keys (Feature 256). Rewrite the modelled
+        #      debrief:* slot keys to their on-disk slot_uri across
+        #      StacExtensionProperties / StacSummaries / StacAsset, so writer
+        #      call sites using props['debrief:foo'] / asset['debrief:toolId']
+        #      gain named-slot typing flowing from LinkML. Schema-driven: keys
+        #      come from each slot's slot_uri, so a new slot flows through with
+        #      no edit here.
+        _stac_prefix_slot_map = _load_extension_slot_uri_map()
+        for cls_name, slot_map in _stac_prefix_slot_map.items():
+            marker = f"export interface {cls_name}"
+            if marker not in content:
+                raise RuntimeError(
+                    f"generate.py: prefix post-processor could not find "
+                    f"`{marker}`. Update generate.py (Feature 256)."
+                )
+            if not slot_map:
+                raise RuntimeError(
+                    f"generate.py: no extension `slot_uri` found for `{cls_name}` "
+                    f"(Feature 256) — the LinkML source changed?"
+                )
+            start = content.index(marker)
+            end = content.index("}\n", start)
+            block = content[start:end]
+            fixed_block = prefix_extension_slots(block, slot_map)
+            if fixed_block == block:
+                raise RuntimeError(
+                    f"generate.py: prefix post-processor made no change to "
+                    f"`{cls_name}` (Feature 256) — gen-typescript output changed; "
+                    f"expected bare keys {sorted(slot_map)}."
+                )
+            content = content[:start] + fixed_block + content[end:]
 
         # Drop the empty `export interface Any {}` stub — it's the LinkML
         # wildcard class that the post-processor has already mapped to

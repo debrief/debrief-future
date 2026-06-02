@@ -1935,3 +1935,60 @@ atomic write is Save Session.
 `apps/web-shell/src/services/__tests__/stacWriterIdb.commitPlotSave.test.ts`.
 Related: ADR-033 (Article IV.5 — derived boundary types), ADR-034 (sidecar
 retirement — the prior save-shape change this builds on).
+
+### ADR-040: Prefix-aware STAC typing — one schema-driven generator step over three classes; write-path props re-typed; `debrief:label` excluded (#256, 2026-06-02)
+
+**Status:** Accepted.
+
+**Context.** LinkML's `gen-typescript` strips the `debrief:` prefix and emits
+each modelled slot under its bare name, while the STAC writers read/write those
+fields under their on-disk colon keys (`props['debrief:platforms']`). A naive
+`StacItem.properties: StacExtensionProperties` intersection therefore typed
+nothing at the real call sites — the gap #240 explicitly deferred (its
+Article II.1 audit finding).
+
+**Decision.**
+1. **One schema-driven post-processor step** (`shared/schemas/scripts/generate.py`,
+   pure function `prefix_extension_slots()` + `_load_extension_slot_uri_map()`)
+   rewrites each modelled slot's emitted TS key to its LinkML `slot_uri` verbatim
+   across **three** classes: `StacExtensionProperties`, `StacSummaries`, and
+   `StacAsset`. We chose the schema-driven `slot_uri` read over a per-class text
+   rule because the three classes have divergent name→`slot_uri` conventions
+   (`platforms`→`debrief:platforms`; `debrief_platforms`→`debrief:platforms`;
+   and `StacAsset` mixes Debrief slots with non-Debrief `href`/`type`/`roles`
+   that must NOT be rewritten). FR-013.
+2. **Model `debrief:toolId` + `debrief:snapshotTimestamp` as `StacAsset` slots**
+   (additive Pydantic regen). Removes the hand-typed
+   `asset as StacAsset & { 'debrief:toolId'?: string }` cast at
+   `stacService.ts`. On-disk keys already exist → shape unchanged (FR-008).
+3. **Re-type both hosts' write-path `props`** from `Record<string, unknown>` to
+   `StacItemProperties` (`stacService.ts`, `stacWriterIdb.ts`). The generated-type
+   change alone types only the read sites; the writers deliberately widened to
+   `Record<string, unknown>` at the mutation path, so without this FR-004/FR-009
+   were only half met on the write path (the ADR-033 silent-drop surface). FR-012.
+4. **Exclude `debrief:label`.** Investigation during `/speckit.plan` showed it is
+   a GeoJSON *feature* property / MCP annotation (`bufferZoneGenerator.ts`,
+   `toolService.ts`), not a STAC item or asset key; modelling it onto a STAC
+   class would type a key the writer never persists. It belongs to a future
+   `BaseFeatureProperties` change.
+
+**Consequence / discovery.** Typing the `debrief:provenance_log` slot surfaced a
+pre-existing divergence (the exact #240 concern): the slot is typed as the
+*generated* (wide) `PropertiesProvenanceEntry` (`tool: string`), while the
+writers work in the *narrowed component hybrid* from
+`@debrief/components/PropertiesPanel/provenanceTypes` (literal `tool`/`method`/
+`source`). The old `as`-cast masked it. Resolved with an explicit, typed
+persistence→domain narrowing bridge on the read only; the write is
+narrow-is-subtype-of-wide and needs no cast. This is not an untyped-bag escape.
+
+**This closes the #240 Article II.1 deferral** — the writers' modelled `debrief:*`
+surface (read + write) now derives from LinkML rather than a hand-typed
+`Record<string, unknown>` bag.
+
+**Verification.** Pure-function unit test (synthetic added slot proves FR-002);
+schema-convention guard; structural counts; `tests/ts/stac-prefix-typing-256.test.ts`
+type-level read/write/asset assertions; byte-stable round-trip for the new asset
+keys; deterministic regen; existing `src/generated` drift gate (no new gate).
+
+Related: ADR-011 (cast governance), ADR-033 (Article IV.5 — derived boundary
+types), #240 (LinkML-derived writer types + drift gate — deferral now closed).
