@@ -31,8 +31,10 @@ import type {
   PositionStyleOverride,
 } from '@debrief/schemas';
 
-// Canonical Safe GeoJSON types from @debrief/utils (T02)
-import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
+// Permissive ingress/parse-boundary feature types (schema-derived, #212)
+import type { IngressFeature, IngressFeatureCollection } from '@debrief/schemas';
+// Shared bounds utility — reused for STAC item bbox computation (#212, R2)
+import { calculateBounds } from '@debrief/utils';
 
 // Properties Panel (#191/#193) — provenance constants + type. Imported via
 // subpath so the service does not drag in the full components barrel (and its
@@ -825,14 +827,14 @@ export class StacService {
 
   private loadGeoJson(
     geoJsonPath: string
-  ): Promise<SafeFeatureCollection | null> {
+  ): Promise<IngressFeatureCollection | null> {
     try {
       if (!fs.existsSync(geoJsonPath)) {
         return Promise.resolve(null);
       }
 
       const content = fs.readFileSync(geoJsonPath, 'utf-8');
-      return Promise.resolve(JSON.parse(content) as SafeFeatureCollection);
+      return Promise.resolve(JSON.parse(content) as IngressFeatureCollection);
     } catch {
       return Promise.resolve(null);
     }
@@ -1011,7 +1013,7 @@ export class StacService {
     storePath: string,
     itemPath: string,
     assetFilename: string
-  ): Promise<SafeFeatureCollection | null> {
+  ): Promise<IngressFeatureCollection | null> {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
     if (!item) {
@@ -1037,7 +1039,7 @@ export class StacService {
   async writeGeoJson(
     storePath: string,
     itemPath: string,
-    featureCollection: SafeFeatureCollection
+    featureCollection: IngressFeatureCollection
   ): Promise<void> {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
@@ -1523,7 +1525,7 @@ export class StacService {
   async addFeatures(
     storePath: string,
     itemPath: string,
-    features: SafeFeature[]
+    features: IngressFeature[]
   ): Promise<number> {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
@@ -1541,7 +1543,7 @@ export class StacService {
 
     const itemDir = path.dirname(fullItemPath);
     let geoJsonPath: string;
-    let featureCollection: SafeFeatureCollection;
+    let featureCollection: IngressFeatureCollection;
 
     if (geoJsonAsset) {
       geoJsonPath = path.resolve(itemDir, geoJsonAsset.href);
@@ -1565,8 +1567,12 @@ export class StacService {
     // Append new features
     featureCollection.features.push(...features);
 
-    // Update bbox if features have coordinates
-    const newBbox = this.calculateBboxFromFeatures(featureCollection.features);
+    // Update bbox if features have coordinates. Reuse the shared
+    // `calculateBounds` (#212, R2): it handles all seven geometry types
+    // (the removed local helper silently omitted Multi* geometries) and
+    // skips null-geometry features. `IngressFeature[]` is assignable to the
+    // utility's structural minimum without a cast.
+    const newBbox = calculateBounds(featureCollection.features);
     if (newBbox) {
       item.bbox = newBbox;
     }
@@ -1624,7 +1630,7 @@ export class StacService {
     }
 
     // Build a map of feature ID -> feature for quick lookup
-    const featureMap = new Map<string, SafeFeature>();
+    const featureMap = new Map<string, IngressFeature>();
     for (const feature of featureCollection.features) {
       const id = feature.id !== null && feature.id !== undefined
         ? String(feature.id)
@@ -1641,7 +1647,7 @@ export class StacService {
       const feature = featureMap.get(featureId);
       if (!feature) { continue; }
 
-      // Ensure properties exists — SafeFeature.properties is Record<string, unknown> | null
+      // Ensure properties exists — IngressFeature.properties is Record<string, unknown> | null | undefined
       if (!feature.properties) {
         feature.properties = {};
       }
@@ -1683,7 +1689,7 @@ export class StacService {
   async loadGeoJsonForItem(
     storePath: string,
     itemPath: string
-  ): Promise<SafeFeatureCollection | null> {
+  ): Promise<IngressFeatureCollection | null> {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
 
@@ -1724,68 +1730,5 @@ export class StacService {
     }
 
     return assetKey in item.assets;
-  }
-
-  /**
-   * Calculate bounding box from features
-   */
-  private calculateBboxFromFeatures(
-    features: SafeFeature[]
-  ): [number, number, number, number] | null {
-    let minLon = Infinity;
-    let minLat = Infinity;
-    let maxLon = -Infinity;
-    let maxLat = -Infinity;
-
-    for (const feature of features) {
-      if (!feature.geometry) {continue;} // Skip features with null geometry
-      const coords = this.extractCoordinates(feature.geometry);
-      for (const [lon, lat] of coords) {
-        if (typeof lon === 'number' && typeof lat === 'number') {
-          minLon = Math.min(minLon, lon);
-          minLat = Math.min(minLat, lat);
-          maxLon = Math.max(maxLon, lon);
-          maxLat = Math.max(maxLat, lat);
-        }
-      }
-    }
-
-    if (minLon === Infinity) {
-      return null;
-    }
-
-    return [minLon, minLat, maxLon, maxLat];
-  }
-
-  /**
-   * Extract all coordinates from a geometry
-   */
-  private extractCoordinates(geometry: SafeGeometry): number[][] {
-    const coords: number[][] = [];
-
-    if (geometry.type === 'Point') {
-      const point = geometry.coordinates as number[];
-      if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
-        coords.push([point[0], point[1]]);
-      }
-    } else if (geometry.type === 'LineString') {
-      const line = geometry.coordinates as number[][];
-      for (const point of line) {
-        if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
-          coords.push([point[0], point[1]]);
-        }
-      }
-    } else if (geometry.type === 'Polygon') {
-      const rings = geometry.coordinates as number[][][];
-      for (const ring of rings) {
-        for (const point of ring) {
-          if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
-            coords.push([point[0], point[1]]);
-          }
-        }
-      }
-    }
-
-    return coords;
   }
 }

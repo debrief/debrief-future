@@ -8,9 +8,9 @@
 import type { Feature, LineString, Position, Polygon } from 'geojson';
 import type { ToolsPanelItem } from '@debrief/components';
 import { extractParameters } from '@debrief/components';
-import type { SafeFeature } from '@debrief/utils';
 import { synthesizeTableDataset } from '@debrief/utils';
 import type {
+  IngressFeature,
   ToolDefinition as ToolDefinitionBase,
   ToolParameterMeta as ToolParameterMetaSchema,
   ToolResult as ToolResultBase,
@@ -241,17 +241,15 @@ function formatToolName(name: string): string {
     .join(' ');
 }
 
-/** Bridge geojson Feature[] to SafeFeature[] for executeTool. */
-function toSafeFeatures(features: Feature[]): SafeFeature[] {
+/** Bridge geojson Feature[] to IngressFeature[] for executeTool.
+ *  geometry may be null (RFC 7946 "unlocated" feature) — preserved, not dropped. */
+function toIngressFeatures(features: Feature[]): IngressFeature[] {
   return features.map(f => {
-    const geom: SafeFeature['geometry'] = f.geometry
-      ? { type: f.geometry.type, coordinates: (f.geometry as { coordinates: unknown }).coordinates }
-      : null;
-    const result: SafeFeature = {
+    const result: IngressFeature = {
       type: 'Feature' as const,
       ...(f.id != null ? { id: f.id as string | number } : {}),
-      geometry: geom,
-      properties: (f.properties ?? null) as SafeFeature['properties'],
+      geometry: (f.geometry ?? null) as IngressFeature['geometry'],
+      properties: f.properties ?? null,
     };
     return result;
   });
@@ -429,7 +427,7 @@ export function createMockCalcService(): MockCalcService {
           const params = collectedParams ?? defaultParams[toolId] ?? {};
           const response = executeTool(
             toolId,
-            toSafeFeatures(selectedFeatures),
+            toIngressFeatures(selectedFeatures),
             params,
           );
           const item = response.content[0];

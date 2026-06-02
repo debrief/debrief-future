@@ -7,17 +7,13 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import type { IngressFeature } from '@debrief/schemas';
 import { executeTool } from '../toolService';
 
 /**
  * Create a minimal track feature for testing tool execution.
  */
-function makeTrackFeature(id = 'track-001'): {
-  type: 'Feature';
-  id: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-} {
+function makeTrackFeature(id = 'track-001'): IngressFeature & { properties: Record<string, unknown> } {
   return {
     type: 'Feature' as const,
     id,

@@ -4,8 +4,8 @@
  * Port of the Python implementation in debrief_calc/tools/sensor/detection/buffer_zone_generator.py.
  */
 
-import type { TrackFeature } from '@debrief/schemas';
-import type { MCPToolDefinition, SafeFeature } from '@debrief/utils';
+import type { RawGeoJSONFeature, TrackFeature } from '@debrief/schemas';
+import type { MCPToolDefinition } from '@debrief/utils';
 
 // ============================================================
 // TYPES
@@ -286,7 +286,7 @@ export function execute(
   features: TrackFeature[],
   params: BufferZoneParams,
   sensorModel?: SensorModel,
-): SafeFeature[] {
+): RawGeoJSONFeature[] {
   // Find the track
   const track = findTrackFeature(features);
   const trackId = (track.id ?? 'unknown') as string;
@@ -360,7 +360,7 @@ export function execute(
   const label = `Generated 3 detection zones (${zoneNames}) for track`;
 
   // Build single MultiPolygon feature
-  const feature: SafeFeature = {
+  const feature: RawGeoJSONFeature = {
     type: 'Feature',
     id: `zone-${generateUUID()}`,
     geometry: {

@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { execute, toolDefinition } from '../bufferZoneGenerator';
 import type { SensorModel, SensorModelZone } from '../bufferZoneGenerator';
-import type { TrackFeature } from '@debrief/schemas';
+import type { RawGeoJSONFeature, TrackFeature } from '@debrief/schemas';
 
 // ============================================================
 // Test fixtures
@@ -56,7 +56,7 @@ const NON_TRACK_FEATURE = asTrack({
 // Helpers
 // ============================================================
 
-/** Helper type: SafeFeature with guaranteed non-null properties/geometry for test assertions. */
+/** Helper type: feature with guaranteed non-null properties/geometry for test assertions. */
 type AssertedFeature = {
   type: string;
   id?: string | number;
@@ -64,8 +64,8 @@ type AssertedFeature = {
   properties: Record<string, unknown>;
 };
 
-/** Assert that SafeFeature[] have non-null properties/geometry for test access. */
-function assertFeatures(features: import('@debrief/utils').SafeFeature[]): AssertedFeature[] {
+/** Assert that RawGeoJSONFeature[] have non-null properties/geometry for test access. */
+function assertFeatures(features: RawGeoJSONFeature[]): AssertedFeature[] {
   return features.map(f => {
     if (!f.properties) throw new Error('Expected non-null properties');
     if (!f.geometry) throw new Error('Expected non-null geometry');
