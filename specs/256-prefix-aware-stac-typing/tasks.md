@@ -47,9 +47,9 @@ no Playwright, no interaction GIF**.
 **Goal**: Capture the pre-change baseline so byte-invariance (FR-008/SC-004) and
 the generated-diff evidence are provable, and confirm the test homes.
 
-- [ ] T001 Capture baseline of the generated TS for the three target classes (current bare-key form) for later before/after diff `specs/256-prefix-aware-stac-typing/evidence/baseline-types-before.txt`
-- [ ] T002 [P] Capture a baseline written `item.json` (with `debrief:*` props) and an asset entry (with `debrief:toolId`) from `apps/vscode/test-data/local-store/exercise-alpha/item.json` for the byte-identical write golden `specs/256-prefix-aware-stac-typing/evidence/baseline-item-before.json`
-- [ ] T003 [P] Confirm test homes exist (Python: `shared/schemas/tests/`; TS type-level: `shared/schemas/tests/typescript-usage.ts` + `shared/schemas/tests/ts/`) and note the existing `test_regen_idempotent.py` + `src/generated` drift gate are reused, not duplicated `specs/256-prefix-aware-stac-typing/tasks.md`
+- [x] T001 Capture baseline of the generated TS for the three target classes (current bare-key form) for later before/after diff `specs/256-prefix-aware-stac-typing/evidence/baseline-types-before.txt`
+- [x] T002 [P] Capture a baseline written `item.json` (with `debrief:*` props) and an asset entry (with `debrief:toolId`) from `apps/vscode/test-data/local-store/exercise-alpha/item.json` for the byte-identical write golden `specs/256-prefix-aware-stac-typing/evidence/baseline-item-before.json`
+- [x] T003 [P] Confirm test homes exist (Python: `shared/schemas/tests/`; TS type-level: `shared/schemas/tests/typescript-usage.ts` + `shared/schemas/tests/ts/`) and note the existing `test_regen_idempotent.py` + `src/generated` drift gate are reused, not duplicated `specs/256-prefix-aware-stac-typing/tasks.md`
 
 **Checkpoint**: Baseline artefacts captured; no source changed yet.
 
@@ -65,18 +65,18 @@ types are the contract every other phase binds to.
 
 ### Schema change (FR-011)
 
-- [ ] T004 Add two optional `string` attributes to `StacAsset` — `tool_id` (`slot_uri: debrief:toolId`) and `snapshot_timestamp` (`slot_uri: debrief:snapshotTimestamp`), with descriptions noting the on-disk colon keys `shared/schemas/src/linkml/stac.yaml`
+- [x] T004 Add two optional `string` attributes to `StacAsset` — `tool_id` (`slot_uri: debrief:toolId`) and `snapshot_timestamp` (`slot_uri: debrief:snapshotTimestamp`), with descriptions noting the on-disk colon keys `shared/schemas/src/linkml/stac.yaml`
 
 ### Schema-driven prefix transform (FR-013, FR-010, FR-001)
 
-- [ ] T005 Implement the pure function `prefix_extension_slots(block_text: str, slot_uri_map: dict[str, str]) -> str` that rewrites each bare-key slot whose name is in `slot_uri_map` to its (colon) `slot_uri`, leaving non-mapped slots untouched; deterministic, no I/O `shared/schemas/scripts/generate.py`
-- [ ] T006 Add a `{class -> {slot_name -> slot_uri}}` loader for `StacExtensionProperties` (from `stac-extension.yaml`), `StacSummaries`, and `StacAsset` (from `stac.yaml`), reading each slot's `slot_uri` via `SchemaView`/PyYAML and keeping only slots whose `slot_uri` carries an extension prefix (a colon CURIE) `shared/schemas/scripts/generate.py`
-- [ ] T007 Wire the step into `generate_typescript()` — for each of the three class blocks, call `prefix_extension_slots(...)`; guard with `raise RuntimeError` if a class block or an expected bare-key token is missing (matches the existing post-processor convention, mirrors the step-5 open-record loop) `shared/schemas/scripts/generate.py`
+- [x] T005 Implement the pure function `prefix_extension_slots(block_text: str, slot_uri_map: dict[str, str]) -> str` that rewrites each bare-key slot whose name is in `slot_uri_map` to its (colon) `slot_uri`, leaving non-mapped slots untouched; deterministic, no I/O `shared/schemas/scripts/generate.py`
+- [x] T006 Add a `{class -> {slot_name -> slot_uri}}` loader for `StacExtensionProperties` (from `stac-extension.yaml`), `StacSummaries`, and `StacAsset` (from `stac.yaml`), reading each slot's `slot_uri` via `SchemaView`/PyYAML and keeping only slots whose `slot_uri` carries an extension prefix (a colon CURIE) `shared/schemas/scripts/generate.py`
+- [x] T007 Wire the step into `generate_typescript()` — for each of the three class blocks, call `prefix_extension_slots(...)`; guard with `raise RuntimeError` if a class block or an expected bare-key token is missing (matches the existing post-processor convention, mirrors the step-5 open-record loop) `shared/schemas/scripts/generate.py`
 
 ### Regenerate + commit artefacts
 
-- [ ] T008 Regenerate all derived artefacts (`task schema:generate`), verifying: TS `StacExtensionProperties`/`StacSummaries`/`StacAsset` carry the `debrief:`-prefixed keys; `StacAsset` Pydantic model gains two optional fields (additive); non-Debrief `StacAsset` slots (`href`/`type`/`roles`) unchanged `shared/schemas/src/generated/`
-- [ ] T009 Run the generator twice and confirm byte-identical output (determinism, C4 / Article I.4), then commit the regenerated artefacts so the `src/generated` drift gate is satisfied `shared/schemas/src/generated/`
+- [x] T008 Regenerate all derived artefacts (`task schema:generate`), verifying: TS `StacExtensionProperties`/`StacSummaries`/`StacAsset` carry the `debrief:`-prefixed keys; `StacAsset` Pydantic model gains two optional fields (additive); non-Debrief `StacAsset` slots (`href`/`type`/`roles`) unchanged `shared/schemas/src/generated/`
+- [x] T009 Run the generator twice and confirm byte-identical output (determinism, C4 / Article I.4), then commit the regenerated artefacts so the `src/generated` drift gate is satisfied `shared/schemas/src/generated/`
 
 **Checkpoint**: Generated types prefixed across 3 classes; `StacAsset` modelled;
 artefacts committed and drift-clean. Foundation ready — stories can proceed.

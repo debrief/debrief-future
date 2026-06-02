@@ -379,6 +379,24 @@ classes:
         range: string
         multivalued: true
         required: false
+      tool_id:
+        description: >-
+          Identifier of the debrief-calc tool that produced this result
+          asset. On-disk key is `debrief:toolId` (colon syntax preserved
+          via slot_uri). Written by `addResultAsset`; read at
+          `stacService.ts` (Feature 256 — replaces the hand-typed
+          `asset as StacAsset & { 'debrief:toolId'?: string }` cast).
+        range: string
+        required: false
+        slot_uri: debrief:toolId
+      snapshot_timestamp:
+        description: >-
+          ISO-8601 UTC timestamp recorded when a snapshot asset is
+          written. On-disk key is `debrief:snapshotTimestamp` (colon
+          syntax preserved via slot_uri). Written by `writeSnapshotAsset`.
+        range: string
+        required: false
+        slot_uri: debrief:snapshotTimestamp
 
   StacItemAssetDefinition:
     description: >-

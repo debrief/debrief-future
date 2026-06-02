@@ -5422,6 +5422,9 @@ class StacAsset(ConfiguredBaseModel):
                        'StacAsset',
                        'StacItemAssetDefinition',
                        'SceneThumbnailAssetEntry']} })
+    tool_id: Optional[str] = Field(default=None, description="""Identifier of the debrief-calc tool that produced this result asset. On-disk key is `debrief:toolId` (colon syntax preserved via slot_uri). Written by `addResultAsset`; read at `stacService.ts` (Feature 256 — replaces the hand-typed `asset as StacAsset & { 'debrief:toolId'?: string }` cast).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacAsset', 'LastToolExecution', 'ToolResultForLog'],
+         'slot_uri': 'debrief:toolId'} })
+    snapshot_timestamp: Optional[str] = Field(default=None, description="""ISO-8601 UTC timestamp recorded when a snapshot asset is written. On-disk key is `debrief:snapshotTimestamp` (colon syntax preserved via slot_uri). Written by `writeSnapshotAsset`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacAsset'], 'slot_uri': 'debrief:snapshotTimestamp'} })
 
 
 class StacItemAssetDefinition(ConfiguredBaseModel):
@@ -5963,7 +5966,7 @@ class LastToolExecution(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
 
-    tool_id: str = Field(default=..., description="""Identifier of the tool that was executed""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution', 'ToolResultForLog']} })
+    tool_id: str = Field(default=..., description="""Identifier of the tool that was executed""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacAsset', 'LastToolExecution', 'ToolResultForLog']} })
     source_feature_ids: list[str] = Field(default=..., description="""IDs of the source features the tool operated on""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution', 'ToolResultForLog']} })
     result_layer_ids: list[str] = Field(default=..., description="""IDs of the result layers produced by the tool""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution']} })
 
@@ -7146,7 +7149,7 @@ class ToolResultForLog(ConfiguredBaseModel):
     result_type: Optional[str] = Field(default=None, description="""Hierarchical result type (e.g. mutation/track/smoothed).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultForLog']} })
     source_feature_ids: Optional[list[str]] = Field(default=[], description="""IDs of input features used to generate this result.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution', 'ToolResultForLog']} })
     artifact_href: Optional[str] = Field(default=None, description="""Path to an exported artifact (for non-GeoJSON tool results).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultForLog', 'ToolExecutionResultForReplay']} })
-    tool_id: Optional[str] = Field(default=None, description="""Tool identifier (mirrors LogEntry.was_generated_by.tool).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution', 'ToolResultForLog']} })
+    tool_id: Optional[str] = Field(default=None, description="""Tool identifier (mirrors LogEntry.was_generated_by.tool).""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacAsset', 'LastToolExecution', 'ToolResultForLog']} })
     input_state: Optional[list[Any]] = Field(default=[], description="""Pre-tool geometry snapshot for mutation tools — passed through to LogEntry. Free-form per Article XV.2 (the inner InputFeatureState shape is owned by #224 session-state).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry', 'ToolResultForLog']} })
 
 
