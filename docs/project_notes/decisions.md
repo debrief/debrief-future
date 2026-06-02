@@ -1826,3 +1826,112 @@ backlog item.
 `apps/web-shell/playwright/tests/storyboard-preview.spec.ts` (asserts every
 captured scene references both tracks and the renderer draws them). Related:
 ADR-011 (cast governance), ADR-033 (Article IV.5 — derived boundary types).
+
+### ADR-039: Atomic plot save — a write-ahead intent journal is the filesystem commit point; one IndexedDB transaction on the browser (#268, 2026-06-01)
+
+**Status:** Accepted.
+
+**Context.** A "Save" of a plot is not one write — it is several: the feature
+collection (`features.geojson`), the STAC `item.json` metadata, and the
+thumbnail/overview PNGs. Before this change those writes were independently
+committable and reported success too early. The VS Code save did a raw
+`fs.writeFileSync` of `features.geojson` (non-atomic, *bypassing* the
+`StacWriter` boundary), then — *after* clearing the dirty flag and showing
+"Plot saved" — wrote the thumbnails and patched `item.json` through the writer
+(`saveSession.ts:124,133-134,142`). A failure or interruption between those
+phases (disk full, permission denied, browser quota, process kill, power loss)
+could leave any subset applied: new features with stale thumbnails, a torn
+`features.geojson`, or a plot the analyst believes is saved when it is not. A
+single-file atomic-write primitive (`atomicWriteSync`, temp→rename) existed, but
+there was no way to commit *multiple* writes as one unit, and the FC write did
+not even use the single-file primitive. The web-shell had a narrower version of
+the same gap: its standalone-create path ran `writeItem()` then `writeAsset()`
+in **two** separate IndexedDB transactions (`mocks/stacService.ts:449-457`).
+
+**Decision.**
+
+1. **One host-agnostic boundary operation, `commitPlotSave`.** The whole save
+   unit (feature collection + optional thumbnail pair, with the `item.json`
+   metadata they imply) is handed to a single `StacWriter.commitPlotSave(input)`
+   that commits it atomically. A companion `reconcilePlotSave(input)` is called
+   on open, *before* the read, to heal an interrupted save. Each host implements
+   both once against its native backend (Article IV.4). Atomicity must be
+   enforced at the boundary (FR-009) — a frontend orchestrating several writer
+   calls cannot make multiple FS renames or IDB transactions atomic. This also
+   moves the feature-collection write onto the boundary (FR-004 / Article IV.2).
+
+2. **Filesystem commit point = a write-ahead intent journal.** `commitPlotSave`
+   on the fs adaptor runs four phases: **stage** every artefact to a
+   `<name>.<token>.tmp` temp (reusing the existing `atomicWriteSync` temp step);
+   **commit point** — atomically write a single `.save-journal.json` listing the
+   pending `temp → final` renames; **apply** the renames (POSIX `rename` is
+   atomic per file); **clear** the journal. The atomic creation of the journal
+   is the commit boundary: `reconcilePlotSave` rolls **back** before it (stray
+   temps, no journal → delete temps, keep originals = last-good) and **forward**
+   after it (journal present → re-apply pending renames idempotently, then delete
+   the journal = the new version). Every interruption point therefore resolves
+   to a single coherent plot (FR-001/FR-007/FR-008). The journal is validated on
+   read through a typed `parseSaveJournal()` (no `any`, Article XV.5).
+
+3. **Browser commit point = one multi-store IndexedDB transaction.**
+   `commitPlotSave` on the idb adaptor opens **one** `readwrite` transaction over
+   `items` + `payloads` + `assets` + `meta`, enqueues all puts, and `await
+   tx.done`. IndexedDB transactions are already atomic — an error aborts the
+   whole transaction and a tab/process kill discards an uncommitted one — so this
+   gives all-or-nothing for free and needs no journal. `reconcilePlotSave`
+   returns `clean` (IndexedDB never exposes partial transaction state).
+
+4. **Report success only after commit.** `markClean()` and the "Plot saved"
+   message move to *after* `commitPlotSave` resolves; on rejection the host
+   surfaces a clear failure, leaves the dirty flag set, and the previous version
+   is intact (FR-005/FR-006). Thumbnail *capture* stays best-effort: a capture
+   failure simply omits `thumbnails` from the commit; a capture *write* that
+   begins is part of the atomic unit.
+
+5. **Durability is explicitly not a goal.** Per the spec clarifications, the
+   guarantee is atomicity/coherence, **not** power-loss durability of the newest
+   save. We add no `fsync` machinery — the existing best-effort temp→rename and
+   the IndexedDB transaction are sufficient. On power loss a coherent *earlier*
+   version may open; whatever opens is never torn.
+
+**Boundary types are derived (Article IV.5).** `CommitPlotSaveInput.thumbnails`
+is `Pick<WritePlotThumbnailPairInput, 'largePngBase64' | 'smallPngBase64'>`;
+`featureCollection` reuses the generated `@debrief/schemas` `FeatureCollection`.
+A compile-time `Pick` guard test (`shared/stac-writer/src/__tests__/commitPlotSave.types.test.ts`)
+keeps the save unit from silently dropping fields as the thumbnail input grows.
+
+**Alternatives rejected.**
+- *Caller-side "transaction" wrapping the existing `writeFeatureCollection` +
+  `writePlotThumbnailPair`.* The frontend cannot make multiple FS renames or IDB
+  transactions atomic — this moves the seam to the wrong layer (violates FR-009).
+- *Sequential temp→rename with no journal.* A crash mid-rename leaves new
+  `features.geojson` + old `item.json` = incoherent, and `rename` has already
+  destroyed the original so it cannot be rolled back. This **is** the core bug.
+- *Backup-originals-then-overwrite, roll back on open.* Doubles I/O on every
+  save and still needs a marker to know a save was in flight; the
+  journal + roll-forward is simpler and cheaper.
+- *Whole-item shadow directory + atomic dir swap.* Item dirs have stable paths
+  referenced elsewhere (catalog links, assets); swapping directories is
+  disruptive and heavier than a per-file journal.
+- *Replicate the FS journal in the browser.* Redundant — IndexedDB already
+  provides transactional atomicity.
+
+**Scene-capture's eager FC write (`captureScene.ts`) is deferred, deliberately.**
+`captureScene`'s `defaultWriteFeatureCollection` writes only `features.geojson`
+(no `item.json`, no thumbnails) as an *eager, best-effort* convenience so a
+captured scene survives a reload without an explicit Save; its failure path
+already tells the analyst to "Run Save Session to retry", and Save Session now
+routes through `commitPlotSave`. Because it writes a single file with no
+cross-artefact unit to keep coherent, and threading the `storePath` /
+catalog-relative split + a `StacWriter` handle into the capture command is a
+larger refactor than its best-effort nature warrants, it is left on its existing
+write for this delivery and tracked as follow-up tech-debt. The authoritative,
+atomic write is Save Session.
+
+**Provenance.** Spec `specs/268-save-atomicity/`. Type contract:
+`specs/268-save-atomicity/contracts/stac-writer-commit.ts`. Tests:
+`apps/vscode/tests/unit/stacWriterFs.commitPlotSave.test.ts`,
+`apps/vscode/tests/unit/stacWriterFs.reconcile.test.ts`,
+`apps/web-shell/src/services/__tests__/stacWriterIdb.commitPlotSave.test.ts`.
+Related: ADR-033 (Article IV.5 — derived boundary types), ADR-034 (sidecar
+retirement — the prior save-shape change this builds on).

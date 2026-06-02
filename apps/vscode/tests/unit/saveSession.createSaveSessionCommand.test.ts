@@ -1,11 +1,13 @@
 /**
  * @vitest-environment node
  *
- * Unit tests for `createSaveSessionCommand` (Feature 242).
+ * Unit tests for `createSaveSessionCommand` — #268 atomic-save routing.
  *
- * Targets the new `getStacWriter` injection point and the error-surface
- * behaviour around `StacWriterError` (Article I.3 — no silent partial
- * catalog writes for thumbnail persistence failures).
+ * The save now commits the whole unit (feature collection + optional
+ * thumbnails) through `StacWriter.commitPlotSave` instead of a raw
+ * features.geojson write followed by a separate thumbnail write. These tests
+ * assert the routing and the best-effort thumbnail-capture behaviour; the
+ * success/failure reporting ORDER is covered in saveSession.reporting.test.ts.
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -13,7 +15,11 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { StacWriterError, type StacWriter } from '@debrief/stac-writer';
+import {
+  StacWriterError,
+  type CommitPlotSaveInput,
+  type StacWriter,
+} from '@debrief/stac-writer';
 import { createSaveSessionCommand } from '../../src/commands/saveSession';
 import type { SessionManager } from '../../src/services/sessionManager';
 import type { MapPanel } from '../../src/webview/mapPanel';
@@ -26,10 +32,6 @@ function makeSessionState(savePath: string): Record<string, unknown> {
   return {
     dirty: true,
     savePath,
-    // Minimal store surface read by the feature-261 systemStateBridge during
-    // save (applyStateToFeatures reads the view-state slices). With timeRange /
-    // viewport null and an empty selection, no state.* features are written —
-    // the save still proceeds (FR-020) and writes features.geojson.
     currentTime: null,
     timeRange: null,
     timeFilter: null,
@@ -46,7 +48,7 @@ function makeSessionState(savePath: string): Record<string, unknown> {
   };
 }
 
-function makeSession(savePath: string): { getState: () => unknown } {
+function makeSession(savePath: string): { getState: () => Record<string, unknown> } {
   const state = makeSessionState(savePath);
   return { getState: () => state };
 }
@@ -64,23 +66,24 @@ function makeSessionManager(opts: {
 function makeMapPanel(opts: {
   thumbnails?: { largePngBase64: string; smallPngBase64: string };
   features?: unknown[];
+  captureRejects?: boolean;
 }): MapPanel {
   return {
-    requestThumbnailCapture: vi.fn().mockResolvedValue(
-      opts.thumbnails ?? { largePngBase64: '', smallPngBase64: '' },
-    ),
+    requestThumbnailCapture: opts.captureRejects
+      ? vi.fn().mockRejectedValue(new Error('webview busy'))
+      : vi.fn().mockResolvedValue(opts.thumbnails ?? { largePngBase64: '', smallPngBase64: '' }),
     getCurrentFeatures: vi.fn().mockReturnValue(opts.features ?? []),
   } as unknown as MapPanel;
 }
 
-describe('createSaveSessionCommand — getStacWriter wiring (#242)', () => {
+describe('createSaveSessionCommand — #268 commitPlotSave routing', () => {
   let storePath: string;
   let savePath: string;
 
   beforeEach(() => {
     storePath = fs.mkdtempSync(path.join(os.tmpdir(), 'debrief-savesess-'));
     fs.mkdirSync(path.join(storePath, 'core--boat1'), { recursive: true });
-    savePath = path.join(storePath, 'core--boat1', 'item.debrief-session');
+    savePath = path.join(storePath, 'core--boat1', 'item.json');
     vi.clearAllMocks();
   });
 
@@ -88,129 +91,99 @@ describe('createSaveSessionCommand — getStacWriter wiring (#242)', () => {
     fs.rmSync(storePath, { recursive: true, force: true });
   });
 
-  it('routes thumbnail writes through the injected StacWriter', async () => {
-    const writePlotThumbnailPair = vi.fn().mockResolvedValue({
+  it('commits the feature collection + thumbnails through commitPlotSave', async () => {
+    const commitPlotSave = vi.fn().mockResolvedValue({
+      featuresPath: 'core--boat1/features.geojson',
       thumbnailPath: 'core--boat1/thumbnail.png',
       overviewPath: 'core--boat1/overview.png',
     });
-    const writer: Partial<StacWriter> = { writePlotThumbnailPair };
-    const getStacWriter = vi.fn().mockReturnValue(writer as StacWriter);
-
-    const sessionManager = makeSessionManager({
-      session: makeSession(savePath),
-      plotUri: PLOT_URI,
-    });
-    const mapPanel = makeMapPanel({
-      thumbnails: { largePngBase64: LARGE_B64, smallPngBase64: SMALL_B64 },
-    });
+    const getStacWriter = vi.fn().mockReturnValue({ commitPlotSave } as Partial<StacWriter> as StacWriter);
+    const session = makeSession(savePath);
 
     const command = createSaveSessionCommand(
-      sessionManager,
+      makeSessionManager({ session, plotUri: PLOT_URI }),
       () => storePath,
-      () => mapPanel,
+      () => makeMapPanel({ thumbnails: { largePngBase64: LARGE_B64, smallPngBase64: SMALL_B64 } }),
       getStacWriter,
     );
-
     await command();
 
     expect(getStacWriter).toHaveBeenCalledWith(storePath);
-    expect(writePlotThumbnailPair).toHaveBeenCalledTimes(1);
-    const callArg = writePlotThumbnailPair.mock.calls[0]?.[0] as {
-      stacItemPath: string;
-      smallPngBase64: string;
-      largePngBase64: string;
-    };
-    expect(callArg.stacItemPath).toBe('core--boat1/item.json');
-    expect(callArg.smallPngBase64).toBe(SMALL_B64);
-    expect(callArg.largePngBase64).toBe(LARGE_B64);
+    expect(commitPlotSave).toHaveBeenCalledTimes(1);
+    const arg = commitPlotSave.mock.calls[0]?.[0] as CommitPlotSaveInput;
+    expect(arg.stacItemPath).toBe('core--boat1/item.json');
+    expect(arg.featureCollection.type).toBe('FeatureCollection');
+    expect(arg.thumbnails).toEqual({ largePngBase64: LARGE_B64, smallPngBase64: SMALL_B64 });
+    expect((session.getState().markClean as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
   });
 
-  it('skips the writer call when no thumbnails were captured', async () => {
-    const writePlotThumbnailPair = vi.fn();
-    const writer: Partial<StacWriter> = { writePlotThumbnailPair };
-    const getStacWriter = vi.fn().mockReturnValue(writer as StacWriter);
-
-    const sessionManager = makeSessionManager({
-      session: makeSession(savePath),
-      plotUri: PLOT_URI,
+  it('still commits the feature collection when no thumbnails were captured', async () => {
+    const commitPlotSave = vi.fn().mockResolvedValue({
+      featuresPath: 'core--boat1/features.geojson',
+      thumbnailPath: null,
+      overviewPath: null,
     });
-    // Empty base64 → falsy → writer must not be invoked.
-    const mapPanel = makeMapPanel({});
+    const getStacWriter = vi.fn().mockReturnValue({ commitPlotSave } as Partial<StacWriter> as StacWriter);
 
     const command = createSaveSessionCommand(
-      sessionManager,
+      makeSessionManager({ session: makeSession(savePath), plotUri: PLOT_URI }),
       () => storePath,
-      () => mapPanel,
+      () => makeMapPanel({}), // empty base64 → no thumbnails
       getStacWriter,
     );
-
     await command();
 
-    expect(writePlotThumbnailPair).not.toHaveBeenCalled();
+    expect(commitPlotSave).toHaveBeenCalledTimes(1);
+    expect((commitPlotSave.mock.calls[0]?.[0] as CommitPlotSaveInput).thumbnails).toBeUndefined();
   });
 
-  it('surfaces StacWriterError via showErrorMessage (Article I.3)', async () => {
-    const writePlotThumbnailPair = vi.fn().mockRejectedValue(
-      new StacWriterError(
-        'write-failed',
-        'simulated service-write failure',
-        { path: 'core--boat1/item.json' },
-      ),
+  it('surfaces a commit failure via showErrorMessage and does NOT clear the dirty flag', async () => {
+    const commitPlotSave = vi.fn().mockRejectedValue(
+      new StacWriterError('read-only-fs', 'simulated read-only filesystem', {
+        path: 'core--boat1/item.json',
+      }),
     );
-    const writer: Partial<StacWriter> = { writePlotThumbnailPair };
-    const getStacWriter = vi.fn().mockReturnValue(writer as StacWriter);
-
-    const sessionManager = makeSessionManager({
-      session: makeSession(savePath),
-      plotUri: PLOT_URI,
-    });
-    const mapPanel = makeMapPanel({
-      thumbnails: { largePngBase64: LARGE_B64, smallPngBase64: SMALL_B64 },
-    });
+    const getStacWriter = vi.fn().mockReturnValue({ commitPlotSave } as Partial<StacWriter> as StacWriter);
+    const session = makeSession(savePath);
 
     const command = createSaveSessionCommand(
-      sessionManager,
+      makeSessionManager({ session, plotUri: PLOT_URI }),
       () => storePath,
-      () => mapPanel,
+      () => makeMapPanel({ thumbnails: { largePngBase64: LARGE_B64, smallPngBase64: SMALL_B64 } }),
       getStacWriter,
     );
-
     await command();
 
     const showErr = vscode.window.showErrorMessage as unknown as ReturnType<typeof vi.fn>;
     expect(showErr).toHaveBeenCalledTimes(1);
-    expect(showErr.mock.calls[0]?.[0]).toMatch(/Thumbnail save failed: simulated/);
+    expect(showErr.mock.calls[0]?.[0]).toMatch(/Failed to save plot: simulated read-only/);
+    expect((session.getState().markClean as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
   });
 
-  it('treats non-StacWriterError exceptions as non-blocking (warn only)', async () => {
+  it('treats a thumbnail-capture failure as non-blocking and still commits FC-only', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const writePlotThumbnailPair = vi.fn();
-    const writer: Partial<StacWriter> = { writePlotThumbnailPair };
-    const getStacWriter = vi.fn().mockReturnValue(writer as StacWriter);
-
-    const sessionManager = makeSessionManager({
-      session: makeSession(savePath),
-      plotUri: PLOT_URI,
+    const commitPlotSave = vi.fn().mockResolvedValue({
+      featuresPath: 'core--boat1/features.geojson',
+      thumbnailPath: null,
+      overviewPath: null,
     });
-    const mapPanel = {
-      requestThumbnailCapture: vi
-        .fn()
-        .mockRejectedValue(new Error('webview busy')),
-      getCurrentFeatures: vi.fn().mockReturnValue([]),
-    } as unknown as MapPanel;
+    const getStacWriter = vi.fn().mockReturnValue({ commitPlotSave } as Partial<StacWriter> as StacWriter);
+    const session = makeSession(savePath);
 
     const command = createSaveSessionCommand(
-      sessionManager,
+      makeSessionManager({ session, plotUri: PLOT_URI }),
       () => storePath,
-      () => mapPanel,
+      () => makeMapPanel({ captureRejects: true }),
       getStacWriter,
     );
-
     await command();
 
     const showErr = vscode.window.showErrorMessage as unknown as ReturnType<typeof vi.fn>;
     expect(showErr).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalled();
+    expect(commitPlotSave).toHaveBeenCalledTimes(1);
+    expect((commitPlotSave.mock.calls[0]?.[0] as CommitPlotSaveInput).thumbnails).toBeUndefined();
+    expect((session.getState().markClean as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
     warnSpy.mockRestore();
   });
 });

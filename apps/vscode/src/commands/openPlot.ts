@@ -8,6 +8,7 @@ import { createLogService, createSnapshotService, createTimeInstant, type Result
 import { hydrateStoreFromFeatures, SystemStateLoadError, type PlayheadClampDiagnostic } from '../services/systemStateBridge';
 import { notifyPlayheadClamps } from '../services/playheadClampNotice';
 import type { StacWriter } from '@debrief/stac-writer';
+import { reconcileBeforeOpen } from './reconcileOnOpen';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
@@ -158,6 +159,12 @@ export function createOpenPlotCommand(
       void vscode.window.showErrorMessage('Store not found');
       return;
     }
+
+    // #268 — reconcile any interrupted save BEFORE reading the plot, so the
+    // loads below observe a single coherent on-disk state (FR-007/FR-008).
+    await reconcileBeforeOpen(getStacWriter, store.path, itemPath, (message) => {
+      void vscode.window.showWarningMessage(message);
+    });
 
     // Load plot
     const plot = await vscode.window.withProgress(
