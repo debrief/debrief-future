@@ -172,18 +172,18 @@ deferral closed and documented.
 
 ### Full gate
 
-- [ ] T025 Run the full CI gate (`task verify` — lint + typecheck + pytest + vitest) and confirm the `src/generated` drift gate passes with the committed artefacts `specs/256-prefix-aware-stac-typing/tasks.md`
+- [x] T025 Run the full CI gate (`task verify` — lint + typecheck + pytest + vitest) and confirm the `src/generated` drift gate passes with the committed artefacts `specs/256-prefix-aware-stac-typing/tasks.md`
 
 ### Evidence Collection
 
-- [ ] T026 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) `specs/256-prefix-aware-stac-typing/evidence/test-summary.md`
-- [ ] T027 [P] Finalise the usage demonstration — before/after writer snippets (read cast removal, write-path re-type, asset access) with the FR-002 add-a-field transcript `specs/256-prefix-aware-stac-typing/evidence/usage-example.md`
-- [ ] T028 [P] Write the round-trip / byte-invariance proof (Python → JSON → TS → JSON; byte-identical write golden; new `StacAsset` keys preserved) `specs/256-prefix-aware-stac-typing/evidence/round-trip-evidence.md`
-- [ ] T029 [P] Capture the generated `types.ts` 3-class before/after diff and the clean drift-gate output `specs/256-prefix-aware-stac-typing/evidence/generated-diff.md`
+- [x] T026 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) `specs/256-prefix-aware-stac-typing/evidence/test-summary.md`
+- [x] T027 [P] Finalise the usage demonstration — before/after writer snippets (read cast removal, write-path re-type, asset access) with the FR-002 add-a-field transcript `specs/256-prefix-aware-stac-typing/evidence/usage-example.md`
+- [x] T028 [P] Write the round-trip / byte-invariance proof (Python → JSON → TS → JSON; byte-identical write golden; new `StacAsset` keys preserved) `specs/256-prefix-aware-stac-typing/evidence/round-trip-evidence.md`
+- [x] T029 [P] Capture the generated `types.ts` 3-class before/after diff and the clean drift-gate output `specs/256-prefix-aware-stac-typing/evidence/generated-diff.md`
 
 ### Media Content
 
-- [ ] T030 Create the feature blog post via the Content Specialist agent (`.claude/agents/media/content.md`): title prefixed `Building `, first three sections copied verbatim from `evidence/opening-context.md`, remaining sections (By the Numbers, Lessons Learned, What's Next) written from evidence `specs/256-prefix-aware-stac-typing/media/shipped-post.md`
+- [x] T030 Create the feature blog post via the Content Specialist agent (`.claude/agents/media/content.md`): title prefixed `Building `, first three sections copied verbatim from `evidence/opening-context.md`, remaining sections (By the Numbers, Lessons Learned, What's Next) written from evidence `specs/256-prefix-aware-stac-typing/media/shipped-post.md`
 
 ### PR Creation
 
