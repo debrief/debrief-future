@@ -17,8 +17,8 @@ Alias: display_mode
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SceneProperties](../classes/SceneProperties.md) | Properties class for a Scene child Feature |  no  |
 | [SystemStateProperties](../classes/SystemStateProperties.md) | Properties for SYSTEM features storing application state |  no  |
+| [SceneProperties](../classes/SceneProperties.md) | Properties class for a Scene child Feature |  no  |
 
 
 
