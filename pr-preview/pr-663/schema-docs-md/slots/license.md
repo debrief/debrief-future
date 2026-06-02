@@ -17,8 +17,8 @@ Alias: license
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
 | [StacCollection](../classes/StacCollection.md) | A STAC 1 |  no  |
+| [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
 
 
 
