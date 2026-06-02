@@ -1,1 +1,0 @@
-{"version":3,"file":"highlightUtils.d.ts","sourceRoot":"","sources":["../../src/StacFileTree/highlightUtils.ts"],"names":[],"mappings":"AAAA;;GAEG;AAEH;;;;;;;;;;;;;;;;;GAiBG;AACH,wBAAgB,oBAAoB,CAAC,gBAAgB,EAAE,MAAM,EAAE,GAAG;IAChE,WAAW,EAAE,GAAG,CAAC,MAAM,CAAC,CAAC;IACzB,aAAa,EAAE,GAAG,CAAC,MAAM,CAAC,CAAC;CAC5B,CAsBA"}
