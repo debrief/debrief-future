@@ -58,6 +58,7 @@ import type {
   WriteSceneThumbnailPairInput,
   WriteSceneThumbnailPairResult,
 } from '@debrief/stac-writer';
+import type { StacItemProperties } from '@debrief/schemas';
 import {
   StacWriterError,
   pathGuard,
@@ -304,17 +305,17 @@ export async function createStacWriterIdb(
         baseMtimeMs = 0;
       }
 
-      // baseItem.properties is typed as Record<string, unknown> by the
-      // StacWriter contract — the spread copies it exactly.
-      const props: Record<string, unknown> = { ...baseItem.properties };
+      // #256: props copies baseItem.properties (StacItemProperties) and is
+      // typed as such — modelled debrief:* writes are type-checked, while
+      // arbitrary/core keys still flow through the index signature.
+      const props: StacItemProperties = { ...baseItem.properties };
       for (const [k, v] of Object.entries(input.patch)) {
         props[k] = v;
       }
 
-      const existingOverrides = Array.isArray(props['debrief:overrides'])
-        ? (props['debrief:overrides'] as unknown[]).filter(
-            (x): x is string => typeof x === 'string',
-          )
+      const existingOverridesVal = props['debrief:overrides'];
+      const existingOverrides = Array.isArray(existingOverridesVal)
+        ? existingOverridesVal.filter((x): x is string => typeof x === 'string')
         : [];
       const overridesSet = new Set<string>(existingOverrides);
       for (const f of input.overrideFields) overridesSet.add(f);
@@ -338,8 +339,13 @@ export async function createStacWriterIdb(
         fields: [...input.provenance.fields].sort(),
       };
 
-      const existingLog = Array.isArray(props['debrief:provenance_log'])
-        ? (props['debrief:provenance_log'] as PropertiesProvenanceEntry[])
+      // #256/#240: the slot is typed as the generated (wide) provenance entry;
+      // the writer works in the narrowed component hybrid (literal tool/method/
+      // source). Bridge persistence-type → domain-type here. This is a typed
+      // narrowing between two known shapes, not an untyped-bag escape.
+      const existingLogVal = props['debrief:provenance_log'];
+      const existingLog: PropertiesProvenanceEntry[] = Array.isArray(existingLogVal)
+        ? (existingLogVal as PropertiesProvenanceEntry[])
         : [];
       const log: PropertiesProvenanceEntry[] = [...existingLog, entry];
 
@@ -366,12 +372,12 @@ export async function createStacWriterIdb(
         );
       }
 
-      // `props` is built dynamically from the in-memory record's
-      // properties + the user's patch; we trust that the base item's
-      // schema-required keys (notably `datetime`) survive the spread.
+      // `props` is StacItemProperties (copied from the in-memory record +
+      // patch); the base item's schema-required keys (notably `datetime`)
+      // survive the spread, so no cast is needed (#256).
       const updatedRecord: StacItem = {
         ...baseItem,
-        properties: props as StacItem['properties'],
+        properties: props,
       };
       const stored: StoredItem = {
         kind,

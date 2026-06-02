@@ -123,22 +123,22 @@ it and confirm it passes. Same for an asset-level `debrief:toolId` typo.
 
 ### Type-level tests for User Story 2 (the gate that catches type regressions)
 
-- [ ] T014 [test] Add type-level assertions to the schema TS usage fixture: (a) `props['debrief:provenance_log']` is `PropertiesProvenanceEntry[] | undefined`; (b) `// @ts-expect-error` a typo'd modelled **read** key used at a concrete type; (c) `// @ts-expect-error` a wrong value type — per contract C3 `shared/schemas/tests/typescript-usage.ts`
-- [ ] T015 [test] Add write-path + asset type-level assertions (contracts C8/C9): a modelled-key **write** with the wrong value type is `// @ts-expect-error`; arbitrary/core-key writes still pass via the index signature; `asset['debrief:toolId']` and `asset['debrief:snapshotTimestamp']` resolve to `string | undefined`; a wrong-typed asset read is `// @ts-expect-error` `shared/schemas/tests/typescript-usage.ts`
+- [x] T014 [test] Add type-level assertions to the schema TS usage fixture: (a) `props['debrief:provenance_log']` is `PropertiesProvenanceEntry[] | undefined`; (b) `// @ts-expect-error` a typo'd modelled **read** key used at a concrete type; (c) `// @ts-expect-error` a wrong value type — per contract C3 `shared/schemas/tests/typescript-usage.ts`
+- [x] T015 [test] Add write-path + asset type-level assertions (contracts C8/C9): a modelled-key **write** with the wrong value type is `// @ts-expect-error`; arbitrary/core-key writes still pass via the index signature; `asset['debrief:toolId']` and `asset['debrief:snapshotTimestamp']` resolve to `string | undefined`; a wrong-typed asset read is `// @ts-expect-error` `shared/schemas/tests/typescript-usage.ts`
 
 ### Implementation for User Story 2 — VS Code host
 
-- [ ] T016 [P] Remove the redundant `as PlatformRecord[] | undefined` / `as string[] | undefined` casts on the modelled read sites (`item.properties['debrief:platforms' | 'debrief:tags' | 'debrief:feature_tags']`, ~lines 304–306) `apps/vscode/src/services/stacService.ts`
-- [ ] T017 Re-type the mutation-path local from `item.properties as Record<string, unknown>` to `StacItemProperties` (line ~1315); remove the `as Record<string, unknown>` cast **and** the `eslint-disable … ADR-011` comment (line ~1314); confirm the arbitrary-key loop `props[k] = v` over `Object.entries(patch)` and the modelled-key writes (`props['debrief:overrides']`, `props['debrief:provenance_log']`) still type-check, dropping their `as unknown[]` / `as PropertiesProvenanceEntry[]` casts (FR-012) `apps/vscode/src/services/stacService.ts`
-- [ ] T018 Remove the hand-cast `asset as StacAsset & { 'debrief:toolId'?: string }` (~line 674) and read `asset['debrief:toolId']` via the modelled `StacAsset` slot; confirm asset writers (`addResultAsset` callers, `writeSnapshotAsset`) type-check against the new slots (FR-011 / SC-007) `apps/vscode/src/services/stacService.ts`
+- [x] T016 [P] Remove the redundant `as PlatformRecord[] | undefined` / `as string[] | undefined` casts on the modelled read sites (`item.properties['debrief:platforms' | 'debrief:tags' | 'debrief:feature_tags']`, ~lines 304–306) `apps/vscode/src/services/stacService.ts`
+- [x] T017 Re-type the mutation-path local from `item.properties as Record<string, unknown>` to `StacItemProperties` (line ~1315); remove the `as Record<string, unknown>` cast **and** the `eslint-disable … ADR-011` comment (line ~1314); confirm the arbitrary-key loop `props[k] = v` over `Object.entries(patch)` and the modelled-key writes (`props['debrief:overrides']`, `props['debrief:provenance_log']`) still type-check, dropping their `as unknown[]` / `as PropertiesProvenanceEntry[]` casts (FR-012) `apps/vscode/src/services/stacService.ts`
+- [x] T018 Remove the hand-cast `asset as StacAsset & { 'debrief:toolId'?: string }` (~line 674) and read `asset['debrief:toolId']` via the modelled `StacAsset` slot; confirm asset writers (`addResultAsset` callers, `writeSnapshotAsset`) type-check against the new slots (FR-011 / SC-007) `apps/vscode/src/services/stacService.ts`
 
 ### Implementation for User Story 2 — web-shell host
 
-- [ ] T019 Re-type the mutation-path local from `Record<string, unknown>` to `StacItemProperties` (line ~309: `const props: StacItemProperties = { ...baseItem.properties }`); drop the `as unknown[]` / `as PropertiesProvenanceEntry[]` casts on `props['debrief:overrides']` / `props['debrief:provenance_log']`; confirm the spread + arbitrary writes still type-check (FR-012 / FR-009) `apps/web-shell/src/services/stacWriterIdb.ts`
+- [x] T019 Re-type the mutation-path local from `Record<string, unknown>` to `StacItemProperties` (line ~309: `const props: StacItemProperties = { ...baseItem.properties }`); drop the `as unknown[]` / `as PropertiesProvenanceEntry[]` casts on `props['debrief:overrides']` / `props['debrief:provenance_log']`; confirm the spread + arbitrary writes still type-check (FR-012 / FR-009) `apps/web-shell/src/services/stacWriterIdb.ts`
 
 ### Verify
 
-- [ ] T020 Run `pnpm -r typecheck` (clean) and the writer unit suites (`pnpm --filter '!@debrief/web-shell' test` for vscode/stacService specs); confirm no behavioural change `apps/vscode/tests/unit/stacService.test.ts`
+- [x] T020 Run `pnpm -r typecheck` (clean) and the writer unit suites (`pnpm --filter '!@debrief/web-shell' test` for vscode/stacService specs); confirm no behavioural change `apps/vscode/tests/unit/stacService.test.ts`
 
 **Checkpoint**: Both hosts type-check modelled `debrief:*` read **and** write
 access (incl. asset-level) against LinkML; all redundant casts + both widenings +

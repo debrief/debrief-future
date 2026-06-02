@@ -17,6 +17,7 @@ import type { PlatformRecord } from '@debrief/schemas';
 export type {
   PlatformRecord,
   StacItem,
+  StacItemProperties,
   StacCatalog,
   StacCollection,
   StacLink,
