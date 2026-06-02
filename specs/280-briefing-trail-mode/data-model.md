@@ -29,13 +29,18 @@ them through their canonical generated/source types.
 
 A platform track in the briefing `FeatureCollection`:
 
+A platform track is the schema-typed `TrackFeature` (narrowed via the canonical
+`isTrackFeature` guard), consumed through its generated type — **not** re-declared:
+
 | Field | Type | Notes |
 |-------|------|-------|
-| `geometry.type` | `'LineString'` | Only `LineString` features participate in time-driven rendering. |
+| `properties.kind` | `'TRACK'` | Discriminator checked by `isTrackFeature`. |
+| `geometry.type` | `'LineString'` | Only simple `LineString` tracks are time-sliced (compound `MultiLineString` tracks render in full). |
 | `geometry.coordinates` | `[lon, lat][]` | Ordered vertices. |
-| `properties.timestamps` | `string[]` (ISO-8601) | **Parallel** to `coordinates` (same length, ≥2). Already present — this is what drives the existing moving dot. |
-| `properties.colour` | `string \| undefined` | Stroke colour (default `#1f77b4`). |
-| `properties.id` \/ `id` | `string` | Feature identifier (stable Polyline key source). |
+| `properties.positions` | `TimestampedPosition[]` | **Parallel** to `coordinates` (same length, ≥2). Each `{ time, … }`; `positions[].time` is the per-vertex ISO time that drives both the trail head and the moving dot. This is the canonical schema slot — real exports carry it. |
+| `properties.style.line.color` | `string` | Stroke colour (default `#1f77b4` when absent). |
+| `properties.display_name` / `platform_name` | `string \| undefined` | Display name. |
+| `id` / `properties.platform_id` | `string` | Feature identifier (stable Polyline key source). |
 
 ### Current playback time (existing store state)
 
@@ -53,19 +58,22 @@ two are always consistent (a track participates in both or neither).
 
 | Field | Type | Derivation |
 |-------|------|-----------|
-| `id` | `string` | `properties.id ?? feature.id` |
+| `id` | `string` | `feature.id ?? properties.platform_id` |
 | `coords` | `[lon, lat][]` | `geometry.coordinates` |
-| `epochsMs` | `number[]` | `properties.timestamps.map(Date.parse)` |
-| `colour` | `string` | `properties.colour ?? DEFAULT_TRACK_COLOR` |
-| `name` | `string` | `properties.name ?? ''` |
+| `epochsMs` | `number[]` | `properties.positions.map((p) => Date.parse(p.time))` |
+| `colour` | `string` | `properties.style?.line?.color ?? DEFAULT_TRACK_COLOR` |
+| `name` | `string` | `properties.display_name ?? properties.platform_name ?? ''` |
 
-**Validity gate** (a `LineString` qualifies as a `TemporalTrack` only if all hold):
-`Array.isArray(timestamps)` · `coords.length === timestamps.length` ·
-`coords.length >= 2` · every `Date.parse(ts)` is not `NaN`.
+**Validity gate** (a feature qualifies as a `TemporalTrack` only if all hold):
+`isTrackFeature(feature)` · `geometry.type === 'LineString'` ·
+`Array.isArray(positions)` · `coords.length === positions.length` ·
+`coords.length >= 2` · every `Date.parse(positions[i].time)` is not `NaN`.
 
-A `LineString` that fails the gate, and every non-`LineString` line/area feature,
-is **not** a `TemporalTrack`: it renders in full via the existing `<GeoJSON>`
-layer in both modes (FR-007, FR-009).
+A feature that fails the gate — non-track, compound `MultiLineString` track,
+or any other line/area feature — is **not** a `TemporalTrack`: it renders in
+full via the existing `<GeoJSON>` layer in both modes (FR-007, FR-009).
+`classifyTemporalTrack` returns `null` (never throws), so a malformed track
+falls back to its full line with no error.
 
 ### Display-coordinate mapping (the pure function under test)
 

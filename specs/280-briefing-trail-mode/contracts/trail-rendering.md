@@ -53,17 +53,23 @@ For `isTrail === true` and any `t1 < t2` within `[epochsMs[0], epochsMs[last]]`:
 
 **Subject**: which features participate in time-driven rendering.
 
-A feature is a **TemporalTrack** iff: `geometry.type === 'LineString'` AND
-`properties.timestamps` is an array AND `timestamps.length === coordinates.length`
-AND `coordinates.length >= 2` AND every `Date.parse(timestamps[i])` is finite.
+A feature is a **TemporalTrack** iff it passes the canonical `isTrackFeature`
+guard (`properties.kind === 'TRACK'`) AND `geometry.type === 'LineString'` AND
+`properties.positions` is an array parallel to the coordinates
+(`positions.length === coordinates.length`) AND `coordinates.length >= 2` AND
+every `Date.parse(positions[i].time)` is finite. The per-vertex timing is read
+from the **schema-typed** `properties.positions[].time` — the same source the
+main application's `extractTemporalData` uses — not a bespoke `timestamps`
+array.
 
 | Feature | Classified as | Trail-mode render |
 |---------|---------------|-------------------|
-| LineString + valid parallel timestamps | TemporalTrack | grows (Contract A) |
-| LineString, no `timestamps` | not temporal | full line, no dot (FR-007) |
-| LineString, `timestamps.length !== coords.length` | not temporal | full line, no dot (FR-007) |
-| LineString, an unparseable timestamp | not temporal | full line, no dot (FR-007) |
-| Polygon / MultiLineString / MultiPolygon | not temporal | full, unchanged (FR-009) |
+| TRACK LineString + valid parallel `positions` | TemporalTrack | grows (Contract A) |
+| Non-TRACK feature (`kind !== 'TRACK'`) | not temporal | full / marker, unchanged (FR-009) |
+| TRACK LineString, no `positions` | not temporal | full line, no dot (FR-007) |
+| TRACK LineString, `positions.length !== coords.length` | not temporal | full line, no dot (FR-007) |
+| TRACK LineString, an unparseable `positions[i].time` | not temporal | full line, no dot (FR-007) |
+| TRACK with `MultiLineString` (compound) / Polygon | not temporal | full, unchanged (FR-009) |
 | Point | reference point | marker, unchanged (FR-009) |
 
 Classification MUST be the **same gate** used for the moving dot, so a track
