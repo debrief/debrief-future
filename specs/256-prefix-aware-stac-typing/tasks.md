@@ -95,9 +95,9 @@ typed, then revert.
 
 ### Tests for User Story 1
 
-- [ ] T010 [P][test] Pure-function unit test: call `prefix_extension_slots()` with a synthetic interface block containing an added slot (e.g. `reviewed_by` ↔ `debrief:reviewed_by`) and assert it is rewritten to the prefixed key while a non-mapped slot is untouched — proves FR-002 deterministically without a full regen `shared/schemas/tests/test_stac_prefix_transform.py`
-- [ ] T011 [P][test] Schema-convention guard test: load the three target classes and assert **every** slot whose `slot_uri` carries the `debrief:` prefix is emitted under its colon key in `src/generated/typescript/types.ts` (none left bare) — catches a future slot whose `slot_uri` diverges `shared/schemas/tests/test_stac_prefix_transform.py`
-- [ ] T012 [P][test] Structural assertion: the regenerated `StacExtensionProperties` (5), `StacSummaries` (3), and `StacAsset` (2 new) blocks each contain their prefixed keys and retain the index signature where expected (extends `test_stac_extension.py` patterns) `shared/schemas/tests/test_stac_extension.py`
+- [x] T010 [P][test] Pure-function unit test: call `prefix_extension_slots()` with a synthetic interface block containing an added slot (e.g. `reviewed_by` ↔ `debrief:reviewed_by`) and assert it is rewritten to the prefixed key while a non-mapped slot is untouched — proves FR-002 deterministically without a full regen `shared/schemas/tests/test_stac_prefix_transform.py`
+- [x] T011 [P][test] Schema-convention guard test: load the three target classes and assert **every** slot whose `slot_uri` carries the `debrief:` prefix is emitted under its colon key in `src/generated/typescript/types.ts` (none left bare) — catches a future slot whose `slot_uri` diverges `shared/schemas/tests/test_stac_prefix_transform.py`
+- [x] T012 [P][test] Structural assertion: the regenerated `StacExtensionProperties` (5), `StacSummaries` (3), and `StacAsset` (2 new) blocks each contain their prefixed keys and retain the index signature where expected (extends `test_stac_extension.py` patterns) `shared/schemas/tests/test_stac_extension.py`
 
 ### Implementation for User Story 1
 
@@ -105,7 +105,7 @@ typed, then revert.
 > makes new fields flow). This phase's deliverable is the **proving tests**
 > above plus the documented worked demo.
 
-- [ ] T013 Verify the FR-002 worked demo from `quickstart.md` end-to-end (add throwaway slot → regenerate → typed prefixed slot appears → revert) and record the transcript for evidence `specs/256-prefix-aware-stac-typing/evidence/usage-example.md`
+- [x] T013 Verify the FR-002 worked demo from `quickstart.md` end-to-end (add throwaway slot → regenerate → typed prefixed slot appears → revert) and record the transcript for evidence `specs/256-prefix-aware-stac-typing/evidence/usage-example.md`
 
 **Checkpoint**: FR-002 is proven by an automated unit test (not just a worked
 example) and the convention guard protects against future `slot_uri` drift.
