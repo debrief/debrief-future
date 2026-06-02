@@ -1,8 +1,8 @@
 ---
 feature: "280-briefing-trail-mode"
-captured_at: "2026-06-01T21:07:17Z"
-git_sha: "ee8579e"
-tests_passed: 24
+captured_at: "2026-06-02T05:40:00Z"
+git_sha: "7954449"
+tests_passed: 26
 tests_failed: 0
 tests_skipped: 0
 coverage_pct: null
@@ -14,16 +14,25 @@ coverage_pct: null
 
 | Metric | Value |
 |--------|-------|
-| Total Tests (feature) | 24 |
-| Passed | 24 |
+| Total Tests (feature) | 26 |
+| Passed | 26 |
 | Failed | 0 |
 | Skipped | 0 |
 | Coverage | n/a (pure helpers fully exercised; render wiring covered by E2E) |
 
-The 24 are the feature's own tests: 20 unit (`trackDisplay.test.ts`) + 4
+The 26 are the feature's own tests: 22 unit (`trackDisplay.test.ts`) + 4
 Playwright (`briefing-zip-trail-mode.spec.ts`). They run inside the wider
-briefing-renderer suites, which stay green (see Regression below), and the
-full repo gate (ruff, eslint, pyright, `tsc`, pytest 2162✓, vitest) passes.
+briefing-renderer suites (96 unit tests total), which stay green (see
+Regression below), and the full repo gate (ruff, eslint, pyright, `tsc`,
+pytest 2162✓, vitest) passes.
+
+> **Typed-path note (review follow-up):** `classifyTemporalTrack` reads the
+> **canonical schema-typed** `properties.positions[].time` (narrowed via
+> `isTrackFeature`), not a bespoke `properties.timestamps` array. The earlier
+> draft keyed off `timestamps`, which only the dev fixture produced — so the
+> trail would not have rendered on a real export. The fixture now emits the
+> canonical track shape (`positions` + `style.line.color`), and the unit tests
+> assert against it.
 
 ## Test Breakdown
 
@@ -41,13 +50,15 @@ full repo gate (ruff, eslint, pyright, `tsc`, pytest 2162✓, vitest) passes.
 | Trail mode full track after last time (`t=1000`) | Pass |
 | `displayCoords` matches `@debrief/utils.sliceTrackToTime` exactly (FR-008) | Pass |
 | Trail length grows monotonically over time (SC-001) | Pass |
-| `classifyTemporalTrack` qualifies LineString + parallel timestamps | Pass |
-| Falls back to feature id + default colour when omitted | Pass |
-| Rejects LineString with no timestamps (FR-007) | Pass |
-| Rejects mismatched timestamps/coords length (FR-007) | Pass |
-| Rejects an unparseable timestamp (FR-007) | Pass |
-| Rejects a single-vertex LineString (≥2 required) | Pass |
-| Rejects a Polygon (FR-009) | Pass |
+| `classifyTemporalTrack` qualifies a TRACK LineString + parallel `positions` | Pass |
+| Prefers `display_name` over `platform_name` | Pass |
+| Falls back to `platform_id` + default colour when style/name omitted | Pass |
+| Rejects a non-TRACK feature (kind discriminator) | Pass |
+| Rejects a TRACK with no `positions` (FR-007) | Pass |
+| Rejects mismatched `positions`/coords length (FR-007) | Pass |
+| Rejects an unparseable `positions[i].time` (FR-007) | Pass |
+| Rejects a single-vertex TRACK (≥2 required) | Pass |
+| Rejects a compound `MultiLineString` TRACK (FR-009) | Pass |
 | Rejects a Point (FR-009) | Pass |
 | Mode predicate: only `'trail'` is trail; `full`/absent/unknown → full | Pass |
 | Full/absent/unrecognised mode shows the whole track | Pass |
