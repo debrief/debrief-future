@@ -12,13 +12,14 @@ Covers:
 
 import importlib.util
 from pathlib import Path
+from types import ModuleType
 
 SCHEMAS_ROOT = Path(__file__).parent.parent
 GENERATE_PY = SCHEMAS_ROOT / "scripts" / "generate.py"
 TYPES_TS = SCHEMAS_ROOT / "src" / "generated" / "typescript" / "types.ts"
 
 
-def _load_generate_module():
+def _load_generate_module() -> ModuleType:
     """Import ``scripts/generate.py`` as a module without running it."""
     spec = importlib.util.spec_from_file_location("debrief_generate", GENERATE_PY)
     assert spec and spec.loader

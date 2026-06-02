@@ -157,13 +157,13 @@ describes open work.
 
 ### Tests for User Story 3
 
-- [ ] T021 [P][test] Byte-identical write golden: a write through the writer for the Phase-1 baseline input produces on-disk JSON byte-for-byte identical to `baseline-item-before.json`, including the asset-level `debrief:toolId` / `debrief:snapshotTimestamp` keys (FR-008 / SC-004) `shared/schemas/tests/test_stac_roundtrip.py`
-- [ ] T022 [P][test] `StacAsset` adherence / round-trip for the two new slots — Python → JSON → TypeScript → JSON preserves `debrief:toolId` + `debrief:snapshotTimestamp` (Article II.2) `shared/schemas/tests/test_stac_roundtrip.py`
+- [x] T021 [P][test] Byte-identical write golden: a write through the writer for the Phase-1 baseline input produces on-disk JSON byte-for-byte identical to `baseline-item-before.json`, including the asset-level `debrief:toolId` / `debrief:snapshotTimestamp` keys (FR-008 / SC-004) `shared/schemas/tests/test_stac_roundtrip.py`
+- [x] T022 [P][test] `StacAsset` adherence / round-trip for the two new slots — Python → JSON → TypeScript → JSON preserves `debrief:toolId` + `debrief:snapshotTimestamp` (Article II.2) `shared/schemas/tests/test_stac_roundtrip.py`
 
 ### Implementation for User Story 3
 
-- [ ] T023 Update the #240 deferral reference to record closure (Article II.1 audit), and add an ADR / decision note describing the schema-driven prefix mechanism and the `debrief:label` exclusion rationale `docs/project_notes/decisions.md`
-- [ ] T024 [P] Log the work item with ticket ID + PR URL `docs/project_notes/issues.md`
+- [x] T023 Update the #240 deferral reference to record closure (Article II.1 audit), and add an ADR / decision note describing the schema-driven prefix mechanism and the `debrief:label` exclusion rationale `docs/project_notes/decisions.md`
+- [x] T024 [P] Log the work item with ticket ID + PR URL `docs/project_notes/issues.md`
 
 **Checkpoint**: On-disk invariance proven; new asset slots round-trip; #240
 deferral closed and documented.
