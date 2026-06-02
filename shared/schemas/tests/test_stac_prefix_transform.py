@@ -96,11 +96,7 @@ def test_prefix_extension_slots_leaves_unmapped_slots_untouched() -> None:
 
 def test_prefix_extension_slots_does_not_touch_substring_matches() -> None:
     """`platforms` must not match inside `debrief_platforms` (anchored keys)."""
-    block = (
-        "export interface StacSummaries {\n"
-        "    debrief_platforms?: PlatformRecord[],\n"
-        "}"
-    )
+    block = "export interface StacSummaries {\n    debrief_platforms?: PlatformRecord[],\n}"
     # Only the full slot name is mapped.
     slot_map = {"debrief_platforms": "debrief:platforms"}
     out = generate.prefix_extension_slots(block, slot_map)
@@ -148,13 +144,11 @@ def test_committed_types_emit_every_extension_slot_under_colon_key() -> None:
         block = _class_block(types_src, cls_name)
         for slot_name, slot_uri in slots.items():
             assert f"'{slot_uri}'" in block, (
-                f"{cls_name}.{slot_name}: expected colon key '{slot_uri}' "
-                f"in generated block"
+                f"{cls_name}.{slot_name}: expected colon key '{slot_uri}' in generated block"
             )
             # The bare key must not survive as a property declaration.
             assert f"\n    {slot_name}?:" not in block, (
-                f"{cls_name}.{slot_name}: bare key still present — prefix "
-                f"transform did not run"
+                f"{cls_name}.{slot_name}: bare key still present — prefix transform did not run"
             )
 
 

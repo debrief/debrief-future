@@ -611,12 +611,9 @@ def _load_extension_slot_uri_map() -> dict[str, dict[str, str]]:
     for cls_name, source in _STAC_PREFIX_SOURCES.items():
         if source not in doc_cache:
             doc_cache[source] = yaml.safe_load((LINKML_DIR / source).read_text())
-        attrs = (
-            (doc_cache[source].get("classes", {}).get(cls_name, {}) or {}).get(
-                "attributes", {}
-            )
-            or {}
-        )
+        attrs = (doc_cache[source].get("classes", {}).get(cls_name, {}) or {}).get(
+            "attributes", {}
+        ) or {}
         slot_map: dict[str, str] = {}
         for slot_name, slot_def in attrs.items():
             if not isinstance(slot_def, dict):
@@ -624,9 +621,7 @@ def _load_extension_slot_uri_map() -> dict[str, dict[str, str]]:
             slot_uri = slot_def.get("slot_uri")
             # Extension keys carry a prefixed CURIE (`debrief:platforms`); skip
             # the LinkML meta prefix and any unprefixed/bare slot_uri.
-            if isinstance(slot_uri, str) and ":" in slot_uri and not slot_uri.startswith(
-                "linkml:"
-            ):
+            if isinstance(slot_uri, str) and ":" in slot_uri and not slot_uri.startswith("linkml:"):
                 slot_map[slot_name] = slot_uri
         out[cls_name] = slot_map
     return out
