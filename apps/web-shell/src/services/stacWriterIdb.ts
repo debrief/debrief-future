@@ -39,6 +39,8 @@
 import { openDB } from 'idb';
 import type {
   CapabilityReport,
+  CommitPlotSaveInput,
+  CommitPlotSaveResult,
   DeleteAssetInput,
   DeleteAssetResult,
   DeleteItemInput,
@@ -46,6 +48,8 @@ import type {
   PatchItemInput,
   PatchItemResult,
   PropertiesProvenanceEntry,
+  ReconcilePlotSaveInput,
+  ReconcilePlotSaveResult,
   StacItem,
   StacWriter,
   StoredItem,
@@ -649,6 +653,112 @@ export async function createStacWriterIdb(
       );
     },
 
+    async commitPlotSave(
+      input: CommitPlotSaveInput,
+    ): Promise<CommitPlotSaveResult> {
+      pathGuard('commitPlotSave.stacItemPath', input.stacItemPath);
+      if (input.featureCollection.type !== 'FeatureCollection') {
+        throw new StacWriterError(
+          'validation-failed',
+          'commitPlotSave: featureCollection.type must be "FeatureCollection"',
+          { path: input.stacItemPath },
+        );
+      }
+      // The browser host does not write plot thumbnails (writePlotThumbnailPair
+      // is unsupported), so `thumbnails`, if supplied, is intentionally not
+      // persisted — the guarantee covers only the writes this host performs
+      // (FR-009 / spec Assumptions).
+      const itemPath = input.stacItemPath;
+      const payloadText = JSON.stringify(input.featureCollection);
+      const byteLength = new TextEncoder().encode(payloadText).length;
+      const dataHref = `idb:${itemPath}::data`;
+
+      // Resolve the base item: existing record → use it; bundled → seed an
+      // overlay; neither → synthesise a minimal standalone from the FC.
+      const existing = (await db.get('items', itemPath)) as StoredItem | undefined;
+      let baseItem: StacItem;
+      let kind: 'overlay' | 'standalone';
+      if (existing !== undefined) {
+        baseItem = existing.record;
+        kind = existing.kind;
+      } else {
+        const bundled = await fetchBundledItem(itemPath);
+        if (bundled !== null) {
+          baseItem = bundled;
+          kind = 'overlay';
+        } else {
+          baseItem = synthStandaloneItem(itemPath, nowMs());
+          kind = 'standalone';
+        }
+      }
+
+      const nextAssets: Record<string, unknown> = {
+        ...((baseItem.assets as Record<string, unknown> | undefined) ?? {}),
+        data: {
+          href: dataHref,
+          type: 'application/geo+json',
+          roles: ['data'],
+          title: 'GeoJSON payload',
+        },
+      };
+      const updated: StacItem = {
+        ...baseItem,
+        assets: nextAssets as StacItem['assets'],
+      };
+      const stored: StoredItem = { kind, record: updated, mtimeMs: nowMs() };
+
+      // ── The commit point: ONE transaction over items + payloads (+ meta).
+      // IndexedDB aborts the whole transaction on any error / tab kill, so the
+      // item record and the geojson payload land together or not at all
+      // (research Decision 3 — atomicity for free, no journal).
+      const tx = db.transaction(['items', 'payloads', 'meta'], 'readwrite');
+      try {
+        await tx.objectStore('payloads').put(
+          {
+            payload: payloadText,
+            mediaType: 'application/geo+json',
+            byteLength,
+            mtimeMs: nowMs(),
+          } satisfies PayloadRecord,
+          itemPath,
+        );
+        await tx.objectStore('items').put(stored, itemPath);
+        await tx.done;
+      } catch (cause) {
+        // The transaction aborted (or a put failed). Observe its `done`
+        // rejection so it never surfaces as an unhandled rejection, then map.
+        await tx.done.catch(() => undefined);
+        throw cause instanceof StacWriterError
+          ? cause
+          : new StacWriterError(
+              'write-failed',
+              `commitPlotSave: transaction aborted — ${cause instanceof Error ? cause.message : String(cause)}`,
+              { path: itemPath, cause },
+            );
+      }
+      await onFirstWrite();
+      broadcast({ kind: 'item-changed', itemPath, mtimeMs: stored.mtimeMs });
+
+      return {
+        featuresPath: dataHref,
+        thumbnailPath: null,
+        overviewPath: null,
+      };
+    },
+
+    // eslint-disable-next-line @typescript-eslint/require-await -- StacWriter interface mandates Promise return; IndexedDB never exposes partial transaction state.
+    async reconcilePlotSave(
+      input: ReconcilePlotSaveInput,
+    ): Promise<ReconcilePlotSaveResult> {
+      // IndexedDB transactions are atomic and durable: a tab/browser kill
+      // discards any uncommitted transaction, leaving the store at the last
+      // committed state. There is therefore never a partial save to reconcile
+      // on the browser host — this is a no-op (FR-007/FR-008). See #268 ADR-039
+      // / research Decision 3.
+      void input;
+      return { recovered: false, outcome: 'clean' };
+    },
+
     async deleteItem(input: DeleteItemInput): Promise<DeleteItemResult> {
       pathGuard('deleteItem.itemPath', input.itemPath);
       const existing = (await db.get('items', input.itemPath)) as
@@ -781,6 +891,35 @@ async function readAssetBlobInTx(
   } catch {
     return null;
   }
+}
+
+/**
+ * Synthesise a minimal standalone {@link StacItem} for a `commitPlotSave` whose
+ * item does not yet exist in the store and has no bundled counterpart (the
+ * first-ever-save / create case). Mirrors the shape `createStandaloneItem`
+ * produces. Callers carrying richer metadata (title/platforms/tags/bbox) should
+ * pre-seed the store record; the create path here has no UI callers today.
+ */
+function synthStandaloneItem(itemPath: string, mtimeMs: number): StacItem {
+  const segments = itemPath.split('/').filter((s) => s.length > 0);
+  const id = segments.length >= 2 ? segments[segments.length - 2]! : itemPath;
+  const nowIso = new Date(mtimeMs).toISOString();
+  return {
+    type: 'Feature',
+    stac_version: '1.1.0',
+    id,
+    geometry: { type: 'Point', coordinates: [0, 0] },
+    bbox: [0, 0, 0, 0],
+    properties: {
+      title: 'Untitled plot',
+      datetime: nowIso,
+      'debrief:platforms': [],
+      'debrief:tags': [],
+      'debrief:feature_tags': [],
+    },
+    links: [{ rel: 'self', href: `./${id}/item.json` }],
+    assets: {},
+  };
 }
 
 function decodeBase64(b64: string): Uint8Array {

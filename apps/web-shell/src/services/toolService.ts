@@ -12,7 +12,7 @@
  *
  * 1. Import `toolDefinition` and `execute` from the tool module
  * 2. Add a `[toolDefinition.name, { definition, execute }]` entry to `toolRegistry`
- * 3. If the tool's SafeFeature type differs, cast execute with `as unknown as ToolExecuteFn`
+ * 3. If the tool's feature type differs, cast execute with `as unknown as ToolExecuteFn`
  *
  * See also: `shared/tools/TEMPLATE.md` § Registration for the full checklist.
  *
@@ -55,10 +55,9 @@ import type {
   MCPToolResponse,
   MCPContentItem,
   DebriefAnnotations,
-  SafeFeature,
 } from '@debrief/utils';
 
-import type { LogEntry } from '@debrief/schemas';
+import type { IngressFeature, LogEntry } from '@debrief/schemas';
 
 import {
   toolDefinition as setTrackColorDef,
@@ -173,7 +172,7 @@ function createLogEntry(
   };
 }
 
-function attachLogEntry(feature: SafeFeature, logEntry: LogEntry): void {
+function attachLogEntry(feature: IngressFeature, logEntry: LogEntry): void {
   if (!feature.properties) feature.properties = {};
   const existing = feature.properties.provenance;
   if (existing === undefined || existing === null) {
@@ -196,7 +195,7 @@ interface ValidationError {
 }
 
 function validateToolOutput(
-  features: SafeFeature[],
+  features: IngressFeature[],
   _expectedKind: string,
   toolName: string,
   _skipKindCheck = false,
@@ -314,7 +313,7 @@ function buildResultType(resultCategory: string, outputKind: string): string {
  * because each tool has its own specific parameter interface; validation
  * occurs inside the tool implementation.
  */
-type ToolExecuteFn = (features: SafeFeature[], params: Record<string, unknown>) => SafeFeature[];
+type ToolExecuteFn = (features: IngressFeature[], params: Record<string, unknown>) => IngressFeature[];
 
 /**
  * Internal registry entry mapping a tool definition to its execute function.
@@ -391,8 +390,8 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
       definition: generateCoursesSpeedsDef,
       // generate-courses-speeds ignores params; the wrapper drops the second
       // argument, and the cast bridges the structural difference between this
-      // module's SafeFeature (coordinates: unknown) and the tool's internal
-      // SafeFeature (coordinates: number[][]).
+      // module's IngressFeature (permissive geometry union) and the tool's
+      // internal feature shape (coordinates: number[][]).
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       execute: asToolFn((features: any[]) => executeGenerateCourseSpeeds(features)),
     },
@@ -459,7 +458,7 @@ export function listTools(): MCPToolDefinition[] {
  */
 export function executeTool(
   toolId: string,
-  features: SafeFeature[],
+  features: IngressFeature[],
   params: Record<string, unknown>,
 ): MCPToolResponse {
   const entry = toolRegistry.get(toolId);

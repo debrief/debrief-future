@@ -100,6 +100,7 @@ export {
   writeSystemStateIntoFeatureCollection,
   readHiddenFeatureIds,
   applyVisibilityToFeatureCollection,
+  applyVisibilityWithProvenance,
   temporalSliceToInput,
   temporalVariantToSlice,
   spatialSliceToInput,
@@ -130,11 +131,16 @@ export {
   type PlayheadClampDiagnostic,
   type ReadSystemStateResult,
   type TemporalCrossFieldResult,
+  type VisibilityProvenanceOptions,
 } from './system-state/index.js';
 
 // Log Service (Feature: 071)
 export {
   buildLogEntry,
+  // Feature 261 (FR-013) — per-feature visibility-change provenance builder.
+  buildVisibilityChangeLogEntry,
+  VISIBILITY_CHANGE_TOOL_SENTINEL,
+  type RecordVisibilityChangeInput,
   msToIsoDuration,
   generateActivityId,
   extractActivityIdFromOutputFeatures,

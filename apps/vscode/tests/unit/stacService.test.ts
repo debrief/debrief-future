@@ -1439,6 +1439,83 @@ describe('StacService', () => {
       expect(written.bbox).toEqual([-10, -20, 30, 40]);
     });
 
+    // #212 VR-1 / SC-004: a `geometry: null` feature (RFC 7946 "unlocated" —
+    // SYSTEM_RECORD / STORYBOARD / NarrativeEntry) must be PRESERVED, not
+    // dropped, through the migrated addFeatures → writeGeoJson boundary, and
+    // must not corrupt the bbox (calculateBounds skips null geometry).
+    it('preserves a geometry:null feature and excludes it from bbox', async () => {
+      const item = createMockItem({ assets: {}, bbox: [0, 0, 0, 0] });
+      let writtenGeoJson: string | undefined;
+      let writtenItem: string | undefined;
+
+      vi.mocked(fs.existsSync).mockImplementation((p) => String(p).endsWith('.json'));
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(item));
+      vi.mocked(fs.writeFileSync).mockImplementation((p, content) => {
+        const pathStr = String(p);
+        if (pathStr.endsWith('.geojson')) {
+          writtenGeoJson = String(content);
+        } else if (pathStr.endsWith('.json')) {
+          writtenItem = String(content);
+        }
+      });
+
+      const features = [
+        // unlocated SYSTEM feature — geometry is null
+        { type: 'Feature' as const, id: 'system-1', geometry: null, properties: { kind: 'SYSTEM_RECORD' } },
+        // located feature — drives the bbox
+        { type: 'Feature' as const, geometry: { type: 'LineString', coordinates: [[-10, -20], [30, 40]] }, properties: {} },
+      ];
+
+      const count = await service.addFeatures('/store', 'items/test.json', features as never[]);
+
+      // both features written — the null-geometry one survives
+      expect(count).toBe(2);
+      const writtenFc = JSON.parse(writtenGeoJson!);
+      expect(writtenFc.features).toHaveLength(2);
+      const systemFeature = writtenFc.features.find((f: { id?: string }) => f.id === 'system-1');
+      expect(systemFeature).toBeDefined();
+      expect(systemFeature.geometry).toBeNull();
+
+      // bbox computed only from the located feature (null geometry skipped)
+      const writtenItemObj = JSON.parse(writtenItem!);
+      expect(writtenItemObj.bbox).toEqual([-10, -20, 30, 40]);
+    });
+
+    // #212 VR-3: the bbox now comes from the shared `calculateBounds`, which
+    // covers all seven geometry types. The deleted local `extractCoordinates`
+    // silently omitted Multi* geometries, so a MultiPolygon-only collection
+    // previously produced no/incorrect bbox; it is now correct.
+    it('computes a correct bbox for a MultiPolygon feature (Multi* fix)', async () => {
+      const item = createMockItem({ assets: {}, bbox: [0, 0, 0, 0] });
+      let writtenItem: string | undefined;
+
+      vi.mocked(fs.existsSync).mockImplementation((p) => String(p).endsWith('.json'));
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(item));
+      vi.mocked(fs.writeFileSync).mockImplementation((p, content) => {
+        if (String(p).endsWith('.json')) {
+          writtenItem = String(content);
+        }
+      });
+
+      const feature = {
+        type: 'Feature' as const,
+        geometry: {
+          type: 'MultiPolygon',
+          coordinates: [
+            [[[-5, -5], [5, -5], [5, 5], [-5, 5], [-5, -5]]],
+            [[[10, 10], [20, 10], [20, 20], [10, 20], [10, 10]]],
+          ],
+        },
+        properties: {},
+      };
+
+      await service.addFeatures('/store', 'items/test.json', [feature as never]);
+
+      const writtenItemObj = JSON.parse(writtenItem!);
+      // spans both polygons: min corner of polygon 1, max corner of polygon 2
+      expect(writtenItemObj.bbox).toEqual([-5, -5, 20, 20]);
+    });
+
     it('should throw when item not found', async () => {
       mockMissingFile();
 

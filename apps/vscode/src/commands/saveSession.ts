@@ -17,6 +17,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import type { RawGeoJSONFeatureCollection } from '@debrief/schemas';
 import type { StacWriter } from '@debrief/stac-writer';
 import { StacWriterError } from '@debrief/stac-writer';
 import type { SessionManager } from '../services/sessionManager';
@@ -48,33 +49,6 @@ export function storeFeatureCollection(
     features,
   };
   fs.writeFileSync(featuresPath, `${JSON.stringify(fc, null, 2)}\n`);
-}
-
-/**
- * Write plot thumbnails by delegating to the host-agnostic StacWriter.
- *
- * Spec 242 closure of Article IV.1 — saveSession is a frontend command, so
- * it must orchestrate persistence through the writer interface rather than
- * touching the filesystem itself. The earlier (spec 241) `plotThumbnailWriter.ts`
- * shim has been deleted; the FS-backed adaptor (`stacWriterFs`) now owns the
- * write path and produces the spec-241 STAC 1.1 shape authoritatively.
- */
-async function storeThumbnails(
-  writer: StacWriter,
-  plotUri: string,
-  largePngBase64: string,
-  smallPngBase64: string,
-): Promise<void> {
-  const parsed = parseStacUri(plotUri);
-  if (!parsed) {
-    return;
-  }
-  await writer.writePlotThumbnailPair({
-    ctx: { kind: 'fs', nowMs: () => Date.now(), randomId: () => '' },
-    stacItemPath: parsed.itemPath,
-    largePngBase64,
-    smallPngBase64,
-  });
 }
 
 /**
@@ -115,13 +89,21 @@ export function createSaveSessionCommand(
       return;
     }
 
-    // Feature 261 (FR-009/FR-010): write exactly features.geojson. The current
-    // view-state (viewport, time window/playhead, selection) is upserted as
-    // SystemState features and per-feature visibility is set, then the whole
-    // FeatureCollection is written. NO `.debrief-session` sidecar is written.
+    // Feature 261 (FR-009/FR-010): the FeatureCollection IS the plot. The
+    // current view-state (viewport, time window/playhead, selection) is
+    // upserted as SystemState features and per-feature visibility is set; the
+    // whole collection is then committed atomically. NO `.debrief-session`
+    // sidecar.
+    //
+    // FR-013/FR-021: visibility transitions are recorded on the affected
+    // feature's own provenance — passing the actor makes `applyStateToFeatures`
+    // append a visibility-change LogEntry to every feature whose visibility
+    // differs from the on-disk FeatureCollection.
+    let features: ReturnType<typeof applyStateToFeatures>;
     try {
-      const features = applyStateToFeatures(mapPanel.getCurrentFeatures(), state);
-      storeFeatureCollection(storePath, plotUri, features);
+      features = applyStateToFeatures(mapPanel.getCurrentFeatures(), state, {
+        actor: sessionManager.actor,
+      });
     } catch (err) {
       void vscode.window.showErrorMessage(
         `Failed to save plot: ${err instanceof Error ? err.message : String(err)}`,
@@ -129,27 +111,73 @@ export function createSaveSessionCommand(
       return;
     }
 
-    // The plot is now persisted; clear the dirty flag.
+    // Legacy fallback when no writer is wired (e.g. a minimal host). This is
+    // the pre-#268 non-atomic path and has no thumbnail/STAC-asset write.
+    if (!getStacWriter) {
+      try {
+        storeFeatureCollection(storePath, plotUri, features);
+      } catch (err) {
+        void vscode.window.showErrorMessage(
+          `Failed to save plot: ${err instanceof Error ? err.message : String(err)}`,
+        );
+        return;
+      }
+      session.getState().markClean();
+      void vscode.window.showInformationMessage('Plot saved');
+      return;
+    }
+
+    // #268 — capture thumbnails BEFORE the commit so they ride in the same
+    // atomic save unit. Thumbnail *capture* stays best-effort: a capture
+    // failure simply omits `thumbnails` from the commit (the spec's "capture
+    // is best-effort and may legitimately be skipped" edge case). A capture
+    // *write* that begins is part of the atomic unit and obeys atomicity.
+    let thumbnails: { largePngBase64: string; smallPngBase64: string } | undefined;
+    try {
+      const captured = await mapPanel.requestThumbnailCapture(5000);
+      if (captured.largePngBase64 && captured.smallPngBase64) {
+        thumbnails = {
+          largePngBase64: captured.largePngBase64,
+          smallPngBase64: captured.smallPngBase64,
+        };
+      }
+    } catch (err) {
+      console.warn('[debrief] Thumbnail capture failed (non-blocking):', err);
+    }
+
+    // #268 / FR-002/FR-004 — commit the whole save unit (feature collection +
+    // the item-metadata it implies + thumbnails) atomically through the shared
+    // persistence boundary. The raw `fs.writeFileSync` of features.geojson is
+    // gone; the FC write is now on the boundary (Article IV.2).
+    // `features` is the loose host boundary shape (SystemState features folded
+    // in); commitPlotSave only serialises the collection, so we cross the
+    // RFC-7946 parse boundary here.
+    const featureCollection: RawGeoJSONFeatureCollection = {
+      type: 'FeatureCollection',
+      features: features as RawGeoJSONFeatureCollection['features'],
+    };
+
+    try {
+      const writer = getStacWriter(storePath);
+      await writer.commitPlotSave({
+        ctx: { kind: 'fs', nowMs: () => Date.now(), randomId: () => '' },
+        stacItemPath: parsed.itemPath,
+        featureCollection,
+        thumbnails,
+      });
+    } catch (err) {
+      // FR-005/FR-006 — a save that cannot fully commit is reported as a
+      // failure; the dirty flag is left set so the analyst can retry, and the
+      // previously-persisted version is untouched. We do NOT markClean here.
+      void vscode.window.showErrorMessage(
+        `Failed to save plot: ${err instanceof StacWriterError || err instanceof Error ? err.message : String(err)}`,
+      );
+      return;
+    }
+
+    // FR-005 — only now, after every write of the save unit has committed, is
+    // the dirty flag cleared and success shown.
     session.getState().markClean();
     void vscode.window.showInformationMessage('Plot saved');
-
-    // Capture thumbnails after successful save (#174)
-    if (getStacWriter) {
-      try {
-        const { largePngBase64, smallPngBase64 } = await mapPanel.requestThumbnailCapture(5000);
-        if (largePngBase64 && smallPngBase64) {
-          const writer = getStacWriter(storePath);
-          await storeThumbnails(writer, plotUri, largePngBase64, smallPngBase64);
-        }
-      } catch (err) {
-        // Article I.3 — service-write failures must surface; capture
-        // failures (non-StacWriterError) remain best-effort.
-        if (err instanceof StacWriterError) {
-          void vscode.window.showErrorMessage(`Thumbnail save failed: ${err.message}`);
-        } else {
-          console.warn('[debrief] Thumbnail capture failed (non-blocking):', err);
-        }
-      }
-    }
   };
 }

@@ -6,6 +6,8 @@
 
 export type {
   CapabilityReport,
+  CommitPlotSaveInput,
+  CommitPlotSaveResult,
   DeleteAssetInput,
   DeleteAssetResult,
   DeleteItemInput,
@@ -13,6 +15,9 @@ export type {
   PatchItemInput,
   PatchItemResult,
   PropertiesProvenanceEntry,
+  RawGeoJSONFeatureCollection,
+  ReconcilePlotSaveInput,
+  ReconcilePlotSaveResult,
   StacAsset,
   StacItem,
   StacWriter,

@@ -45,10 +45,13 @@ import {
   type StoryboardPanelProps,
 } from '@debrief/components';
 import {
-  persistActiveStoryboardId,
-  readPersistedActiveStoryboardId,
-} from './services/activeStoryboardPersistence';
-import type { SessionStoreApi } from '@debrief/session-state';
+  readSystemStateFromFeatureCollection,
+  writeSystemStateIntoFeatureCollection,
+  activeStoryboardIdToInput,
+  activeStoryboardVariantToId,
+  type SessionStoreApi,
+  type SystemStatePlotFeatureCollection,
+} from '@debrief/session-state';
 import {
   captureSceneWeb,
   __abortCaptureInFlight,
@@ -86,6 +89,76 @@ function packagePlot(features: readonly Feature[]): StoryboardPlot {
     // eslint-disable-next-line no-restricted-syntax -- #235 web-shell mirror of #216 ADR-019.
     features: features as unknown as StoryboardPlotFeature[],
   };
+}
+
+/**
+ * Bridge the web-shell's `geojson.FeatureCollection` to the shared SystemState
+ * helper's structural `PlotFeatureCollection`. Identical at runtime; the cast is
+ * the #235 web-shell mirror of #216 ADR-019.
+ */
+function asPlotFc(fc: FeatureCollection): SystemStatePlotFeatureCollection {
+  // eslint-disable-next-line no-restricted-syntax -- #235 web-shell mirror of #216 ADR-019.
+  return fc as unknown as SystemStatePlotFeatureCollection;
+}
+
+/**
+ * Read the persisted active-Storyboard id (#237) through the single shared
+ * SystemState helper (#261, FR-015 — `@debrief/session-state` is the sole
+ * producer/consumer of SystemState logic across both hosts). Adds the host-side
+ * stale guard (V-2): a recorded id whose Storyboard no longer exists in this
+ * plot is reported as `stale`. The shared read is strict-on-import and throws on
+ * a malformed FeatureCollection (FR-012); that error surfaces loudly at the host
+ * plot-open boundary, so here a read failure is treated tolerantly as "absent"
+ * rather than crashing the panel.
+ */
+function readPersistedActiveStoryboardId(
+  fc: FeatureCollection,
+): { kind: 'absent' | 'stale' | 'valid'; id: string | null } {
+  let persisted: string | null;
+  try {
+    persisted = activeStoryboardVariantToId(
+      readSystemStateFromFeatureCollection(asPlotFc(fc)).map.active_storyboard,
+    );
+  } catch {
+    persisted = null;
+  }
+  if (persisted === null) {
+    return { kind: 'absent', id: null };
+  }
+  const stillExists = fc.features.some(
+    (f) =>
+      isStoryboardFeature(f as StoryboardPlotFeature) &&
+      (f.properties as { id?: unknown } | null)?.id === persisted,
+  );
+  return stillExists ? { kind: 'valid', id: persisted } : { kind: 'stale', id: null };
+}
+
+/**
+ * Persist the active-Storyboard id through the edit pipeline via the shared
+ * writer (#261, FR-015). `null` clears the pin — the shared writer has no delete
+ * API, so the `state.activestoryboard` feature is filtered out for that case.
+ */
+function persistActiveStoryboardId(
+  fc: FeatureCollection,
+  id: string | null,
+  setFeatureCollection: (next: FeatureCollection) => void,
+): void {
+  const input = activeStoryboardIdToInput(id);
+  if (input === undefined) {
+    setFeatureCollection({
+      ...fc,
+      features: fc.features.filter((f) => {
+        const props = f.properties as { kind?: unknown; state_type?: unknown } | null;
+        return !(props?.kind === 'SYSTEM' && props.state_type === 'active_storyboard');
+      }),
+    });
+    return;
+  }
+  const next = writeSystemStateIntoFeatureCollection(asPlotFc(fc), {
+    active_storyboard: input,
+  });
+  // eslint-disable-next-line no-restricted-syntax -- #235 web-shell mirror of #216 ADR-019.
+  setFeatureCollection(next as unknown as FeatureCollection);
 }
 
 function computeSceneRows(

@@ -19,6 +19,7 @@
     "@debrief/components": "workspace:*",
     "@debrief/schemas": "workspace:*",
     "@debrief/session-state": "workspace:*",
+    "@debrief/utils": "workspace:*",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

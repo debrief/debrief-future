@@ -1,0 +1,31 @@
+# Regression-guard validation — scripts/check-no-geojson-feature.sh (#212 FR-007)
+
+Captured: 2026-06-01T21:11:53Z | git_sha: 899c5ee
+
+## 1. Clean run (no hand-written Safe*/GeoJSONFeature definitions)
+```
+✅ No hand-written GeoJSONFeature / Safe* definitions found (regression guard passed)
+exit code: 0
+```
+
+## 2. Rejection of a planted `interface SafeFeature {}`
+Planted file: apps/web-shell/src/__guard_probe__.ts
+```
+❌ Hand-written GeoJSON feature-type regression guard failed!
+
+The following files define a hand-written GeoJSONFeature / Safe* type.
+Use `RawGeoJSONFeature` from `@debrief/schemas` (result-carrying /
+parse-boundary), the schema-derived `IngressFeature` /
+`IngressFeatureCollection` (permissive ingress, geometry may be null),
+or narrow via existing `DebriefFeature` type guards (isDebriefFeature,
+isTrackFeature, isReferenceLocation) in @debrief/schemas/unions.
+
+apps/web-shell/src/__guard_probe__.ts:1:export interface SafeFeature { type: 'Feature' }
+exit code: 1
+```
+
+## 3. Confirm clean again after removing the planted file
+```
+✅ No hand-written GeoJSONFeature / Safe* definitions found (regression guard passed)
+exit code: 0
+```

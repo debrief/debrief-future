@@ -10,7 +10,12 @@
  */
 
 import type { CatalogOverviewItem } from '@debrief/components';
-import type { PlatformRecord, StacCatalog, StacItem } from '@debrief/schemas';
+import type {
+  PlatformRecord,
+  RawGeoJSONFeatureCollection,
+  StacCatalog,
+  StacItem,
+} from '@debrief/schemas';
 import type { FeatureCollection } from 'geojson';
 import { getActiveStacWriter } from '../services/stacWriterRegistry';
 
@@ -306,6 +311,26 @@ export function createMockStacService(): MockStacService {
     },
 
     async getPlotData(itemPath: string): Promise<FeatureCollection> {
+      // #268 — reconcile any interrupted save BEFORE the read. On the browser
+      // host IndexedDB transactions are atomic (a tab kill discards an
+      // uncommitted transaction), so this is a clean no-op; it honours the
+      // boundary contract symmetrically with the desktop host and surfaces a
+      // change notification if a future orphan-prune ever recovers state.
+      const reconcileWriter = getActiveStacWriter();
+      if (reconcileWriter) {
+        try {
+          const reconciliation = await reconcileWriter.reconcilePlotSave({
+            ctx: { kind: 'idb', nowMs: () => Date.now(), randomId: () => '' },
+            stacItemPath: itemPath,
+          });
+          if (reconciliation.recovered) {
+            for (const listener of listeners) listener(itemPath);
+          }
+        } catch {
+          // Reconcile must never block opening a plot.
+        }
+      }
+
       // Check cache first (includes bundled fallback data)
       const cached = geojsonCache.get(itemPath);
       if (cached) return cached;
@@ -443,17 +468,18 @@ export function createMockStacService(): MockStacService {
         randomId: () => id,
       };
       try {
-        // Both the local StacItem and @debrief/stac-writer.StacItem now
-        // reference @debrief/schemas.StacItem (spec #223 Decision 1B);
-        // no projection cast required.
-        await writer.writeItem({ ctx, itemPath, item, mode: 'create' });
-        await writer.writeAsset({
+        // #268 — commit the item record + geojson payload in ONE IndexedDB
+        // transaction (was a writeItem + writeAsset pair across two separate
+        // transactions, the web-shell save-atomicity gap). `input.geojson` is
+        // the `geojson`-package FeatureCollection (nullable geometry);
+        // commitPlotSave only serialises it, so we cross the parse boundary.
+        // (The rich `item` below still drives the in-memory session catalog;
+        // the store record commitPlotSave synthesises is a minimal standalone —
+        // this create path has no UI callers today.)
+        await writer.commitPlotSave({
           ctx,
-          itemPath,
-          assetHref: './data.geojson',
-          body: JSON.stringify(input.geojson),
-          mediaType: 'application/geo+json',
-          assetEntry: { key: 'data', roles: ['data'], title: 'GeoJSON payload' },
+          stacItemPath: itemPath,
+          featureCollection: input.geojson as RawGeoJSONFeatureCollection,
         });
         // Register in the in-memory catalog so the next render pass shows it.
         itemMap.set(itemPath, item);

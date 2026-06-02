@@ -31,7 +31,7 @@ import {
 } from '../types/tool';
 import { adaptMCPToolsForMatching } from './mcpToolAdapter';
 import type { MapPanel } from '../webview/mapPanel';
-import type { DebriefFeature, ToolCategoryEnum } from '@debrief/schemas';
+import type { DebriefFeature, IngressFeatureCollection, ToolCategoryEnum } from '@debrief/schemas';
 
 const execFileAsync = promisify(execFile);
 
@@ -66,9 +66,6 @@ function spawnWithStdin(
     proc.stdin.end();
   });
 }
-
-// Canonical Safe GeoJSON types from @debrief/utils (T02)
-import type { SafeFeatureCollection } from '@debrief/utils';
 
 // MCP connection states
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
@@ -736,7 +733,7 @@ print(json.dumps(tools))
     toolId: string,
     features: Array<{ type: 'Feature'; id?: string | number; geometry: unknown; properties: Record<string, unknown> | null }>,
     params: Record<string, unknown>
-  ): Promise<{ success: boolean; features?: SafeFeatureCollection; resultType?: string; artifactHref?: string; tool_version?: string }> {
+  ): Promise<{ success: boolean; features?: IngressFeatureCollection; resultType?: string; artifactHref?: string; tool_version?: string }> {
     await this.connect();
 
     const input = JSON.stringify({
@@ -758,7 +755,7 @@ print(json.dumps(tools))
       return { success: false };
     }
 
-    const geoFeatures: SafeFeatureCollection['features'] = [];
+    const geoFeatures: IngressFeatureCollection['features'] = [];
     let resultType: string | undefined;
     let artifactHref: string | undefined;
     let toolVersion: string | undefined;
@@ -783,7 +780,7 @@ print(json.dumps(tools))
           item.resource
         ) {
           try {
-            const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+            const feature = JSON.parse(item.resource.text) as IngressFeatureCollection['features'][number];
             geoFeatures.push(feature);
             continue;
           } catch {
@@ -794,7 +791,7 @@ print(json.dumps(tools))
         continue;
       }
       if (item.type === 'resource' && item.resource) {
-        const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+        const feature = JSON.parse(item.resource.text) as IngressFeatureCollection['features'][number];
         geoFeatures.push(feature);
       }
     }
@@ -821,7 +818,7 @@ print(json.dumps(tools))
     toolId: string,
     featureIds: string[],
     params?: Record<string, unknown>
-  ): Promise<{ features: SafeFeatureCollection; resultType?: string; label?: string; sourceFeatureIds?: string[]; artifactData?: string; artifactHref?: string; tool_version?: string; modifiedFeatures?: ToolExecutionResult['modifiedFeatures']; createdFeatures?: string[]; createdAssets?: ToolExecutionResult['createdAssets']; parameters?: ToolExecutionResult['parameters'] }> {
+  ): Promise<{ features: IngressFeatureCollection; resultType?: string; label?: string; sourceFeatureIds?: string[]; artifactData?: string; artifactHref?: string; tool_version?: string; modifiedFeatures?: ToolExecutionResult['modifiedFeatures']; createdFeatures?: string[]; createdAssets?: ToolExecutionResult['createdAssets']; parameters?: ToolExecutionResult['parameters'] }> {
     const features = this.resolveFeatures(featureIds);
 
     const input = JSON.stringify({
@@ -849,7 +846,7 @@ print(json.dumps(tools))
     const response = parsed;
 
     // Extract content from MCP response items
-    const geoFeatures: SafeFeatureCollection['features'] = [];
+    const geoFeatures: IngressFeatureCollection['features'] = [];
     let resultType: string | undefined;
     let label: string | undefined;
     let sourceFeatureIds: string[] | undefined;
@@ -920,7 +917,7 @@ print(json.dumps(tools))
           item.resource
         ) {
           try {
-            const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+            const feature = JSON.parse(item.resource.text) as IngressFeatureCollection['features'][number];
             geoFeatures.push(feature);
             continue;
           } catch (parseErr) {
@@ -936,7 +933,7 @@ print(json.dumps(tools))
       }
 
       if (item.type === 'resource' && item.resource) {
-        const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+        const feature = JSON.parse(item.resource.text) as IngressFeatureCollection['features'][number];
         geoFeatures.push(feature);
       }
     }
@@ -975,7 +972,7 @@ print(json.dumps(tools))
  * @throws Error when the stdout is an MCP error response.
  */
 export function parseMcpResponseForTest(stdout: string): {
-  features: SafeFeatureCollection;
+  features: IngressFeatureCollection;
   resultType?: string;
   label?: string;
   sourceFeatureIds?: string[];
@@ -990,7 +987,7 @@ export function parseMcpResponseForTest(stdout: string): {
   }
 
   const response = parsed;
-  const geoFeatures: SafeFeatureCollection['features'] = [];
+  const geoFeatures: IngressFeatureCollection['features'] = [];
   let resultType: string | undefined;
   let label: string | undefined;
   let sourceFeatureIds: string[] | undefined;
@@ -1015,7 +1012,7 @@ export function parseMcpResponseForTest(stdout: string): {
         item.resource
       ) {
         try {
-          const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+          const feature = JSON.parse(item.resource.text) as IngressFeatureCollection['features'][number];
           geoFeatures.push(feature);
           continue;
         } catch {
@@ -1030,7 +1027,7 @@ export function parseMcpResponseForTest(stdout: string): {
     }
 
     if (item.type === 'resource' && item.resource) {
-      const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+      const feature = JSON.parse(item.resource.text) as IngressFeatureCollection['features'][number];
       geoFeatures.push(feature);
     }
   }

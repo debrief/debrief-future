@@ -7,8 +7,7 @@
 
 import type { LayerStyle } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
-import type { SafeFeatureCollection } from '@debrief/utils';
-import type { DisplayMode, PlatformRecord, Viewport } from '@debrief/schemas';
+import type { DisplayMode, IngressFeatureCollection, PlatformRecord, Viewport } from '@debrief/schemas';
 export type { PlatformRecord };
 
 // ============================================================================
@@ -72,7 +71,7 @@ export interface AddResultLayerMessage {
   layer: {
     id: string;
     name: string;
-    features: SafeFeatureCollection;
+    features: IngressFeatureCollection;
     style: LayerStyle;
   };
 }
@@ -80,7 +79,7 @@ export interface AddResultLayerMessage {
 /** Update plot features in-place (mutation tool results) */
 export interface UpdatePlotFeaturesMessage {
   type: 'updatePlotFeatures';
-  features: SafeFeatureCollection;
+  features: IngressFeatureCollection;
 }
 
 /** Remove a result layer */

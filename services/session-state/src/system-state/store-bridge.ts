@@ -16,7 +16,12 @@
  */
 import { readSystemStateFromFeatureCollection } from './read.js';
 import { writeSystemStateIntoFeatureCollection } from './write.js';
-import { readHiddenFeatureIds, applyVisibilityToFeatureCollection } from './visibility.js';
+import {
+  readHiddenFeatureIds,
+  applyVisibilityToFeatureCollection,
+  applyVisibilityWithProvenance,
+  type VisibilityProvenanceOptions,
+} from './visibility.js';
 import {
   temporalSliceToInput,
   spatialSliceToInput,
@@ -101,13 +106,21 @@ export function buildWriteInputFromStore(state: ViewStateStore): SystemStateWrit
  * Apply current view-state + per-feature visibility into the FeatureCollection.
  * Returns the augmented features (state.* upserted, visible flags set). Pure —
  * the input array is not mutated.
+ *
+ * When `provenance` is supplied (FR-013/FR-021), a visibility-change `LogEntry`
+ * is appended to the `provenance[]` of every feature whose visibility actually
+ * changes relative to the incoming FeatureCollection — the host passes this at
+ * save time so the transition is recorded, bounded to saved states.
  */
 export function applyStateToFeatures(
   features: ReadonlyArray<FeatureLike>,
   state: ViewStateStore,
+  provenance?: VisibilityProvenanceOptions,
 ): PlotFeature[] {
   const withState = writeSystemStateIntoFeatureCollection(toFc(features), buildWriteInputFromStore(state));
-  const withVisibility = applyVisibilityToFeatureCollection(withState, state.hiddenFeatureIds);
+  const withVisibility = provenance
+    ? applyVisibilityWithProvenance(withState, state.hiddenFeatureIds, provenance)
+    : applyVisibilityToFeatureCollection(withState, state.hiddenFeatureIds);
   return withVisibility.features;
 }
 
