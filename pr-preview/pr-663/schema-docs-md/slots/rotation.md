@@ -17,8 +17,8 @@ Alias: rotation
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SpatialSlice](../classes/SpatialSlice.md) | Geographic view state for the map display |  no  |
 | [SystemStateProperties](../classes/SystemStateProperties.md) | Properties for SYSTEM features storing application state |  no  |
+| [SpatialSlice](../classes/SpatialSlice.md) | Geographic view state for the map display |  no  |
 
 
 

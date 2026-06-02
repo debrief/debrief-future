@@ -17,9 +17,9 @@ Alias: tool_id
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [LastToolExecution](../classes/LastToolExecution.md) | Record of the last tool execution, enabling single-step undo |  no  |
 | [ToolResultForLog](../classes/ToolResultForLog.md) | Persisted tool-result shape written by the live tool-result logger and read b... |  no  |
 | [StacAsset](../classes/StacAsset.md) | A single asset entry within `assets[<key>]` |  no  |
+| [LastToolExecution](../classes/LastToolExecution.md) | Record of the last tool execution, enabling single-step undo |  no  |
 
 
 
