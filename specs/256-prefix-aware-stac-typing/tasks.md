@@ -187,7 +187,7 @@ deferral closed and documented.
 
 ### PR Creation
 
-- [ ] T031 Create PR and publish blog: run `/speckit.pr` (updates the already-open PR #663 with evidence + publishes `shipped-post.md` to debrief.github.io) `specs/256-prefix-aware-stac-typing/tasks.md`
+- [x] T031 Create PR and publish blog: run `/speckit.pr` (updates the already-open PR #663 with evidence + publishes `shipped-post.md` to debrief.github.io) `specs/256-prefix-aware-stac-typing/tasks.md`
 
 **Task T031 must run last. It depends on every evidence + media task being complete.**
 
