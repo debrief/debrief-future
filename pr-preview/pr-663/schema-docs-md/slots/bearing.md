@@ -17,9 +17,9 @@ Alias: bearing
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [VectorAnnotationProperties](../classes/VectorAnnotationProperties.md) | Properties for a VectorAnnotation |  no  |
 | [Viewport](../classes/Viewport.md) | Camera state sub-record inside a Scene |  no  |
 | [TUASolution](../classes/TUASolution.md) | Single Target Uncertainty Area estimate |  no  |
+| [VectorAnnotationProperties](../classes/VectorAnnotationProperties.md) | Properties for a VectorAnnotation |  no  |
 | [SensorContact](../classes/SensorContact.md) | Single sensor measurement record |  no  |
 
 

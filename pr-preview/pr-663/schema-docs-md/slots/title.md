@@ -17,17 +17,17 @@ Alias: title
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [PlotSummary](../classes/PlotSummary.md) | Projection of a STAC Item for UI consumption (e |  no  |
-| [SceneThumbnailAssetEntry](../classes/SceneThumbnailAssetEntry.md) | A single STAC Item asset entry produced by Storyboarding (#216) for one |  no  |
-| [StacItemAssetDefinition](../classes/StacItemAssetDefinition.md) | Item Asset Definition Object — declares the shape of an asset that child Item... |  no  |
-| [DatasetEntry](../classes/DatasetEntry.md) | Standard envelope for all tool result datasets, matching the runtime DatasetE... |  no  |
-| [StacAsset](../classes/StacAsset.md) | A single asset entry within `assets[<key>]` |  no  |
 | [StacItemProperties](../classes/StacItemProperties.md) | STAC Item `properties` block |  no  |
-| [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
-| [StacCatalog](../classes/StacCatalog.md) | A flat STAC Catalog (no extent, no summaries) |  no  |
-| [StacCollection](../classes/StacCollection.md) | A STAC 1 |  no  |
-| [SceneProperties](../classes/SceneProperties.md) | Properties class for a Scene child Feature |  no  |
 | [StacLink](../classes/StacLink.md) | A single link entry within `links[]` |  no  |
+| [SceneProperties](../classes/SceneProperties.md) | Properties class for a Scene child Feature |  no  |
+| [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
+| [SceneThumbnailAssetEntry](../classes/SceneThumbnailAssetEntry.md) | A single STAC Item asset entry produced by Storyboarding (#216) for one |  no  |
+| [StacCatalog](../classes/StacCatalog.md) | A flat STAC Catalog (no extent, no summaries) |  no  |
+| [StacItemAssetDefinition](../classes/StacItemAssetDefinition.md) | Item Asset Definition Object — declares the shape of an asset that child Item... |  no  |
+| [StacAsset](../classes/StacAsset.md) | A single asset entry within `assets[<key>]` |  no  |
+| [StacCollection](../classes/StacCollection.md) | A STAC 1 |  no  |
+| [DatasetEntry](../classes/DatasetEntry.md) | Standard envelope for all tool result datasets, matching the runtime DatasetE... |  no  |
+| [PlotSummary](../classes/PlotSummary.md) | Projection of a STAC Item for UI consumption (e |  no  |
 
 
 

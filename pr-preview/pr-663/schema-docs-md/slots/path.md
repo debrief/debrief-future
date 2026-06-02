@@ -17,8 +17,8 @@ Alias: path
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [VertexMetadata](../classes/VertexMetadata.md) | Optional, sparse per-vertex annotation attached to a feature |  no  |
 | [ResultTypePath](../classes/ResultTypePath.md) | Slash-delimited hierarchical type path |  no  |
+| [VertexMetadata](../classes/VertexMetadata.md) | Optional, sparse per-vertex annotation attached to a feature |  no  |
 
 
 

@@ -17,8 +17,8 @@ Alias: course
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TUASolution](../classes/TUASolution.md) | Single Target Uncertainty Area estimate |  no  |
 | [SegmentMetadata](../classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |  no  |
+| [TUASolution](../classes/TUASolution.md) | Single Target Uncertainty Area estimate |  no  |
 | [TimestampedPosition](../classes/TimestampedPosition.md) | Temporal and kinematic metadata for a single track position |  no  |
 
 
