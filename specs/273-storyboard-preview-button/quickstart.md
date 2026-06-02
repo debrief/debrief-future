@@ -30,7 +30,7 @@ Expected: existing `boot.test.ts` green (inline path, dev-fixture fallback, erro
 ## Verify in VS Code
 
 1. Open a plot with a storyboard in the extension (or code-server preview).
-2. Storyboard panel → **Preview** → system browser opens `http://127.0.0.1:<port>/?features=/features.geojson` and plays back. Works offline (basemap tiles degrade to placeholder when offline).
+2. Storyboard panel → **Preview** → system browser opens `http://127.0.0.1:<port>/?features=features.geojson` (run through `asExternalUri`, so under a Remote/code-server tunnel it becomes `…/proxy/<port>/?features=features.geojson`) and plays back. Works offline (basemap tiles degrade to placeholder when offline).
 
 ## Run the full gate before pushing
 

@@ -1,7 +1,7 @@
 ---
 feature: "261-session-state-systemstate"
-captured_at: "2026-05-28T20:27:33Z"
-git_sha: "63cfbb6"
+captured_at: "2026-06-01T20:52:37Z"
+git_sha: "a1aaa59"
 tests_passed: 2620
 tests_failed: 0
 tests_skipped: 1
@@ -25,8 +25,8 @@ Aggregated across the four suites this feature touches:
 | Suite | Command | Pass |
 |-------|---------|------|
 | Schema adherence (Python) | `uv run pytest` (shared/schemas) | 1071 |
-| session-state (Vitest) | `pnpm --filter @debrief/session-state test` | 696 |
-| VS Code extension (Vitest) | `pnpm --filter debrief-vscode test` | 845 |
+| session-state (Vitest) | `pnpm --filter @debrief/session-state test` | 724 |
+| VS Code extension (Vitest) | `pnpm --filter debrief-vscode test` | 825 |
 | Web-shell E2E (Playwright) | `node run-playwright.mjs system-state-roundtrip` | 4 (+2 #237 regression) |
 
 ## Test Breakdown
@@ -51,6 +51,7 @@ Aggregated across the four suites this feature touches:
 | `visibility.ts` — absent⇒visible; hidden round-trip; reveal clears flag; pure | Pass |
 | `mapping.ts` — epoch↔ISO bit-equality; FeatureSelection split; null/empty ⇒ omit | Pass |
 | `active-storyboard` — helper writes #237 wire shape verbatim (NG-002) | Pass |
+| `visibility-provenance.ts` — builder emits the visibility sentinel; save-time diff appends one entry per genuine transition, none for unchanged features; existing log preserved; no mutation (FR-013/FR-021, T083) | Pass (10) |
 | dirty-tracking contract — view-state actions leave dirty=false (FR-019); markDirty sets it (FR-021) | Pass |
 
 ### Hosts
@@ -74,6 +75,7 @@ Aggregated across the four suites this feature touches:
 
 ## Known Issues / Scope Notes
 
-- **active_storyboard consolidation (tasks T052–T054):** the web-shell's interactive active-storyboard read/write deliberately continues to use the tolerant `@debrief/components` helpers (R-011) rather than the strict shared helper, because the strict helper's load reader throws on duplicate/malformed features and the web-shell calls it on every edit. The shared helper owns the unified *load-time* read of all four variants and is the single writer for the three migrated variants. No host re-implements the SystemState wire shape. Recorded as ADR.
+- **active_storyboard consolidation (tasks T052–T054) — DONE:** the web-shell's host-private `activeStoryboardPersistence` module is deleted; its read/write now goes through the single shared `@debrief/session-state` helper (`readSystemStateFromFeatureCollection` / `writeSystemStateIntoFeatureCollection`), with the host-side stale-guard verdict + null-clear glue inlined into `StoryboardPanelMount`. The on-the-wire shape is unchanged (NG-002) — the #237 Playwright regression passes verbatim. The shared helper's strict load reader is tolerated at the panel by catching `SystemStateLoadError` and treating it as "absent" (the strict failure surfaces loudly at the host plot-open boundary, T068). SC-007 satisfied: one SystemState write path across both hosts.
+- **Visibility provenance (task T083) — DONE:** a visibility change is recorded on the affected feature's own `provenance[]` via a shared `buildVisibilityChangeLogEntry`, bounded to saved states (FR-021) — VS Code appends at explicit save (diffing the FeatureCollection's `visible` flags against the store's hidden set); the web-shell appends as it flips `properties.visible` (auto-persist = save). The log growth this produces is an accepted rough edge with compaction deferred (FR-014 / NG-003). No new `ActivityType` enum value / schema change — the sentinel tool name `debrief.visibilityChange` is the discriminator.
 - **Web-shell durable persistence:** the web-shell mirrors view-state into the *in-memory* FeatureCollection (FR-009a); durable IDB persistence of arbitrary plot edits remains the #250 residual (an auto-commit-trigger UX decision, explicitly out of scope per the spec's Dependencies section).
 - **Interaction GIF (T105):** `screenshots/interaction.gif` — a 4-frame animated GIF (560×315, 41 KB) of the headline flow (host A view → host B restored → visibility round-trip), assembled from the captured PNG frames with a self-contained GIF89a encoder (no ffmpeg/imagemagick in the cloud env; sharp's raw-animation path is unsupported by this libvips build).

@@ -72,6 +72,7 @@ import {
   resetSessionStore,
   hydrateStoreFromFeatures,
   mirrorViewStateIntoFeatures,
+  buildVisibilityChangeLogEntry,
   SystemStateLoadError,
   type PlayheadClampDiagnostic,
 } from '@debrief/session-state';
@@ -1438,13 +1439,31 @@ export default function App() {
         });
         const newVisible = allCurrentlyHidden; // true = show, false = hide
 
-        // Update plot features
+        // Update plot features. The web-shell auto-persists the FeatureCollection
+        // on edit (#236), so a toggle IS a save — FR-013/FR-021: record the
+        // transition on the affected feature's own provenance, bounded to a
+        // genuine change (prior visibility differs from the new value).
+        const visibilityTimestamp = new Date().toISOString();
         setCurrentPlot(plot => {
           if (!plot) return plot;
           const updatedFeatures = plot.features.features.map(f => {
             if (!targetIds.has(String(f.id))) return f;
             const props = (f.properties ?? {}) as { [key: string]: unknown };
-            return { ...f, properties: { ...props, visible: newVisible } };
+            const priorVisible = props.visible !== false;
+            if (priorVisible === newVisible) {
+              return { ...f, properties: { ...props, visible: newVisible } };
+            }
+            const existing = Array.isArray(props.provenance) ? props.provenance : [];
+            const entry = buildVisibilityChangeLogEntry({
+              feature_id: String(f.id),
+              visible: newVisible,
+              actor: 'web-shell-user',
+              timestamp: visibilityTimestamp,
+            });
+            return {
+              ...f,
+              properties: { ...props, visible: newVisible, provenance: [...existing, entry] },
+            };
           });
           return { ...plot, features: { ...plot.features, features: updatedFeatures } };
         });

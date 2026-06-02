@@ -92,10 +92,18 @@ export function createSaveSessionCommand(
     // Feature 261 (FR-009/FR-010): the FeatureCollection IS the plot. The
     // current view-state (viewport, time window/playhead, selection) is
     // upserted as SystemState features and per-feature visibility is set; the
-    // whole collection is then committed. NO `.debrief-session` sidecar.
+    // whole collection is then committed atomically. NO `.debrief-session`
+    // sidecar.
+    //
+    // FR-013/FR-021: visibility transitions are recorded on the affected
+    // feature's own provenance — passing the actor makes `applyStateToFeatures`
+    // append a visibility-change LogEntry to every feature whose visibility
+    // differs from the on-disk FeatureCollection.
     let features: ReturnType<typeof applyStateToFeatures>;
     try {
-      features = applyStateToFeatures(mapPanel.getCurrentFeatures(), state);
+      features = applyStateToFeatures(mapPanel.getCurrentFeatures(), state, {
+        actor: sessionManager.actor,
+      });
     } catch (err) {
       void vscode.window.showErrorMessage(
         `Failed to save plot: ${err instanceof Error ? err.message : String(err)}`,
