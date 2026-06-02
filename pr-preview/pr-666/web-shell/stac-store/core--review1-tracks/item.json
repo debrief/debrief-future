@@ -1,0 +1,175 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "id": "core--review1-tracks",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          51.364580555555555,
+          26.101755555555556
+        ],
+        [
+          52.06401944444444,
+          26.101755555555556
+        ],
+        [
+          52.06401944444444,
+          26.454141666666665
+        ],
+        [
+          51.364580555555555,
+          26.454141666666665
+        ],
+        [
+          51.364580555555555,
+          26.101755555555556
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    51.364580555555555,
+    26.101755555555556,
+    52.06401944444444,
+    26.454141666666665
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Review1 Tracks",
+    "datetime": "1970-01-03T01:34:25+00:00",
+    "description": "Saxon Warrior: Review1 Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FS Roald Amundsen, FGS Laboon. Multi-national participation: DE, FR.",
+    "start_datetime": "1970-01-03T01:34:25+00:00",
+    "end_datetime": "1970-01-03T04:17:25+00:00",
+    "debrief:platforms": [
+      {
+        "id": "Frigate",
+        "name": "FS Roald Amundsen",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_type": "type26",
+        "vessel_role": "frigate"
+      },
+      {
+        "id": "New_SSK",
+        "name": "FGS Laboon",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "multi-national",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "prosecution",
+      "radar-detection"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Review1_Tracks (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/Review1_Tracks.rep",
+      "title": "Review1_Tracks.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Review1_Tracks": {
+      "href": "./assets/Review1_Tracks.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Review1_Tracks.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/Review1_Tracks.rep",
+        "load_timestamp": "2026-04-13T23:12:32.503210Z",
+        "tool_version": "0.1.0"
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:32.503Z",
+      "file:size": 22549,
+      "file:checksum": "1220d99fc6d7bc6d917d4557b7a6f3337ac761d43a5839f5b238cdab797617818336"
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (200x150)",
+      "roles": [
+        "thumbnail"
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 19251,
+      "file:checksum": "1220475c72f9de316d5fbd30cc9158c1366e5a98ad3717c4fcde75e0ebacd6dc3a69"
+    },
+    "overview": {
+      "href": "./overview.png",
+      "type": "image/png",
+      "title": "Plot overview (800x600)",
+      "roles": [
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 77287,
+      "file:checksum": "12208cea89a3dd558cb15343328afc1552fc3693ce66ce3810040246a23c8725aaf6"
+    }
+  }
+}
