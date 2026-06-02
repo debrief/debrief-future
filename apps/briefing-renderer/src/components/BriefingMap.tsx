@@ -26,6 +26,7 @@ import {
 } from 'react-leaflet';
 import type { Feature, FeatureCollection } from 'geojson';
 import type { LatLngTuple, Map as LeafletMap, PathOptions } from 'leaflet';
+import type { DebriefFeature } from '@debrief/components';
 import { useBriefingStore } from '../store';
 import { useBrowserMapAdapter, usePlaybackDriver } from '../playback/PlaybackProvider';
 import {
@@ -167,7 +168,10 @@ export const BriefingMap: FC<BriefingMapProps> = ({ onMapReady }) => {
     const tracks: TemporalTrack[] = [];
     const others: FeatureLike[] = [];
     for (const f of lineFeatures) {
-      const track = classifyTemporalTrack(f);
+      // `classifyTemporalTrack` narrows via the canonical `isTrackFeature`
+      // guard, so passing the loose briefing feature is safe — non-tracks
+      // return null and fall through to the static GeoJSON layer.
+      const track = classifyTemporalTrack(f as unknown as DebriefFeature);
       if (track) tracks.push(track);
       else others.push(f);
     }

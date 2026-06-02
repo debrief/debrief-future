@@ -86,89 +86,136 @@ describe('displayCoords — Trail mode (FR-001 / SC-001)', () => {
 });
 
 describe('classifyTemporalTrack (Contract B — FR-007 / FR-009)', () => {
-  const makeFeature = (geometry: unknown, properties: unknown): unknown => ({
-    type: 'Feature',
-    id: 'feat-1',
-    geometry,
-    properties,
-  });
-
   const isoTimes = EPOCHS.map((e) => new Date(e).toISOString());
+  const positionsFrom = (times: string[]): Array<{ time: string }> =>
+    times.map((time) => ({ time }));
 
-  it('qualifies a LineString with parallel, parseable timestamps', () => {
+  // A canonical Debrief track feature: timing in `properties.positions`,
+  // line colour in `properties.style.line.color`. `classifyTemporalTrack`
+  // is typed against `DebriefFeature`; the tests build that shape and cast
+  // through `unknown` at the single call boundary.
+  type Props = Record<string, unknown>;
+  const makeFeature = (
+    geometry: unknown,
+    properties: Props,
+    id: unknown = 'feat-1',
+  ): Parameters<typeof classifyTemporalTrack>[0] =>
+    ({ type: 'Feature', id, geometry, properties } as unknown as Parameters<
+      typeof classifyTemporalTrack
+    >[0]);
+
+  const trackProps = (extra: Props): Props => ({ kind: 'TRACK', ...extra });
+
+  it('qualifies a TRACK LineString with parallel, parseable positions', () => {
     const track = classifyTemporalTrack(
       makeFeature(
         { type: 'LineString', coordinates: COORDS },
-        { id: 'alpha', name: 'Alpha', colour: '#abcdef', timestamps: isoTimes },
+        trackProps({
+          platform_id: 'alpha',
+          platform_name: 'Alpha',
+          style: { line: { color: '#abcdef' } },
+          positions: positionsFrom(isoTimes),
+        }),
+        'alpha-feat',
       ),
     );
     expect(track).not.toBeNull();
-    expect(track!.id).toBe('alpha');
+    expect(track!.id).toBe('alpha-feat');
     expect(track!.coords).toEqual(COORDS);
     expect(track!.epochsMs).toEqual(EPOCHS);
     expect(track!.colour).toBe('#abcdef');
     expect(track!.name).toBe('Alpha');
   });
 
-  it('falls back to the feature id and a default colour when omitted', () => {
+  it('prefers display_name over platform_name', () => {
     const track = classifyTemporalTrack(
       makeFeature(
         { type: 'LineString', coordinates: COORDS },
-        { timestamps: isoTimes },
+        trackProps({
+          platform_id: 'p',
+          platform_name: 'Platform',
+          display_name: 'Override',
+          positions: positionsFrom(isoTimes),
+        }),
+      ),
+    );
+    expect(track!.name).toBe('Override');
+  });
+
+  it('falls back to platform_id and a default colour when style/name omitted', () => {
+    const track = classifyTemporalTrack(
+      makeFeature(
+        { type: 'LineString', coordinates: COORDS },
+        trackProps({ platform_id: 'pid-1', positions: positionsFrom(isoTimes) }),
+        null,
       ),
     );
     expect(track).not.toBeNull();
-    expect(track!.id).toBe('feat-1');
+    expect(track!.id).toBe('pid-1');
     expect(track!.colour).toBe('#1f77b4');
     expect(track!.name).toBe('');
   });
 
-  it('rejects a LineString with no timestamps (FR-007)', () => {
-    expect(
-      classifyTemporalTrack(
-        makeFeature({ type: 'LineString', coordinates: COORDS }, { id: 'x' }),
-      ),
-    ).toBeNull();
-  });
-
-  it('rejects a LineString whose timestamps length differs from coords (FR-007)', () => {
+  it('rejects a non-TRACK feature (kind discriminator)', () => {
     expect(
       classifyTemporalTrack(
         makeFeature(
           { type: 'LineString', coordinates: COORDS },
-          { timestamps: isoTimes.slice(0, 3) },
+          { kind: 'POINT', positions: positionsFrom(isoTimes) },
         ),
       ),
     ).toBeNull();
   });
 
-  it('rejects a LineString with an unparseable timestamp (FR-007)', () => {
+  it('rejects a TRACK with no positions (FR-007)', () => {
+    expect(
+      classifyTemporalTrack(
+        makeFeature({ type: 'LineString', coordinates: COORDS }, trackProps({ platform_id: 'x' })),
+      ),
+    ).toBeNull();
+  });
+
+  it('rejects a TRACK whose positions length differs from coords (FR-007)', () => {
+    expect(
+      classifyTemporalTrack(
+        makeFeature(
+          { type: 'LineString', coordinates: COORDS },
+          trackProps({ positions: positionsFrom(isoTimes.slice(0, 3)) }),
+        ),
+      ),
+    ).toBeNull();
+  });
+
+  it('rejects a TRACK with an unparseable position time (FR-007)', () => {
     const bad = [...isoTimes];
     bad[2] = 'not-a-date';
     expect(
       classifyTemporalTrack(
-        makeFeature({ type: 'LineString', coordinates: COORDS }, { timestamps: bad }),
-      ),
-    ).toBeNull();
-  });
-
-  it('rejects a single-vertex LineString (≥2 points required)', () => {
-    expect(
-      classifyTemporalTrack(
         makeFeature(
-          { type: 'LineString', coordinates: [A] },
-          { timestamps: [isoTimes[0]] },
+          { type: 'LineString', coordinates: COORDS },
+          trackProps({ positions: positionsFrom(bad) }),
         ),
       ),
     ).toBeNull();
   });
 
-  it('rejects a Polygon (FR-009 — static context)', () => {
+  it('rejects a single-vertex TRACK (≥2 points required)', () => {
     expect(
       classifyTemporalTrack(
         makeFeature(
-          { type: 'Polygon', coordinates: [[A, B, C, A]] },
-          { timestamps: isoTimes },
+          { type: 'LineString', coordinates: [A] },
+          trackProps({ positions: positionsFrom([isoTimes[0]!]) }),
+        ),
+      ),
+    ).toBeNull();
+  });
+
+  it('rejects a compound MultiLineString TRACK (only simple LineStrings slice)', () => {
+    expect(
+      classifyTemporalTrack(
+        makeFeature(
+          { type: 'MultiLineString', coordinates: [COORDS] },
+          trackProps({ positions: positionsFrom(isoTimes) }),
         ),
       ),
     ).toBeNull();
@@ -177,7 +224,7 @@ describe('classifyTemporalTrack (Contract B — FR-007 / FR-009)', () => {
   it('rejects a Point (FR-009 — reference marker)', () => {
     expect(
       classifyTemporalTrack(
-        makeFeature({ type: 'Point', coordinates: A }, { timestamps: [isoTimes[0]] }),
+        makeFeature({ type: 'Point', coordinates: A }, { kind: 'POINT' }),
       ),
     ).toBeNull();
   });

@@ -75,6 +75,11 @@ function makeTrack(
   colour: string,
 ) {
   const times = buildTrackTimes(path.length);
+  // Canonical track shape: per-vertex timing lives in `properties.positions`
+  // (parallel to `geometry.coordinates`) and the line colour in
+  // `properties.style.line.color` — exactly what a real exported briefing
+  // carries and what `classifyTemporalTrack` reads (#280).
+  const positions = times.map((time) => ({ time }));
   return {
     type: 'Feature' as const,
     id,
@@ -84,10 +89,17 @@ function makeTrack(
     },
     properties: {
       kind: 'TRACK',
-      id,
-      name,
-      colour,
-      timestamps: times,
+      platform_id: id,
+      platform_name: name,
+      track_type: 'CONTACT',
+      start_time: times[0],
+      end_time: times[times.length - 1],
+      positions,
+      style: {
+        line: { color: colour, weight: 3, opacity: 0.85 },
+        point: { shape: 'circle', radius: 3, color: colour, fill_color: colour },
+      },
+      default_position_style: { show_symbol: false, symbol: 'circle', show_label: false },
       provenance: [
         {
           activity_id: `prov-${id}`,
