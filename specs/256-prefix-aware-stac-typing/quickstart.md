@@ -4,21 +4,29 @@
 
 ## What changed
 
-The generated `StacExtensionProperties` TypeScript interface now declares its
-slots under their on-disk `debrief:`-prefixed keys. Reading/writing the
-modelled extension fields through `StacItem.properties` is now type-checked —
-no more `as` casts on `props['debrief:provenance_log']` & friends.
+The generated TypeScript now declares modelled `debrief:*` slots under their
+on-disk `debrief:`-prefixed keys across **three** classes —
+`StacExtensionProperties` (item properties), `StacSummaries` (collection
+summaries), and `StacAsset` (asset metadata, with two newly-modelled keys
+`debrief:toolId` / `debrief:snapshotTimestamp`). Reading **and writing** the
+modelled fields is now type-checked — no more `as` casts on
+`props['debrief:provenance_log']`, no `Record<string, unknown>` widening at the
+write path, and no `asset as StacAsset & { 'debrief:toolId'?: string }` hand-cast.
+
+(`debrief:label` is deliberately *not* modelled — it is a GeoJSON feature
+property / MCP annotation, not a STAC property.)
 
 ## Regenerate the types
 
 ```sh
 task schema:generate
-# or:
-cd shared/schemas && uv run python scripts/generate.py --target typescript
+# or (TS + Pydantic — StacAsset gains two optional fields):
+cd shared/schemas && uv run python scripts/generate.py
 ```
 
-This rewrites `shared/schemas/src/generated/typescript/types.ts`. Commit the
-result — CI fails if the committed artefact drifts from the generator output.
+This rewrites `shared/schemas/src/generated/typescript/types.ts` and the
+Pydantic models. Commit the result — CI fails if the committed artefact drifts
+from the generator output.
 
 ## Verify it works
 
@@ -65,5 +73,24 @@ Unmodelled / STAC-core / third-party keys still work via open content:
 
 ```ts
 const datetime = props['datetime'];        // string (STAC core, declared)
-const label = props['debrief:label'];      // unknown — narrow before use
+const label = props['debrief:label'];      // unknown — feature/annotation key, not modelled
+```
+
+Write path — `props` is now `StacItemProperties`, not `Record<string, unknown>`:
+
+```ts
+// Before — widened bag:
+const props = item.properties as Record<string, unknown>; // eslint-disable ADR-011
+// After — typed; modelled-key writes are checked, arbitrary keys still allowed:
+const props: StacItemProperties = item.properties;
+props['debrief:overrides'] = merged;       // checked: string[]
+```
+
+Asset metadata — `debrief:toolId` / `debrief:snapshotTimestamp` typed via `StacAsset`:
+
+```ts
+// Before — hand-cast:
+const a = asset as StacAsset & { 'debrief:toolId'?: string };
+// After — modelled:
+const toolId = asset['debrief:toolId'];     // string | undefined
 ```

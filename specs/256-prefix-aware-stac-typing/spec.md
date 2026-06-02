@@ -121,11 +121,22 @@ confirm modelled `debrief:*` fields resolve to LinkML-derived types; confirm
   `start_datetime`, third-party extension keys). The typed surface MUST still
   accept these without error — it narrows the modelled `debrief:*` slots, it
   does not close the object.
-- **Unmodelled `debrief:*` keys**: Some `debrief:*` keys the writer touches
-  are *not* in `StacExtensionProperties` today (e.g. `debrief:label` at item
-  level; `debrief:snapshotTimestamp`; `debrief:toolId` at asset level). These
-  MUST remain accessible without a type error; they are out of the modelled
-  set unless separately added to LinkML.
+- **Asset-level `debrief:*` keys**: `debrief:toolId` and
+  `debrief:snapshotTimestamp` are written into STAC **asset** metadata (not
+  item `properties`) by the VS Code writer (`addResultAsset` /
+  `writeSnapshotAsset`), and `stacService.ts:674` currently reaches them via a
+  hand-typed `asset as StacAsset & { 'debrief:toolId'?: string }` cast. This
+  feature models both onto the `StacAsset` LinkML class so the prefix-aware
+  transform types them and the hand-cast is removed.
+- **`debrief:label` is NOT a STAC property**: it is a GeoJSON *feature*
+  property / MCP result annotation (`bufferZoneGenerator.ts`,
+  `toolService.ts`); it never appears on STAC `item.properties` or asset
+  metadata. It is therefore **out of scope** for this STAC-surface feature and
+  remains open content; modelling it belongs to a future `BaseFeatureProperties`
+  change.
+- **Other unmodelled `debrief:*` keys**: any `debrief:*` key not in the
+  modelled set MUST remain accessible without a type error via open content;
+  they are out of the modelled set unless separately added to LinkML.
 - **On-disk shape must not change**: The persisted JSON keys and structure
   must be byte-for-byte identical before and after this change. If an
   internal unprefixed representation is used anywhere, a single serialisation
@@ -176,6 +187,29 @@ confirm modelled `debrief:*` fields resolve to LinkML-derived types; confirm
 - **FR-009**: Both writer hosts MUST share a single typed definition of the
   prefixed surface (no per-host re-declaration), so a schema change cannot
   type one host and miss the other.
+- **FR-010**: The prefix-aware transform MUST also apply to the Collection-level
+  `StacSummaries` class, whose slots (`debrief_platforms`, `debrief_tags`,
+  `debrief_feature_tags`) declare `slot_uri: debrief:*` but generate
+  underscore-named keys today. After this feature their typed keys MUST be the
+  on-disk `debrief:`-prefixed form.
+- **FR-011**: `debrief:toolId` and `debrief:snapshotTimestamp` (asset-level keys
+  written by the VS Code host) MUST be modelled as slots on the `StacAsset`
+  LinkML class (range `string`) so that the writer's asset-metadata access is
+  statically typed and the existing hand-typed
+  `asset as StacAsset & { 'debrief:toolId'?: string }` cast at
+  `stacService.ts:674` is removed.
+- **FR-012**: The writer hosts' **write/mutation** paths MUST type-check against
+  the prefixed surface, not only the read paths. Both hosts currently widen the
+  properties bag to `Record<string, unknown>` at the mutation site
+  (`stacService.ts:1315`, `stacWriterIdb.ts:309`); these widenings MUST be
+  removed and the locals re-typed to `StacItemProperties` so a mis-typed
+  modelled-key *write* fails the build (closes the ADR-033 / Article IV.5
+  silent-drop class on the write path).
+- **FR-013**: The prefix-aware transform MUST be schema-driven — it derives each
+  emitted key from the slot's LinkML `slot_uri` (verbatim) and MUST NOT
+  hard-code field names, per-class string rules, or assume a uniform
+  name→`slot_uri` convention. Slots whose `slot_uri` carries no extension
+  prefix (e.g. `StacAsset.href`) MUST be left unchanged.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -192,7 +226,17 @@ confirm modelled `debrief:*` fields resolve to LinkML-derived types; confirm
 - **Writer access sites**: The concrete read/write points in
   `apps/vscode/src/services/stacService.ts` and
   `apps/web-shell/src/services/stacWriterIdb.ts` that today use prefixed
-  string-literal keys with `as` casts.
+  string-literal keys with `as` casts — including the `Record<string, unknown>`
+  widenings at the mutation paths (`stacService.ts:1315`,
+  `stacWriterIdb.ts:309`) and the `StacAsset & { 'debrief:toolId'?: string }`
+  hand-cast at `stacService.ts:674`.
+- **StacSummaries (LinkML class)**: The Collection-level summary of `debrief:*`
+  fields (`slot_uri: debrief:platforms` etc.). Its generated TS keys are
+  underscore-named today (`debrief_platforms`); the transform rewrites them to
+  the on-disk colon form.
+- **StacAsset (LinkML class)**: The concrete STAC asset shape. Gains modelled
+  `debrief:toolId` and `debrief:snapshotTimestamp` slots; non-Debrief slots
+  (`href`, `type`, `roles`, …) are untouched by the transform.
 
 ## Success Criteria *(mandatory)*
 
@@ -204,10 +248,11 @@ confirm modelled `debrief:*` fields resolve to LinkML-derived types; confirm
 - **SC-002**: A renamed/removed modelled key in the schema, or a typo at a
   call site, causes the typecheck step to **fail the build** (demonstrated by
   a deliberate-error check that is reverted).
-- **SC-003**: 100% of the LinkML-modelled `debrief:*` extension fields
-  accessed by either writer host (currently 5: `platforms`, `tags`,
-  `feature_tags`, `overrides`, `provenance_log`) are covered by the typed
-  surface.
+- **SC-003**: 100% of the LinkML-modelled `debrief:*` keys accessed by either
+  writer host are covered by the typed surface — the 5 item-property fields
+  (`platforms`, `tags`, `feature_tags`, `overrides`, `provenance_log`), the 2
+  asset fields (`toolId`, `snapshotTimestamp`), and the 3 Collection-summary
+  fields (`debrief:platforms`/`tags`/`feature_tags` on `StacSummaries`).
 - **SC-004**: A write operation produces on-disk JSON byte-for-byte identical
   to the pre-feature output for the same input (golden / round-trip check),
   confirming typing-only with no data migration.
@@ -215,21 +260,33 @@ confirm modelled `debrief:*` fields resolve to LinkML-derived types; confirm
   diverges from the LinkML schema, and passes when in sync.
 - **SC-006**: The Article II.1 audit deferral recorded in #240 (modelled
   `debrief:*` access via hand-typed `Record<string, unknown>`) is closed — the
-  writer no longer relies on an untyped bag for the modelled fields.
+  writer no longer relies on an untyped bag for the modelled fields, on either
+  the read or write path.
+- **SC-007**: The hand-typed `asset as StacAsset & { 'debrief:toolId'?: string }`
+  cast at `stacService.ts:674` is removed; asset-level `debrief:toolId` /
+  `debrief:snapshotTimestamp` access resolves to LinkML-derived `StacAsset`
+  slots.
+- **SC-008**: `StacSummaries` consumers access the Collection summary fields
+  under their on-disk `debrief:`-prefixed keys with no `as` cast, typed against
+  the LinkML-derived shape.
 
 ## Assumptions
 
-- **Scope = both writer hosts, read & write, modelled fields only.** The five
-  fields modelled in `stac-extension.yaml`'s `StacExtensionProperties` are the
-  authoritative typed set. `debrief:label`, `debrief:snapshotTimestamp`, and
-  the asset-level `debrief:toolId` are out of the modelled set and remain
-  open-content unless separately modelled (not in scope here).
-- **Implementation route is a planning decision.** The two routes named in the
-  backlog — (a) a generator extension / post-processor emitting a sibling
-  prefixed interface, vs. (b) refactoring the writer's access pattern to
-  unprefixed keys plus a serialisation adapter — both satisfy these
-  requirements. The choice (and its blast radius / cost trade-off, est. 3–5
-  vs. 5–8 dev-days) is deferred to `/speckit.plan` and `/speckit.review`.
+- **Scope = both writer hosts, read & write, across three LinkML classes.** The
+  typed set is: the 5 `StacExtensionProperties` item fields, the 3
+  `StacSummaries` Collection-summary fields, and the 2 newly-modelled
+  `StacAsset` fields (`toolId`, `snapshotTimestamp`). `debrief:label` is
+  explicitly excluded — it is a GeoJSON feature property / MCP annotation, not a
+  STAC property.
+- **Implementation route confirmed (route a, schema-driven).** A generator
+  post-processor in `shared/schemas/scripts/generate.py` rewrites each modelled
+  slot's emitted TS key to its LinkML `slot_uri` verbatim, across the three
+  classes. The alternative (route b — unprefixed keys + a serialisation adapter)
+  was rejected in `/speckit.review` (larger blast radius, introduces the
+  silent-drop boundary this project guards against). The schema-driven read
+  (vs. a per-class text rule) was selected in `/speckit.plan` because the three
+  classes have divergent name→`slot_uri` conventions and `StacAsset` mixes
+  Debrief and non-Debrief slots.
 - **Builds on #240.** `PropertiesProvenanceEntry` is already LinkML-derived
   and a schema drift gate already exists; this feature extends that
   infrastructure rather than inventing a new one.
@@ -237,8 +294,13 @@ confirm modelled `debrief:*` fields resolve to LinkML-derived types; confirm
   significant `services/stac` MCP contract iteration so related contract work
   ships together. This is a coordination preference, not a hard blocker for
   the spec; the planning phase should confirm timing.
-- **Python side unaffected.** This concerns the TypeScript writer surface;
-  Pydantic-side typing is out of scope.
+- **Python regenerates additively; no Python consumer change.** Modelling the
+  two new `StacAsset` slots is a LinkML change, so `gen-pydantic` re-emits the
+  `StacAsset` Python model with two additional optional fields. This is additive
+  and backward-compatible, follows the existing `StacSummaries` `slot_uri`
+  precedent, and requires no edit to any Python consumer. Round-trip / schema
+  adherence tests for the new slots are in scope (Article II.2); behavioural
+  Python changes are not.
 
 ## Dependencies
 
@@ -251,9 +313,14 @@ confirm modelled `debrief:*` fields resolve to LinkML-derived types; confirm
 
 ## Out of Scope
 
-- Changing the on-disk JSON format or any data migration.
-- Modelling additional `debrief:*` fields beyond those already in
-  `StacExtensionProperties` (beyond a throwaway field used to demonstrate
-  SC-001/SC-002).
-- Reader/display code paths outside the two writer hosts.
-- Python / Pydantic typing changes.
+- Changing the on-disk JSON format or any data migration. The two newly-modelled
+  `StacAsset` keys already exist on disk (`debrief:toolId`,
+  `debrief:snapshotTimestamp`); modelling them is typing-only over existing keys.
+- Modelling `debrief:label` (a GeoJSON feature property / MCP annotation, not a
+  STAC item or asset key) — and any change to `BaseFeatureProperties`.
+- Modelling any further `debrief:*` keys beyond the 5 item + 3 summary + 2 asset
+  fields named above.
+- Reader/display code paths outside the two writer hosts (beyond removing now-
+  redundant casts where they sit in those hosts).
+- Behavioural Python changes. (Additive Pydantic regen of `StacAsset` and its
+  adherence tests are in scope; consumer logic is not.)
