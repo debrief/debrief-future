@@ -1,0 +1,39 @@
+<!--
+  Mermaid diagram rendering for shipped Future Debrief blog posts.
+  Add this block immediately before the closing </body> tag in
+  _layouts/future-post.html on debrief/debrief.github.io.
+
+  Rationale and trade-offs: see ADR-026 in
+  https://github.com/debrief/debrief-future/blob/main/docs/project_notes/decisions.md
+
+  The Liquid `if` guard ensures the CDN script only loads on posts that
+  actually contain a Mermaid fence — non-diagram posts pay zero bytes.
+
+  Kramdown (the GitHub Pages default Markdown processor) renders fenced
+  code blocks as nested <div class="highlighter-rouge"><div class="highlight">
+  <pre class="highlight"><code class="language-mermaid">…</code></pre></div></div>.
+  The shim below extracts the diagram source from `code.language-mermaid`
+  and replaces the entire highlighter wrapper with `<pre class="mermaid">`,
+  which is the form mermaid@11's `run()` API expects.
+
+  Pinned to mermaid@11 (current major as of 2026-04). Bump deliberately
+  on upgrade to avoid silent breakage.
+-->
+{% if page.content contains "language-mermaid" %}
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  document.querySelectorAll('code.language-mermaid').forEach((code) => {
+    const pre = document.createElement('pre');
+    pre.className = 'mermaid';
+    pre.textContent = code.textContent;
+    const wrapper = code.closest('div.highlighter-rouge')
+                 || code.closest('pre')
+                 || code;
+    wrapper.replaceWith(pre);
+  });
+
+  mermaid.initialize({ startOnLoad: false, theme: 'default' });
+  await mermaid.run();
+</script>
+{% endif %}

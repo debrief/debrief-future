@@ -1,9 +1,34 @@
 /**
  * STAC-related type definitions for the Debrief VS Code Extension
+ *
+ * STAC envelope types (StacItem, StacCatalog, StacCollection,
+ * StacLink, StacAsset, StacExtent, StacSummaries, StacCatalogOrCollection,
+ * StacProvider) are LinkML-rooted and re-exported from @debrief/schemas
+ * per spec #223 — the audit's drift cluster has been resolved by
+ * promoting the hand-types to schema-derived ones.
+ *
+ * UI-only Debrief-specific projections (StoreStatus, StacStore, Catalog,
+ * StacItemSummary camelCase adapter, the createStore/buildStacUri/etc.
+ * helpers) remain hand-typed because they do NOT cross Python↔TS — see
+ * spec §OOS-001 / §OOS-002.
  */
 
 import type { PlatformRecord } from '@debrief/schemas';
-export type { PlatformRecord };
+export type {
+  PlatformRecord,
+  StacItem,
+  StacItemProperties,
+  StacCatalog,
+  StacCollection,
+  StacLink,
+  StacAsset,
+  StacExtent,
+  StacSpatialExtent,
+  StacTemporalExtent,
+  StacSummaries,
+  StacProvider,
+  StacCatalogOrCollection,
+} from '@debrief/schemas';
 
 /**
  * Store availability status
@@ -101,106 +126,25 @@ export interface StacItemSummary {
   /** Feature-level tags from debrief:feature_tags */
   featureTags?: readonly string[];
 
-  /** Href to large thumbnail PNG (800x600), or null if not captured */
+  /**
+   * Href to small thumbnail PNG (200x150), or null if not captured.
+   *
+   * Spec 241 rename: the field name now follows STAC convention — the small
+   * variant (200x150) lives at `assets.thumbnail`, so `thumbnailHref`
+   * unambiguously points at the small image. The large 800x600 variant
+   * is exposed via the new `overviewHref` field below.
+   */
   thumbnailHref?: string | null;
 
-  /** Href to small thumbnail PNG (200x150), or null if not captured */
-  thumbnailSmHref?: string | null;
+  /**
+   * Href to large overview PNG (800x600), or null if not captured.
+   *
+   * Spec 241 rename: was `thumbnailHref` (which used to point at the
+   * 800x600). Now lives at `assets.overview` per STAC 1.1 conventions
+   * (`roles: ["overview"]`).
+   */
+  overviewHref?: string | null;
 }
-
-/**
- * Full STAC Item (from catalog.json)
- */
-export interface StacItem {
-  type: 'Feature';
-  stac_version: string;
-  id: string;
-  geometry: GeoJSON.Geometry;
-  bbox: [number, number, number, number];
-  properties: {
-    datetime: string;
-    title?: string;
-    description?: string;
-    [key: string]: unknown;
-  };
-  links: StacLink[];
-  assets: Record<string, StacAsset>;
-}
-
-/**
- * STAC Link
- */
-export interface StacLink {
-  rel: string;
-  href: string;
-  type?: string;
-  title?: string;
-}
-
-/**
- * STAC Asset
- */
-export interface StacAsset {
-  href: string;
-  type?: string;
-  title?: string;
-  roles?: string[];
-}
-
-/**
- * STAC Catalog JSON structure
- */
-export interface StacCatalog {
-  type: 'Catalog';
-  stac_version: string;
-  id: string;
-  title?: string;
-  description: string;
-  links: StacLink[];
-}
-
-/**
- * Spatial and temporal extent of a STAC Collection
- */
-export interface StacExtent {
-  spatial: {
-    /** Bounding boxes as [[west, south, east, north]] */
-    bbox: [number, number, number, number][];
-  };
-  temporal: {
-    /** Temporal intervals as [[start, end]] (ISO 8601 strings or null) */
-    interval: [string | null, string | null][];
-  };
-}
-
-/**
- * Pre-aggregated summaries of extension properties across all items
- */
-export interface StacSummaries {
-  'debrief:platforms'?: PlatformRecord[];
-  'debrief:tags'?: string[];
-  'debrief:feature_tags'?: string[];
-}
-
-/**
- * STAC Collection JSON structure (extends Catalog with extent, summaries, license)
- */
-export interface StacCollection {
-  type: 'Collection';
-  stac_version: string;
-  id: string;
-  title?: string;
-  description: string;
-  license: string;
-  extent: StacExtent;
-  summaries?: StacSummaries;
-  links: StacLink[];
-}
-
-/**
- * Union type for catalog.json which may be either a Catalog or a promoted Collection
- */
-export type StacCatalogOrCollection = StacCatalog | StacCollection;
 
 /**
  * Create a new store with default values

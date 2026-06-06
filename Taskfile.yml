@@ -112,12 +112,7 @@ tasks:
       - bash scripts/check-no-geojson-feature.sh
       - bash scripts/check-no-hand-typed-temporal-enums.sh
       - bash scripts/check-adr-refs.sh
-      # #210's log-panel skip-guard removed 2026-04-24 per spec 233. It
-      # asserted the log-panel E2E suite was stable, but the underlying
-      # openvscode-server webview-frame flakiness (research sprint #142)
-      # keeps the suite failing in CI. The tests are currently
-      # `test.describe.fixme`-suspended; the guard is re-introduced when
-      # #142 resolves and the suite is un-muted. See #233.
+      - bash scripts/check-log-panel-skip-guard.sh
 
   lint:fix:
     desc: "Auto-fix code style issues"
@@ -127,14 +122,46 @@ tasks:
       - uv run ruff format .
       - pnpm lint -- --fix
 
+  verify:ffmpeg:
+    desc: "Verify ffmpeg system binary is present (Feature 234 FR-045 — required for Playwright GIF capture)"
+    cmds:
+      - |
+        if ! command -v ffmpeg >/dev/null 2>&1; then
+          echo "task verify:ffmpeg: FAIL — ffmpeg not found on PATH."
+          echo "  ffmpeg required for Playwright video → GIF conversion (#234 FR-045)."
+          echo "  Install via: brew install ffmpeg  (macOS)"
+          echo "             apt install ffmpeg   (Debian/Ubuntu)"
+          echo "             scoop install ffmpeg (Windows)"
+          exit 1
+        fi
+        echo "task verify:ffmpeg: PASS — $(ffmpeg -version 2>&1 | head -1)"
+
   verify:
-    desc: "Run full CI checks locally (lint + typecheck + test + knip) before pushing"
+    desc: "Run full CI checks locally (lint + typecheck + test + knip + ffmpeg) before pushing"
     deps: [install]
     cmds:
+      - task: verify:ffmpeg
       - task: lint
       - task: typecheck
       - task: test
       - task: knip
+
+  schema:generate:
+    desc: "Regenerate Pydantic, JSON Schema, and TypeScript artefacts from LinkML"
+    deps: [install]
+    cmds:
+      - cd shared/schemas && uv run python scripts/generate.py
+
+  schema:check-drift:
+    desc: "Verify generated artefacts under shared/schemas/src/generated/ match a fresh regeneration"
+    deps: [schema:generate]
+    cmds:
+      - |
+        if ! git diff --quiet -- shared/schemas/src/generated/; then
+          echo "::error::Generated artefacts have drifted. Run 'task schema:generate' and commit the result."
+          git --no-pager diff --stat -- shared/schemas/src/generated/
+          exit 1
+        fi
 
   docs:generate:
     desc: "Generate Markdown docs from LinkML schemas (shared/schemas/build/md/)"

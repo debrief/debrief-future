@@ -1,0 +1,70 @@
+{
+  "type": "Feature",
+  "id": "track-malformed-path",
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [
+      [
+        -3.0,
+        51.0
+      ],
+      [
+        -2.9,
+        51.1
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "TRACK",
+    "platform_id": "CONTACT-01",
+    "platform_name": "Contact 01",
+    "track_type": "CONTACT",
+    "start_time": "2026-01-15T08:00:00Z",
+    "end_time": "2026-01-15T10:00:00Z",
+    "positions": [
+      {
+        "time": "2026-01-15T08:00:00Z",
+        "course": 180,
+        "speed": 8
+      },
+      {
+        "time": "2026-01-15T09:00:00Z",
+        "course": 182,
+        "speed": 8
+      }
+    ],
+    "default_position_style": {
+      "show_symbol": false,
+      "symbol": "circle",
+      "show_label": false
+    },
+    "style": {
+      "line": {
+        "stroke": true,
+        "color": "#CC0000",
+        "weight": 2,
+        "opacity": 1.0,
+        "line_cap": "round",
+        "line_join": "round",
+        "dash_array": null
+      },
+      "point": {
+        "shape": "circle",
+        "radius": 4,
+        "fill": true,
+        "fill_color": "#CC0000",
+        "fill_opacity": 1.0,
+        "stroke": true,
+        "color": "#FFFFFF",
+        "weight": 1,
+        "opacity": 1.0
+      }
+    },
+    "vertex_metadata": [
+      {
+        "path": "positions/-1",
+        "label": "negative index \u2014 malformed"
+      }
+    ]
+  }
+}

@@ -67,6 +67,7 @@ decision (the project previously ran a single persistent Fly.io demo at
 - **Services never touch UI** — return data only
 - **Tests required** — no service code merged without tests
 - **Specs before code** — no implementation without written specification
+- **Boundary types are derived, not rewritten** — when defining a DTO, message payload, snapshot, persistence record, or any cross-boundary type that mirrors a *subset* of an existing typed source (LinkML-generated, schema-derived, or another module's exported type), use `Pick<T, K>` / `Omit<T, K>` / `Partial<T>` — never re-list the fields by name. Re-listing fields is the known root cause of silently-dropped data when the source type grows (see ADR-033 / PR #623). If structural derivation is genuinely impossible, include a compile-time exhaustiveness guard: `type _Exhaustive = Exclude<keyof Source, keyof Dto | 'intentionally_omitted'> extends never ? true : never`. Apply this check **before** writing the type declaration, not in review — Constitution Article IV.5.
 
 ## Tooling (Planned)
 
@@ -202,6 +203,23 @@ Only updated when a feature introduces a technology not already listed here.
 - Python 3.11 (matches project baseline; stdlib-first). + Python stdlib (`pathlib`, `re`, `datetime`, `argparse`, `json`, `urllib.request`, `subprocess`), `PyYAML` (already in `uv.lock` via `linkml` transitively; used for shipped-post front matter parsing). Optional: `gh` CLI (shelled out for PR description retrieval; graceful degradation if absent — see FR-010 edge case). (228-regenerate-blog-archive)
 - Python 3.11 (matches project baseline, stdlib-first) + Python stdlib (`re`, `pathlib`, `dataclasses`, (231-blog-archive-screenshot-fix-impl)
 - TypeScript 5.x (strict mode), Node 20.x runtime via VS Code extension host + VS Code Extension API (^1.85.0), existing modules — `sceneThumbnailService`, `storyboardEditService`, `sessionManager`, `MapPanel`, `saveSession` command. **No new runtime dependencies.** (219-buffer-asset-entries)
+- TypeScript 5.x (strict mode mandatory per Article XV; no new languages) + `node:fs/promises` (atomic write primitive — already used by `sceneThumbnailService`), `node:crypto` (mtime fingerprints already used by `stacService`), Vite 5.x dev/preview server middleware (already in `apps/web-shell/vite.config.ts`), `@debrief/components` (existing `FilesystemAdapter` typed surface — read-only, untouched), `@debrief/session-state` (existing `saveSession` — untouched) (236-web-shell-stac-writes)
+- TypeScript 5.x (strict mode mandatory per Article XV; no new languages) + `idb` (small, well-typed Promise-based wrapper around IndexedDB — proposed new runtime dependency, single source, used by hundreds of projects, last-written 2025); `BroadcastChannel` (browser stdlib, no dep); existing `node:fs/promises` and `node:crypto` for VS Code adaptor; existing `@debrief/components` (`FilesystemAdapter` typed surface — read-only, untouched); existing `@debrief/session-state` (`saveSession` — untouched). **No server-side dependencies added; no new Vite plugins.** (236-web-shell-stac-writes)
+- Two backends behind one interface. VS Code: filesystem at `STAC_STORE_PATH` (existing — `preview/workspace/samples/local-store/` in dev, `apps/vscode/test-data/local-store/` in CI). Web-shell: per-origin IndexedDB database `debrief-stac-writer-v1` with object stores `items`, `assets`, `payloads`, `meta`. Bundled static catalog continues to be served read-only by the existing `/stac-store/` GET handler. (236-web-shell-stac-writes)
+- Python 3.11 (services, schemas, regeneration script), TypeScript 5.x (VS Code reader, web-shell reader, Playwright test) + `multiformats` (multihash SHA-256 encoding for `file:checksum`), `stac_validator` (already present — bumps to STAC 1.1 schemas), `@radiantearth/stac-browser` v3.3.4 (Playwright dev-dep), `http-server` (Playwright dev-dep, serves the catalog). **No changes to existing runtime stack.** (241-stac-best-practices-upgrade)
+- TypeScript 5.x (strict mode, per Article XV); Python 3.11 (one-shot backfill script only — no runtime Python). + React 18.x, Vite 5.x, Zod ^3.22.0 (GitHub REST boundary validation, mirrors spec-navigator), `react-markdown` + `remark-gfm` (Description cell rendering), `diff` (jsdiff, ^5 — unified-diff synthesis for the raw-diff toggle), `@playwright/test` + `@axe-core/playwright` (E2E + a11y), Vitest (unit). **No new runtime dependencies for table behaviour** — sort/filter/group is implemented in-app over plain `<table>` + `useMemo` (TanStack react-table considered and rejected, see research.md). (242-backlog-navigator)
+- Same as #242 — GitHub REST as remote, `localStorage` for the PAT envelope. **No new client storage** (deliberate per spec Assumption A-1: no offline edit queue → no IndexedDB / OPFS / similar). + `@tanstack/react-virtual` ^3 (direct dep), `vite-plugin-pwa` ^0.20 (dev-dep — Workbox-backed SW + manifest emission), `@lhci/cli` (repo-root dev-dep — Lighthouse CI gate), `@debrief/components/hooks/useIsMobile` subpath import. ADR-030 records the vite-plugin-pwa decision. (244-navigator-mobile-pwa)
+- TypeScript 5.x (strict mode) + `@debrief/stac-writer` (writer interface/types), Node.js `node:crypto` + `node:fs/promises` (stacWriterFs adaptor) (242-savesession-stac-writes)
+- TypeScript 5.x (strict mode, per Article XV); React 18.x peer dependency. + React 18.x (peer only). devDeps: `typescript ^5.3.0`, `vitest ^1.0.0`, `jsdom ^24.0.0`, `@testing-library/react ^14.0.0`, `@types/react ^18.2.0`, ESLint + `@typescript-eslint/*` matching the rest of the monorepo. No new runtime deps anywhere in the repo. (246-hooks-workspace-package)
+- TypeScript 5.x (strict mode, per Article XV), React 18.x — unchanged from current `apps/backlog-navigator/` + Vite 5.x (build), `vite-plugin-pwa` ^0.20 (PWA — ADR-030 commitment), `react-markdown` + `remark-gfm` (Description rendering), `@tanstack/react-virtual` (virtualised lists), `diff` (jsdiff — raw-diff toggle), `Zod` ^3.22.0 (GitHub REST + PWA manifest boundaries), `workbox-window` (SW registration); devDeps include `@playwright/test`, `@axe-core/playwright`, `@sparticuz/chromium`, Vitest, `@testing-library/react`, `@testing-library/dom`, `jsdom`. **One new local file** (`src/hooks/useIsMobile.ts` inlined from `@debrief/components`, R-007). No new external runtime dependencies introduced. (249-extract-backlog-navigator)
+- Python 3.11 (schema authoring + Pydantic generation), TypeScript 5.x strict (component library + both frontends — Article XV) + LinkML ≥1.7.0 (master schema); Pydantic v2 (generated Python models); `@debrief/schemas` (generated TS types); React 18.x + `react-leaflet` 4.2 (`SceneRectangleLayer`, `MapView`); Leaflet 1.9.x (`map.getSize()`, `map.containerPointToLatLng()`); `@tanstack/react-virtual` (`FeatureList` virtualisation — already in place); Zustand ^5 (`@debrief/session-state` `displayMode` slice at `services/session-state/src/store/slices/temporal.ts`). (258-scene-playback-fidelity)
+- Python 3.11, TypeScript 5.x (existing monorepo — no new languages) + LinkML >= 1.7.0 (schema source), Pydantic v2 (generated Python models), gen-pydantic/gen-typescript/gen-json-schema (existing toolchain — no new generators added) (222-linkml-mcp-envelopes)
+- Plot file `*.plot.geojson` (GeoJSON `FeatureCollection`) — the destination for migrated state, accessed through the existing writer abstraction. Sidecar `*.debrief-session` (JSON sibling file) — continues to exist for non-migrated per-machine fields. Web-shell continues to use the existing IndexedDB-backed plot store from #236; no new browser-storage adapter is introduced. (261-session-state-systemstate)
+- Python 3.11 (services, schema-build tooling, + LinkML ≥ 1.7.0 (schema source + (223-linkml-stac-catalog)
+- TypeScript 5.x (strict mode) — no new technology; amends spec-261's `@debrief/session-state` `SystemState` load layer (`validate.ts`, reconciliation, `load.ts`) + host notification surfaces. No schema change, no new dependency. (267-tolerant-playhead-import)
+- TypeScript 5.x (strict), Node 20 runtime (VS Code extension host); React 18.x (renderer + panel) + `@debrief/components` (StoryboardPanel), `@debrief/stac-writer` (web-shell reads), `@debrief/schemas` (LinkML types — consumed, not changed), JSZip 3.10.1 (already present), VS Code Extension API ^1.85.0, `react-leaflet`/Leaflet (renderer map), Vite 5.x (web-shell + renderer) (273-storyboard-preview-button)
+- Python 3.11 (`generate.py` post-processor), TypeScript 5.x (generated types + consumers) — no new technology; extends the existing LinkML `gen-typescript` post-processor to emit `debrief:`-prefixed extension-property slot keys (256-prefix-aware-stac-typing)
+- TypeScript 5.x (strict; Article XV). No Python change. + `@debrief/stac-writer` (interface + core), `node:fs`/`node:crypto` (fs adaptor — existing), `idb` (web-shell adaptor — existing), `@debrief/schemas` (`FeatureCollection`, `StacItem`), VS Code Extension API (`window.showWarningMessage`). **No new runtime dependencies.** (268-save-atomicity)
 
 ## Before Pushing
 
@@ -247,6 +265,33 @@ pnpm --filter @debrief/spec-navigator build && cd apps/spec-navigator && node ru
 
 **Playwright note:** Step 4 uses `run-playwright.mjs` which extracts Chromium via `@sparticuz/chromium` — this works in both cloud (Claude Code) and CI environments. For local macOS/Windows, use `pnpm exec playwright install chromium` then `pnpm --filter @debrief/web-shell test` instead. See `docs/project_notes/playwright-installation-research.md` for details.
 
+### Playwright in Claude Code on the web — works fully, captures screenshots
+
+**Cloud sessions can — and should — run Playwright tests and capture real screenshots.** Standard `playwright install chromium` is blocked by the CDN 403 in cloud, but the project bundles `@sparticuz/chromium` via npm and the `run-playwright.mjs` wrappers handle extraction + flag wiring transparently. **Do not skip Playwright tasks under the assumption screenshots can't be produced** — they can, and the evidence pipeline (per-feature `evidence/screenshots/*.png`, blog-post media) is built around running these in-session.
+
+Three wrappers exist, one per surface:
+
+```sh
+# Web-shell flows (the one most feature posts need — full plot load + capture)
+cd apps/web-shell && node run-playwright.mjs <spec-basename>
+# e.g. node run-playwright.mjs viewport-lock
+
+# Shared components Storybook (builds storybook-static + serves on :6006 + runs e2e/*.spec.ts)
+cd shared/components && node run-playwright.mjs <spec-basename>
+# e.g. node run-playwright.mjs ViewportLock
+
+# Spec Navigator
+cd apps/spec-navigator && node run-playwright.mjs
+```
+
+Each wrapper:
+1. Extracts the bundled Chromium binary to `/tmp/chromium` via `@sparticuz/chromium`.
+2. Starts the necessary dev / static server (Vite for web-shell, http-server for the Storybook build).
+3. Runs `pnpm exec playwright test` with `CHROMIUM_PATH` / `CLAUDE_CODE=1` set so `playwright.config.ts` picks the bundled binary.
+4. Cleans up.
+
+**Workflow note for feature delivery:** when a spec lists screenshots under "Evidence Requirements" (e.g. `evidence/screenshots/banner-{light,dark,vscode}.png`), the Playwright specs are the producers — write the spec, run the appropriate wrapper, and the PNGs land directly into the evidence directory. The post then references real paths, not placeholders. See `docs/project_notes/playwright-installation-research.md` for the full diagnostic trail.
+
 ### What CI actually runs (`.github/workflows/ci.yml`)
 
 | CI Step | Command | What it catches |
@@ -258,6 +303,6 @@ pnpm --filter @debrief/spec-navigator build && cd apps/spec-navigator && node ru
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
-- 219-buffer-asset-entries: Added TypeScript 5.x (strict mode), Node 20.x runtime via VS Code extension host + VS Code Extension API (^1.85.0), existing modules — `sceneThumbnailService`, `storyboardEditService`, `sessionManager`, `MapPanel`, `saveSession` command. **No new runtime dependencies.**
-- 231-blog-archive-screenshot-fix-impl: Added Python 3.11 (matches project baseline, stdlib-first) + Python stdlib (`re`, `pathlib`, `dataclasses`,
-- 228-regenerate-blog-archive: Added Python 3.11 (matches project baseline; stdlib-first). + Python stdlib (`pathlib`, `re`, `datetime`, `argparse`, `json`, `urllib.request`, `subprocess`), `PyYAML` (already in `uv.lock` via `linkml` transitively; used for shipped-post front matter parsing). Optional: `gh` CLI (shelled out for PR description retrieval; graceful degradation if absent — see FR-010 edge case).
+- 256-prefix-aware-stac-typing: One schema-driven step in the LinkML `gen-typescript` post-processor (`shared/schemas/scripts/generate.py`) rewrites modelled slot keys to their on-disk `debrief:` `slot_uri` across `StacExtensionProperties`, `StacSummaries`, and `StacAsset`, so the STAC writers' `props['debrief:*']` / `asset['debrief:toolId']` access sites gain typed slots on read **and** write (both hosts' write-path `props` re-typed to `StacItemProperties`). Models `debrief:toolId` + `debrief:snapshotTimestamp` as `StacAsset` slots (additive Pydantic regen); `debrief:label` excluded (feature/annotation key, not STAC). On-disk JSON unchanged; reuses the existing `src/generated` drift gate.
+- 268-save-atomicity: Added TypeScript 5.x (strict; Article XV). No Python change. + `@debrief/stac-writer` (interface + core), `node:fs`/`node:crypto` (fs adaptor — existing), `idb` (web-shell adaptor — existing), `@debrief/schemas` (`FeatureCollection`, `StacItem`), VS Code Extension API (`window.showWarningMessage`). **No new runtime dependencies.**
+- 267-tolerant-playhead-import: Relaxes spec-261 FR-018 strict-on-import for one recoverable case — orphaned playhead (out-of-window `current_time`) clamps to nearest window edge + non-blocking notification; incoherent window (`start>end`) still hard-fails. No schema change, no new dependency.

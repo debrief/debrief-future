@@ -1,0 +1,32 @@
+{
+  "_comment": "T020 — coexists with plot-level assets: an Item assets map containing the spec-241 plot-level thumbnail + overview entries alongside a paired scene-thumbnail set. The overlay says nothing about plot-level keys; it must accept their presence.",
+  "thumbnail": {
+    "href": "thumbnail.png",
+    "type": "image/png",
+    "roles": ["thumbnail"],
+    "proj:shape": [150, 200]
+  },
+  "overview": {
+    "href": "overview.png",
+    "type": "image/png",
+    "roles": ["overview"],
+    "proj:shape": [600, 800]
+  },
+  "features": {
+    "href": "features.geojson",
+    "type": "application/geo+json",
+    "roles": ["data"]
+  },
+  "scene-thumbnail-01HJKM4K8M9N0P1Q2R3S4T5V6W": {
+    "href": "./scene-thumbnails/scene-01HJKM4K8M9N0P1Q2R3S4T5V6W.png",
+    "type": "image/png",
+    "roles": ["thumbnail"],
+    "title": "Scene thumbnail"
+  },
+  "scene-thumbnail-01HJKM4K8M9N0P1Q2R3S4T5V6W-sm": {
+    "href": "./scene-thumbnails/scene-01HJKM4K8M9N0P1Q2R3S4T5V6W-sm.png",
+    "type": "image/png",
+    "roles": ["thumbnail"],
+    "title": "Scene thumbnail (small)"
+  }
+}

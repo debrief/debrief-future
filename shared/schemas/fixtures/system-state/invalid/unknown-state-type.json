@@ -1,0 +1,9 @@
+{
+  "type": "Feature",
+  "id": "state.frobnicate",
+  "geometry": { "type": "Point", "coordinates": [] },
+  "properties": {
+    "kind": "SYSTEM",
+    "state_type": "frobnicate"
+  }
+}

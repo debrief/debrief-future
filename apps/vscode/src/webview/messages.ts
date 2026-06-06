@@ -7,8 +7,7 @@
 
 import type { LayerStyle } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
-import type { SafeFeatureCollection } from '@debrief/utils';
-import type { DisplayMode, PlatformRecord, Viewport } from '@debrief/schemas';
+import type { DisplayMode, IngressFeatureCollection, PlatformRecord, Viewport } from '@debrief/schemas';
 export type { PlatformRecord };
 
 // ============================================================================
@@ -46,6 +45,13 @@ export interface LoadPlotMessage {
     bbox: [number, number, number, number];
     timeExtent: [string, string];
   };
+  /**
+   * When true (or omitted, for back-compat), the webview refits the
+   * map to the plot's bbox. Set to `false` for in-place feature updates
+   * (e.g. Scene capture appending a STORYBOARD_SCENE feature) where the
+   * user's current pan/zoom must be preserved.
+   */
+  refitBounds?: boolean;
 }
 
 /** Set the current selection (from external source like Outline click) */
@@ -65,7 +71,7 @@ export interface AddResultLayerMessage {
   layer: {
     id: string;
     name: string;
-    features: SafeFeatureCollection;
+    features: IngressFeatureCollection;
     style: LayerStyle;
   };
 }
@@ -73,7 +79,7 @@ export interface AddResultLayerMessage {
 /** Update plot features in-place (mutation tool results) */
 export interface UpdatePlotFeaturesMessage {
   type: 'updatePlotFeatures';
-  features: SafeFeatureCollection;
+  features: IngressFeatureCollection;
 }
 
 /** Remove a result layer */
@@ -151,6 +157,16 @@ export interface SetDrawingPaletteIndexMessage {
   paletteIndex: number;
 }
 
+/**
+ * Push the current viewport-lock state to the webview (host → webview).
+ * Spec 260 — fires whenever the spatial slice's `viewportLocked` changes
+ * server-side (e.g. on plot switch, where the host force-unlocks).
+ */
+export interface SetViewportLockedMessage {
+  type: 'setViewportLocked';
+  viewportLocked: boolean;
+}
+
 /** Response to export PNG request */
 export interface RequestExportPngResponse extends ResponseMessage {
   type: 'requestExportPngResponse';
@@ -194,6 +210,13 @@ export interface SceneRectangleSnapshot {
   readonly timestamp: string;
   /** GeoJSON Polygon coordinates — outer ring + optional holes. */
   readonly polygon: readonly (readonly (readonly [number, number])[])[];
+  /**
+   * Spec #258 / FR-006 — provenance of `polygon`. Threaded through the
+   * snapshot so the webview's `SceneRectangleLayer.pickPolygonForRender`
+   * trusts captured-bounds polygons (`'bounds'`) instead of falling into the
+   * legacy recompute path. Optional because pre-#258 scenes don't carry it.
+   */
+  readonly polygonSource?: 'bounds' | 'placeholder' | 'manual';
 }
 
 /**
@@ -298,6 +321,17 @@ export interface FeatureDrawnMessage {
 export interface DrawingModeChangedMessage {
   type: 'drawingModeChanged';
   drawingMode: 'point' | 'rectangle' | 'polygon' | 'polyline' | null;
+}
+
+/**
+ * Notify extension that the user toggled the viewport lock from the webview
+ * (banner click, padlock click, or `L` shortcut). Spec 260 / FR-001..FR-005.
+ * The host updates the spatial slice and the next render echoes the new
+ * value back via `SetViewportLockedMessage`.
+ */
+export interface ViewportLockChangedMessage {
+  type: 'viewportLockChanged';
+  viewportLocked: boolean;
 }
 
 /** Notify extension of viewport change for session state (Feature: 029) */
@@ -423,6 +457,46 @@ export interface ThumbnailCaptureResponseMessage extends ResponseMessage {
   type: 'thumbnailCaptureResponse';
   largePngBase64: string | null;
   smallPngBase64: string | null;
+}
+
+// ============================================================================
+// Live Viewport Query (PR #627)
+// ============================================================================
+//
+// PR #625/#626 fixed the asynchronous viewport sync (debounce flush +
+// echo-suppression + moveend zoom race), but `captureScene` still relies on
+// `state.viewport` having propagated through that chain by the time the
+// capture command runs. For the very first capture — where the analyst has
+// composed but never panned (only zoomed, or zoomed-and-clicked-quickly) —
+// `state.viewport` can still lag the live Leaflet view because either
+// `moveend` hasn't fired in time, or the `postMessage` is in flight, or the
+// 100 ms debounce hasn't drained. The defensive fix is a synchronous-ish RPC:
+// the host asks the webview for the *current* Leaflet viewport at capture
+// time, and the webview responds with `map.getCenter()` + `map.getZoom()` +
+// the 4 bounds corners, bypassing every queue in between.
+
+/** Request the current Leaflet viewport from the webview (Extension → Webview) */
+export interface RequestCurrentViewportMessage extends RequestMessage {
+  type: 'requestCurrentViewport';
+}
+
+/** Current Leaflet viewport response (Webview → Extension) */
+export interface CurrentViewportResponseMessage extends ResponseMessage {
+  type: 'currentViewportResponse';
+  /** Map centre as [longitude, latitude] (matches `Viewport.center` schema). */
+  center: [number, number];
+  /** Map zoom level (`map.getZoom()`). */
+  zoom: number;
+  /**
+   * Viewport bounds polygon as 4 corners in `[NW, NE, SE, SW]` order, each
+   * `[longitude, latitude]` — the same shape `viewportChanged` already uses.
+   */
+  bounds: [
+    [number, number],
+    [number, number],
+    [number, number],
+    [number, number],
+  ];
 }
 
 // ============================================================================
@@ -558,11 +632,13 @@ export type ExtensionToWebviewMessage =
   | SetHiddenIdsMessage
   | SetDrawingModeMessage
   | SetDrawingPaletteIndexMessage
+  | SetViewportLockedMessage
   | RequestExportPngResponse
   | RequestTrackDetailsResponse
   | ImportProgressMessage
   | ImportCompleteMessage
   | RequestThumbnailCaptureMessage
+  | RequestCurrentViewportMessage
   | ResultSavedMessage
   // Results panel (#178)
   | ResultsSetTabsMessage
@@ -589,7 +665,9 @@ export type WebviewToExtensionMessage =
   | RequestRedoMessage
   | FeatureDrawnMessage
   | DrawingModeChangedMessage
+  | ViewportLockChangedMessage
   | ThumbnailCaptureResponseMessage
+  | CurrentViewportResponseMessage
   | SaveResultMessage
   | SaveResultAsMessage
   | RetryToolMessage

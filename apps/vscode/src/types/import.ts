@@ -1,7 +1,7 @@
 /**
  * Import Error Types - Error classes for REP file import operations
  */
-import type { SafeFeature } from '@debrief/utils';
+import type { IngressFeature } from '@debrief/schemas';
 
 /**
  * Error thrown when a file has already been imported to the same STAC item
@@ -69,7 +69,7 @@ export class StacStorageError extends Error {
  * Parse result from IoService
  */
 export interface ParseResult {
-  features: SafeFeature[];
+  features: IngressFeature[];
   warnings: ParseWarning[];
   sourceFile: string;
   encoding: string;
@@ -87,6 +87,8 @@ export interface ParseWarning {
 }
 
 // #204: The legacy `GeoJSONFeature as SafeFeature` alias has been removed.
-// Consumers inside apps/vscode now import the shape appropriate to their
-// use site: `SafeFeature` for MCP/service-call boundaries, or
-// `RawGeoJSONFeature` from `@debrief/schemas` for the parse-boundary shape.
+// #212: The hand-written `Safe*` family has been removed too. Consumers inside
+// apps/vscode now import the shape appropriate to their use site from
+// `@debrief/schemas`: `IngressFeature` (geometry may be null) for the permissive
+// parse/MCP/disk boundaries, or `RawGeoJSONFeature` for result-carrying surfaces
+// where geometry is always present.

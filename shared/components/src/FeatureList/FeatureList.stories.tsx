@@ -105,6 +105,123 @@ const sampleData: DebriefFeatureCollection = {
   features: [...sampleTracks, ...sampleLocations],
 };
 
+// ─── Spec #258 — Storyboard grouping fixtures ────────────────────────
+
+const STORYBOARD_ID = '01HZSB258000000000000000XX';
+
+function generateStoryboardScenes(
+  count: number,
+  storyboardId: string,
+): DebriefFeature[] {
+  const baseTime = Date.parse('2026-04-20T10:00:00Z');
+  return Array.from({ length: count }, (_, i) => ({
+    type: 'Feature' as const,
+    id: `scene-${i.toString().padStart(3, '0')}`,
+    geometry: {
+      type: 'Polygon' as const,
+      coordinates: [
+        [
+          [-1.5 + i * 0.05, 50.5],
+          [-1.4 + i * 0.05, 50.5],
+          [-1.4 + i * 0.05, 50.6],
+          [-1.5 + i * 0.05, 50.6],
+          [-1.5 + i * 0.05, 50.5],
+        ],
+      ] as unknown as number[],
+    },
+    properties: {
+      kind: 'STORYBOARD_SCENE',
+      id: `01HZSC25800000000000000${String(i).padStart(2, '0')}`,
+      storyboard_id: storyboardId,
+      title: `Scene ${i + 1} — ${new Date(baseTime + i * 60000)
+        .toISOString()
+        .slice(11, 19)}Z`,
+      viewport: { center: [-1.25, 50.55], zoom: 11, bearing: 0 },
+      timestamp: new Date(baseTime + i * 60000).toISOString(),
+      visible_feature_ids: [],
+      feature_set_hash: '0'.repeat(64),
+      thumbnail_asset_ref: `thumb-${i}.png`,
+      transition_duration_ms: 500,
+      display_mode: i % 2 === 0 ? 'trail' : 'full',
+      _polygon_source: 'bounds',
+    },
+  })) as unknown as DebriefFeature[];
+}
+
+function makeStoryboard(id: string, name: string): DebriefFeature {
+  return {
+    type: 'Feature',
+    id,
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [-1.55, 50.45],
+          [-1.2, 50.45],
+          [-1.2, 50.65],
+          [-1.55, 50.65],
+          [-1.55, 50.45],
+        ],
+      ] as unknown as number[],
+    },
+    properties: {
+      kind: 'STORYBOARD',
+      id,
+      name,
+      schema_version: 2,
+    },
+  } as unknown as DebriefFeature;
+}
+
+const storyboardGroupingFeatures: DebriefFeatureCollection = {
+  type: 'FeatureCollection',
+  features: [
+    ...generateTracks(2),
+    makeStoryboard(STORYBOARD_ID, 'Engagement Brief'),
+    ...generateStoryboardScenes(5, STORYBOARD_ID),
+  ],
+};
+
+const storyboardGroupingExpandedFeatures: DebriefFeatureCollection = {
+  type: 'FeatureCollection',
+  features: [
+    ...generateTracks(2),
+    makeStoryboard(STORYBOARD_ID, 'Engagement Brief'),
+    ...generateStoryboardScenes(5, STORYBOARD_ID),
+    makeStoryboard('01HZSB259000000000000000XX', 'Empty Storyboard'),
+  ],
+};
+
+export const StoryboardGrouping: Story = {
+  args: {
+    features: storyboardGroupingFeatures,
+    height: 360,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Spec #258 / US4 — each Storyboard renders as a single collapsible parent row with the scene count in a `(N)` badge. Scenes appear as indented children when the parent is expanded; otherwise they are hidden under the parent. Tracks continue to render at the top level alongside the storyboard parent.',
+      },
+    },
+  },
+};
+
+export const StoryboardGroupingExpanded: Story = {
+  args: {
+    features: storyboardGroupingExpandedFeatures,
+    height: 480,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Spec #258 — same fixture as `StoryboardGrouping` plus a second storyboard with zero scenes. The empty storyboard renders with `(0)` and a disabled chevron (FR-013), so authors can still see it exists.',
+      },
+    },
+  },
+};
+
 export const Default: Story = {
   args: {
     features: sampleData,

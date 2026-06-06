@@ -1,0 +1,13 @@
+{
+  "feature": "247-lazy-mobile-bundle",
+  "baseline_bytes": 126009,
+  "baseline_files": {
+    "apps/backlog-navigator/dist/assets/index-CSnrj-tG.js": 126009
+  },
+  "commit_sha": "fddf210",
+  "captured_at": "2026-05-07T16:05:00Z",
+  "target_pct": 15,
+  "cap_pct": 30,
+  "current_budget_pct": 15,
+  "notes": "Re-baselined for #247: the bundle-size guard now measures the desktop entry chunk alone (resolved via Vite's build manifest), not the sum of all emitted JS. The previous pre-#244 baseline of 121,576 B summed every JS file and was captured before the mobile component subtree shipped, which made the pre-split number incommensurable with the post-split entry-only contract. Pre-split entry chunk on the same git tree was 132,742 B gz; post-split entry is 126,009 B gz — a 6,733 B gz drop (5.07%) and a 23.84 KB drop in raw uncompressed JS, satisfying SC-001. The delta is attributable to removing CardList, MobileFilterBar, StickyPushBar, BottomSheetEditor, and DescriptionEditorScreen plus their @tanstack/react-virtual dependency from the desktop entry. The 15%-over budget here governs the desktop-only entry chunk. The mobile chunk and PWA chunks are listed in stdout for human review but do not gate CI."
+}

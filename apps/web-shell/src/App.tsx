@@ -38,10 +38,14 @@ import {
   useIsMobile,
   MobileTabLayout,
   PropertiesForm,
+  validatePlot,
+  StoryboardError,
+  applyClickToSelection,
 } from '@debrief/components';
 import type {
   PropertiesFormField,
   PropertiesFormProps,
+  SelectionClickEvent,
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance, AssociatedFile } from '@debrief/components';
 import type {
@@ -63,15 +67,25 @@ import type {
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
-import { getSessionStore, resetSessionStore } from '@debrief/session-state';
+import {
+  getSessionStore,
+  resetSessionStore,
+  hydrateStoreFromFeatures,
+  mirrorViewStateIntoFeatures,
+  buildVisibilityChangeLogEntry,
+  SystemStateLoadError,
+  type PlayheadClampDiagnostic,
+} from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
 import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
+import { buildPlayheadClampMessage, PLAYHEAD_CLAMP_NOTICE_MS } from './playheadClampMessage';
 import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
 import {
   StoryboardEditHarness,
   parseHarnessQueryString,
 } from './StoryboardEditHarness';
+import { useStoryboardPanelProps } from './StoryboardPanelMount';
 
 const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
 
@@ -88,6 +102,20 @@ function asDebriefFeatures(features: Feature[]): DebriefFeature[] {
 export function StoryboardEditHarnessMount(): JSX.Element {
   const initial = parseHarnessQueryString(window.location.search);
   return <StoryboardEditHarness initial={initial} />;
+}
+
+/**
+ * #235 — read the `?storyboardPanel=1` query string flag at module
+ * load time so the analysis view conditionally renders the live rail.
+ * Once the rail integration is fully validated, this gate can be lifted
+ * (the rail is always-on); for now it stays so the existing
+ * `apps/web-shell/playwright/tests/*.spec.ts` suite is unaffected.
+ */
+function isStoryboardPanelEnabled(): boolean {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  const v = params.get('storyboardPanel');
+  return v === '1' || v === 'true';
 }
 
 /** Extract indexable properties from a feature safely. */
@@ -107,6 +135,25 @@ import { calcService } from './mocks/calcService';
 import { executeTool, isMutationTool, listTools } from './services/toolService';
 import type { ToolResult } from './mocks/calcService';
 import { mockFsAdapter } from './mocks/fsAdapter';
+import { createStacWriterIdb } from './services/stacWriterIdb';
+import { probeIndexedDbCapability } from './services/stacWriterCapability';
+import {
+  getActiveCapability,
+  setActiveStacItemPath,
+  setActiveStacWriter,
+} from './services/stacWriterRegistry';
+import {
+  clearSceneThumbnailStore,
+  hydrateSceneThumbnailStoreFromIdb,
+} from './services/webSceneThumbnailAdapter';
+
+/**
+ * Strip the catalog-relative `./<plot>/item.json` form down to the bare
+ * `<plot>` segment that #236's writer expects as its `stacItemPath`.
+ */
+function stripItemPathToParent(itemPath: string): string {
+  return itemPath.replace(/^\.\//, '').replace(/\/item\.json$/, '');
+}
 
 // Expose session store on window for Playwright test introspection
 declare global {
@@ -117,6 +164,15 @@ declare global {
     __openPlot?: (itemPath: string) => void;
     /** Exposed for Playwright backfill script (#174) */
     __backToCatalog?: () => void;
+    /** #259 — Playwright hook: forces a plot-load validation against an
+     *  arbitrary FeatureCollection so legacy-rejection screenshots can be
+     *  captured without smuggling a pre-#259 fixture through the bundled
+     *  catalog's pre-loaded cache. */
+    __triggerPlotValidation?: (fc: FeatureCollection) => void;
+    /** #261 — Playwright hook: open a plot from a supplied FeatureCollection
+     *  (a fresh store hydrated from the file alone), simulating "transfer ONLY
+     *  features.geojson to another host" for the self-describing round-trip. */
+    __openPlotFromFeatures?: (itemPath: string, features: unknown[]) => void;
   }
 }
 window.__sessionStore = getSessionStore();
@@ -174,6 +230,7 @@ function getMimeType(filePath: string): string {
 }
 
 /**
+/**
  * Main application component.
  */
 export default function App() {
@@ -184,6 +241,20 @@ export default function App() {
   // View state (local — not part of session-state)
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
+  // #259 — plot-load validation error banner. Populated by handlePlotSelect
+  // when validatePlot throws (e.g. pre-#259 plot lacking creation_order or
+  // carrying schema_version < 2).
+  const [plotLoadError, setPlotLoadError] = useState<{
+    readonly code: string;
+    readonly message: string;
+  } | null>(null);
+  // Stable ref for the writer-init effect's hydration retry path
+  // (avoids re-running the init effect every time currentPlot changes).
+  const currentPlotRef = useRef<PlotState | null>(null);
+  useEffect(() => {
+    currentPlotRef.current = currentPlot;
+  }, [currentPlot]);
+
   // Result layers now live in session-state store (#109)
   const resultLayers = state.resultLayers;
   /** Maps activityId → original feature snapshots so revert can restore them */
@@ -206,6 +277,21 @@ export default function App() {
   const [logSelectedEntryId, setLogSelectedEntryId] = useState<string | null>(null);
   const [logFilterState, setLogFilterState] = useState<LogFilterState>(LOG_DEFAULT_FILTER_STATE);
   const [logNotification, setLogNotification] = useState<string | null>(null);
+  // #267 — non-blocking, always-visible clamp notice for an orphaned playhead
+  // adjusted on load. NOT the LogPanel transient (that is tab-gated and does not
+  // render a notice set while the Log tab is unmounted) and NOT the #259 error
+  // banner (this is a recovery, not a failure).
+  const [playheadClampNotice, setPlayheadClampNotice] = useState<string | null>(null);
+
+  // #267 — surface the non-blocking clamp notice (auto-dismiss). No-op when no
+  // playhead was clamped (valid plots stay silent — FR-009).
+  const surfacePlayheadClamp = useCallback((clamps: readonly PlayheadClampDiagnostic[]): void => {
+    const message = buildPlayheadClampMessage(clamps);
+    if (message !== null) {
+      setPlayheadClampNotice(message);
+      setTimeout(() => setPlayheadClampNotice(null), PLAYHEAD_CLAMP_NOTICE_MS);
+    }
+  }, []);
 
   // Counter for generating unique activity IDs
   const [activityCounter, setActivityCounter] = useState(0);
@@ -217,6 +303,9 @@ export default function App() {
 
   // Mobile viewport detection (Feature: mobile-web-shell-preview)
   const isMobile = useIsMobile();
+
+  // #235 — storyboard panel feature flag (query string for now).
+  const storyboardPanelEnabled = useMemo(() => isStoryboardPanelEnabled(), []);
 
   // Drawing state (Feature: 094) — drawingMode wired to session-state store (#108)
   const drawingMode = state.drawingMode;
@@ -239,6 +328,51 @@ export default function App() {
       }
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // #236 — initialise the IndexedDB-backed StacWriter and probe capability.
+  // Failure modes (private mode, denied browser policy, IDB missing) are
+  // captured in the registry's CapabilityReport and surface via the
+  // session-only badge rather than throwing.
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const capability = await probeIndexedDbCapability();
+      if (cancelled) return;
+      if (!capability.available) {
+        setActiveStacWriter(null, capability);
+        return;
+      }
+      try {
+        const writer = await createStacWriterIdb();
+        if (cancelled) {
+          await writer.close();
+          return;
+        }
+        setActiveStacWriter(writer, capability);
+        // Re-apply IDB metadata overlays on top of the in-memory catalog
+        // (FR-002 / FR-008). Required after writer becomes available
+        // since the stacService.init() call above may have raced ahead.
+        void stacService.reapplyIdbOverlays();
+        // If a plot was already selected before the writer became
+        // available (the URL ?plot= auto-open path can race the writer
+        // init), re-hydrate now that the IDB read path is ready.
+        const cp = currentPlotRef.current;
+        if (cp !== null) {
+          void hydrateSceneThumbnailStoreFromIdb(cp.features.features);
+        }
+      } catch (err) {
+        console.warn('[App] stacWriter init failed:', err);
+        setActiveStacWriter(null, {
+          available: false,
+          persistent: false,
+          reason: 'unavailable',
+        });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Re-render the catalog whenever an item's metadata is patched (Properties
   // Panel commits → stacService.updateItemMetadata → bumps revision).
@@ -267,6 +401,34 @@ export default function App() {
     if (!currentPlot) return [];
     return currentPlot.features.features as DebriefFeature[];
   }, [currentPlot]);
+
+  // Feature 261 (FR-009a): the SELF-DESCRIBING FeatureCollection — the plot's
+  // features plus the analyst's current view-state (viewport / time window /
+  // playhead / selection) materialised as `state.*` SystemState features.
+  // `currentPlot.features` itself stays pure: storyboard capture, the layers
+  // panel, and scene packaging never see view-state SystemState features. This
+  // augmented view is what the persistence / round-trip boundary exposes so the
+  // plot round-trips from features.geojson alone. Per-feature `visible` flags
+  // already ride on the plot features (the layer:toggleVisibility handler), so
+  // this only adds state.* and never rewrites visibility. Recomputed reactively
+  // from the store view-state (the `state` snapshot drives the deps).
+  const selfDescribingFeatures = useMemo<DebriefFeature[]>(() => {
+    const augmented = mirrorViewStateIntoFeatures(plotFeatures, store.getState());
+    // eslint-disable-next-line no-restricted-syntax -- #261 FC boundary cast (mirror of #235 ADR-019): the helper returns the structural PlotFeature shape; the consumers treat it as DebriefFeature.
+    return augmented as unknown as DebriefFeature[];
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- store snapshot fields are the real deps
+  }, [
+    plotFeatures,
+    state.viewport,
+    state.rotation,
+    state.selection,
+    state.currentTime,
+    state.timeRange,
+    state.timeFilter,
+    state.displayMode,
+    state.stepSize,
+    state.playbackRate,
+  ]);
 
   // All features including result layers and drawn features
   const allFeatures = useMemo<DebriefFeature[]>(() => {
@@ -301,10 +463,32 @@ export default function App() {
     return names;
   }, [allFeatures]);
 
-  // Expose plot features on window for Playwright test introspection
+  // Expose the self-describing plot features (incl. state.* view-state) on
+  // window for Playwright introspection + the round-trip transfer hook.
   useEffect(() => {
-    window.__currentPlotFeatures = plotFeatures as Feature[];
-  }, [plotFeatures]);
+    window.__currentPlotFeatures = selfDescribingFeatures as Feature[];
+  }, [selfDescribingFeatures]);
+
+  // #259 — Playwright hook: run validatePlot against an arbitrary FC and
+  // drive the same banner state handlePlotSelect would on a real failure.
+  useEffect(() => {
+    window.__triggerPlotValidation = (fc) => {
+      try {
+        validatePlot({
+          type: 'FeatureCollection',
+          features: fc.features as Parameters<typeof validatePlot>[0]['features'],
+        });
+        setPlotLoadError(null);
+      } catch (err) {
+        if (err instanceof StoryboardError) {
+          setPlotLoadError({ code: err.code, message: err.message });
+        } else {
+          throw err;
+        }
+      }
+    };
+    return () => { delete window.__triggerPlotValidation; };
+  }, []);
 
   // Calculate time extent from features
   const timeExtent = useMemo<[number, number] | null>(() => {
@@ -378,6 +562,23 @@ export default function App() {
       const plotData = await stacService.getPlotData(itemPath);
       const item = stacService.getItem(itemPath);
 
+      // #259 — validate the plot's Storyboards / Scenes before swapping
+      // in any state. Pre-#259 plots (schema_version < 2 or Scenes lacking
+      // creation_order) are rejected here per FR-010 — no silent coercion.
+      try {
+        validatePlot({
+          type: 'FeatureCollection',
+          features: plotData.features as Parameters<typeof validatePlot>[0]['features'],
+        });
+        setPlotLoadError(null);
+      } catch (err) {
+        if (err instanceof StoryboardError) {
+          setPlotLoadError({ code: err.code, message: err.message });
+          return;
+        }
+        throw err;
+      }
+
       // Reset session store for new plot
       resetSessionStore();
       window.__sessionStore = getSessionStore();
@@ -397,15 +598,65 @@ export default function App() {
         freshStore.getState().setCurrentTime(extent[0]);
       }
 
+      // Feature 261 (FR-007): hydrate saved view-state (viewport, time window/
+      // playhead, selection) from the plot's SystemState features, overriding
+      // the data-extent defaults above. The plot is self-describing — no
+      // sidecar. Per-feature visibility already rides on `properties.visible`.
+      // Strict-on-import: a malformed/duplicate/cross-field-invalid SystemState
+      // feature surfaces the same error banner as a Storyboard validation
+      // failure (FR-011/FR-012).
+      let playheadClamps: PlayheadClampDiagnostic[] = [];
+      try {
+        playheadClamps = hydrateStoreFromFeatures(
+          freshStore.getState(),
+          plotData.features as DebriefFeature[],
+        );
+      } catch (err) {
+        if (err instanceof SystemStateLoadError) {
+          setPlotLoadError({ code: err.kind, message: err.message });
+          return;
+        }
+        throw err;
+      }
+      // spec 267 (FR-003): an orphaned playhead was clamped to the window edge
+      // on load — surface a non-blocking notice. Never silent (Article I.3).
+      surfacePlayheadClamp(playheadClamps);
+
       // Clear undo history — initialization isn't a user action
       freshStore.getState().clearHistory();
       freshStore.getState().markClean();
+      // Spec 260 / FR-012 — opening a different plot force-unlocks the
+      // viewport. The fresh store defaults to false; we set explicitly so
+      // the invariant survives a future refactor that, say, copies a slice
+      // across the boundary.
+      freshStore.getState().setViewportLocked(false);
+      // Spec #192 T017 (producer rule 1) — dispatch the read-only signal
+      // from the IDB writer's capability. `getActiveCapability()` is
+      // populated by the writer-init effect above; if it hasn't resolved
+      // yet (race), we default to writable and rely on the save-time
+      // escalation path to catch real write failures.
+      {
+        const capability = getActiveCapability();
+        const persistent = capability.persistent === true;
+        freshStore.getState().setReadOnly(
+          !persistent,
+          persistent ? null : 'Storage location is not writable',
+        );
+      }
 
       setCurrentPlot({
         itemPath,
         title: item?.properties.title ?? itemPath,
         features: plotData,
       });
+      // #236 — register the active STAC item parent so scene-thumbnail
+      // captures know which item.json overlay to land into.
+      setActiveStacItemPath(stripItemPathToParent(itemPath));
+      // #236 FR-001 — re-hydrate the in-memory thumbnail store from IDB
+      // so previously-captured scenes show their thumbnails after reload.
+      // Best-effort; failures fall back to empty thumbnails.
+      clearSceneThumbnailStore();
+      void hydrateSceneThumbnailStoreFromIdb(plotData.features);
       freshStore.getState().clearResultLayers();
       setDrawnFeatures([]);
       freshStore.getState().setDrawingMode(null);
@@ -416,13 +667,17 @@ export default function App() {
       console.error('Failed to load plot:', error);
     }
     })();
-  }, []);
+  }, [surfacePlayheadClamp]);
 
   // Handle back to catalog
   const handleBackToCatalog = useCallback(() => {
     setView('welcome');
     setCurrentPlot(null);
+    setActiveStacItemPath(null);
     store.getState().clearResultLayers();
+    // Spec 260 / FR-012 — leaving the plot view force-unlocks (no active
+    // map means there's nothing for the lock to constrain).
+    store.getState().setViewportLocked(false);
     setToolMessage(null);
     setLogEntries([]);
     setSavedResultFiles([]);
@@ -434,8 +689,42 @@ export default function App() {
   useEffect(() => {
     window.__openPlot = handlePlotSelect;
     window.__backToCatalog = handleBackToCatalog;
-    return () => { delete window.__openPlot; delete window.__backToCatalog; };
-  }, [handlePlotSelect, handleBackToCatalog]);
+    // Feature 261 test hook: open a plot from a supplied FeatureCollection
+    // (rather than the bundled catalog), simulating "transfer ONLY
+    // features.geojson to another host" — a fresh store hydrated from the file
+    // alone (US1). Drives the same reset + hydrate path handlePlotSelect uses.
+    window.__openPlotFromFeatures = (itemPath: string, features: unknown[]): void => {
+      resetSessionStore();
+      const fresh = getSessionStore();
+      window.__sessionStore = fresh;
+      fresh.getState().setFeatureCollectionUri(itemPath);
+      let playheadClamps: PlayheadClampDiagnostic[] = [];
+      try {
+        playheadClamps = hydrateStoreFromFeatures(fresh.getState(), features as DebriefFeature[]);
+      } catch (err) {
+        if (err instanceof SystemStateLoadError) {
+          setPlotLoadError({ code: err.kind, message: err.message });
+          return;
+        }
+        throw err;
+      }
+      // spec 267 (FR-003): non-blocking clamp notice on the transfer/test path too.
+      surfacePlayheadClamp(playheadClamps);
+      fresh.getState().clearHistory();
+      fresh.getState().markClean();
+      const transferredFc: PlotState['features'] = {
+        type: 'FeatureCollection',
+        features: features as Feature[],
+      };
+      setCurrentPlot({ itemPath, title: itemPath, features: transferredFc });
+      setView('analysis');
+    };
+    return () => {
+      delete window.__openPlot;
+      delete window.__backToCatalog;
+      delete window.__openPlotFromFeatures;
+    };
+  }, [handlePlotSelect, handleBackToCatalog, surfacePlayheadClamp]);
 
   // Restore original features for a reverted activity
   const restoreSnapshots = useCallback((aid: string) => {
@@ -768,20 +1057,21 @@ export default function App() {
     []
   );
 
-  // Handle map feature selection (goes through session-state)
-  const handleMapSelect = useCallback((featureId: string, event: React.MouseEvent) => {
+  // Handle map feature selection (goes through session-state).
+  //
+  // #192 Phase 5: routes the new `SelectionClickEvent` through the shared
+  // `applyClickToSelection` helper so the map and the Layers panel
+  // produce identical selection sets for identical sequences.
+  const handleMapSelect = useCallback((event: SelectionClickEvent) => {
     const s = store.getState();
-    if (event.ctrlKey || event.metaKey) {
-      // Toggle: add or remove
-      const current = s.selection.featureIds;
-      if (current.includes(featureId)) {
-        s.removeFromSelection([featureId]);
-      } else {
-        s.addToSelection([featureId]);
-      }
-    } else {
-      s.setSelection([featureId], featureId);
-    }
+    const next = applyClickToSelection({
+      current: {
+        featureIds: s.selection.featureIds,
+        primary: s.selection.primary ?? null,
+      },
+      event,
+    });
+    s.setSelection(next.featureIds, next.primary ?? undefined);
   }, [store]);
 
   // Handle background click (clear selection via session-state)
@@ -793,6 +1083,42 @@ export default function App() {
   const handleDrawingModeChange = useCallback((mode: DrawingMode) => {
     store.getState().setDrawingMode(mode);
   }, [store]);
+
+  // Spec 260 — viewport lock toggle from MapView (banner click, padlock,
+  // L shortcut). The session-state slice is the source of truth. The
+  // Storyboard padlock has its own toggle helper inside StoryboardPanelMount.
+  const handleViewportLockChange = useCallback((locked: boolean) => {
+    store.getState().setViewportLocked(locked);
+  }, [store]);
+
+  // #235 — track the latest map bounds + zoom and write a 4-corner
+  // ViewportPolygon to session-state so the capture command can read
+  // viewport / zoom synchronously. Mirrors VS Code's mapPanel.ts viewport
+  // wiring (lines 875-894) but without the postMessage bridge.
+  const latestMapZoomRef = useRef<number | null>(null);
+  const handleMapZoomChange = useCallback((zoom: number): void => {
+    latestMapZoomRef.current = zoom;
+  }, []);
+  const handleMapBoundsChange = useCallback(
+    (bounds: [number, number, number, number]): void => {
+      // bounds = [west, south, east, north]
+      const [west, south, east, north] = bounds;
+      // Default zoom to MapView's initialZoom (10) if zoomend hasn't
+      // fired yet — the capture command rejects when zoom is undefined,
+      // and zoomend is unreliable in headless browsers on initial mount.
+      const zoom = latestMapZoomRef.current ?? 10;
+      // 4-corner polygon in clockwise order [NW, NE, SE, SW] per
+      // ViewportPolygon's documented contract.
+      const coordinates = [
+        { longitude: west, latitude: north },
+        { longitude: east, latitude: north },
+        { longitude: east, latitude: south },
+        { longitude: west, latitude: south },
+      ];
+      store.getState().setViewport({ coordinates, zoom });
+    },
+    [store],
+  );
 
   // Handle shape drawn on map (Feature: 094, 096)
   const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
@@ -1086,6 +1412,23 @@ export default function App() {
       case 'layer:select':
         store.getState().setSelection(message.payload.featureIds);
         break;
+      case 'layer:selectEvent': {
+        // #192 Phase 5: emitted right after `layer:select` by FeatureList
+        // for plain/modifier clicks. Re-route through the shared
+        // `applyClickToSelection` helper so `selection.primary` follows
+        // the modifier-aware "most recent action" rule, matching the
+        // map-click path.
+        const s = store.getState();
+        const next = applyClickToSelection({
+          current: {
+            featureIds: s.selection.featureIds,
+            primary: s.selection.primary ?? null,
+          },
+          event: message.payload,
+        });
+        s.setSelection(next.featureIds, next.primary ?? undefined);
+        break;
+      }
       case 'layer:toggleVisibility': {
         const targetIds = new Set(message.payload.featureIds);
 
@@ -1096,13 +1439,31 @@ export default function App() {
         });
         const newVisible = allCurrentlyHidden; // true = show, false = hide
 
-        // Update plot features
+        // Update plot features. The web-shell auto-persists the FeatureCollection
+        // on edit (#236), so a toggle IS a save — FR-013/FR-021: record the
+        // transition on the affected feature's own provenance, bounded to a
+        // genuine change (prior visibility differs from the new value).
+        const visibilityTimestamp = new Date().toISOString();
         setCurrentPlot(plot => {
           if (!plot) return plot;
           const updatedFeatures = plot.features.features.map(f => {
             if (!targetIds.has(String(f.id))) return f;
             const props = (f.properties ?? {}) as { [key: string]: unknown };
-            return { ...f, properties: { ...props, visible: newVisible } };
+            const priorVisible = props.visible !== false;
+            if (priorVisible === newVisible) {
+              return { ...f, properties: { ...props, visible: newVisible } };
+            }
+            const existing = Array.isArray(props.provenance) ? props.provenance : [];
+            const entry = buildVisibilityChangeLogEntry({
+              feature_id: String(f.id),
+              visible: newVisible,
+              actor: 'web-shell-user',
+              timestamp: visibilityTimestamp,
+            });
+            return {
+              ...f,
+              properties: { ...props, visible: newVisible, provenance: [...existing, entry] },
+            };
           });
           return { ...plot, features: { ...plot.features, features: updatedFeatures } };
         });
@@ -1207,6 +1568,29 @@ export default function App() {
     }
   }, [playback, store, handleRunTool, handleFileSelect, allFeatures]);
 
+  // Storyboard is the 5th section of the shared ActivityPanel — build its
+  // live StoryboardPanel props here (reducer, capture/edit handlers, session
+  // badge) and hand them to ActivityPanel, which renders the child panel.
+  const emptyFeatureCollection = useMemo<FeatureCollection>(
+    () => ({ type: 'FeatureCollection', features: [] }),
+    [],
+  );
+  const setStoryboardFeatureCollection = useCallback(
+    (fc: FeatureCollection) =>
+      setCurrentPlot((p) => (p === null ? p : { ...p, features: fc })),
+    [],
+  );
+  const getStoryboardMapContainer = useCallback(
+    () => document.querySelector('.leaflet-container') as HTMLElement | null,
+    [],
+  );
+  const storyboardPanelProps = useStoryboardPanelProps({
+    sessionStore: store,
+    featureCollection: currentPlot?.features ?? emptyFeatureCollection,
+    setFeatureCollection: setStoryboardFeatureCollection,
+    getMapContainer: getStoryboardMapContainer,
+  });
+
   // --- Panel workspace infrastructure ---
   // Create panel registry once (stable reference)
   const panelRegistry = useMemo(() => createDefaultRegistry(), []);
@@ -1300,18 +1684,42 @@ export default function App() {
       selectedFeatureIds: state.selection.featureIds,
       hiddenIds: hiddenFeatureIds,
       resultFiles: savedResultFiles,
+      // #192 Phase 6 (T048) — plumb the plot slice's read-only signal
+      // through to the Properties panel so every mode renders the banner
+      // + disabled inputs (FR-018 / FR-019 / FR-020). The signal itself
+      // is producer-rule-driven by `setReadOnly` calls from openPlot
+      // (capability probe) and `saveSession` (EACCES / EPERM / RO error).
+      // PlotSlice fields are flat on `SessionStoreWithUndo` (no `.plot`
+      // namespace — the Zustand store flattens every slice).
+      isPlotReadOnly: state.isReadOnly,
+      plotReadOnlyReason: state.readOnlyReason,
       onMessage: handleActivityMessage,
+      // Storyboard is the 5th section of the shared ActivityPanel. Pass its
+      // live props so web-shell matches VS Code (ActivityPanel renders the
+      // child StoryboardPanel rather than a separate rail).
+      storyboard: storyboardPanelEnabled ? storyboardPanelProps : undefined,
     } : null,
     mapViewProps: currentPlot ? {
       features: visibleFeatures,
       selectedIds: selectedIds,
       onSelect: handleMapSelect,
       onBackgroundClick: handleBackgroundClick,
+      // #235 — viewport-sync wiring is gated on the storyboard rail flag.
+      // Leaflet fires `boundsChange` during initial mount, which would
+      // call `setViewport` and push an undo entry the moment the map
+      // renders — breaking the #073 invariant that plot load is not
+      // undoable. The sync only exists for the capture command, which
+      // is unreachable without the rail.
+      onZoomChange: storyboardPanelEnabled ? handleMapZoomChange : undefined,
+      onBoundsChange: storyboardPanelEnabled ? handleMapBoundsChange : undefined,
       currentTime: playback.currentTime,
       displayMode: state.displayMode,
       drawingMode,
       onDrawingModeChange: handleDrawingModeChange,
       onShapeCreated: handleShapeCreated,
+      // Spec 260 — viewport lock wired through session-state.
+      viewportLocked: state.viewportLocked,
+      onViewportLockChange: handleViewportLockChange,
       height: '100%',
       className: 'web-shell__map',
     } : null,
@@ -1351,12 +1759,18 @@ export default function App() {
     playback.playbackState, playback.speed, state.displayMode,
     tools, toolMatches, allFeatures, visibleFeatures, state.selection.featureIds,
     hiddenFeatureIds, handleActivityMessage,
-    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode, handleDrawingModeChange,
+    // #192 Phase 6 — read-only signal threading (flat slice fields)
+    state.isReadOnly, state.readOnlyReason,
+    selectedIds, handleMapSelect, handleBackgroundClick,
+    handleMapZoomChange, handleMapBoundsChange, storyboardPanelEnabled,
+    drawingMode, handleDrawingModeChange,
+    state.viewportLocked, handleViewportLockChange,
     handleShapeCreated, logEntries, featureNames,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
     handleSchemaRequest, handleDisableToggle, handleRationaleUpdate,
     handleFileSelect, treeRefreshKey, chartContextProps, savedResultFiles, highlightedFilePaths,
+    storyboardPanelProps,
   ]);
 
   // Context wrapper for the GoldenLayout bridge — wraps each panel in PanelContextProvider
@@ -1517,6 +1931,25 @@ export default function App() {
 
     return (
       <div className="web-shell web-shell--welcome">
+        {plotLoadError !== null && (
+          <div
+            role="alert"
+            data-testid="plot-load-error-banner"
+            data-error-code={plotLoadError.code}
+            style={{
+              background: '#7f1d1d',
+              color: '#fee2e2',
+              padding: '12px 20px',
+              borderBottom: '2px solid #fca5a5',
+              fontFamily: 'system-ui, sans-serif',
+              fontSize: '14px',
+              lineHeight: '1.5',
+            }}
+          >
+            <strong>Plot could not be loaded</strong> ({plotLoadError.code}):{' '}
+            {plotLoadError.message}
+          </div>
+        )}
         <header className="web-shell__header">
           <h1 className="web-shell__title">Debrief Web Shell</h1>
           <p className="web-shell__subtitle">STAC Catalog Browser</p>
@@ -1537,6 +1970,15 @@ export default function App() {
             >
               VS Code Preview &rarr;
             </a>
+            <a
+              className="web-shell__header-link"
+              href="https://debrief.github.io/debrief-future/backlog-navigator/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Open the Backlog Navigator to triage / edit BACKLOG.md"
+            >
+              ⚙ Edit Backlog &rarr;
+            </a>
           </div>
         </header>
         <main className="web-shell__main">
@@ -1553,7 +1995,8 @@ export default function App() {
     );
   }
 
-  // Render analysis view
+  // Render analysis view. The Storyboard is now the 5th section of the
+  // shared ActivityPanel (no separate rail / grid column).
   return (
     <div className="web-shell web-shell--analysis">
       <header className="web-shell__header">
@@ -1592,6 +2035,26 @@ export default function App() {
         </button>
       </header>
 
+      {/* #267 — non-blocking playhead-clamp notice. Always visible (not tab-gated),
+          auto-dismisses, and is visually distinct from the #259 error banner. */}
+      {playheadClampNotice !== null && (
+        <div
+          role="status"
+          data-testid="playhead-clamp-toast"
+          style={{
+            background: '#78350f',
+            color: '#fef3c7',
+            padding: '8px 16px',
+            borderBottom: '1px solid #f59e0b',
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '13px',
+            lineHeight: '1.4',
+          }}
+        >
+          {playheadClampNotice}
+        </div>
+      )}
+
       {toolMessage && (
         <div className="web-shell__tool-message" role="status">
           <pre>{toolMessage}</pre>
@@ -1621,6 +2084,9 @@ export default function App() {
             onLayoutReset={() => setLayoutResetCount(c => c + 1)}
           />
         )}
+        {/* #235 Storyboard now renders as the 5th section *inside* the
+          * shared ActivityPanel (see activityPanelProps.storyboardSlot),
+          * matching VS Code — no separate rail. */}
       </main>
     </div>
   );

@@ -192,7 +192,12 @@ class TestFeature205EnumParity:
     def _load_linkml_enum(self, enum_name: str) -> set[str]:
         import yaml  # noqa: PLC0415
 
-        linkml_file = Path(__file__).parent.parent / "src" / "linkml" / "session-state.yaml"
+        # PlaybackStateEnum / DisplayModeEnum / TimeUnitEnum were consolidated
+        # into common.yaml as their single source of truth (feature 261,
+        # FR-002a) so SystemStateProperties (geojson.yaml) and SceneProperties
+        # (storyboard.yaml) can reference them without re-importing
+        # session-state.yaml.
+        linkml_file = Path(__file__).parent.parent / "src" / "linkml" / "common.yaml"
         data = yaml.safe_load(linkml_file.read_text())
         perms = data.get("enums", {}).get(enum_name, {}).get("permissible_values", {}) or {}
         return set(perms.keys())

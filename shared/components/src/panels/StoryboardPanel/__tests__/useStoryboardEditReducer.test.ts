@@ -7,9 +7,14 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  COLLISION_OFFSET_CAP,
+  composeCollisionBannerViewModel,
+  composeNamingRowViewModel,
   composeSceneEditViewModels,
   createInitialStoryboardEditState,
   storyboardEditReducer,
+  type CollisionBannerPushState,
+  type NamingRowPushState,
   type StaleFlagEntry,
   type StoryboardEditReducerState,
   type UndoToastDescriptor,
@@ -385,5 +390,509 @@ describe('composeSceneEditViewModels', () => {
     expect(Object.keys(out).length).toBe(3);
     expect(out['S1'].pendingDelete).toBe(false);
     expect(out['S1'].missingData.kind).toBe('ok');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Feature 235 — first-capture naming row + duplicate-timestamp banner
+// ─────────────────────────────────────────────────────────────────────
+
+const NAMING_PUSH: NamingRowPushState = {
+  visible: true,
+  defaultName: 'Plot Alpha — storyboard',
+  knownNames: ['Existing storyboard'],
+};
+
+const COLLISION_PUSH: CollisionBannerPushState = {
+  visible: true,
+  conflictingSceneId: 'scene-x',
+  conflictingSceneTitle: '201400Z APR 26',
+  originalTimestamp: '2026-04-20T14:00:00.000Z',
+  proposedTimestamp: '2026-04-20T14:00:00.000Z',
+  offsetCount: 0,
+  offsetWouldExceedTimeRange: false,
+  cause: 'capture',
+};
+
+describe('storyboardEditReducer — namingRow push (T005)', () => {
+  it('initialises pendingName from the host default when first pushed', () => {
+    const next = storyboardEditReducer(createInitialStoryboardEditState(), {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: NAMING_PUSH,
+      },
+    });
+    expect(next.namingRow).not.toBeNull();
+    expect(next.namingRow!.visible).toBe(true);
+    expect(next.namingRow!.defaultName).toBe('Plot Alpha — storyboard');
+    expect(next.namingRow!.pendingName).toBe('Plot Alpha — storyboard');
+    expect(next.namingRow!.knownNames).toEqual(['Existing storyboard']);
+  });
+
+  it('clears the slice when host pushes namingRow: null', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: NAMING_PUSH,
+      },
+    });
+    const cleared = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: null,
+      },
+    });
+    expect(cleared.namingRow).toBeNull();
+  });
+
+  it('preserves analyst keystrokes when host re-pushes the same defaultName', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: NAMING_PUSH,
+      },
+    });
+    s = storyboardEditReducer(s, {
+      type: 'naming-row-text-changed',
+      pendingName: 'My new name',
+    });
+    s = storyboardEditReducer(s, {
+      type: 'scenes-message',
+      payload: {
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        namingRow: NAMING_PUSH,
+      },
+    });
+    expect(s.namingRow!.pendingName).toBe('My new name');
+  });
+
+  it('reinitialises pendingName when host pushes a different defaultName', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: NAMING_PUSH,
+      },
+    });
+    s = storyboardEditReducer(s, {
+      type: 'naming-row-text-changed',
+      pendingName: 'something',
+    });
+    s = storyboardEditReducer(s, {
+      type: 'scenes-message',
+      payload: {
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        namingRow: { ...NAMING_PUSH, defaultName: 'Different default' },
+      },
+    });
+    expect(s.namingRow!.defaultName).toBe('Different default');
+    expect(s.namingRow!.pendingName).toBe('Different default');
+  });
+
+  it('leaves namingRow unchanged when payload omits the field', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: NAMING_PUSH,
+      },
+    });
+    s = storyboardEditReducer(s, {
+      type: 'scenes-message',
+      payload: {
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+      },
+    });
+    expect(s.namingRow).not.toBeNull();
+    expect(s.namingRow!.defaultName).toBe('Plot Alpha — storyboard');
+  });
+});
+
+describe('storyboardEditReducer — collisionBanner push (T006)', () => {
+  it('applies the host-pushed slice verbatim', () => {
+    const next = storyboardEditReducer(createInitialStoryboardEditState(), {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: COLLISION_PUSH,
+      },
+    });
+    expect(next.collisionBanner).not.toBeNull();
+    expect(next.collisionBanner!.conflictingSceneId).toBe('scene-x');
+    expect(next.collisionBanner!.offsetCount).toBe(0);
+    expect(next.collisionBanner!.offsetWouldExceedTimeRange).toBe(false);
+    expect(next.collisionBanner!.cause).toBe('capture');
+  });
+
+  it('replaces the slice on each push (advances after Offset)', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: COLLISION_PUSH,
+      },
+    });
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: {
+          ...COLLISION_PUSH,
+          proposedTimestamp: '2026-04-20T14:00:01.000Z',
+          offsetCount: 1,
+        },
+      },
+    });
+    expect(s.collisionBanner!.offsetCount).toBe(1);
+    expect(s.collisionBanner!.proposedTimestamp).toBe(
+      '2026-04-20T14:00:01.000Z',
+    );
+  });
+
+  it('clears the slice on null push', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: COLLISION_PUSH,
+      },
+    });
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: null,
+      },
+    });
+    expect(s.collisionBanner).toBeNull();
+  });
+
+  it('preserves the offsetWouldExceedTimeRange flag from the host', () => {
+    const next = storyboardEditReducer(createInitialStoryboardEditState(), {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: { ...COLLISION_PUSH, offsetWouldExceedTimeRange: true },
+      },
+    });
+    expect(next.collisionBanner!.offsetWouldExceedTimeRange).toBe(true);
+  });
+});
+
+describe('storyboardEditReducer — stateless action stale defence (T007)', () => {
+  it('drops naming-row-text-changed when no slice is live', () => {
+    const s = createInitialStoryboardEditState();
+    const next = storyboardEditReducer(s, {
+      type: 'naming-row-text-changed',
+      pendingName: 'orphan',
+    });
+    expect(next).toBe(s);
+  });
+
+  it('updates pendingName when slice is visible', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: NAMING_PUSH,
+      },
+    });
+    s = storyboardEditReducer(s, {
+      type: 'naming-row-text-changed',
+      pendingName: 'Echo',
+    });
+    expect(s.namingRow!.pendingName).toBe('Echo');
+  });
+
+  it('drops naming-row-confirm-requested when slice is null', () => {
+    const s = createInitialStoryboardEditState();
+    const next = storyboardEditReducer(s, {
+      type: 'naming-row-confirm-requested',
+    });
+    expect(next).toBe(s);
+  });
+
+  it('drops collision-replace-requested when no banner is live', () => {
+    const s = createInitialStoryboardEditState();
+    const next = storyboardEditReducer(s, {
+      type: 'collision-replace-requested',
+      conflictingSceneId: 'whatever',
+    });
+    expect(next).toBe(s);
+  });
+
+  it('drops collision-replace-requested with mismatched conflictingSceneId', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: COLLISION_PUSH,
+      },
+    });
+    const next = storyboardEditReducer(s, {
+      type: 'collision-replace-requested',
+      conflictingSceneId: 'a-different-scene',
+    });
+    expect(next).toBe(s);
+  });
+
+  it('drops collision-offset / collision-cancel when no banner is live', () => {
+    const s = createInitialStoryboardEditState();
+    expect(
+      storyboardEditReducer(s, { type: 'collision-offset-requested' }),
+    ).toBe(s);
+    expect(
+      storyboardEditReducer(s, { type: 'collision-cancel-requested' }),
+    ).toBe(s);
+  });
+});
+
+describe('storyboardEditReducer — view-model projections (T015/T016)', () => {
+  it('namingRowViewModel.canConfirm requires non-empty trimmed pendingName', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: { ...NAMING_PUSH, defaultName: '   ', knownNames: [] },
+      },
+    });
+    const vm = composeNamingRowViewModel(s);
+    expect(vm.visible).toBe(true);
+    expect(vm.canConfirm).toBe(false);
+  });
+
+  it('namingRowViewModel surfaces collisionWith when pendingName matches a known name', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: NAMING_PUSH,
+      },
+    });
+    s = storyboardEditReducer(s, {
+      type: 'naming-row-text-changed',
+      pendingName: 'Existing storyboard',
+    });
+    const vm = composeNamingRowViewModel(s);
+    expect(vm.collisionWith).toBe('Existing storyboard');
+    expect(vm.canConfirm).toBe(false);
+  });
+
+  it('namingRowViewModel returns invisible defaults when slice is null', () => {
+    const vm = composeNamingRowViewModel(createInitialStoryboardEditState());
+    expect(vm.visible).toBe(false);
+    expect(vm.canConfirm).toBe(false);
+    expect(vm.collisionWith).toBeNull();
+  });
+
+  it('collisionBannerViewModel.offsetButtonHidden = true when offsetCount >= cap', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: { ...COLLISION_PUSH, offsetCount: COLLISION_OFFSET_CAP },
+      },
+    });
+    const vm = composeCollisionBannerViewModel(s);
+    expect(vm.visible).toBe(true);
+    expect(vm.offsetCapReached).toBe(true);
+    expect(vm.offsetButtonHidden).toBe(true);
+  });
+
+  it('collisionBannerViewModel.offsetButtonHidden = true when offsetWouldExceedTimeRange', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: { ...COLLISION_PUSH, offsetWouldExceedTimeRange: true },
+      },
+    });
+    const vm = composeCollisionBannerViewModel(s);
+    expect(vm.offsetButtonHidden).toBe(true);
+    expect(vm.offsetCapReached).toBe(false);
+  });
+
+  it('collisionBannerViewModel returns invisible defaults when slice is null', () => {
+    const vm = composeCollisionBannerViewModel(
+      createInitialStoryboardEditState(),
+    );
+    expect(vm.visible).toBe(false);
+    expect(vm.conflictingSceneId).toBeNull();
+    expect(vm.offsetButtonHidden).toBe(false);
+  });
+
+  it('collisionBannerViewModel formats DTG when a formatter is supplied', () => {
+    let s = createInitialStoryboardEditState();
+    s = storyboardEditReducer(s, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: [],
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: COLLISION_PUSH,
+      },
+    });
+    const vm = composeCollisionBannerViewModel(
+      s,
+      (iso): string => `formatted(${iso})`,
+    );
+    expect(vm.proposedTimestampDtg).toBe(
+      'formatted(2026-04-20T14:00:00.000Z)',
+    );
+  });
+});
+
+describe('regression — pre-#235 reducer machine (T011)', () => {
+  it('still applies stale flags correctly', () => {
+    const flags: readonly StaleFlagEntry[] = [
+      { sceneId: 'S1', stale: true, unresolvedFeatureIds: ['feat-1'] },
+    ];
+    const next = storyboardEditReducer(seeded(), {
+      type: 'scene-stale-flags-updated',
+      flags,
+    });
+    expect(next.staleFlags.get('S1')?.stale).toBe(true);
+    expect(next.staleFlags.size).toBe(1);
+  });
+
+  it('still toggles overflow menu open + close', () => {
+    let s = seeded();
+    s = storyboardEditReducer(s, {
+      type: 'overflow-menu-open',
+      sceneId: 'S2',
+      anchorRect: FAKE_RECT,
+    });
+    expect(s.overflowMenuOpenFor).toBe('S2');
+    s = storyboardEditReducer(s, { type: 'overflow-menu-close' });
+    expect(s.overflowMenuOpenFor).toBeNull();
+  });
+
+  it('still surfaces undo toast via scene-undo-toast-shown', () => {
+    const toast: UndoToastDescriptor = {
+      sceneId: 'S1',
+      sceneTitle: 'Scene S1',
+      deletedAt: '2026-04-20T14:00:00.000Z',
+      canUndo: true,
+    };
+    const next = storyboardEditReducer(seeded(), {
+      type: 'scene-undo-toast-shown',
+      toast,
+    });
+    expect(next.pendingUndoToast).toEqual(toast);
   });
 });

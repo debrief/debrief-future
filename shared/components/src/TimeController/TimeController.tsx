@@ -121,6 +121,7 @@ export function TimeController({
         ref={containerRef}
         className={`debrief-time-controller debrief-time-controller--empty ${className ?? ''}`}
         style={style}
+        data-testid="time-controller"
       >
         <div className="debrief-time-controller__empty-message">
           No data loaded
@@ -136,6 +137,7 @@ export function TimeController({
         ref={containerRef}
         className={`debrief-time-controller debrief-time-controller--loading ${className ?? ''}`}
         style={style}
+        data-testid="time-controller"
       >
         <div className="debrief-time-controller__loading-message">
           Loading...
@@ -153,6 +155,7 @@ export function TimeController({
       tabIndex={0}
       role="region"
       aria-label="Time Controller"
+      data-testid="time-controller"
     >
       {/* Row 1: Time Display */}
       <div className="debrief-time-controller__row debrief-time-controller__row--display">

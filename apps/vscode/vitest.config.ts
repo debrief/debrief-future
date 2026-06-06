@@ -28,8 +28,15 @@ export default defineConfig({
       '@debrief/components/ToolMatch': path.resolve(__dirname, '../../shared/components/src/ToolMatch/index.ts'),
       '@debrief/components/PropertiesPanel/provenanceTypes': path.resolve(__dirname, '../../shared/components/src/PropertiesPanel/provenanceTypes.ts'),
       '@debrief/components/PropertiesPanel/autoDerivedFields': path.resolve(__dirname, '../../shared/components/src/PropertiesPanel/autoDerivedFields.ts'),
+      // Briefing-zip export (#264) — keep tests off the Leaflet-dependent barrel.
+      '@debrief/components/storyboard': path.resolve(__dirname, '../../shared/components/src/storyboard/index.ts'),
+      // T-HOIST (spec #264) — the relocated StoryboardPlaybackService.
+      '@debrief/components/storyboardPlayback': path.resolve(__dirname, '../../shared/components/src/storyboardPlayback/index.ts'),
       '@debrief/components': path.resolve(__dirname, '../../shared/components/src/index.ts'),
       '@debrief/schemas': path.resolve(__dirname, '../../shared/schemas/src/generated/typescript/index.ts'),
+      // Briefing-export core (#273) — resolve to source so tests run without a
+      // prior package build and stay off the Leaflet barrel transitively.
+      '@debrief/briefing-export': path.resolve(__dirname, '../../shared/briefing-export/src/index.ts'),
     },
   },
 });

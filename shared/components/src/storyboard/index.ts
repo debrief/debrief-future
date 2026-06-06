@@ -19,16 +19,28 @@ export type {
   Plot as StoryboardPlot,
   SceneFeature,
   StoryboardFeature,
+  TimeRange,
+  Viewport,
   Ulid,
   StoryboardId,
   SceneId,
+  // #263 — Scene flavour discriminated union
+  InstantSceneFeature,
+  TimeRangeSceneFeature,
+  InstantSceneProperties,
+  TimeRangeSceneProperties,
 } from "./types";
 export {
   isStoryboardFeature,
   isSceneFeature,
+  // #263 — Scene flavour predicate
+  isTimeRangeScene,
   asUlid,
   asStoryboardId,
   asSceneId,
+  // Canonical feature identity accessor (ADR-038) — reads the top-level
+  // GeoJSON `id`; never `properties.id` (absent on data features).
+  getPlotFeatureId,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -36,7 +48,6 @@ export {
 // ---------------------------------------------------------------------------
 export {
   StoryboardError,
-  DuplicateTimestampError,
   OrphanSceneError,
   UnknownStoryboardError,
   UnknownSceneError,
@@ -45,6 +56,14 @@ export {
   ThumbnailDeepCopyFailedError,
   SchemaMigrationFailedError,
   InvariantViolationError,
+  // #259 — replaces DuplicateTimestampError
+  DuplicateCreationOrderError,
+  CreationOrderOutOfRangeError,
+  MissingCreationOrderError,
+  UnsupportedSchemaVersionError,
+  // #263 — Scene flavour XOR + range validity
+  SceneFlavourXorViolationError,
+  SceneTimeRangeEndNotAfterStartError,
 } from "./errors";
 export type { StoryboardErrorCode } from "./errors";
 
@@ -63,7 +82,11 @@ export {
   // #218 additive extensions (review 2A + analyze patch I1)
   describeStoryboard,
   restoreScene,
-  checkSceneTimestamp,
+  // #258 — bounds-derived polygon helper exposed for the host capture
+  // commands that have a Leaflet map handle.
+  bboxToPolygon,
+  // #259 — reorder within a tied-timestamp group
+  reorderSceneInTiedGroup,
 } from "./crud";
 export type {
   CreateStoryboardInput,
@@ -78,6 +101,10 @@ export type {
   // #218 additive extensions
   DescribeStoryboardInput,
   RestoreSceneInput,
+  // #258 additive extensions
+  SceneBounds,
+  // #259 — reorder within a tied-timestamp group
+  ReorderSceneInTiedGroupInput,
 } from "./crud";
 
 // ---------------------------------------------------------------------------
@@ -103,13 +130,30 @@ export type {
 } from "./missing-data";
 
 // ---------------------------------------------------------------------------
+// Time-range Scene overlap detector (#271 — sync, pure)
+// ---------------------------------------------------------------------------
+export { detectSceneOverlaps, overlapPairKey } from "./overlap";
+export type { OverlapPartner } from "./overlap";
+
+// ---------------------------------------------------------------------------
 // Invariant helpers
 // ---------------------------------------------------------------------------
 export {
   canonicaliseVisibleFeatureIds,
   computeFeatureSetHash,
 } from "./hash";
-export { validatePlot } from "./validate";
+export { validatePlot, flavourCheck } from "./validate";
+
+// ---------------------------------------------------------------------------
+// Active-storyboard selection persistence (#237)
+// ---------------------------------------------------------------------------
+export {
+  isActiveStoryboardSelection,
+  getActiveStoryboardSelection,
+  setActiveStoryboardSelection,
+  ACTIVE_STORYBOARD_FEATURE_ID,
+  ACTIVE_STORYBOARD_STATE_TYPE,
+} from "./activeStoryboardSelection";
 
 // ---------------------------------------------------------------------------
 // Migration hook

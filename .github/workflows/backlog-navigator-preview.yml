@@ -1,0 +1,88 @@
+name: Preview Backlog Navigator (branch)
+
+# Deploys a branch build of the Backlog Navigator to
+#   https://debrief.github.io/debrief-future/backlog-navigator-preview/<slug>/
+# Preview builds default to dry-run mode (VITE_BACKLOG_NAV_DRY_RUN=true) so
+# reviewers can exercise the UI without hitting the GitHub write path.
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to preview (default: the branch this workflow was dispatched from)'
+        required: false
+        type: string
+  push:
+    branches:
+      - 'preview/**'
+    paths:
+      - 'apps/backlog-navigator/**'
+      - 'BACKLOG.md'
+      - '.github/workflows/backlog-navigator-preview.yml'
+
+jobs:
+  build-and-publish-preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Resolve branch + slug
+        id: branch
+        run: |
+          BRANCH="${{ inputs.branch || github.ref_name }}"
+          SLUG=$(printf '%s' "$BRANCH" | tr -c 'A-Za-z0-9-' '-' | sed -E 's/-+/-/g;s/^-|-$//g')
+          if [ -z "$SLUG" ]; then
+            echo "::error::Could not derive slug from branch '$BRANCH'"
+            exit 1
+          fi
+          if [ "$SLUG" = "main" ]; then
+            echo "::error::Refusing to publish 'main' as a preview — use the production workflow."
+            exit 1
+          fi
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "base_url=/debrief-future/backlog-navigator-preview/$SLUG/" >> "$GITHUB_OUTPUT"
+          echo "Resolved: branch=$BRANCH slug=$SLUG"
+
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.branch.outputs.branch }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build backlog-navigator (preview base URL, dry-run mode)
+        env:
+          VITE_BASE_URL: ${{ steps.branch.outputs.base_url }}
+          VITE_BACKLOG_NAV_DRY_RUN: 'true'
+        run: pnpm --filter @debrief/backlog-navigator build
+
+      - name: Deploy preview to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/backlog-navigator/dist
+          destination_dir: backlog-navigator-preview/${{ steps.branch.outputs.slug }}
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'chore(preview): deploy backlog-navigator from ${{ steps.branch.outputs.branch }}'
+
+      - name: Summarise
+        run: |
+          echo "### Preview deployed :rocket:" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Branch: \`${{ steps.branch.outputs.branch }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Slug: \`${{ steps.branch.outputs.slug }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL: https://debrief.github.io/debrief-future/backlog-navigator-preview/${{ steps.branch.outputs.slug }}/" >> "$GITHUB_STEP_SUMMARY"

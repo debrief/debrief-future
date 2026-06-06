@@ -123,6 +123,28 @@ body {
   overflow: hidden;
 }
 
+/* #235 — when the storyboard rail is mounted, switch the analysis main to
+ * a 2-column CSS Grid layout. Grid respects child height: 100% via
+ * `grid-template-rows: 1fr`, which avoids the flex sizing collapse that
+ * broke GoldenLayout's Map panel. Each grid cell becomes the explicit
+ * sizing context for its child. */
+.web-shell--analysis.web-shell--with-storyboard-rail .web-shell__main {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  grid-template-rows: 1fr;
+}
+
+.web-shell__storyboard-rail {
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--vscode-panel-border, #3c3c3c);
+  background: var(--vscode-sideBar-background, #1e1e1e);
+  color: var(--vscode-foreground, #cccccc);
+  overflow: hidden;
+}
+
 /* Welcome view - full width catalog */
 .web-shell--welcome .web-shell__main {
   display: flex;

@@ -5,8 +5,8 @@
  *   - Dropdown renders populated from `storyboards[]`
  *   - `activeStoryboardId` marks the matching option as selected
  *   - Overflow menu button opens on click
- *   - Menu items Create / Rename / Delete render
- *   - Rename + Delete items are hidden when `activeStoryboardId` is null
+ *   - Menu items Create / Rename render (Delete moved to the panel header)
+ *   - Rename item is hidden when `activeStoryboardId` is null
  *   - Accessibility attributes (aria-expanded, role="menu") present
  *   - Empty `storyboards` → component renders nothing (design-fix 3)
  *   - Dropdown change fires `onActiveStoryboardChange(storyboardId)`
@@ -101,7 +101,7 @@ describe('StoryboardHeader', () => {
     expect(button.getAttribute('aria-haspopup')).toBe('menu');
   });
 
-  it('overflow menu opens on click and renders Create/Rename/Delete items', () => {
+  it('overflow menu opens on click and renders Create/Rename items', () => {
     render(
       <StoryboardHeader
         storyboards={THREE}
@@ -109,7 +109,6 @@ describe('StoryboardHeader', () => {
         onActiveStoryboardChange={() => undefined}
         onCreateStoryboard={() => undefined}
         onRenameStoryboard={() => undefined}
-        onDeleteStoryboard={() => undefined}
       />,
     );
     const button = screen.getByTestId('storyboard-header-overflow');
@@ -120,10 +119,11 @@ describe('StoryboardHeader', () => {
     expect(menu.getAttribute('role')).toBe('menu');
     expect(screen.getByTestId('storyboard-header-menu-create')).toBeTruthy();
     expect(screen.getByTestId('storyboard-header-menu-rename')).toBeTruthy();
-    expect(screen.getByTestId('storyboard-header-menu-delete')).toBeTruthy();
+    // Delete is no longer in this menu — the panel header owns it.
+    expect(screen.queryByTestId('storyboard-header-menu-delete')).toBeNull();
   });
 
-  it('Rename + Delete items are hidden when activeStoryboardId is null', () => {
+  it('Rename item is hidden when activeStoryboardId is null', () => {
     render(
       <StoryboardHeader
         storyboards={THREE}
@@ -131,13 +131,11 @@ describe('StoryboardHeader', () => {
         onActiveStoryboardChange={() => undefined}
         onCreateStoryboard={() => undefined}
         onRenameStoryboard={() => undefined}
-        onDeleteStoryboard={() => undefined}
       />,
     );
     fireEvent.click(screen.getByTestId('storyboard-header-overflow'));
     expect(screen.getByTestId('storyboard-header-menu-create')).toBeTruthy();
     expect(screen.queryByTestId('storyboard-header-menu-rename')).toBeNull();
-    expect(screen.queryByTestId('storyboard-header-menu-delete')).toBeNull();
   });
 
   it('menu item is hidden when its corresponding callback is undefined', () => {
@@ -147,13 +145,12 @@ describe('StoryboardHeader', () => {
         activeStoryboardId="sb-a"
         onActiveStoryboardChange={() => undefined}
         onCreateStoryboard={() => undefined}
-        // No onRenameStoryboard / onDeleteStoryboard provided
+        // No onRenameStoryboard provided
       />,
     );
     fireEvent.click(screen.getByTestId('storyboard-header-overflow'));
     expect(screen.getByTestId('storyboard-header-menu-create')).toBeTruthy();
     expect(screen.queryByTestId('storyboard-header-menu-rename')).toBeNull();
-    expect(screen.queryByTestId('storyboard-header-menu-delete')).toBeNull();
   });
 
   it('clicking Create item fires onCreateStoryboard and closes the menu', () => {
@@ -189,29 +186,13 @@ describe('StoryboardHeader', () => {
     expect(screen.queryByTestId('storyboard-header-menu')).toBeNull();
   });
 
-  it('clicking Delete item fires onDeleteStoryboard and closes the menu', () => {
-    const onDeleteStoryboard = vi.fn();
-    render(
-      <StoryboardHeader
-        storyboards={THREE}
-        activeStoryboardId="sb-a"
-        onActiveStoryboardChange={() => undefined}
-        onDeleteStoryboard={onDeleteStoryboard}
-      />,
-    );
-    fireEvent.click(screen.getByTestId('storyboard-header-overflow'));
-    fireEvent.click(screen.getByTestId('storyboard-header-menu-delete'));
-    expect(onDeleteStoryboard).toHaveBeenCalledTimes(1);
-    expect(screen.queryByTestId('storyboard-header-menu')).toBeNull();
-  });
-
   it('renders no overflow button when no management callbacks are provided', () => {
     render(
       <StoryboardHeader
         storyboards={THREE}
         activeStoryboardId="sb-a"
         onActiveStoryboardChange={() => undefined}
-        // No create / rename / delete — overflow button should not render
+        // No create / rename — overflow button should not render
       />,
     );
     expect(screen.queryByTestId('storyboard-header-overflow')).toBeNull();

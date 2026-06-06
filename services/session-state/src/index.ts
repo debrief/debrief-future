@@ -57,6 +57,9 @@ export {
   type SessionStoreWithUndo,
 } from './store/index.js';
 
+// Plot slice — read-only signal (Feature: 192)
+export { selectIsReadOnly, selectReadOnlyReason } from './store/slices/plot.js';
+
 // Subscriptions
 export {
   subscribeToSlice,
@@ -83,23 +86,61 @@ export {
   hasUnsavedChangesSelector,
 } from './store/middleware/selector.js';
 
-// Persistence
+// Persistence: the `.debrief-session` sidecar I/O (saveSession / loadSession /
+// extractPersistentState / serializeState / parseSessionJson + the SessionFile
+// version machinery) was REMOVED in feature 261. All plot state now lives in
+// features.geojson as SystemState features + per-feature `visible` flags,
+// read/written through the SystemState helper below.
+
+// SystemState helper (Feature 261) — FeatureCollection-based plot-state
+// read/write for all four variants + per-feature visibility. The shared,
+// pure transformation layer that replaces the sidecar persistence path.
 export {
-  saveSession,
-  serializeState,
-  extractPersistentState,
-  loadSession,
-  parseSessionJson,
-  isVersionCompatible,
-  isFutureVersion,
-  SCHEMA_VERSIONS,
-  type SaveResult,
-  type LoadResult,
-} from './persistence/index.js';
+  readSystemStateFromFeatureCollection,
+  writeSystemStateIntoFeatureCollection,
+  readHiddenFeatureIds,
+  applyVisibilityToFeatureCollection,
+  applyVisibilityWithProvenance,
+  temporalSliceToInput,
+  temporalVariantToSlice,
+  spatialSliceToInput,
+  spatialVariantToSlice,
+  selectionSliceToInput,
+  selectionVariantToSlice,
+  activeStoryboardIdToInput,
+  activeStoryboardVariantToId,
+  checkTemporalCrossField,
+  buildWriteInputFromStore,
+  applyStateToFeatures,
+  mirrorViewStateIntoFeatures,
+  hydrateStoreFromFeatures,
+  SystemStateLoadError,
+  STATE_FEATURE_ID,
+  type FeatureLike,
+  type ViewStateStore,
+  type SystemStateLoadErrorKind,
+  type PlotFeature as SystemStatePlotFeature,
+  type PlotFeatureCollection as SystemStatePlotFeatureCollection,
+  type SystemStateType,
+  type TemporalVariant,
+  type SpatialVariant,
+  type SelectionVariant,
+  type ActiveStoryboardVariant,
+  type SystemStateMap,
+  type SystemStateWriteInput,
+  type PlayheadClampDiagnostic,
+  type ReadSystemStateResult,
+  type TemporalCrossFieldResult,
+  type VisibilityProvenanceOptions,
+} from './system-state/index.js';
 
 // Log Service (Feature: 071)
 export {
   buildLogEntry,
+  // Feature 261 (FR-013) — per-feature visibility-change provenance builder.
+  buildVisibilityChangeLogEntry,
+  VISIBILITY_CHANGE_TOOL_SENTINEL,
+  type RecordVisibilityChangeInput,
   msToIsoDuration,
   generateActivityId,
   extractActivityIdFromOutputFeatures,

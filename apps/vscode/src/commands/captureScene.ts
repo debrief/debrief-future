@@ -10,17 +10,18 @@
  */
 
 import * as vscode from 'vscode';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 import { ulid } from 'ulid';
 import {
   createStoryboard,
   createScene,
-  deleteScene,
   getActiveStoryboardDefault,
-  formatDtg,
-  DuplicateTimestampError,
+  getPlotFeatureId,
   DuplicateStoryboardNameError,
   type StoryboardPlot,
   type SceneFeature,
+  type SceneBounds,
   type CreateSceneInput,
 } from '@debrief/components';
 type StoryboardPlotFeature = StoryboardPlot['features'][number];
@@ -35,6 +36,32 @@ import {
   writeSceneThumbnail,
   type WriteSceneThumbnailResult,
 } from '../services/sceneThumbnailService';
+import type {
+  CollisionBannerResolution,
+  NamingRowResolution,
+} from '../views/storyboardPanelView';
+
+/**
+ * Panel-prompt surface the capture command needs (#235). The real
+ * implementation is the storyboard panel view; tests can stub it with
+ * resolved Promises.
+ */
+export interface CapturePanelSurface {
+  promptStoryboardName(args: {
+    readonly defaultName: string;
+    readonly knownNames: readonly string[];
+  }): Promise<NamingRowResolution>;
+  promptCollisionResolution(state: {
+    readonly visible: boolean;
+    readonly conflictingSceneId: string;
+    readonly conflictingSceneTitle: string;
+    readonly originalTimestamp: string;
+    readonly proposedTimestamp: string;
+    readonly offsetCount: number;
+    readonly offsetWouldExceedTimeRange: boolean;
+    readonly cause: 'capture' | 'update-to-current';
+  }): Promise<CollisionBannerResolution>;
+}
 
 /** Dependencies the capture handler pulls from the activation composition root. */
 export interface CaptureCommandContext {
@@ -46,16 +73,21 @@ export interface CaptureCommandContext {
     | { readonly source: 'keybinding' }
     | { readonly source: 'panelButton' }
     | { readonly source: 'programmatic' };
+  /** #235 — panel-driven naming + collision prompts. */
+  readonly panelView: CapturePanelSurface;
 }
 
 /**
  * Override points for unit tests — real implementations default to VS Code
  * APIs + the on-disk thumbnail service.
+ *
+ * #235: the first-capture name and the duplicate-timestamp resolution are
+ * gathered through the inline panel rows (see `panelView` on the context),
+ * NOT through host-level prompts that would occlude the map. SC-009's
+ * grep-test asserts the legacy quick-pick / modal call sites are gone.
  */
 export interface CaptureCommandDeps {
-  readonly showInputBox?: typeof vscode.window.showInputBox;
   readonly showErrorMessage?: typeof vscode.window.showErrorMessage;
-  readonly showInformationMessage?: typeof vscode.window.showInformationMessage;
   readonly setStatusBarMessage?: typeof vscode.window.setStatusBarMessage;
   readonly executeCommand?: typeof vscode.commands.executeCommand;
   readonly writeSceneThumbnail?: (
@@ -64,6 +96,10 @@ export interface CaptureCommandDeps {
     largePngBase64: string,
     smallPngBase64: string,
   ) => Promise<WriteSceneThumbnailResult>;
+  readonly writeFeatureCollection?: (
+    stacItemPath: string,
+    features: DebriefFeature[],
+  ) => Promise<void>;
   readonly generateUlid?: () => string;
   readonly now?: () => string;
   readonly logError?: (line: string) => void;
@@ -88,28 +124,83 @@ export type CaptureResult =
     };
 
 interface ResolvedDeps {
-  showInputBox: NonNullable<CaptureCommandDeps['showInputBox']>;
   showErrorMessage: NonNullable<CaptureCommandDeps['showErrorMessage']>;
-  showInformationMessage: NonNullable<CaptureCommandDeps['showInformationMessage']>;
   setStatusBarMessage: NonNullable<CaptureCommandDeps['setStatusBarMessage']>;
   executeCommand: NonNullable<CaptureCommandDeps['executeCommand']>;
   writeSceneThumbnail: NonNullable<CaptureCommandDeps['writeSceneThumbnail']>;
+  writeFeatureCollection: NonNullable<CaptureCommandDeps['writeFeatureCollection']>;
   generateUlid: () => string;
   now: () => string;
   logError: (line: string) => void;
 }
 
+async function defaultWriteFeatureCollection(
+  stacItemPath: string,
+  features: DebriefFeature[],
+): Promise<void> {
+  const fc = { type: 'FeatureCollection' as const, features };
+  await fs.writeFile(
+    path.join(stacItemPath, 'features.geojson'),
+    `${JSON.stringify(fc, null, 2)}\n`,
+  );
+}
+
+/**
+ * Spec #258 / FR-004 — derive a {@link SceneBounds} from the session-state
+ * `ViewportPolygon` (four corners in `[NW, NE, SE, SW]` order). Returns
+ * `undefined` if the viewport is missing or has no corners (the caller then
+ * falls back to the legacy placeholder path and records
+ * `_polygon_source: 'placeholder'`).
+ */
+function sceneBoundsFromViewport(
+  viewport: SessionStoreWithUndo['viewport'],
+): SceneBounds | undefined {
+  if (viewport === null) {
+    return undefined;
+  }
+  const corners = viewport.coordinates;
+  if (corners === null || corners === undefined || corners.length === 0) {
+    return undefined;
+  }
+  let west = Number.POSITIVE_INFINITY;
+  let east = Number.NEGATIVE_INFINITY;
+  let south = Number.POSITIVE_INFINITY;
+  let north = Number.NEGATIVE_INFINITY;
+  for (const c of corners) {
+    if (c.longitude < west) {
+      west = c.longitude;
+    }
+    if (c.longitude > east) {
+      east = c.longitude;
+    }
+    if (c.latitude < south) {
+      south = c.latitude;
+    }
+    if (c.latitude > north) {
+      north = c.latitude;
+    }
+  }
+  if (
+    !Number.isFinite(west) ||
+    !Number.isFinite(east) ||
+    !Number.isFinite(south) ||
+    !Number.isFinite(north)
+  ) {
+    return undefined;
+  }
+  return { west, south, east, north };
+}
+
 function resolveDeps(input: CaptureCommandDeps | undefined): ResolvedDeps {
   const i = input ?? {};
   return {
-    showInputBox: i.showInputBox ?? vscode.window.showInputBox,
     showErrorMessage: i.showErrorMessage ?? vscode.window.showErrorMessage,
-    showInformationMessage:
-      i.showInformationMessage ?? vscode.window.showInformationMessage,
     setStatusBarMessage:
       i.setStatusBarMessage ?? vscode.window.setStatusBarMessage,
     executeCommand: i.executeCommand ?? vscode.commands.executeCommand,
     writeSceneThumbnail: i.writeSceneThumbnail ?? writeSceneThumbnail,
+    writeFeatureCollection:
+      i.writeFeatureCollection ?? defaultWriteFeatureCollection,
     generateUlid: i.generateUlid ?? ((): string => ulid()),
     now: i.now ?? ((): string => new Date().toISOString()),
     logError: i.logError ?? ((line: string): void => console.error(line)),
@@ -161,9 +252,38 @@ async function captureSceneInner(
 ): Promise<CaptureResult> {
   const { mapPanel, sessionStore, stacItemPath, actor } = context;
 
+  // PR #625 — drain any in-flight viewport-debounce so the read of
+  // `state.viewport` below sees the analyst's latest pan/zoom. Without
+  // this, a fresh pan that hasn't yet cleared the 100 ms
+  // `handleViewportChanged` debounce is invisible to capture, and the
+  // first scene gets stamped with the initial-fit viewport instead of
+  // what the analyst composed.
+  mapPanel.flushPendingViewportUpdate();
+
+  // PR #627 — query the LIVE Leaflet viewport synchronously-ish so the
+  // captured scene matches what the analyst is currently looking at, even
+  // if the moveend → postMessage → debounce → state.viewport chain hasn't
+  // propagated for this round (the very first capture is the case in point:
+  // the analyst zooms to compose, then clicks Capture before any pan
+  // gives `state.viewport` a chance to absorb the zoom). The webview
+  // returns `map.getCenter()` + `map.getZoom()` + the 4 bounds corners
+  // direct from Leaflet. On timeout/Leaflet-not-ready (`liveViewport ===
+  // null`) we fall back to `state.viewport` so the rejection path below
+  // still catches a truly empty session.
+  const liveViewport = await mapPanel.requestCurrentViewport(1000);
+
   // Step 3 — read snapshot
   const state: SessionStoreWithUndo = sessionStore.getState();
-  const viewport = state.viewport;
+  const stateViewport = state.viewport;
+  const viewport: typeof stateViewport = liveViewport !== null
+    ? {
+        coordinates: liveViewport.bounds.map(([lng, lat]) => ({
+          longitude: lng,
+          latitude: lat,
+        })),
+        zoom: liveViewport.zoom,
+      }
+    : stateViewport;
   const currentTime = state.currentTime;
   const timeRange = state.timeRange;
   const hiddenIds = new Set(state.hiddenFeatureIds);
@@ -197,27 +317,38 @@ async function captureSceneInner(
   const zoom = viewport.zoom;
   const visibleIds: string[] = [];
   for (const f of features) {
-    const props = f.properties as { id?: string | number | null } | null;
-    const rawId = props?.id;
-    if (typeof rawId !== 'string' || rawId.length === 0) {continue;}
+    // ADR-038: canonical identity is the top-level GeoJSON `id`.
+    // `properties.id` is absent on data features (Tracks), so reading it
+    // here silently dropped every Track from `visible_feature_ids`.
+    const rawId = getPlotFeatureId(f);
+    if (rawId === undefined) {continue;}
     if (hiddenIds.has(rawId)) {continue;}
     visibleIds.push(rawId);
   }
 
-  // Step 6 — resolve active Storyboard (first-capture prompt if none)
+  // Step 6 — resolve active Storyboard (first-capture prompt if none).
+  // #235: the first-capture name comes from the inline panel naming row,
+  // not a host-level quick-pick that would occlude the map
+  // (FR-VIS-022/023, SC-009). The panel surface posts back the analyst's
+  // confirmed name (or null on cancel) — both paths leave the map and
+  // time controller continuously visible.
   let activeStoryboardId: string;
   let currentPlot = packagePlot(features);
   const existing = getActiveStoryboardDefault(currentPlot);
   if (existing !== null) {
     activeStoryboardId = existing.properties.id;
   } else {
-    const name = await promptForStoryboardName(currentPlot, deps);
-    if (name === undefined) {
+    const knownNames = collectStoryboardNames(currentPlot);
+    const reply = await context.panelView.promptStoryboardName({
+      defaultName: defaultStoryboardName(),
+      knownNames,
+    });
+    if (reply === null || reply.name.trim() === '') {
       return { status: 'cancelled', reason: 'name-prompt' };
     }
     try {
       const result = await createStoryboard(currentPlot, {
-        name,
+        name: reply.name.trim(),
         actor,
         now: deps.now(),
       });
@@ -272,9 +403,15 @@ async function captureSceneInner(
   const assetKey = `scene-thumbnail-${sceneId}`;
 
   // Step 9 — call #215 createScene on the latest features, then push back.
+  // Spec #258: pass the captured display_mode + real viewport bounds so the
+  // scene's stored polygon matches what the author saw (FR-001, FR-004).
+  const bounds = sceneBoundsFromViewport(viewport);
   const sceneInput: CreateSceneInput = {
     storyboardId: activeStoryboardId,
     viewport: { center, zoom, bearing: 0 },
+    bounds,
+    polygonSource: bounds !== undefined ? 'bounds' : 'placeholder',
+    displayMode: state.displayMode,
     timestamp: timestampIso,
     visibleFeatureIds: visibleIds,
     thumbnailAssetRef: assetKey,
@@ -289,14 +426,25 @@ async function captureSceneInner(
       // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
       result.plot.features as unknown as DebriefFeature[],
     );
+    await persistFeatureCollection(context, deps, mapPanel.getCurrentFeatures());
     const withUndo = sessionStore.getState();
     withUndo.markDirty();
-    void deps.executeCommand('debrief.storyboardPanel.focus');
+    // PR #624 — restore the captured viewport on the live map. Adding a new
+    // STORYBOARD_SCENE polygon to the feature list expands the overall
+    // bounding box, which (depending on host config) can re-trigger
+    // fit-to-features behaviour and snap the analyst away from the
+    // composition they just captured. Jumping back to (center, zoom) with
+    // animate:false is idempotent when nothing reset the view and corrective
+    // when something did, so we issue it unconditionally on the success
+    // path.
+    mapPanel.flyToViewport({ center, zoom, bearing: 0 }, 0);
+    // Storyboard now lives inside the Activity panel — reveal that view so
+    // the captured scene is visible (UX-review flatten).
+    void deps.executeCommand('debrief.activityPanel.focus');
     return { status: 'captured', scene: result.scene };
   } catch (err) {
-    if (err instanceof DuplicateTimestampError) {
-      return handleDuplicateTimestamp(context, deps, sceneInput, 0);
-    }
+    // #259 — createScene no longer throws DuplicateTimestampError; any
+    // failure here is an unexpected error.
     deps.logError(
       `[captureScene] createScene failed: ${stringifyError(err)}`,
     );
@@ -307,154 +455,63 @@ async function captureSceneInner(
   }
 }
 
-async function handleDuplicateTimestamp(
+/**
+ * Eagerly persist the post-create FeatureCollection to features.geojson so
+ * the captured Storyboard / Scene survives a reload without requiring the
+ * user to run "Save Session" first. Mirrors the eager scene-PNG write that
+ * already happened in step 8.
+ *
+ * Best-effort: write failures are logged + surfaced as a non-modal warning,
+ * but do not roll back the in-memory capture (the user can retry via Save
+ * Session, and the scene PNG is already on disk).
+ */
+async function persistFeatureCollection(
   context: CaptureCommandContext,
   deps: ResolvedDeps,
-  inputs: CreateSceneInput,
-  retries: number,
-): Promise<CaptureResult> {
-  const { mapPanel, sessionStore } = context;
-  if (retries >= 5) {
-    void deps.showErrorMessage(
-      'Too many consecutive offset retries — pick a different moment in time.',
-    );
-    return { status: 'rejected', reason: 'duplicate-offset-limit-exceeded' };
-  }
-  const conflict = findExistingConflict(mapPanel, inputs);
-  const choice = await deps.showInformationMessage(
-    `A scene already exists at ${formatDtg(inputs.timestamp)}.`,
-    { modal: true },
-    'Replace',
-    'Offset (+1 s)',
-  );
-  if (choice === undefined) {
-    return { status: 'cancelled', reason: 'duplicate-prompt' };
-  }
-  if (choice === 'Replace') {
-    return performReplace(context, deps, inputs, conflict);
-  }
-  if (choice === 'Offset (+1 s)') {
-    const offsetIso = new Date(
-      new Date(inputs.timestamp).getTime() + 1000,
-    ).toISOString();
-    return retryCreateScene(context, deps, { ...inputs, timestamp: offsetIso }, retries + 1);
-  }
-  void sessionStore; // reserved for future telemetry
-  return { status: 'cancelled', reason: 'duplicate-prompt' };
-}
-
-function findExistingConflict(
-  mapPanel: MapPanel,
-  inputs: CreateSceneInput,
-): string | null {
-  const plot = packagePlot(mapPanel.getCurrentFeatures());
-  for (const f of plot.features) {
-    const props = f.properties as {
-      kind?: string;
-      storyboard_id?: string;
-      timestamp?: string;
-      id?: string;
-    } | null;
-    if (
-      props !== null &&
-      props.kind === 'STORYBOARD_SCENE' &&
-      props.storyboard_id === inputs.storyboardId &&
-      props.timestamp === inputs.timestamp
-    ) {
-      return typeof props.id === 'string' ? props.id : null;
-    }
-  }
-  return null;
-}
-
-async function performReplace(
-  context: CaptureCommandContext,
-  deps: ResolvedDeps,
-  inputs: CreateSceneInput,
-  conflictSceneId: string | null,
-): Promise<CaptureResult> {
-  if (conflictSceneId === null) {
-    deps.logError('[captureScene] Replace requested but conflict scene not located; retrying createScene');
-    return retryCreateScene(context, deps, inputs, 0);
-  }
+  features: DebriefFeature[],
+): Promise<void> {
   try {
-    const fcLatest = packagePlot(context.mapPanel.getCurrentFeatures());
-    const afterDelete = await deleteScene(fcLatest, {
-      sceneId: conflictSceneId,
-      actor: context.actor,
-      now: deps.now(),
-    });
-    context.mapPanel.setFeatures(
-      // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
-      afterDelete.plot.features as unknown as DebriefFeature[],
-    );
+    await deps.writeFeatureCollection(context.stacItemPath, features);
   } catch (err) {
     deps.logError(
-      `[captureScene] deleteScene (replace branch) failed: ${stringifyError(err)}`,
+      `[captureScene] features.geojson write failed: ${stringifyError(err)}`,
     );
-    void deps.showErrorMessage(
-      'Capture failed — could not replace the conflicting scene.',
+    void vscode.window.showWarningMessage(
+      'Scene captured, but features.geojson could not be written. Run Save Session to retry.',
     );
-    return { status: 'rejected', reason: 'unexpected', error: err };
-  }
-  return retryCreateScene(context, deps, inputs, 0);
-}
-
-async function retryCreateScene(
-  context: CaptureCommandContext,
-  deps: ResolvedDeps,
-  inputs: CreateSceneInput,
-  retries: number,
-): Promise<CaptureResult> {
-  try {
-    const fcLatest = packagePlot(context.mapPanel.getCurrentFeatures());
-    const result = await createScene(fcLatest, inputs);
-    context.mapPanel.setFeatures(
-      // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
-      result.plot.features as unknown as DebriefFeature[],
-    );
-    const withUndo = context.sessionStore.getState();
-    withUndo.markDirty();
-    void deps.executeCommand('debrief.storyboardPanel.focus');
-    return { status: 'captured', scene: result.scene };
-  } catch (err) {
-    if (err instanceof DuplicateTimestampError) {
-      return handleDuplicateTimestamp(context, deps, inputs, retries);
-    }
-    deps.logError(
-      `[captureScene] createScene (retry) failed: ${stringifyError(err)}`,
-    );
-    void deps.showErrorMessage(
-      'Capture failed — unexpected error. See Debrief output channel for details.',
-    );
-    return { status: 'rejected', reason: 'unexpected', error: err };
   }
 }
 
-async function promptForStoryboardName(
-  plot: StoryboardPlot,
-  deps: ResolvedDeps,
-): Promise<string | undefined> {
-  const existingNames = new Set<string>();
+// #259 — handleDuplicateTimestamp / performReplace / retryCreateScene /
+// findExistingConflict / findExistingTitle / wouldOffsetExceedTimeRange
+// were the duplicate-timestamp banner flow. They are obsolete now that
+// createScene unconditionally appends to a tied-timestamp group.
+
+/**
+ * Collect existing Storyboard names on the plot for inline collision
+ * detection in the panel's first-capture naming row (#235).
+ */
+function collectStoryboardNames(plot: StoryboardPlot): readonly string[] {
+  const names: string[] = [];
   for (const f of plot.features) {
     const props = f.properties as { kind?: string; name?: string } | null;
-    if (props !== null && props.kind === 'STORYBOARD' && typeof props.name === 'string') {
-      existingNames.add(props.name);
+    if (
+      props !== null &&
+      props.kind === 'STORYBOARD' &&
+      typeof props.name === 'string'
+    ) {
+      names.push(props.name);
     }
   }
-  return deps.showInputBox({
-    prompt: 'Name for the new Storyboard',
-    placeHolder: 'e.g. Exercise Alpha',
-    ignoreFocusOut: true,
-    validateInput: (value) => {
-      const trimmed = value.trim();
-      if (trimmed === '') {return 'Name cannot be empty';}
-      if (existingNames.has(trimmed)) {
-        return `A Storyboard named "${trimmed}" already exists on this plot`;
-      }
-      return null;
-    },
-  });
+  return names;
+}
+
+/**
+ * Default Storyboard name for the inline naming row. Kept simple — the
+ * analyst will almost always type something more meaningful.
+ */
+function defaultStoryboardName(): string {
+  return 'Storyboard';
 }
 
 function stringifyError(err: unknown): string {

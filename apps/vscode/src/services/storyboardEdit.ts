@@ -12,7 +12,6 @@
 
 import * as vscode from 'vscode';
 import {
-  checkSceneTimestamp,
   computeFeatureSetHash,
   copySceneToOtherStoryboard as crudCopyScene,
   deleteScene as crudDeleteScene,
@@ -22,12 +21,12 @@ import {
   getStoryboard,
   isSceneFeature,
   isStoryboardFeature,
+  getPlotFeatureId,
   readSceneWithStaleness,
   renameStoryboard as crudRenameStoryboard,
   restoreScene as crudRestoreScene,
   updateScene as crudUpdateScene,
   DuplicateStoryboardNameError,
-  DuplicateTimestampError,
   ThumbnailDeepCopyFailedError,
   UnknownSceneError,
   UnknownStoryboardError,
@@ -180,22 +179,16 @@ export type UndoDeleteOutcome =
   | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null }
   | { readonly kind: 'unrecoverable-scene'; readonly reason: 'storyboard-gone' | 'buffer-evicted' };
 
+// #259 — duplicate-timestamp-collision results removed. updateScene /
+// duplicateScene / copySceneToOtherStoryboard now accept tied timestamps
+// unconditionally, so these branches are no longer reachable.
+
 export type UpdateToCurrentResult =
   | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null }
-  | { readonly kind: 'thumbnail-failed'; readonly error: Error }
-  | {
-      readonly kind: 'duplicate-timestamp-collision';
-      readonly existingSceneId: string;
-      readonly suggestedOffsetTimestamp: string;
-    };
+  | { readonly kind: 'thumbnail-failed'; readonly error: Error };
 
 export type DuplicateSceneResult =
-  | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null }
-  | {
-      readonly kind: 'duplicate-timestamp-collision';
-      readonly existingSceneId: string;
-      readonly suggestedOffsetTimestamp: string;
-    };
+  | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null };
 
 export type CopySceneResult =
   | {
@@ -203,11 +196,6 @@ export type CopySceneResult =
       readonly scene: SceneFeature;
       readonly logEntryActivityId: string | null;
       readonly pairActivityId: string;
-    }
-  | {
-      readonly kind: 'duplicate-timestamp-collision';
-      readonly existingSceneId: string;
-      readonly suggestedOffsetTimestamp: string;
     }
   | { readonly kind: 'deep-copy-failed'; readonly error: Error };
 
@@ -720,26 +708,9 @@ export class StoryboardEditService implements vscode.Disposable {
       throw new UnknownSceneError(input.sceneId);
     }
 
-    // Pre-flight collision check BEFORE invoking the thumbnail pipeline
-    // (review 1A — eliminates the orphan-thumbnail-on-collision failure
-    // mode from research.md R5).
-    if (input.currentView.timestamp !== existing.properties.timestamp) {
-      const conflict = checkSceneTimestamp(
-        plot,
-        existing.properties.storyboard_id,
-        input.currentView.timestamp,
-        input.sceneId,
-      );
-      if (conflict !== null) {
-        return {
-          kind: 'duplicate-timestamp-collision',
-          existingSceneId: conflict.properties.id,
-          suggestedOffsetTimestamp: offsetTimestampBy1s(
-            input.currentView.timestamp,
-          ),
-        };
-      }
-    }
+    // #259 — duplicate-timestamp pre-flight removed. Multiple Scenes can
+    // share a timestamp; updateScene unconditionally preserves the existing
+    // creation_order so no collision is possible here.
 
     // Capture thumbnail (may be mocked in tests — if no port, reuse
     // the existing ref; tests that rely on capture failure inject a
@@ -803,42 +774,35 @@ export class StoryboardEditService implements vscode.Disposable {
       throw new UnknownSceneError(input.sceneId);
     }
     const now = new Date().toISOString();
-    try {
-      const { plot: nextPlot, scene } = await crudDuplicateScene(plot, {
-        sceneId: input.sceneId,
-        newTimestamp: input.newTimestamp,
-        actor: input.actor,
-        now,
-      });
-      this.writePlot(input.documentUri, nextPlot);
-      // T071 — insert a stale flag for the duplicated Scene.
-      await this.recomputeStaleFlagFor(
-        input.documentUri,
-        nextPlot,
-        scene.properties.id,
-      );
-      const logEntryActivityId = await this.emitLogEntry(
-        input.documentUri,
-        'duplicate',
-        scene.properties.storyboard_id,
-        scene.properties.id,
-        scene.properties.thumbnail_asset_ref,
-        input.actor,
-        `duplicate scene → ${scene.properties.timestamp}`,
-        now,
-        this.readLastActivityId(scene),
-      );
-      return { kind: 'ok', scene, logEntryActivityId };
-    } catch (err) {
-      if (err instanceof DuplicateTimestampError) {
-        return {
-          kind: 'duplicate-timestamp-collision',
-          existingSceneId: err.conflictingSceneId,
-          suggestedOffsetTimestamp: offsetTimestampBy1s(input.newTimestamp),
-        };
-      }
-      throw err;
-    }
+    // #259 — duplicateScene no longer throws DuplicateTimestampError; tied
+    // timestamps are accepted and the duplicate receives a fresh
+    // creation_order. Any unexpected error propagates naturally without a
+    // catch wrapper.
+    const { plot: nextPlot, scene } = await crudDuplicateScene(plot, {
+      sceneId: input.sceneId,
+      newTimestamp: input.newTimestamp,
+      actor: input.actor,
+      now,
+    });
+    this.writePlot(input.documentUri, nextPlot);
+    // T071 — insert a stale flag for the duplicated Scene.
+    await this.recomputeStaleFlagFor(
+      input.documentUri,
+      nextPlot,
+      scene.properties.id,
+    );
+    const logEntryActivityId = await this.emitLogEntry(
+      input.documentUri,
+      'duplicate',
+      scene.properties.storyboard_id,
+      scene.properties.id,
+      scene.properties.thumbnail_asset_ref,
+      input.actor,
+      `duplicate scene → ${scene.properties.timestamp}`,
+      now,
+      this.readLastActivityId(scene),
+    );
+    return { kind: 'ok', scene, logEntryActivityId };
   }
 
   // ── Copy-to-other-storyboard (review 3A two-card emission) ─────────
@@ -905,13 +869,8 @@ export class StoryboardEditService implements vscode.Disposable {
       if (err instanceof ThumbnailDeepCopyFailedError) {
         return { kind: 'deep-copy-failed', error: err };
       }
-      if (err instanceof DuplicateTimestampError) {
-        return {
-          kind: 'duplicate-timestamp-collision',
-          existingSceneId: err.conflictingSceneId,
-          suggestedOffsetTimestamp: offsetTimestampBy1s(input.newTimestamp),
-        };
-      }
+      // #259 — copySceneToOtherStoryboard no longer throws
+      // DuplicateTimestampError; unexpected errors are re-thrown.
       throw err;
     }
   }
@@ -1228,30 +1187,26 @@ function plotHasAnyStoryboard(plot: StoryboardPlot): boolean {
  * Collect IDs of plot features that can RESOLVE a scene's
  * `visible_feature_ids` entry. Excludes Storyboard and Scene features
  * (those carry their own provenance / structure, never the underlying
- * plot data a Scene references). Uses `properties.id` as the canonical
- * id (matches #216/#217 capture behaviour — Scene's visibleFeatureIds
- * come from `props.id` on each iterated feature).
+ * plot data a Scene references). Uses the **top-level GeoJSON `id`** as the
+ * canonical identity (ADR-038) — the same source capture now records into
+ * `visible_feature_ids`. (The prior implementation read `properties.id`,
+ * which is absent on data features, so it would have failed to resolve
+ * every captured Track once capture was fixed.)
  */
 function collectResolvableFeatureIds(plot: StoryboardPlot): Set<string> {
   const set = new Set<string>();
   for (const f of plot.features) {
     if (isStoryboardFeature(f) || isSceneFeature(f)) {continue;}
-    const props = (f as { properties?: { id?: unknown } | null }).properties;
-    const id = props?.id;
-    if (typeof id === 'string' && id.length > 0) {
+    const id = getPlotFeatureId(f);
+    if (id !== undefined) {
       set.add(id);
     }
   }
   return set;
 }
 
-function offsetTimestampBy1s(iso: string): string {
-  const ms = Date.parse(iso);
-  if (Number.isNaN(ms)) {
-    return iso;
-  }
-  return new Date(ms + 1000).toISOString();
-}
+// #259 — offsetTimestampBy1s was used by the now-removed
+// duplicate-timestamp-collision suggestion paths.
 
 function coerceError(err: unknown): Error {
   return err instanceof Error ? err : new Error(String(err));

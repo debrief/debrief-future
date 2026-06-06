@@ -964,3 +964,1031 @@ The legacy `'vscode'` value is **retired**. Inside a VS Code webview, the varian
 - `specs/220-fix-theme-responsiveness/evidence/test-summary.md` — full test transcript across the four variants.
 - `specs/220-fix-theme-responsiveness/evidence/screenshots/all-panels-{light,dark,high-contrast-light,high-contrast-dark}.png` — visual consistency proof.
 - `specs/220-fix-theme-responsiveness/evidence/screenshots/interaction.gif` — runtime-switch demo.
+
+### ADR-026: Mermaid Diagrams in Shipped Blog Posts via CDN-Loaded Client-Side Renderer (2026-04-26)
+
+**Decision.** Mermaid diagrams in shipped feature blog posts (`debrief.github.io/_posts/`) are rendered client-side by `mermaid@11` loaded from the jsDelivr CDN, wired into the `future-post` Jekyll layout via a Liquid-gated `<script type="module">` block that only fires when the post body contains a `language-mermaid` code class. Authors continue to write standard ` ```mermaid ` fences in `specs/NNN/media/shipped-post.md` — no new authoring syntax. The `/publish` pipeline is unchanged.
+
+**Context.** Mermaid fences have been authored in shipped posts since at least #061 (Feb 2026), but the publishing pipeline took no action on them and the live site currently renders them as `<pre><code>` text (confirmed visually against the #210 post on 2026-04-26). Three viable paths existed: (A1) client-side Mermaid via CDN in the website layout; (A2) same but vendoring the script into the website repo for offline-safety; (B) pre-render to SVG inside `/publish` using `mmdc`. Stock GitHub Pages excludes `jekyll-mermaid` from its plugin allowlist, so a server-side Jekyll plugin was not an option.
+
+**Rejected alternatives.**
+
+- **A2 — vendor `mermaid.min.js` in the website repo.** Originally preferred to satisfy the constitution's offline-by-default principle. Owner clarified the public marketing site is explicitly an online-only surface (the principle applies to *core platform functionality* — services, schemas, file IO — not to the project's website). Vendoring would cost ~600 KB of git history per upgrade for no benefit.
+- **B — pre-render to SVG in `/publish`.** Would add a Node + Puppeteer/Chromium dependency to the publish step and require backfill of already-published posts. Worth revisiting only if diagrams later need to appear in non-HTML contexts (RSS feed, PDF export) or the site moves to a custom Actions Jekyll build.
+- **Custom Liquid tag (`{% mermaid %}…{% endmermaid %}`).** Rejected: would break GitHub's native preview of the source post and force the technical-specialist agent to learn a new syntax. The whole point of using Mermaid is that ` ```mermaid ` fences render everywhere they're seen.
+
+**Consequences.**
+
+- **Retroactive fix.** All three already-published posts that contain Mermaid fences (#061, #210, plus #217's evidence pages if linked) start rendering as soon as the website-repo PR merges. No backfill needed.
+- **Per-page cost is gated.** The Liquid `{% if page.content contains "language-mermaid" %}` guard means non-diagram posts pay zero bytes for mermaid.js. Only diagram-bearing posts trigger the CDN fetch.
+- **Authoring guideline updated.** `.claude/agents/media/technical.md` and `docs/CLAUDE-media-agents.md` now state that Mermaid renders both in GitHub previews and on the published site, removing the previous implicit "GitHub-preview-only" framing.
+- **CDN is a soft external dependency.** If jsDelivr is blocked or down, diagrams degrade to the pre-existing raw-text fallback — non-fatal and consistent with current behaviour.
+
+**Originating issue:** ad-hoc research spike (no backlog item). Spike: `docs/project_notes/mermaid-in-blog-posts.md`. Branch: `claude/research-mermaid-diagrams-0gl5e`.
+
+**Evidence:**
+- `docs/project_notes/mermaid-in-blog-posts.md` — full options analysis and decision rationale.
+- `docs/project_notes/mermaid-website-patch/future-post-layout-snippet.html` — exact website-repo patch to apply to `_layouts/future-post.html`.
+- `docs/project_notes/mermaid-website-patch/README.md` — application instructions for the website-repo PR.
+- Screenshot supplied by owner (2026-04-26) — confirmed `sequenceDiagram` body of #210 post rendering as raw text on live site.
+- Implementing PR: [debrief/debrief.github.io#90](https://github.com/debrief/debrief.github.io/pull/90) (submitted 2026-04-26; the patch landed in `_layouts/future-post.html` at end-of-file rather than before `</body>` because the post layout delegates to `_layouts/future-default.html` for the document shell — see implementation notes in the spike doc).
+- End-to-end verification (2026-04-26): owner confirmed a freshly-published meta-post drafted from `specs/239-mermaid-blog-rendering/spec.md` (originally numbered `999`; renumbered 2026-05-01) renders its embedded `flowchart LR` Mermaid diagram as an SVG on `debrief.github.io`, closing the cycle from author-side fence → kramdown → layout shim → CDN runtime → rendered SVG.
+
+### ADR-027: Storyboard edit-suite test seam — callback adapter, not PortContext (#234, 2026-04-27)
+
+**Decision.** Feature 234's "interactive Storybook + shared mock layer" goal is met with a **callback-adapter helper** (`useStoryOnlyMockHandlers(seed, knobs)` returning `{state, dispatch, handlers}`) that the harness + four edit-suite stories spread onto `<StoryboardPanel {...handlers} />`. The previously-planned `PortContext` + `OutboundMessage` discriminated union + production webview rewrite (#234 plan v1) is **not** adopted.
+
+**Context.** Feature 234 plan v1 introduced `PortContext` so `<StoryboardPanel>` would emit typed `OutboundMessage` values via a context-supplied port; production wrapped with `<PortContext.Provider value={acquireVsCodeApi()}>`, harness/stories with `<PortContext.Provider value={mockPort.port}>`. The stated rationale (research R10) was idiomatic-context, prop-drilling avoidance, and a throwing default for "no provider" misuse.
+
+Re-examination of the current code (`apps/vscode/src/webview/web/storyboardPanel.tsx:170-260`) found the panel is **already cleanly presentational**: it declares ~20 callback props; the webview entry translates each callback to `vscode.postMessage(...)`, and the harness translates each callback to `useStoryboardEditReducer().dispatch(...)`. The translation layer is the only repetition; the panel itself emits no postMessage and is reusable in any host.
+
+The `PortContext` proposal would have:
+
+1. Defined a new `OutboundMessage` discriminated union (~20 variants).
+2. Pushed `usePanelPort()` into every panel sub-component that today fires a callback (SceneRow, SceneOverflowMenu, StoryboardHeader, the edit form, the toast, …).
+3. Rewritten the production webview entry (`apps/vscode/src/webview/web/storyboardPanel.tsx`) to drop ~50 lines of postMessage glue in favour of one provider.
+4. Required a smoke E2E pass (T022) as the only regression gate against a wrong port wiring deep in event handlers.
+
+**Decision rationale.**
+
+- **The "prop drilling" objection in research R10 is a strawman.** The current callback props are already prop-drilled — that's the existing idiom. Replacing N callback props with N message variants threaded through `usePanelPort()` is not less drilling; it just relocates the surface.
+- **The panel becomes less reusable, not more.** Today it is presentational and composable into any host (Storybook + harness + production). Adding `usePanelPort()` couples it to the existence of a port provider — a non-VS Code consumer would have to fake one.
+- **The "shared behavioural layer" goal (FR-003) is independent of the port abstraction.** Whether the helper exposes `port: { postMessage }` or `handlers: {...}` is a representation choice; both produce one source of truth that harness + four stories share.
+- **The throwing-default-port argument (Article I.3 — no silent failures) is moot in the callback model.** Missing a callback today produces an immediate React `prop.fn is not a function` at the call site — the same actionable error the throwing default was meant to provide.
+- **Risk profile is meaningfully lower.** Callback adapter touches: 1 new helper file (`__testing__/storyOnlyMockHandlers.ts` ≈ 80 LOC), 1 harness refactor, 4 story upgrades. PortContext touched: that plus a new `PortContext.tsx`, panel rewires, every emitter rewires, the production webview entry — gated by a single E2E run. The smaller blast radius is itself a quality.
+
+**Alternatives considered.**
+
+- **`PortContext` + typed `OutboundMessage` (plan v1).** Rejected as above. The architectural abstraction is defensible on its own merits but does not earn its cost as a side-effect of "make four stories interactive." Worth revisiting as a standalone refactor with its own spec if the production webview entry's postMessage glue grows past current scale.
+- **Patch `acquireVsCodeApi` at module scope for tests.** Rejected — couples the test seam to a global; not strict-type-safe.
+- **Callback adapter inline in each story.** Rejected — duplicates ~80 LOC across four stories; drifts the moment one story adds a knob (the FR-003 violation `PortContext` was meant to prevent, also prevented by a single shared helper).
+
+**Consequences.**
+
+- ✅ Phase 3 estimate drops from "multi-hour, cross-cutting, E2E-gated" to "30–60 min, additive, helper-gated".
+- ✅ `<StoryboardPanel>` stays presentational — no architectural debt added.
+- ✅ Production code path (`apps/vscode/src/webview/web/storyboardPanel.tsx`) is untouched; existing 2,400+ test baseline from #230 is unchanged.
+- ✅ FR-001/-002/-003/-044/-045/-046 all still met. FR-044's ESLint rule still applies — `__testing__/` is still the test-only export surface.
+- ⚠️ **Constitution Article XV (Strict Type Safety).** Plan v1 cited Article XV as supporting `PortContext` ("explicit context > module-scope global"). The callback adapter is also strict-typed: each callback prop has an explicit signature, and `useStoryOnlyMockHandlers` returns the same `Pick<StoryboardPanelProps, ...>` surface. Article XV row remains Pass; the supporting note shifts from "explicit context for IO" to "explicit callback-prop surface for IO". Flagged for transparency; no Constitution Check breach.
+- ❌ The `PortContext`-shaped audit trail (research R10) is preserved with a "Superseded by R10b" header. Reviewers asking "did you consider a typed message port?" find a written answer rather than silent absence.
+
+**Originating issue:** Feature 234, Phase 3 plan-pivot triggered by review comment 2026-04-27. Spec artefacts revised in the same commit that records this ADR.
+
+**Evidence:**
+- `specs/234-storyboard-edit-polish-followup/research.md` R10 (Superseded) + R10b (Adopted).
+- `specs/234-storyboard-edit-polish-followup/contracts/harness-knobs.md` §2 (callback-adapter API; §3 PortContext deleted).
+- `specs/234-storyboard-edit-polish-followup/data-model.md` §1 (`MockPortKnobs` retained); §4 (`PanelPort`) deleted.
+- Code touchpoints baseline: `apps/vscode/src/webview/web/storyboardPanel.tsx:170-260` (read 2026-04-27 to verify current callback architecture); `apps/web-shell/src/StoryboardEditHarness.tsx:117` (existing reducer wiring).
+
+---
+
+### ADR-028: STAC Conformance Profile — adopted standards, retained `debrief:` namespace, target version (#241, 2026-05-02)
+
+**Decision.** Debrief STAC catalogs target **STAC 1.1.0** and adopt the following standard extensions alongside the bespoke `debrief:` namespace:
+
+| Extension | URI | What we use it for | Why standard, not bespoke |
+|---|---|---|---|
+| **Processing** v1.2.0 | `https://stac-extensions.github.io/processing/v1.2.0/schema.json` | `processing:software`, `processing:datetime` mirroring asset-level `debrief:provenance.tool_version` and `.load_timestamp`. Optional `processing:level`, `processing:facility`, `processing:lineage`. | The canonical lineage extension. STAC Browser / `stac-fields` pretty-print these; bespoke `debrief:provenance.*` is invisible to third-party tooling. |
+| **File Info** v2.1.0 | `https://stac-extensions.github.io/file/v2.1.0/schema.json` | `file:size` + `file:checksum` (multihash SHA-256) on every disk-backed asset. | Closes the "no content-hash lineage" gap previously tracked as #219 / informally elsewhere. Stable extension, broad tooling support. |
+| **Debrief** v1.0.0 | `https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json` | `debrief:platforms`, `debrief:tags`, `debrief:feature_tags`, `debrief:overrides`, `debrief:provenance_log` (item-level audit), `debrief:provenance` (asset-level). | Genuinely Debrief-specific. No standard equivalent for vessel taxonomy, properties-panel edit log, or overrides. |
+
+`debrief:provenance` and `debrief:provenance_log` are **retained** under our namespace. The `processing:*` fields are co-published — same data, two namespaces — to be legible to the STAC ecosystem without losing our richer audit shape. There is no standard provenance extension; the W3C-PROV-aligned STACD proposal (PROPL 2025) is research, not registry-stable.
+
+**Item-level common metadata.** Every Item emits the recommended common-metadata fields:
+- `properties.created` (RFC 3339 UTC; preserved across edits)
+- `properties.updated` (RFC 3339 UTC; refreshed on every write)
+- `properties.license` — SPDX expression or `"other"`. **Never `"proprietary"` or `"various"`** (deprecated in 1.1.0). `"other"` requires a `links[]` entry with `rel: "license"`.
+- `properties.providers[]` — at least one entry, `roles` from the standard enum (`licensor`/`producer`/`processor`/`host`).
+
+**Thumbnail/preview convention.** Two visual assets per Item:
+- `assets.thumbnail` — 200×150 PNG, `roles: ["thumbnail"]`, `proj:shape: [150, 200]`. STAC Browser keys off this for list/card views.
+- `assets.overview` — 800×600 PNG, `roles: ["overview"]`, `proj:shape: [600, 800]`. STAC Browser keys off this for detail-page rendering.
+
+The previous convention (both PNGs at `assets.thumbnail` / `assets.thumbnail-sm`, both with `roles: ["thumbnail"]`) is superseded. Capture pipeline (#174's modern-screenshot + sharp) is unchanged; only the asset key + role labelling moves.
+
+**Collection-level convention.** Every Collection (including the promoted `catalog.json`) emits:
+- `stac_version: "1.1.0"`.
+- `item_assets` block (new in 1.1 core spec) declaring the asset shape every Item exposes — `features` / `thumbnail` / `overview` / `source`. Self-documents the catalog contract; `stac-browser` renders this in the Collection landing page.
+- `license` (SPDX or `"other"`), `providers[]`, plus the existing `summaries` block.
+- `summaries` semantics unchanged from #136.
+
+**Self-link href: relative.** STAC 1.1.0 relaxed the "self-link MUST be absolute" guidance from 1.0. Our existing relative `./item.json` and `./catalog.json` self-links are spec-blessed under 1.1 and are retained because they keep catalogs portable across `vscode://`, `file://`, and `http://` mounts without rewriting.
+
+**Custom-namespace policy.** A field belongs under `debrief:` only if (a) no standard STAC extension covers it, AND (b) the field is genuinely Debrief-specific rather than a generic geospatial concept. New requirements that fit a standard extension MUST adopt the standard extension; the `debrief:` namespace is for what the ecosystem doesn't already model.
+
+**Verification.** Conformance is verified two ways:
+1. STAC 1.1.0 JSON Schema validation in the schema-adherence test suite — every Item and the Collection MUST pass.
+2. Playwright-driven E2E test (delivered by #241) that opens our catalog in `radiantearth/stac-browser` and asserts standard-extension fields render correctly. The test captures three screenshots (`evidence/stac-browser-collection.png`, `.../stac-browser-item.png`, `.../stac-browser-assets.png`) that serve double-duty as blog post artefacts.
+
+**Context.** A 2026-05-02 review (originating in branch `claude/review-stac-architecture-ON3N1`) cross-checked the implementation against the STAC 1.0/1.1 spec, the [STAC Best Practices guide](https://github.com/radiantearth/stac-spec/blob/master/best-practices.md), the official extensions registry, and the `radiantearth/stac-browser` rendering behaviour. The review confirmed the implementation is structurally correct and 1.0-compliant, but identified that ecosystem-standard extensions exist for things we already track (lineage via `processing`, asset integrity via `file`) — and that adopting them was strictly additive to our existing `debrief:` content. ADR-003 chose STAC for plot storage; this ADR refines the conformance profile we target.
+
+**Alternatives considered.**
+
+- **Stay on STAC 1.0.0 indefinitely.** Rejected. 1.1.0 is stable, strictly additive for our use, and unlocks `item_assets` in core (which `radiantearth/stac-browser` renders) plus the formal `"other"` license value. The migration cost is one factory bump + one catalog regeneration.
+- **Replace `debrief:provenance` with `processing:*` rather than co-publish.** Rejected. `debrief:provenance` carries `source_path` and is an unambiguous Debrief-internal record; `processing:*` is the ecosystem-legible mirror. Co-publication preserves both audiences without the schema migration cost of removing fields.
+- **Adopt the W3C-PROV-aligned STACD extension proposal.** Rejected. STACD is research-stage (PROPL 2025), not in the official extensions registry. Our retained `debrief:provenance_log` already provides W3C-PROV-shaped activity records (activity_id ULIDs, was_generated_by, used) with stronger audit guarantees (immutability, archive rotation) than STACD currently specifies. Re-evaluate if STACD reaches Stable maturity.
+- **Make `self`-link absolute (per pre-1.1 guidance).** Rejected. STAC 1.1 relaxes this; our offline-first portable-catalog use case is exactly what the relaxation was meant to allow.
+- **Add a STAC API (search/transactions extension).** Out of scope for this ADR. Static catalog conformance is the immediate need; an API is a separate architectural decision.
+
+**Consequences.**
+
+- ✅ Catalog interoperates with `radiantearth/stac-browser`, `pystac`, `stac-fields`, and any other STAC 1.1-compliant client without bespoke adapters.
+- ✅ Asset integrity (`file:checksum`) closes a long-noted gap and enables bit-identical-source verification.
+- ✅ Lineage (`processing:software`, `processing:datetime`) is now legible to third-party tooling.
+- ✅ `created`/`updated`/`license`/`providers` give STAC Browser the metadata it needs to render proper Item cards.
+- ✅ `item_assets` self-documents the catalog contract — new contributors see the expected asset shape from the catalog, not from a README.
+- ⚠️ `debrief:provenance` and `processing:*` carry duplicated data on every source asset. Tolerable (one extra small object per asset; total <100 bytes), and the duplication is deliberate.
+- ⚠️ Adds two new ext URIs to every Item's `stac_extensions[]`. Validation cost is one extra schema fetch per Item at validation time (cached after first fetch).
+- ⚠️ Sample-catalog regeneration produces a 73-file diff. Reviewers are warned upfront; the diff is structural, not semantic.
+- ❌ Asset-key change (`assets.thumbnail` → `assets.overview` for the 800×600 PNG) is a breaking read-side change for any consumer that hard-codes `thumbnail` for the large variant. Audited consumers updated as part of #241; downstream `contrib/` consumers may need patching.
+
+**Originating issue:** STAC architecture review, 2026-05-02. Implemented by spec #241.
+
+**Evidence:**
+- `specs/241-stac-best-practices-upgrade/spec.md` (this ADR's implementation spec).
+- `specs/241-stac-best-practices-upgrade/evidence/stac-browser-collection.png`, `.../stac-browser-item.png`, `.../stac-browser-assets.png` (captured by the Playwright test in FR-022 → FR-027).
+- Original review session and audit data: branch `claude/review-stac-architecture-ON3N1` (review conversation logs, gap-table baseline of 0/73 conformance on `processing:*`, `file:*`, `created`, `updated`, `providers`).
+
+---
+
+### ADR-029: Persistence-host abstraction — IndexedDB adaptor + Article IV.4 amendment (#236, 2026-05-01)
+
+**Status:** Accepted. Implemented in feature `236-web-shell-stac-writes`.
+
+**Context.**
+
+Pre-ADR-029, the constitution's Article IV.2 ("Frontends never persist") was
+read absolutely: every write went through a Node-side service. That reading
+was sound when both hosts had a Node process — but the web-shell ships as a
+pure static site to GitHub Pages. There is no Node runtime in production.
+The pre-existing scene-thumbnail capture path silently lost data on reload
+(FR-WEB-029a "Session-only" badge in #215/#235 was the user-visible warning),
+and the user's mental model was "I captured a scene, refreshing should not
+delete it".
+
+The naive fix — add a Vite middleware POST/PUT/PATCH/DELETE under
+`/stac-store/` — works in dev and per-PR Heroku review apps but evaporates
+in production GitHub Pages. The original spec for #236 chose that path and
+was pivoted at Phase 0 review.
+
+**Decision.**
+
+Introduce a single host-agnostic TypeScript writer interface — `StacWriter`,
+in `@debrief/stac-writer` — and have each host implement it against its
+native backend:
+
+  - VS Code → `apps/vscode/src/services/stacWriterFs.ts` (Node fs; wraps
+    existing `sceneThumbnailService.writeSceneThumbnail` and
+    `stacService.updateItemMetadataSync` to preserve the 1700+ LOC test
+    corpus by construction).
+  - Web-shell → `apps/web-shell/src/services/stacWriterIdb.ts` (IndexedDB,
+    `idb`-backed). Bundled catalog items are read-only demo content; user
+    writes layer on top as IndexedDB overlays via `mergeOverlay`. New
+    items live entirely in IndexedDB.
+
+Article IV is amended with clause **IV.4 Persistence-host abstraction**: the
+*interface* is the persistence boundary, not the host process. Browser-native
+stores qualify as a persistence backend only when accessed through the
+unified writer abstraction. Machine-enforced via the new ESLint rule
+`no-direct-persistence-in-frontend` (`shared/eslint-rules/`):
+
+  - `node:fs`/`fs` imports forbidden under `apps/web-shell/**` (test files
+    excepted — vitest runs in Node and reads golden fixtures).
+  - `indexedDB`, `localStorage`, `sessionStorage`, `caches` globals
+    forbidden outside the two host-adaptor files (`stacWriterIdb.ts` and
+    `stacWriterCapability.ts`).
+
+**Constitution version bump:** 1.2.0 → 1.3.0 (MINOR — new clause, no breaking
+change to existing semantics).
+
+**Consequences.**
+
+- ✅ Web-shell remains a pure static site. Captures persist across reload
+  in production (GitHub Pages), not just dev.
+- ✅ Both hosts share one operation surface. Future hosts (mobile native,
+  OPFS, server-backed) plug in as new adaptors with no other changes.
+- ✅ Cross-adaptor parametrised tests (vitest + `fake-indexeddb`) catch
+  divergence between the two backends as it lands, rather than at the
+  next integration test.
+- ⚠️ Two new dependencies added: `idb@^8.0.0` (Promise wrapper around
+  IndexedDB, ≈ 5 KB minified gzipped, by Jake Archibald; eight years of
+  maintenance, MIT, zero transitive deps) and `fake-indexeddb@^6.0.0`
+  (test-only). Both meet Article IX's "minimal, vetted" bar.
+- ⚠️ Breaking change is permitted under Article XIV (pre-release). Keys
+  carry the database version in their name (`debrief-stac-writer-v1`)
+  so the next breaking change is a fresh database, not a migration.
+
+**Alternatives considered.**
+
+- **Vite middleware writes.** Rejected — works in dev only, breaks under
+  static deployment. The original Phase 1 plan; pivoted at Phase 0 review.
+- **Service worker intercepting `PUT /stac-store/`.** Rejected — service
+  worker registration timing and lifecycle complications add ceremony
+  for a problem IndexedDB solves directly.
+- **OPFS / File System Access API for Phase 1.** Rejected — newer browser
+  API, less universal support (Safari). Worth revisiting in Phase 2 if
+  IndexedDB blob-storage performance is a bottleneck.
+- **Strike Article IV.2 entirely.** Rejected — the principle that frontends
+  don't own a divergent write path is sound; only the absolute reading was
+  wrong. IV.4 re-anchors IV.2 around interface design, not process boundary.
+- **Per-feature exception in Complexity Tracking.** Rejected — three features
+  now lean on the host-adaptor pattern (#174, #215/#235, this one); the
+  next will too. Constitution is the right home.
+
+**Originating issue:** Feature 236 (`specs/236-web-shell-stac-writes/`).
+
+**Evidence:**
+- `specs/236-web-shell-stac-writes/research.md` R-001 (pivot rationale),
+  R-002 (interface location), R-009 (ESLint enforcement), R-006 (amendment
+  text).
+- `specs/236-web-shell-stac-writes/contracts/stac-writer.ts` (normative
+  contract for the writer interface).
+- `specs/236-web-shell-stac-writes/contracts/indexeddb-schema.md` (schema
+  for the four object stores).
+- `shared/stac-writer/` workspace package (interface + types + errors +
+  overlay merge + path guard).
+- `apps/vscode/src/services/stacWriterFs.ts` (Node-fs adaptor).
+- `apps/web-shell/src/services/stacWriterIdb.ts` (IndexedDB adaptor).
+- `shared/eslint-rules/no-direct-persistence-in-frontend.cjs` (machine
+  enforcement; sandbox-violation output captured at
+  `specs/236-web-shell-stac-writes/evidence/eslint-enforcement-output.txt`).
+
+### ADR-030: vite-plugin-pwa adoption for Backlog Navigator (#244, 2026-05-03)
+
+**Status:** Accepted (open — to be closed at #244 merge with final wording + linked evidence path).
+
+**Context.** Spec #244 (Backlog Navigator — Full Mobile Parity) requires
+the existing Vite-built React app at `apps/backlog-navigator/` to be
+installable as a PWA on iOS and Android, with an offline app shell and an
+"update available" reload affordance. This is the project's first PWA
+surface; the choice of PWA tooling is therefore an architectural precedent.
+
+**Decision.** Adopt `vite-plugin-pwa@^0.20` (which wraps Google Workbox)
+as the PWA generator for `apps/backlog-navigator/`. The plugin handles:
+
+1. PWA manifest emission (typed config, validated by a Zod schema at
+   `apps/backlog-navigator/src/pwa/manifestSchema.ts` per Article XV).
+2. Service-worker generation via Workbox (precaching + runtime caching).
+3. The `virtual:pwa-register` module which exposes the update lifecycle
+   (`needRefresh`, `offlineReady`) for the in-app `<UpdatePrompt>`.
+
+**Consequences.**
+
+- ✅ Standard solution used by Vue, SvelteKit, and Astro communities;
+  Workbox is Google-maintained.
+- ✅ Replaces ~200 LoC of hand-rolled Workbox glue + manifest emitter +
+  version-detection wiring.
+- ✅ Subpath-importing `useIsMobile` from `@debrief/components/hooks/useIsMobile`
+  proves the workspace dep can be tree-shaken so the navigator doesn't pick
+  up MapView / Leaflet / Vega.
+- ⚠️ One new dev-dep: `vite-plugin-pwa@^0.20` (peer-deps `workbox-window`).
+  `@lhci/cli` added as a repo-root dev-dep for the Lighthouse PWA gate.
+  Both meet Article IX's "minimal, vetted" bar.
+- ⚠️ Workbox is pulled into the runtime bundle; budget impact is measured
+  in Phase 2 of the implementation per the Issue 4A protocol (see
+  `scripts/bundle-baseline-244.json`).
+
+**Alternatives considered.**
+
+- **Hand-rolled SW + manifest.** Rejected — the surface area (precaching,
+  runtime caching for GitHub responses, update-detection lifecycle) is
+  exactly what Workbox solves. Article IX prefers vetted deps over
+  hand-rolling well-understood infrastructure.
+- **`@vite-pwa/sveltekit` style alternative for React.** Rejected —
+  `vite-plugin-pwa` is the canonical Vite plugin; framework-specific
+  wrappers add no value here.
+
+**Originating issue:** Feature 244 (`specs/244-navigator-mobile-pwa/`).
+
+**Evidence (to be filled at merge):**
+- `specs/244-navigator-mobile-pwa/contracts/pwa-manifest.md` (manifest contract).
+- `specs/244-navigator-mobile-pwa/contracts/service-worker.md` (cache + update protocol).
+- `apps/backlog-navigator/vite.config.ts` (VitePWA wiring).
+- `apps/backlog-navigator/src/pwa/registerSW.ts` + `UpdatePrompt.tsx`.
+- `specs/244-navigator-mobile-pwa/evidence/lighthouse-pwa.html` (Lighthouse PWA score ≥ 90).
+- `specs/244-navigator-mobile-pwa/evidence/bundle-baseline-244.json` (final budget + delta).
+
+### Phase-3 deferred ADRs (placeholder, #249)
+
+The cutover PR for spec #249 (Extract `apps/backlog-navigator/` into a
+standalone repository) will land two ADR updates that are intentionally
+NOT in this Phase 0/1/2 PR:
+
+- **ADR-032 (new)** — Backlog Navigator extraction. Records the
+  three-phase shape, the gh-pages + JamesIves/github-pages-deploy-action
+  hosting decision (R-003 / FR-011), the destination slug as operator
+  input (R-009), the cutover gate (≥7 days green CI), and the
+  cross-reference to ADR-030 + ADR-031 (#248 extraction).
+- **ADR-030 amendment** — Owner-moved annotation. Appends a closing
+  note: "Owner moved to standalone repo `<org>/<repo>` as of #249. PWA
+  tooling decision unchanged, executes there now." Status stays unchanged
+  (decision is unchanged; only the executing repo moves).
+
+Both ADR updates land in the same cutover PR that deletes
+`apps/backlog-navigator/`, removes the three dedicated workflows, and
+removes `@lhci/cli` from the root `devDependencies`. This placeholder
+exists so a future-me grepping `decisions.md` for `#249` finds the
+hand-off path documented even before the cutover PR opens.
+
+Reference: `specs/249-extract-backlog-navigator/extraction-kit/PHASE3-RUNBOOK.md`.
+
+---
+
+### ADR-033: Boundary types must be derived, not rewritten — Article IV.5 amendment (#623, 2026-05-13)
+
+> **Numbering note (merge-resolution, 2026-05-14).** Originally drafted as ADR-031, but on `main` ADR-031 is reserved for the #248 spec-navigator extraction and ADR-032 is reserved for the #249 backlog-navigator extraction (both placeholder-referenced from extraction-kit runbooks before this branch merged). Bumped to ADR-033 to avoid the collision; `CLAUDE.md` reference updated to match.
+
+**Status:** Accepted. Constitution amended; CLAUDE.md updated. ESLint rule deferred to a follow-up.
+
+**Context.**
+
+PR #623 fixed a Spec #258 regression where storyboard scene rectangles, captured at the user's current zoom, rendered as ~50px squares instead of filling the captured viewport. Root cause: the host→webview message DTO `SceneRectangleSnapshot` (`apps/vscode/src/webview/messages.ts:198-204`) hand-picked four fields from `SceneProperties` and silently dropped a fifth — `_polygon_source`. When PR #620 added that field to `SceneProperties` (LinkML-generated), the snapshot DTO did not gain it. The webview then synthesised a `SceneFeature` whose `_polygon_source` was always `undefined`, so `pickPolygonForRender` never took the trust-captured-bounds branch and instead recomputed from `(scene.center, current map size)` — which produced tiny polygons mid-layout.
+
+TypeScript could not catch this because the failure mode was **under-declaration**: the boundary type didn't *claim* the field, so the compiler had nothing to enforce. Article XV (Strict Type Safety) addresses missing annotations and `any` leaks, not subset-DTO drift. This was the third instance of the same class of bug in the project — `/speckit.review` had caught earlier cases but the user wants the rule applied at write time, not at review time.
+
+**Decision.**
+
+Amend Constitution Article IV (Architectural Boundaries) with a new clause **IV.5 Boundary types are derived, not rewritten**: any cross-boundary type representing a subset of an existing typed source MUST be expressed structurally (`Pick<T, K>`, `Omit<T, K>`, `Partial<T>`, a generated-schema export, or a schema-derived runtime validator). Hand-rewriting fields by name is forbidden. Where structural derivation is genuinely impossible, the boundary type must carry a compile-time exhaustiveness guard against the source. Mirror the principle in `CLAUDE.md` so every AI session applies it at write time.
+
+The matching ESLint rule is deferred to a follow-up. Two implementation paths considered:
+
+1. **Cheap:** flag interfaces named `*Snapshot`, `*Message`, `*Payload`, `*Dto`, `*Envelope`, `*Response`, `*Request` that lack a `Pick<` / `Omit<` / `extends` reference. Catches the smell with ~30 LoC.
+2. **Strict:** custom TS-ESLint rule that resolves the declared type and verifies every field originates from `keyof T` of an imported source type. Higher fidelity, higher build cost.
+
+Sequencing this work behind the constitutional rule lets the rule guide behaviour immediately while the rule's exact scope (which suffixes, which directories) settles through real-world use.
+
+**Constitution version bump:** 1.4 → 1.5 (MINOR — new clause, no breaking change to existing semantics).
+
+**Consequences.**
+
+- ✅ Future under-declared DTO bugs are caught at write time: the author cannot list fields without first stating *which type the fields come from*, so the compiler does the enumeration.
+- ✅ Source-type growth (e.g., adding a slot to a LinkML class that backs `SceneProperties`) produces a compile error at every boundary that uses `Pick<...>` of that source — surfacing pick/omit decisions for review rather than dropping the field on the wire.
+- ✅ Builds on Article II.1 ("Single source of truth — LinkML schemas") and Article IV.4 (persistence-host abstraction): the schema is canonical, boundary types must reference it.
+- ⚠️ No machine enforcement yet — the rule is a written discipline + AI-session-level check until the ESLint rule lands. Mitigated by `CLAUDE.md` integration (every session applies it) and the worked example in this ADR.
+- ⚠️ Some boundary types legitimately cannot derive from a single source (e.g., a message that joins data from two unrelated types). For those, the exhaustiveness guard against each source type is the substitute. Ergonomics worth revisiting if many such cases emerge.
+
+**Alternatives considered.**
+
+- **Strengthen Article XV (Strict Type Safety) with the rule.** Rejected — Article XV is about *whether* types are present and concrete. Article IV is about *contracts between components*. The rule belongs with the boundary articles, where it sits next to IV.4 (persistence-host abstraction) which has the same structural-fidelity flavour.
+- **Document only in `CLAUDE.md` (not the constitution).** Rejected — the bug recurs in human-authored code as well as AI-authored. Constitutional placement makes it a project-wide standard, not a Claude-specific heuristic.
+- **Block on the ESLint rule.** Rejected — the rule's scope is uncertain enough that designing it first slows ship velocity. The written discipline plus Claude integration captures most of the value immediately.
+
+**Worked example (from PR #623):**
+
+```ts
+// ❌ Hand-rewritten subset — silent drop when SceneProperties grows
+export interface SceneRectangleSnapshot {
+  readonly sceneId: string;
+  readonly viewport: Viewport;
+  readonly timestamp: string;
+  readonly polygon: readonly (readonly (readonly [number, number])[])[];
+}
+
+// ✅ Structurally derived — Pick forces an explicit pick/omit choice
+//    when SceneProperties gains a new field
+type ScenePropertyPicks = Pick<
+  SceneProperties,
+  'id' | 'viewport' | 'timestamp' | '_polygon_source'
+>;
+export interface SceneRectangleSnapshot extends ScenePropertyPicks {
+  readonly polygon: readonly (readonly (readonly [number, number])[])[];
+}
+```
+
+**Originating issue:** PR #623 (`claude/fix-scene-rectangle-bounds-ZiCot`). Bug fix commit `f719d8f`. Related to Spec #258 (`specs/258-scene-playback-fidelity/`) which introduced the `_polygon_source` slot the DTO dropped.
+
+**Evidence:**
+- `CONSTITUTION.md` Article IV clause 5 (the rule).
+- `CLAUDE.md` "Governing Principles" → "Boundary types are derived, not rewritten" bullet (AI-session integration).
+- PR #623 (worked example + fix).
+
+---
+
+## ADR-NEW (2026-05-19): Time-range Scene schema is additive, no version bump (Spec #263)
+
+**Context.** Spec #263 introduces a second Scene flavour ("time-range") to
+the Storyboarding cluster. The new shape adds one sub-record (`TimeRange`)
+and one optional slot (`viewport_end`) to `SceneProperties`. The existing
+`time_range` slot — a string-typed reserved-null placeholder from #215 —
+becomes a real `Optional[TimeRange]`.
+
+**Decision.** The schema evolution lands **additive** under Article XIV
+(pre-4.0 freedom): no `schema_version` bump, no migration shim, no reader
+gymnastics. Both new slots are optional at the schema layer. Legacy plots
+(instant Scenes with `time_range = null` and no `viewport_end`) parse
+unchanged. Mixed-presence Scenes are rejected by a layered enforcement
+strategy: LinkML rules → JSON Schema `if/then` constraints on the
+boundary, plus a `flavourCheck()` function in `validate.ts` at the
+application layer.
+
+**Why no version bump.**
+
+- The two new slots are optional. A v1 reader (pre-#263) reading a v3
+  schema's instant Scene sees no new keys.
+- The XOR cross-field rule means a v1 reader receiving a time-range
+  Scene from a newer writer would see an unfamiliar `time_range`
+  object — but the schema-version field already exists (`schema_version
+  >= 2` since #259), and any v1 reader would be running pre-#259 code,
+  which the existing `UnsupportedSchemaVersionError` already rejects.
+- Article XIV explicitly authorises additive evolution without ceremony
+  pre-4.0.
+
+**Alternative considered.** Two distinct classes (`InstantScene` +
+`TimeRangeScene`) with a discriminator field, rather than a single
+`SceneProperties` class with the cross-field XOR. Rejected because the
+renaming cost across every consumer (CRUD, validate, ordering, playback,
+panel, briefing-renderer-to-be) was disproportionate to a two-line XOR
+rule. Tracked as a future v3 schema cycle item (#269 in BACKLOG.md) for
+when a third Scene flavour arrives.
+
+**Layered cross-field enforcement (related decision).** LinkML 1.7's
+`rules:` block lowers cleanly to JSON Schema `if/then` constraints, but
+does **not** generate Pydantic `model_validator` functions. The XOR and
+range-validity rules therefore live in:
+
+1. The LinkML source (one place — declarative).
+2. The generated JSON Schema (mechanical, enforced on serialisation
+   boundaries).
+3. A hand-written `flavourCheck()` in `shared/components/src/storyboard/
+   validate.ts` (enforced at the application boundary; called from
+   `validatePlot` and from `createScene`).
+
+Pydantic adherence tests pin this division explicitly: the Pydantic layer
+is structural-only for these slots; the application layer carries the
+cross-field semantics. A future LinkML upgrade that DOES generate
+validators would surface as a test diff.
+
+**RAF lock-step interpolation primitive.** As part of the same feature we
+also adopt a "single RAF loop drives both axes" rule for time-range
+playback. The `TimeRangeTween` primitive in
+`shared/components/src/storyboardPlayback/` computes a single normalised
+progress `p ∈ [0, 1]` from elapsed wall-clock time, then on every frame
+applies `setCurrentTime(lerp(t_start, t_end, p))` **before**
+`flyToViewport(blendedViewport, 0)`. The per-frame `flyToViewport` is
+called with `durationMs = 0` (the documented snap path) so Leaflet's own
+pan/zoom tween — which has its own clock — does not run alongside ours
+and drift the two axes apart. Reverse playback reuses the same primitive
+with the schedule reversed; abort sets a cancelled flag the next tick
+honours; the `done` Promise resolves with the last-written `(epoch,
+viewport)` pair so the engine can emit a coherent snapshot whether the
+tween completed naturally or was cancelled.
+
+**Provenance.** Spec `specs/263-time-range-scenes/` (data-model.md §3 and
+§5 — review note 2A; research.md R8). Evidence:
+`specs/263-time-range-scenes/evidence/round-trip-evidence.md` and the
+`TimeRangeTween` test suite at
+`shared/components/src/storyboardPlayback/__tests__/timeRangeTween.test.ts`.
+
+---
+
+## ADR-NEW (2026-05-20): Air-gapped briefing ships as a standalone file://-loadable SPA (Spec #264)
+
+**Context.** The Storyboarding feature line (#215–#218, #258, #263)
+produces in-application Storyboards. Recipients downstream of an analyst
+— customers, training audiences, after-action reviewers — often lack
+Debrief installs and may be working on disconnected networks. They need
+to *watch* a Storyboard, not author one. The question for #264 was the
+artefact format.
+
+**Decision.** Ship the briefing as a self-contained zip whose root
+`index.html` boots a bundled React + Leaflet SPA from a `file://`
+origin in current Chrome or Edge on desktop. The zip carries the SPA,
+a scoped `features.geojson` (one Storyboard's Scenes + the features
+they reference), an `item.json` subset, pre-fetched basemap tiles, and
+Scene thumbnails. All paths inside the zip are relative; no runtime
+network requests are issued.
+
+**Alternatives considered.**
+
+1. **Printable PDF.** Captures the Scene grid at export time. Rejected:
+   loses every motion-bearing dimension (per-Scene viewport tweens, the
+   simultaneous viewport + time-slider scrub from #263), and any
+   time-driven layer movement. The whole *briefing* value is the
+   playback, not the still frames.
+
+2. **MP4 / GIF screen recording.** Captures playback as video. Rejected
+   here for #264 — there's no scrub, no Scene-by-Scene step, no Present
+   ↔ Minimal toggle, and the recipient can't pause on a moment of
+   interest to talk through it. (Video export is tracked as #265 — a
+   research spike — not a substitute.)
+
+3. **Hosted briefing on a server (with auth).** Easy delivery via URL
+   share. Rejected: violates Article I (offline by default) and
+   Article III.4 (data stays local), and assumes the recipient has
+   network access at briefing time — the most common reason to need a
+   briefing artefact is precisely that they *don't*.
+
+**Consequences.**
+
+- ✅ Recipients can play the briefing on a memory-stick handoff, on an
+  air-gapped machine, with no install. SC-001 verifies this end-to-end.
+- ✅ The SPA reuses the host-agnostic playback primitive from #263
+  (`runTimeRangeTween`) verbatim — the briefing's lock-step scrub
+  matches the authoring environment frame-for-frame (SC-003).
+- ✅ The zip is a deliverable artefact, not application state — the
+  CSV-export precedent from #178 applies; Article IV.4 (writer
+  abstraction) does not cover one-shot artefact exports.
+- ❌ The SPA is restricted to current Chrome and Edge on desktop. The
+  `file://` origin doesn't permit the same fetch-from-relative-path
+  behaviour in Firefox / Safari / mobile browsers. A boot-time browser
+  probe surfaces a banner for unsupported browsers (no silent failure —
+  Article I.3).
+- ❌ Zip size grows with tile coverage. Typical 5–20 MB; outliers cap
+  around 50 MB given the integer-zoom-only policy (research.md R2).
+  PMTiles is the natural follow-up if size becomes a transport problem
+  (tracked as #272).
+- ❌ The bundled SPA pins React + Leaflet + Zustand versions at zip
+  creation time. Recipients receive a forever-snapshot of the renderer;
+  bug fixes require a re-export. Acceptable because the renderer is
+  the deliverable, not application state.
+
+**Why "file:// in current Chrome / Edge" specifically.** Decision 3C
+during `/speckit.review` narrowed an earlier four-browser matrix
+(Chrome, Edge, Firefox, Safari) to two. The narrowing trades platform
+breadth for a single, testable loading contract — every supported
+browser uses the same inline-`<script type="application/json">` boot
+path. Firefox's stricter `file://`-origin sibling-loading rules and
+Safari's preference for served HTML would have required two additional
+loader paths and three Playwright matrices. Out of scope for v1; an
+unsupported-browser banner directs those users to the supported set.
+
+**Why a SPA-local playback driver instead of hoisting `StoryboardPlaybackService`.**
+The plan's T-HOIST step (relocate the 983-line `StoryboardPlaybackService`
+from `apps/vscode/` to `shared/components/`) would clean up an
+inheritance the briefing renderer should share with the authoring
+environment. But the existing service is tightly coupled to
+`vscode.Event` and `vscode.workspace.fs` — the hoist is a careful
+refactor in its own right and was at high risk of breaking the
+authoring extension if rushed.
+
+For #264 we wrote a SPA-local driver
+(`apps/briefing-renderer/src/playback/playbackDriver.ts`) that:
+
+- Composes the host-agnostic `runTimeRangeTween` primitive from #263
+  directly (the bit the briefing actually needs).
+- Wires four small browser port adapters
+  (`BrowserMapAdapter`, `LocalSessionStoreAdapter`,
+  `BrowserPanelViewAdapter`, `BrowserTimeRangeViewAdapter`).
+- Surfaces a "playback halted" state on any adapter throw or tween
+  rejection (Article I.3 — no silent failures).
+
+This driver is ~150 lines, deliberately narrower than the authoring
+service (no CRUD, no missing-data flow, no panel snapshots). When
+T-HOIST lands as a follow-up, the briefing renderer can swap in the
+shared service and delete the local driver.
+
+**Provenance.** Spec `specs/264-briefing-zip-renderer/`. Plan + contract:
+`specs/264-briefing-zip-renderer/plan.md`,
+`specs/264-briefing-zip-renderer/contracts/{export-command,spa-loading,tile-coverage}.md`.
+Evidence: `specs/264-briefing-zip-renderer/evidence/`.
+
+---
+
+### ADR-034: Retire the `.debrief-session` sidecar — all plot state lives in `features.geojson` (#249 / spec 261, 2026-05-28)
+
+**Context.** A plot was materialised on disk as three files: `item.json` (STAC
+metadata), `features.geojson` (the portable FeatureCollection), and
+`item.debrief-session` (a sidecar written by `services/session-state` carrying
+the Zustand store's temporal / spatial / selection / visibility slices). The
+sidecar violated Constitution Article II.1 (single source of truth): a plot's
+state was split across two files, only one of which travelled with the plot.
+Open a colleague's plot without its sidecar — email, STAC catalog, git, USB —
+and you landed on default view/time/selection.
+
+**Decision.** Delete the sidecar. Every field it carried is reclassified into
+one of three homes:
+
+- **Plot state** → a `SystemState` Feature inside `features.geojson`
+  (`state.spatial` / `state.temporal` / `state.selection` /
+  `state.activestoryboard`), the #237 pattern generalised to all four variants.
+- **Per-feature state** → `properties.visible` on the individual feature
+  (absent/`true` ⇒ visible; `false` ⇒ hidden) — replacing the sidecar's
+  `hiddenFeatureIds` denylist.
+- **Ephemeral runtime** → not persisted; defaulted on load (`playbackState`,
+  `drawingMode`, `viewportLocked`, `styleVersion`, `selection.timestamp`,
+  `featureCollectionUri`).
+
+A plot is now **exactly two files** (`item.json` + `features.geojson`, plus
+thumbnail assets), and the entire interactive state is reconstructable from
+`features.geojson` alone. A single pure helper in `@debrief/session-state`
+(`system-state/`) is the sole producer/consumer of SystemState read/write for
+both hosts; a host-agnostic store-bridge translates store↔FeatureCollection.
+The package-level sidecar I/O (`saveSession`/`loadSession`/`extractPersistentState`/
+`serializeState`/`parseSessionJson` + the `SessionFile` version machinery) is
+deleted with no legacy read shim (Article XIV — pre-release breaking change).
+
+**Trade-offs.** Provenance growth from frequent hide/reveal toggles is accepted
+(bounded to *saved* states; compaction is a follow-up). Strict-on-import:
+malformed / duplicate-`state_type` / cross-field-invariant SystemState features
+fail load loudly with the offending feature id, rather than a tolerant fallback
+(Article XIV.4; the out-of-window `current_time` policy is revisitable as #267).
+
+**Provenance.** Spec `specs/261-session-state-systemstate/`. Evidence:
+`specs/261-session-state-systemstate/evidence/` (round-trip screenshots, the
+self-describing `features-after.json`, the two-file dir listings).
+
+---
+
+### ADR-035: Per-feature visibility as a `visible` flag on `BaseFeatureProperties` (#249 / spec 261, 2026-05-28)
+
+**Context.** The sidecar stored hidden features as a `hiddenFeatureIds`
+denylist on the session store — a parallel structure that did not travel with
+the plot and could go stale against a renamed/deleted feature.
+
+**Decision.** Add an optional `visible: boolean` to the shared
+`BaseFeatureProperties` LinkML class, so every concrete feature-properties type
+inherits it. Absent or `true` means visible; `false` means hidden. Visibility
+now travels *with the feature* inside `features.geojson` and round-trips for
+free. Visibility transitions append a `LogEntry` to the affected feature's own
+provenance via the existing `LogService` (Article III.1) — the pure helper never
+writes provenance for the `state.*` view-state features themselves (they are
+current-state markers, FR-013). The web-shell already modelled visibility this
+way (`properties.visible`); this decision makes it the schema-blessed, cross-host
+home and removes the sidecar denylist.
+
+**Provenance.** Spec `specs/261-session-state-systemstate/`,
+`contracts/linkml-delta.md` §1.
+
+---
+
+### ADR-036: Consolidate shared value types into `common.yaml`; active_storyboard stays tolerant via `@debrief/components` (#249 / spec 261, 2026-05-28)
+
+**Context (a) — value-type duplication.** `ViewportPolygon`, the `Coordinate`
+lng/lat class, `TimeStep`/`TimeUnitEnum`, `DisplayModeEnum`, `PlaybackStateEnum`,
+and the `TimeInstant`/`TimeRange`/`TimeFilter` types lived in `session-state.yaml`
+(with `DisplayModeEnum` also duplicated in `storyboard.yaml` and a scalar
+`Coordinate` *type* shadowed in `common.yaml`). `geojson.yaml`'s
+`SystemStateProperties` could not reference them as authored, and the JSON Schema
+build (`debrief-jsonschema.yaml`) deliberately excluded `session-state.yaml`.
+
+**Decision (a).** Move these value types into `common.yaml` as their single
+definition (it is imported by every cluster, including the JSON Schema build),
+delete the duplicates, and remove the dead scalar `Coordinate` type. Generated
+symbol names are unchanged (the master `debrief.yaml` already imports every
+cluster), so this pays down an Article II.1 duplication with no consumer churn.
+The long-feared `gen-json-schema` multivalued-`Coordinate`-range bug did **not**
+resurface — `SystemState.schema.json` is correct and no post-processor was
+needed (FR-006a closed).
+
+**Context (b) — active_storyboard.** FR-015 asked for one shared helper to own
+all four SystemState variants, folding #237's host-private web-shell writer in.
+But `@debrief/components` (which owns the tolerant `get/setActiveStoryboardSelection`
+used by storyboard playback) depends on `@debrief/session-state`, so the helper
+cannot import it (cycle); and the strict helper reader throws on
+duplicate/malformed features, whereas the web-shell reads active_storyboard on
+*every* edit and must stay tolerant.
+
+**Decision (b).** The `@debrief/session-state` helper owns the three migrated
+variants (spatial/temporal/selection) + per-feature visibility + the unified
+*load-time* read of all four variants, and implements `active_storyboard` with
+the identical #237 wire shape (NG-002) for that read and for VS Code parity. The
+web-shell's *interactive* active_storyboard read/write deliberately keeps
+delegating to the shared `@debrief/components` helpers (R-011) — those are shared
+logic, not a host-private re-implementation of the SystemState shape. No host
+re-implements the wire shape; the single-source goal holds for every variant
+that 261 migrates.
+
+**Provenance.** Spec `specs/261-session-state-systemstate/`,
+`contracts/linkml-delta.md` §2, research-notes/active-storyboard-call-sites.md.
+
+---
+
+### ADR-037: Live storyboard preview — renderer dual-boot path + VS Code loopback server (#273, 2026-05-27)
+
+**Status:** Accepted.
+
+**Context.** The briefing renderer (#264) booted exactly one way: from JSON
+inlined into its `index.html` at zip-export time, read synchronously before
+first paint. That path is deliberately air-gapped — a distributed briefing zip
+plays back offline with zero network requests. Spec #273 adds a **live
+Preview** button (both VS Code and web-shell) that opens the renderer in a new
+browser tab, loaded from the *current* plot's storyboard with no zip-packing
+step. An external browser tab cannot read `vscode-webview-resource:` URIs, so a
+reachable URL is required, and the air-gapped offline guarantee must not
+regress.
+
+**Decision.**
+
+1. **Renderer gains a second, additive boot path.** When the launch URL carries
+   `?features=<url>`, the renderer enters an async `loading → ready/error`
+   lifecycle: `fetch` the URL, validate with the **existing** boundary
+   validators (one storyboard, scene ordering), seed the **unchanged** store.
+   When `?features` is absent, the synchronous inline path runs exactly as
+   before. The two paths share validators + `store.seed()` but never each
+   other's I/O — the inline path imports no `fetch`, so the offline zip path
+   provably issues zero network requests for storyboard data (test-guarded). An
+   optional renderer-local `BriefingConfig.tileLayerUrl` selects an online
+   basemap for preview; the inline/zip path leaves it unset and keeps its
+   bundled local tiles (byte-identical to pre-#273). This is a renderer-local
+   TS field, **not** a LinkML/schema change.
+
+2. **VS Code serves preview via an ephemeral loopback HTTP server.**
+   `BriefingPreviewServer` (pure Node, no `vscode` import) binds `127.0.0.1` on
+   an OS-assigned port, serves the bundled renderer at `/` and the active
+   storyboard's scoped features at `/features.geojson`. The extension opens the
+   system browser via `openExternal(await asExternalUri(...))` so the URL is
+   correct under Remote/Codespaces tunnels and works fully offline. One shared
+   lazily-started instance, disposed on deactivation; read-only serving only.
+
+   **Security — DNS-rebinding defence (C-B7).** Binding loopback blocks remote
+   network access but *not* DNS rebinding, where a malicious page resolves an
+   attacker-controlled domain to `127.0.0.1` and reaches the server from its own
+   origin — arriving as an ordinary local request carrying a *foreign* `Host`
+   header. The server enforces a **`Host` allowlist**: loopback names
+   (`127.0.0.1`/`localhost`/`[::1]`) are served; foreign hosts get `403`. With
+   the ephemeral lifetime, OS-assigned port, and read-only scope, this closes
+   the loopback attack surface (Article X).
+
+   **Tunnel exception (amended 2026-06-01).** Under a Remote/Codespaces/
+   code-server tunnel, `asExternalUri` rewrites the loopback to a *public* host
+   (e.g. `<app>.herokuapp.com/proxy/<port>/`) and the proxy forwards that
+   foreign `Host` to the server — which the strict allowlist `403`ed, so the
+   Preview tab showed a bare **"Forbidden"** under Heroku code-server. The
+   command now registers the `asExternalUri` host via `trustExternalHost`, and
+   the server additionally accepts it. This does not weaken the defence: in a
+   tunnel the server is bound to the *remote* host's loopback, reachable only
+   through the authenticated tunnel, so a browser cannot reach it by rebinding
+   (rebinding hits the *browser machine's* loopback, not the container's). The
+   non-tunneled local case registers nothing and keeps the strict allowlist.
+
+   Two related proxy-path issues were fixed in the same pass: (a) the launch
+   URL's `features` value is now **relative** (`?features=features.geojson`)
+   so it resolves under the proxy path-prefix (`/proxy/<port>/`) instead of
+   escaping to the proxy root; and (b) code-server's `asExternalUri` rewrite
+   **drops the query string** entirely, so the preview server now also injects
+   the features location into the served `index.html` as a global
+   (`window.__BRIEFING_PREVIEW_FEATURES__`), which the renderer reads (via
+   `resolveFeaturesUrl`) when `?features` is absent. Without (b) the renderer
+   loaded but played its dev fixture instead of the active storyboard. See
+   `bugs.md` 2026-06-01.
+
+3. **Web-shell hands off via a same-origin blob URL.** Web-shell scopes the
+   active storyboard, builds a `Blob`, and opens the renderer (served
+   same-origin under `/briefing-renderer/`) at `?features=<blobUrl>` in a reused
+   named tab. No server needed — one code path across dev, `vite preview`, and
+   the static Pages build.
+
+4. **Packing core extracted to `@debrief/briefing-export`.** The pure
+   briefing-zip core moved out of `apps/vscode` into a shared package so both
+   hosts share one implementation and cannot drift (FR-016). VS Code keeps its
+   filesystem/save-dialog host adapter; the package is browser-safe (JSZip is
+   the only zip lib, already present — no new dependency).
+
+**Alternatives rejected.** Merging the two boot paths into one loader (pollutes
+the proven sync path, risks the air-gap); a webview instead of an external tab
+(the user chose a new tab; a webview also can't host the renderer offline
+without similar plumbing); a `file://` temp page with inlined data (that *is*
+the zip path in disguise — a packing step, contradicting "live URL, no zip").
+
+**Consequences.** One novel pattern (a local HTTP server in the extension),
+scoped tightly: loopback-only, ephemeral, read-only, `Host`-allowlisted. The
+offline distribution path is unchanged and test-guarded.
+
+**Provenance.** Spec `specs/273-storyboard-preview-button/`. Plan + contracts:
+`specs/273-storyboard-preview-button/plan.md`,
+`specs/273-storyboard-preview-button/contracts/{preview-boot,host-integration}.md`.
+Evidence: `specs/273-storyboard-preview-button/evidence/`.
+
+---
+
+### ADR-038: Canonical feature identity is the top-level GeoJSON `id`; unchecked inline-object casts are banned (#273, 2026-05-28)
+
+**Status:** Accepted.
+
+**Context.** While capturing live-preview evidence for #273 the preview map
+came up *empty* — no vessel tracks. Root cause: the storyboard capture/edit
+pipeline (#216/#217) recorded each scene's `visible_feature_ids` by reading
+`feature.properties.id`. But the LinkML schema places `id` as `required: true`
+at the **top level** of every feature class (TrackFeature, ReferenceLocation,
+MultiPoint/MultiPolygon, SystemState, Scene, Storyboard); `properties.id`
+exists *only* on `SceneProperties`/`StoryboardProperties`. Data-feature
+properties derive from `BaseFeatureProperties`, which has **no `id`**. REP
+import (`services/io/.../rep.py`), feature selection, `hiddenFeatureIds`,
+`scopeStoryboard`, and the briefing renderer all key on the top-level `id`.
+So for real tracks `properties.id` was `undefined`, scenes recorded an empty
+visibility set, and `scopeStoryboard` dropped every track from the
+exported/previewed briefing. The shipped VS Code zip export had the same latent
+hole.
+
+**Why strong typing didn't catch it.** The capture sites iterated the
+deliberately-loose `PlotFeature` boundary type, whose `properties` carries an
+index signature (`{ kind?: string; [k: string]: unknown }`), then cast it
+(`feature.properties as { id?: string | number | null }`). The index signature
+makes `.id` type-check as `unknown`; the cast fabricates a field the schema
+never defines. An unchecked assertion is precisely where the type checker stops
+helping — a direct miss against Article IV.5 (derive boundary types) and
+Article XV.7 (type assertions are expert overrides). The repo already ships the
+correctly-derived `DebriefFeature` union + guards (`@debrief/schemas/unions.ts`,
+#173) that would have made `track.properties.id` a compile error.
+
+**Decision.**
+
+1. **Canonical feature identity is the top-level GeoJSON `id`.** Not
+   `properties.id`. Scene/Storyboard features keep their `properties.id` (a
+   ULID that mirrors the top-level id and is a FK target for
+   `storyboard_id`), but identity for cross-references (visibility, selection,
+   scoping) is always the top-level id.
+
+2. **One typed accessor, no casts.** `getPlotFeatureId(feature)` (exported from
+   `@debrief/components`) reads the top-level id; all five collection/resolution
+   sites — VS Code + web-shell capture, web-shell update-to-current, the
+   extension host-deps collector, and the missing-data resolver
+   (`collectResolvableFeatureIds`) — route through it. The `feature.properties
+   as { id }` casts are removed.
+
+3. **Lint closes the hole.** A `no-restricted-syntax` selector
+   (`TSAsExpression > TSTypeLiteral`) bans casts to an inline object type
+   (`x as { … }`) — the exact form that fabricated `properties.id`. Landed at
+   `warn` in `shared/components` (the package where `PlotFeature` and the
+   generalisation live); a backlog item clears the existing warning backlog
+   across the other packages and promotes the rule to `error` repo-wide. The
+   companion wording widening of Constitution XV.7 keeps the principle and the
+   lint rule in lock-step.
+
+**Alternatives rejected.** (a) Add `id` to `BaseFeatureProperties` so every
+feature carries `properties.id`: larger blast radius, duplicates the
+already-required top-level id, and diverges from GeoJSON's top-level-id
+convention; selection/scoping/render/import would all need reworking.
+(b) Make capture fall back to `properties.id ?? feature.id` without fixing the
+loose type: leaves the unchecked-cast anti-pattern (and the index signature)
+in place to bite again.
+
+**Consequences.** Captures now reference data features by their real id, so the
+preview *and* the existing export carry the tracks. The fix is additive
+(behaviour only changes for features lacking `properties.id` — previously
+dropped, now included), so fixtures that set `properties.id` are unaffected.
+`PlotFeature` stays loose for now (it is used in 36 files / ~100 cast sites);
+tightening it / deriving from `DebriefFeature` is folded into the cast-cleanup
+backlog item.
+
+**Provenance.** Spec `specs/273-storyboard-preview-button/`. Regression test:
+`shared/components/src/storyboard/__tests__/featureId.test.ts`; E2E guard:
+`apps/web-shell/playwright/tests/storyboard-preview.spec.ts` (asserts every
+captured scene references both tracks and the renderer draws them). Related:
+ADR-011 (cast governance), ADR-033 (Article IV.5 — derived boundary types).
+
+### ADR-039: Atomic plot save — a write-ahead intent journal is the filesystem commit point; one IndexedDB transaction on the browser (#268, 2026-06-01)
+
+**Status:** Accepted.
+
+**Context.** A "Save" of a plot is not one write — it is several: the feature
+collection (`features.geojson`), the STAC `item.json` metadata, and the
+thumbnail/overview PNGs. Before this change those writes were independently
+committable and reported success too early. The VS Code save did a raw
+`fs.writeFileSync` of `features.geojson` (non-atomic, *bypassing* the
+`StacWriter` boundary), then — *after* clearing the dirty flag and showing
+"Plot saved" — wrote the thumbnails and patched `item.json` through the writer
+(`saveSession.ts:124,133-134,142`). A failure or interruption between those
+phases (disk full, permission denied, browser quota, process kill, power loss)
+could leave any subset applied: new features with stale thumbnails, a torn
+`features.geojson`, or a plot the analyst believes is saved when it is not. A
+single-file atomic-write primitive (`atomicWriteSync`, temp→rename) existed, but
+there was no way to commit *multiple* writes as one unit, and the FC write did
+not even use the single-file primitive. The web-shell had a narrower version of
+the same gap: its standalone-create path ran `writeItem()` then `writeAsset()`
+in **two** separate IndexedDB transactions (`mocks/stacService.ts:449-457`).
+
+**Decision.**
+
+1. **One host-agnostic boundary operation, `commitPlotSave`.** The whole save
+   unit (feature collection + optional thumbnail pair, with the `item.json`
+   metadata they imply) is handed to a single `StacWriter.commitPlotSave(input)`
+   that commits it atomically. A companion `reconcilePlotSave(input)` is called
+   on open, *before* the read, to heal an interrupted save. Each host implements
+   both once against its native backend (Article IV.4). Atomicity must be
+   enforced at the boundary (FR-009) — a frontend orchestrating several writer
+   calls cannot make multiple FS renames or IDB transactions atomic. This also
+   moves the feature-collection write onto the boundary (FR-004 / Article IV.2).
+
+2. **Filesystem commit point = a write-ahead intent journal.** `commitPlotSave`
+   on the fs adaptor runs four phases: **stage** every artefact to a
+   `<name>.<token>.tmp` temp (reusing the existing `atomicWriteSync` temp step);
+   **commit point** — atomically write a single `.save-journal.json` listing the
+   pending `temp → final` renames; **apply** the renames (POSIX `rename` is
+   atomic per file); **clear** the journal. The atomic creation of the journal
+   is the commit boundary: `reconcilePlotSave` rolls **back** before it (stray
+   temps, no journal → delete temps, keep originals = last-good) and **forward**
+   after it (journal present → re-apply pending renames idempotently, then delete
+   the journal = the new version). Every interruption point therefore resolves
+   to a single coherent plot (FR-001/FR-007/FR-008). The journal is validated on
+   read through a typed `parseSaveJournal()` (no `any`, Article XV.5).
+
+3. **Browser commit point = one multi-store IndexedDB transaction.**
+   `commitPlotSave` on the idb adaptor opens **one** `readwrite` transaction over
+   `items` + `payloads` + `assets` + `meta`, enqueues all puts, and `await
+   tx.done`. IndexedDB transactions are already atomic — an error aborts the
+   whole transaction and a tab/process kill discards an uncommitted one — so this
+   gives all-or-nothing for free and needs no journal. `reconcilePlotSave`
+   returns `clean` (IndexedDB never exposes partial transaction state).
+
+4. **Report success only after commit.** `markClean()` and the "Plot saved"
+   message move to *after* `commitPlotSave` resolves; on rejection the host
+   surfaces a clear failure, leaves the dirty flag set, and the previous version
+   is intact (FR-005/FR-006). Thumbnail *capture* stays best-effort: a capture
+   failure simply omits `thumbnails` from the commit; a capture *write* that
+   begins is part of the atomic unit.
+
+5. **Durability is explicitly not a goal.** Per the spec clarifications, the
+   guarantee is atomicity/coherence, **not** power-loss durability of the newest
+   save. We add no `fsync` machinery — the existing best-effort temp→rename and
+   the IndexedDB transaction are sufficient. On power loss a coherent *earlier*
+   version may open; whatever opens is never torn.
+
+**Boundary types are derived (Article IV.5).** `CommitPlotSaveInput.thumbnails`
+is `Pick<WritePlotThumbnailPairInput, 'largePngBase64' | 'smallPngBase64'>`;
+`featureCollection` reuses the generated `@debrief/schemas` `FeatureCollection`.
+A compile-time `Pick` guard test (`shared/stac-writer/src/__tests__/commitPlotSave.types.test.ts`)
+keeps the save unit from silently dropping fields as the thumbnail input grows.
+
+**Alternatives rejected.**
+- *Caller-side "transaction" wrapping the existing `writeFeatureCollection` +
+  `writePlotThumbnailPair`.* The frontend cannot make multiple FS renames or IDB
+  transactions atomic — this moves the seam to the wrong layer (violates FR-009).
+- *Sequential temp→rename with no journal.* A crash mid-rename leaves new
+  `features.geojson` + old `item.json` = incoherent, and `rename` has already
+  destroyed the original so it cannot be rolled back. This **is** the core bug.
+- *Backup-originals-then-overwrite, roll back on open.* Doubles I/O on every
+  save and still needs a marker to know a save was in flight; the
+  journal + roll-forward is simpler and cheaper.
+- *Whole-item shadow directory + atomic dir swap.* Item dirs have stable paths
+  referenced elsewhere (catalog links, assets); swapping directories is
+  disruptive and heavier than a per-file journal.
+- *Replicate the FS journal in the browser.* Redundant — IndexedDB already
+  provides transactional atomicity.
+
+**Scene-capture's eager FC write (`captureScene.ts`) is deferred, deliberately.**
+`captureScene`'s `defaultWriteFeatureCollection` writes only `features.geojson`
+(no `item.json`, no thumbnails) as an *eager, best-effort* convenience so a
+captured scene survives a reload without an explicit Save; its failure path
+already tells the analyst to "Run Save Session to retry", and Save Session now
+routes through `commitPlotSave`. Because it writes a single file with no
+cross-artefact unit to keep coherent, and threading the `storePath` /
+catalog-relative split + a `StacWriter` handle into the capture command is a
+larger refactor than its best-effort nature warrants, it is left on its existing
+write for this delivery and tracked as follow-up tech-debt. The authoritative,
+atomic write is Save Session.
+
+**Provenance.** Spec `specs/268-save-atomicity/`. Type contract:
+`specs/268-save-atomicity/contracts/stac-writer-commit.ts`. Tests:
+`apps/vscode/tests/unit/stacWriterFs.commitPlotSave.test.ts`,
+`apps/vscode/tests/unit/stacWriterFs.reconcile.test.ts`,
+`apps/web-shell/src/services/__tests__/stacWriterIdb.commitPlotSave.test.ts`.
+Related: ADR-033 (Article IV.5 — derived boundary types), ADR-034 (sidecar
+retirement — the prior save-shape change this builds on).
+
+### ADR-040: Prefix-aware STAC typing — one schema-driven generator step over three classes; write-path props re-typed; `debrief:label` excluded (#256, 2026-06-02)
+
+**Status:** Accepted.
+
+**Context.** LinkML's `gen-typescript` strips the `debrief:` prefix and emits
+each modelled slot under its bare name, while the STAC writers read/write those
+fields under their on-disk colon keys (`props['debrief:platforms']`). A naive
+`StacItem.properties: StacExtensionProperties` intersection therefore typed
+nothing at the real call sites — the gap #240 explicitly deferred (its
+Article II.1 audit finding).
+
+**Decision.**
+1. **One schema-driven post-processor step** (`shared/schemas/scripts/generate.py`,
+   pure function `prefix_extension_slots()` + `_load_extension_slot_uri_map()`)
+   rewrites each modelled slot's emitted TS key to its LinkML `slot_uri` verbatim
+   across **three** classes: `StacExtensionProperties`, `StacSummaries`, and
+   `StacAsset`. We chose the schema-driven `slot_uri` read over a per-class text
+   rule because the three classes have divergent name→`slot_uri` conventions
+   (`platforms`→`debrief:platforms`; `debrief_platforms`→`debrief:platforms`;
+   and `StacAsset` mixes Debrief slots with non-Debrief `href`/`type`/`roles`
+   that must NOT be rewritten). FR-013.
+2. **Model `debrief:toolId` + `debrief:snapshotTimestamp` as `StacAsset` slots**
+   (additive Pydantic regen). Removes the hand-typed
+   `asset as StacAsset & { 'debrief:toolId'?: string }` cast at
+   `stacService.ts`. On-disk keys already exist → shape unchanged (FR-008).
+3. **Re-type both hosts' write-path `props`** from `Record<string, unknown>` to
+   `StacItemProperties` (`stacService.ts`, `stacWriterIdb.ts`). The generated-type
+   change alone types only the read sites; the writers deliberately widened to
+   `Record<string, unknown>` at the mutation path, so without this FR-004/FR-009
+   were only half met on the write path (the ADR-033 silent-drop surface). FR-012.
+4. **Exclude `debrief:label`.** Investigation during `/speckit.plan` showed it is
+   a GeoJSON *feature* property / MCP annotation (`bufferZoneGenerator.ts`,
+   `toolService.ts`), not a STAC item or asset key; modelling it onto a STAC
+   class would type a key the writer never persists. It belongs to a future
+   `BaseFeatureProperties` change.
+
+**Consequence / discovery.** Typing the `debrief:provenance_log` slot surfaced a
+pre-existing divergence (the exact #240 concern): the slot is typed as the
+*generated* (wide) `PropertiesProvenanceEntry` (`tool: string`), while the
+writers work in the *narrowed component hybrid* from
+`@debrief/components/PropertiesPanel/provenanceTypes` (literal `tool`/`method`/
+`source`). The old `as`-cast masked it. Resolved with an explicit, typed
+persistence→domain narrowing bridge on the read only; the write is
+narrow-is-subtype-of-wide and needs no cast. This is not an untyped-bag escape.
+
+**This closes the #240 Article II.1 deferral** — the writers' modelled `debrief:*`
+surface (read + write) now derives from LinkML rather than a hand-typed
+`Record<string, unknown>` bag.
+
+**Verification.** Pure-function unit test (synthetic added slot proves FR-002);
+schema-convention guard; structural counts; `tests/ts/stac-prefix-typing-256.test.ts`
+type-level read/write/asset assertions; byte-stable round-trip for the new asset
+keys; deterministic regen; existing `src/generated` drift gate (no new gate).
+
+Related: ADR-011 (cast governance), ADR-033 (Article IV.5 — derived boundary
+types), #240 (LinkML-derived writer types + drift gate — deferral now closed).

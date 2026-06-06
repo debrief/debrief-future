@@ -1,0 +1,374 @@
+/**
+ * BriefingMap — Leaflet-backed map surface for the briefing renderer.
+ *
+ * Mounts a `<MapContainer>` + `<TileLayer>` + a per-Scene `<GeoJSON>`
+ * layer that draws only the features `visible_feature_ids` of the
+ * current Scene names. The four file://-friendly tile-layer props added
+ * to MapView by T-MAPVIEW-EXT remain available for a future migration
+ * (the briefing SPA uses react-leaflet directly to avoid pulling in
+ * MapView's drawing toolbar, scene rectangles, and sensor layers — none
+ * of which the briefing needs).
+ *
+ * For each Scene change, the map flies to the Scene's captured viewport
+ * via Leaflet `map.flyTo`. The `time_range` interpolation path (#263)
+ * lands when the playback driver wires `runTimeRangeTween` into this
+ * component's exposed `mapRef`.
+ */
+
+import { type FC, useEffect, useMemo, useRef } from 'react';
+import {
+  MapContainer,
+  TileLayer,
+  GeoJSON,
+  CircleMarker,
+  Polyline,
+  Popup,
+} from 'react-leaflet';
+import type { Feature, FeatureCollection } from 'geojson';
+import type { LatLngTuple, Map as LeafletMap, PathOptions } from 'leaflet';
+import type { DebriefFeature } from '@debrief/components';
+import { useBriefingStore } from '../store';
+import { useBrowserMapAdapter, usePlaybackDriver } from '../playback/PlaybackProvider';
+import {
+  classifyTemporalTrack,
+  displayCoords,
+  DEFAULT_TRACK_COLOR,
+  type TemporalTrack,
+} from './trackDisplay';
+
+export interface BriefingMapProps {
+  onMapReady?: (map: LeafletMap) => void;
+}
+
+interface FeatureLike {
+  type?: string;
+  id?: unknown;
+  geometry?: { type?: string; coordinates?: unknown };
+  properties?: {
+    kind?: string;
+    id?: string;
+    name?: string;
+    colour?: string;
+    [k: string]: unknown;
+  } | null;
+}
+
+const DEFAULT_POINT_COLOR = '#2ca02c';
+
+/** Bundled local-tile template used by the air-gapped inline/zip path. */
+export const BUNDLED_TILE_URL = './tiles/{z}/{x}/{y}.png';
+
+/**
+ * Resolve the basemap tile-URL template. The live-preview URL-boot path
+ * (#273) sets `config.tileLayerUrl` to an online basemap; the inline/zip
+ * path leaves it unset and keeps the bundled local tiles — byte-identical
+ * to pre-#273 behaviour (contract preview-boot Basemap).
+ */
+export function resolveTileUrl(tileLayerUrl: string | undefined | null): string {
+  return tileLayerUrl != null && tileLayerUrl.length > 0 ? tileLayerUrl : BUNDLED_TILE_URL;
+}
+
+/**
+ * Linear-interpolate a classified track's `[lon, lat]` position at a given
+ * epoch-ms time. The track has already passed `classifyTemporalTrack`'s
+ * validity gate (parallel `coords`/`epochs`, ≥2 points, finite epochs), so
+ * the dot and the growing trail are always consistent — a track shows both
+ * or neither (FR-004 / FR-007). Returns `null` when the time falls outside
+ * the track's recorded range (the dot is simply absent there, mirroring the
+ * empty trail before the track starts).
+ */
+function interpolateTrackPosition(
+  coords: [number, number][],
+  epochs: number[],
+  currentTimeMs: number,
+): [number, number] | null {
+  if (currentTimeMs < epochs[0]! || currentTimeMs > epochs[epochs.length - 1]!) return null;
+  for (let i = 1; i < epochs.length; i++) {
+    const e0 = epochs[i - 1]!;
+    const e1 = epochs[i]!;
+    if (currentTimeMs <= e1) {
+      const span = e1 - e0;
+      const f = span > 0 ? (currentTimeMs - e0) / span : 0;
+      const c0 = coords[i - 1]!;
+      const c1 = coords[i]!;
+      return [c0[0] + (c1[0] - c0[0]) * f, c0[1] + (c1[1] - c0[1]) * f];
+    }
+  }
+  return null;
+}
+
+export const BriefingMap: FC<BriefingMapProps> = ({ onMapReady }) => {
+  const config = useBriefingStore((s) => s.config);
+  const features = useBriefingStore((s) => s.features);
+  const scenes = useBriefingStore((s) => s.scenes);
+  const currentSceneIndex = useBriefingStore((s) => s.currentSceneIndex);
+  const currentTime = useBriefingStore((s) => s.currentTime);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const mapAdapter = useBrowserMapAdapter();
+  const driver = usePlaybackDriver();
+
+  const currentScene = scenes[currentSceneIndex] ?? scenes[0] ?? null;
+  const initialCenter: [number, number] = currentScene?.properties.viewport
+    ? // viewport.center is [lon, lat]; Leaflet wants [lat, lon]
+      [
+        (currentScene.properties.viewport.center?.[1] as number) ?? 50,
+        (currentScene.properties.viewport.center?.[0] as number) ?? -4,
+      ]
+    : [50, -4];
+  const initialZoom = currentScene?.properties.viewport?.zoom ?? 6;
+
+  // Compute the visible features for the current Scene. Tracks + line
+  // features go through `<GeoJSON>`; reference points go through
+  // `<CircleMarker>` so they show as obvious dots.
+  const visibleFeatureIds = useMemo<Set<string>>(() => {
+    const ids = (currentScene?.properties as { visible_feature_ids?: unknown })?.visible_feature_ids;
+    if (Array.isArray(ids)) return new Set(ids.filter((x): x is string => typeof x === 'string'));
+    return new Set<string>();
+  }, [currentScene]);
+
+  const { lineFeatures, pointFeatures } = useMemo(() => {
+    const lines: FeatureLike[] = [];
+    const points: FeatureLike[] = [];
+    if (!features) return { lineFeatures: lines, pointFeatures: points };
+    for (const f of (features.features as FeatureLike[]) ?? []) {
+      const kind = f.properties?.kind;
+      // Skip Storyboard / Scene wrappers.
+      if (kind === 'STORYBOARD' || kind === 'STORYBOARD_SCENE') continue;
+      // Honour the Scene's visibility set (when populated). An empty set
+      // is treated as "show everything" — useful for the first Scene
+      // before scoping kicks in.
+      const fid = (f.properties?.id ?? f.id) as string | undefined;
+      if (visibleFeatureIds.size > 0 && fid && !visibleFeatureIds.has(fid)) continue;
+      const geomType = f.geometry?.type;
+      if (geomType === 'Point') {
+        points.push(f);
+      } else if (
+        geomType === 'LineString' ||
+        geomType === 'MultiLineString' ||
+        geomType === 'Polygon' ||
+        geomType === 'MultiPolygon'
+      ) {
+        lines.push(f);
+      }
+    }
+    return { lineFeatures: lines, pointFeatures: points };
+  }, [features, visibleFeatureIds]);
+
+  // Partition the visible line features into time-stamped tracks (which
+  // honour the Scene's display mode — grow in Trail, full otherwise) and
+  // everything else (polygons, multi-segment annotations, lines without
+  // parallel timestamps). The latter stay in the static `<GeoJSON>` layer,
+  // unchanged in both modes (FR-009). The classification gate is shared
+  // with the moving dot, so a track shows both a trail and a dot or neither
+  // (FR-007).
+  const { temporalTracks, otherLines } = useMemo<{
+    temporalTracks: TemporalTrack[];
+    otherLines: FeatureLike[];
+  }>(() => {
+    const tracks: TemporalTrack[] = [];
+    const others: FeatureLike[] = [];
+    for (const f of lineFeatures) {
+      // `classifyTemporalTrack` narrows via the canonical `isTrackFeature`
+      // guard, so passing the loose briefing feature is safe — non-tracks
+      // return null and fall through to the static GeoJSON layer.
+      const track = classifyTemporalTrack(f as unknown as DebriefFeature);
+      if (track) tracks.push(track);
+      else others.push(f);
+    }
+    return { temporalTracks: tracks, otherLines: others };
+  }, [lineFeatures]);
+
+  // The Scene's captured display mode (#258 / #280). Only the literal
+  // `'trail'` enables trail growth; `'full'`, an absent slot (legacy), and
+  // any unrecognised value all render the whole track — the safe,
+  // non-destructive default (FR-002 / FR-003).
+  const isTrail =
+    (currentScene?.properties as { display_mode?: string } | undefined)?.display_mode ===
+    'trail';
+
+  const geoJsonCollection = useMemo<FeatureCollection | null>(() => {
+    if (otherLines.length === 0) return null;
+    return {
+      type: 'FeatureCollection',
+      features: otherLines as Feature[],
+    };
+  }, [otherLines]);
+
+  // Per-track render model: the Leaflet `[lat, lng]` positions to draw at
+  // the current time. In Trail mode the positions are sliced to `currentTime`
+  // (a growing snail-trail, identical to the main app via `sliceTrackToTime`);
+  // in Full/legacy mode they are the whole track. Each track renders as a
+  // stable-keyed `<Polyline>` so Leaflet updates the path in place every
+  // frame — no per-frame layer teardown.
+  const trackRenders = useMemo<
+    Array<{ id: string; colour: string; positions: LatLngTuple[]; vertexCount: number }>
+  >(() => {
+    return temporalTracks.map((t) => {
+      const coords = displayCoords(t.coords, t.epochsMs, isTrail, currentTime);
+      return {
+        id: t.id,
+        colour: t.colour,
+        positions: coords.map(([lon, lat]) => [lat, lon] as LatLngTuple),
+        vertexCount: coords.length,
+      };
+    });
+  }, [temporalTracks, isTrail, currentTime]);
+
+  // Per-track "current time" markers. For each classified temporal track we
+  // interpolate the vessel's position at `currentTime` and render a filled
+  // circle there. The slider drives `currentTime`; so does the playback
+  // driver during time-range Scenes — both paths make the marker (and, in
+  // Trail mode, the trailing line) visibly move together (FR-004).
+  const timeMarkers = useMemo<
+    Array<{ id: string; lat: number; lon: number; colour: string; name: string }>
+  >(() => {
+    const markers: Array<{ id: string; lat: number; lon: number; colour: string; name: string }> = [];
+    for (const track of temporalTracks) {
+      const pos = interpolateTrackPosition(track.coords, track.epochsMs, currentTime);
+      if (!pos) continue;
+      markers.push({
+        id: track.id,
+        lat: pos[1],
+        lon: pos[0],
+        colour: track.colour,
+        name: track.name,
+      });
+    }
+    return markers;
+  }, [temporalTracks, currentTime]);
+
+  const styleFeature = (feature?: Feature): PathOptions => {
+    const colour =
+      (feature?.properties as { colour?: string } | undefined)?.colour ??
+      DEFAULT_TRACK_COLOR;
+    return {
+      color: colour,
+      weight: 3,
+      opacity: 0.85,
+    };
+  };
+
+  // Once the map mounts, run the driver to land on Scene 0.
+  useEffect(() => {
+    if (!mapRef.current) return;
+    void driver.syncToCurrentScene();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSceneIndex]);
+
+  // React calls ref callbacks on EVERY render (when the callback identity
+  // is a new closure). BriefingMap re-renders whenever `currentTime`
+  // changes — and `setCurrentTime` fires every tween frame. If
+  // `handleMapReady` ran on each ref-callback invocation it would
+  // re-trigger `syncToCurrentScene`, cancelling and restarting the tween
+  // every frame — producing the slider-oscillation symptom in #264.
+  // Gate by comparing against the stable `mapRef` so the work only runs
+  // the first time a new Leaflet map instance is attached.
+  const handleMapReady = (map: LeafletMap): void => {
+    if (mapRef.current === map) return;
+    mapRef.current = map;
+    mapAdapter.setMap(map);
+    onMapReady?.(map);
+    void driver.syncToCurrentScene();
+  };
+
+  // Re-key the GeoJSON layer whenever the visibility set changes so
+  // react-leaflet re-renders cleanly (the layer caches by reference).
+  const geoJsonKey = useMemo(
+    () => `${currentSceneIndex}:${Array.from(visibleFeatureIds).sort().join(',')}`,
+    [currentSceneIndex, visibleFeatureIds],
+  );
+
+  return (
+    <div data-testid="briefing-map" style={{ position: 'absolute', inset: 0 }}>
+      <MapContainer
+        center={initialCenter}
+        zoom={initialZoom}
+        maxZoom={config?.maxBundledZoom ?? 18}
+        style={{ height: '100%', width: '100%' }}
+        zoomControl={false}
+        ref={(instance: LeafletMap | null): void => {
+          if (instance) handleMapReady(instance);
+        }}
+      >
+        <TileLayer
+          url={resolveTileUrl(config?.tileLayerUrl)}
+          attribution={config?.tileLayerAttribution ?? ''}
+          {...(config?.maxBundledZoom !== undefined ? { maxZoom: config.maxBundledZoom } : {})}
+          noWrap
+          errorTileUrl="./tiles/placeholder.png"
+        />
+        {geoJsonCollection ? (
+          <GeoJSON key={geoJsonKey} data={geoJsonCollection} style={styleFeature} />
+        ) : null}
+        {/*
+          Time-stamped tracks render as stable-keyed `<Polyline>` layers
+          (one stable key per track id) whose `positions` update in place
+          each frame. In Trail mode the positions are sliced to the current
+          playback time, so the line grows; in Full/legacy mode they are the
+          whole track. A stable key per track (no `currentTime` in the key)
+          avoids per-frame layer teardown — the #264 oscillation failure mode.
+        */}
+        {trackRenders.map((t) =>
+          t.positions.length > 0 ? (
+            <Polyline
+              key={`trail-${t.id}`}
+              positions={t.positions}
+              pathOptions={{ color: t.colour, weight: 3, opacity: 0.85 }}
+            />
+          ) : null,
+        )}
+        {pointFeatures.map((f) => {
+          const coords = f.geometry?.coordinates as [number, number] | undefined;
+          if (!coords) return null;
+          const colour = f.properties?.colour ?? DEFAULT_POINT_COLOR;
+          const name = (f.properties?.name as string | undefined) ?? '';
+          const fid = (f.properties?.id ?? f.id) as string;
+          return (
+            <CircleMarker
+              key={`${geoJsonKey}-${fid}`}
+              center={[coords[1], coords[0]]}
+              pathOptions={{ color: colour, fillColor: colour, fillOpacity: 0.85 }}
+              radius={6}
+            >
+              {name ? <Popup>{name}</Popup> : null}
+            </CircleMarker>
+          );
+        })}
+        {timeMarkers.map((m) => (
+          <CircleMarker
+            key={`time-marker-${m.id}`}
+            center={[m.lat, m.lon]}
+            pathOptions={{
+              color: '#ffffff',
+              weight: 2,
+              fillColor: m.colour,
+              fillOpacity: 1,
+            }}
+            radius={9}
+          >
+            {m.name ? <Popup>{m.name}</Popup> : null}
+          </CircleMarker>
+        ))}
+      </MapContainer>
+      {/*
+        Hidden, deterministic measurement hooks for the Playwright growth
+        test (Contract C). Each carries the exact number of vertices drawn
+        for its track at the current playback time — robust to Leaflet's
+        polyline simplification, which would make counting from the SVG
+        path's `d` attribute unreliable. `display_mode` and the overall
+        active mode are exposed too so tests can assert per-Scene mode
+        re-evaluation (FR-005). Not visible to viewers.
+      */}
+      <div data-testid="trail-layer" data-mode={isTrail ? 'trail' : 'full'} hidden>
+        {trackRenders.map((t) => (
+          <span
+            key={`trail-len-${t.id}`}
+            data-testid={`trail-len-${t.id}`}
+            data-track-id={t.id}
+            data-count={t.vertexCount}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};

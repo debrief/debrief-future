@@ -12,6 +12,16 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./storyboard": {
+      "types": "./dist/storyboard/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./storyboardPlayback": {
+      "types": "./dist/storyboardPlayback/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
     "./MapView": {
       "types": "./dist/MapView/index.d.ts",
       "import": "./dist/MapView/index.js"
@@ -59,6 +69,10 @@
     "./nl-cql2-node": {
       "types": "./src/nl-cql2/node.ts",
       "import": "./src/nl-cql2/node.ts"
+    },
+    "./hooks/useIsMobile": {
+      "types": "./src/hooks/useIsMobile.ts",
+      "import": "./src/hooks/useIsMobile.ts"
     }
   },
   "sideEffects": [
@@ -90,6 +104,7 @@
   },
   "dependencies": {
     "@debrief/schemas": "workspace:*",
+    "@debrief/session-state": "workspace:*",
     "@debrief/utils": "workspace:*",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/sortable": "^8.0.0",

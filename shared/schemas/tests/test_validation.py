@@ -539,24 +539,21 @@ class TestStoryboardingNegativeFixtures:
         return json.loads((INVALID_FIXTURES_DIR / name).read_text())
 
     def test_rejects_non_null_time_range(self) -> None:
-        """FR-SCHEMA-004: time_range MUST be null in schema v1."""
-        # Load fixture and corrupt it by asserting non-null time_range flows
-        # through to the SceneFeature model where the v1 reserved-slot check
-        # (pattern/field-validator) rejects it.
+        """Pre-#263 invariant: legacy fixture with stringified time_range.
+
+        Under #215/#259 `time_range` was a `string` reserved slot that MUST
+        be null. Under #263 it is a `TimeRange` sub-record. The legacy
+        fixture's stringified JSON-as-`time_range` is now invalid for a
+        structural reason (string ≠ TimeRange object), so Pydantic rejects
+        it at the type layer. The spirit of the invariant survives: an
+        ill-formed `time_range` is still rejected.
+        """
         fixture = self._load("storyboard-scene-non-null-time-range.json")
-        # The fixture encodes the reserved-slot violation directly; confirm the
-        # Pydantic model rejects it with a clear error naming the time_range
-        # slot (via the module-level check) OR accepts the string form (since
-        # LinkML encodes it as a string). Either way, the spirit of the
-        # invariant is tested at the module boundary in Phase 4.
-        # At the schema level, the non-null string is structurally valid but
-        # will be rejected by the module via ReservedSlotViolation — so we
-        # assert the fixture still parses but carries the forbidden non-null
-        # value that the module will reject in T068.
-        scene = SceneFeature(**fixture)
-        assert scene.properties.time_range is not None, (
-            "Fixture encodes a non-null time_range for downstream module rejection"
-        )
+        with pytest.raises(ValidationError) as exc_info:
+            SceneFeature(**fixture)
+        # Error must name the time_range field
+        error_text = str(exc_info.value).lower()
+        assert "time_range" in error_text
 
     def test_rejects_bearing_nonzero(self) -> None:
         """FR-SCHEMA-005: viewport.bearing MUST be 0 in schema v1."""
@@ -567,27 +564,38 @@ class TestStoryboardingNegativeFixtures:
         error_text = str(exc_info.value)
         assert "bearing" in error_text.lower()
 
-    def test_rejects_duplicate_timestamp_detected_by_module_layer(self) -> None:
-        """FR-SCHEMA-006: duplicate timestamps within a Storyboard are rejected.
+    def test_rejects_duplicate_creation_order_detected_by_module_layer(self) -> None:
+        """FC-I4 (#259): duplicate `creation_order` within a Storyboard is
+        rejected at the module validator. Replaces the pre-#259
+        duplicate-timestamp test — equality on `timestamp` is now allowed
+        and is broken by `creation_order` as a secondary sort key.
 
-        This invariant spans two Features, so it is enforced at the
-        module layer (`createScene` + `validatePlot`) rather than the
-        single-Feature LinkML layer. The fixture is a valid collection
-        of individually-valid SceneFeatures — the point of this test is
-        that each parses cleanly (so the duplicate-timestamp check is
-        indeed cross-Feature).
+        The fixture is a valid collection of individually-valid
+        SceneFeatures sharing a `creation_order`; the module-layer
+        validator detects the cross-Feature collision.
         """
-        fixture = self._load("storyboard-scene-duplicate-timestamp.json")
+        fixture = self._load("storyboard-scene-duplicate-creation-order.json")
         features = fixture["features"]
         scene_features = [f for f in features if f["properties"]["kind"] == "STORYBOARD_SCENE"]
         assert len(scene_features) == 2
         for scene in scene_features:
             SceneFeature(**scene)  # Each parses individually
-        # Both share the same timestamp
+        # Both share the same creation_order — module validator rejects.
         assert (
-            scene_features[0]["properties"]["timestamp"]
-            == (scene_features[1]["properties"]["timestamp"])
+            scene_features[0]["properties"]["creation_order"]
+            == scene_features[1]["properties"]["creation_order"]
         )
+
+    def test_rejects_missing_creation_order_at_pydantic_layer(self) -> None:
+        """FC-I5 (#259): pre-#259 Scenes (no `creation_order`) are rejected
+        at the Pydantic layer because `creation_order` is now a required
+        slot on `SceneProperties`."""
+        fixture = self._load("storyboard-scene-missing-creation-order.json")
+        features = fixture["features"]
+        scene = next(f for f in features if f["properties"]["kind"] == "STORYBOARD_SCENE")
+        with pytest.raises(ValidationError) as exc_info:
+            SceneFeature(**scene)
+        assert "creation_order" in str(exc_info.value).lower()
 
     def test_rejects_orphan_scene_detected_by_module_layer(self) -> None:
         """FR-SCHEMA-007: Scene.storyboard_id must reference an existing

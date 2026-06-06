@@ -200,6 +200,23 @@
             "array",
             "null"
           ]
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -209,6 +226,30 @@
         "style"
       ],
       "title": "CircleAnnotationProperties",
+      "type": "object"
+    },
+    "Coordinate": {
+      "additionalProperties": false,
+      "description": "A geographic coordinate [longitude, latitude]",
+      "properties": {
+        "latitude": {
+          "description": "Latitude in degrees (-90 to 90)",
+          "maximum": 90,
+          "minimum": -90,
+          "type": "number"
+        },
+        "longitude": {
+          "description": "Longitude in degrees (-180 to 180)",
+          "maximum": 180,
+          "minimum": -180,
+          "type": "number"
+        }
+      },
+      "required": [
+        "longitude",
+        "latitude"
+      ],
+      "title": "Coordinate",
       "type": "object"
     },
     "DatasetAxisMetadata": {
@@ -354,6 +395,15 @@
       ],
       "title": "DatasetSeries",
       "type": "object"
+    },
+    "DisplayModeEnum": {
+      "description": "Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.",
+      "enum": [
+        "full",
+        "trail"
+      ],
+      "title": "DisplayModeEnum",
+      "type": "string"
     },
     "DurationPresetEnum": {
       "description": "Common ISO 8601 duration presets for interval parameters",
@@ -782,6 +832,23 @@
             "array",
             "null"
           ]
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -1001,6 +1068,244 @@
       "title": "LogEntry",
       "type": "object"
     },
+    "MCPContentItem": {
+      "additionalProperties": false,
+      "description": "A single MCP content item (resource, text, or image). Carries Debrief-specific annotations (debrief:* keys) on every item. Closes audit \u00a73.1 row 15.",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/Any",
+          "description": "Debrief-specific annotations (`debrief:resultType`, `debrief:label`, `debrief:sourceFeatures`, etc). Free-form per Article XV.2 because the key set is open-ended and uses colons (`debrief:*`) that LinkML cannot constrain as slot names."
+        },
+        "data": {
+          "description": "Base64-encoded payload when type=image.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mimeType": {
+          "description": "IANA media type when type=image or type=resource.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resource": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Nested resource descriptor `{ uri, mimeType, text }` when type=resource. Free-form per Article XV.2 (the inner shape is driven by individual tool authors)."
+        },
+        "text": {
+          "description": "Body text when type=text.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "description": "Content-item discriminator. Current consumers emit `resource`, `text`, `image`. Kept as string to remain additive over any future MCP content-item types.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "annotations"
+      ],
+      "title": "MCPContentItem",
+      "type": "object"
+    },
+    "MCPContentItemTypeEnum": {
+      "description": "Discriminator for MCPContentItem variants.",
+      "enum": [
+        "text",
+        "resource_link",
+        "image",
+        "structured"
+      ],
+      "title": "MCPContentItemTypeEnum",
+      "type": "string"
+    },
+    "MCPErrorResponse": {
+      "additionalProperties": false,
+      "description": "MCP error response envelope. Closes audit \u00a73.1 row 17. The error payload is nested (matches the JSON-RPC convention used by the live server).",
+      "properties": {
+        "duration_ms": {
+          "description": "Wall-clock duration before failure.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "error": {
+          "$ref": "#/$defs/Any",
+          "description": "Nested error object `{ code, message, data: { debrief:errorCategory, debrief:affectedFeatures } }`. Free-form per Article XV.2 because the inner `data` map uses colon-bearing keys outside LinkML slot syntax."
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "MCPErrorResponse",
+      "type": "object"
+    },
+    "MCPParamSchema": {
+      "additionalProperties": false,
+      "description": "JSON-Schema-like parameter fragment used inside MCPToolDefinition.input_schema. Closes audit \u00a73.1 rows 1 and 27 (two-site drift). Open at the wire level \u2014 consumers narrow with additional fields (`enum`, `default`, `x-debrief-param-type`) via intersection in the local adapter modules.",
+      "properties": {
+        "description": {
+          "description": "Human-readable parameter description.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "description": "JSON-Schema primitive type (string / number / integer / boolean / array / object).",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "MCPParamSchema",
+      "type": "object"
+    },
+    "MCPParamTypeEnum": {
+      "description": "JSON-Schema-compatible primitive types for tool parameters.",
+      "enum": [
+        "string",
+        "number",
+        "integer",
+        "boolean",
+        "array",
+        "object"
+      ],
+      "title": "MCPParamTypeEnum",
+      "type": "string"
+    },
+    "MCPRequest": {
+      "additionalProperties": false,
+      "description": "MCP tool invocation envelope. Sent by consumers (VS Code, web-shell) to the MCP server. Closes audit \u00a73.1 row 13.",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/Any",
+          "description": "Free-form per-tool input payload (Article XV.2 exception \u2014 narrowed by per-tool Pydantic input model at dispatch)."
+        },
+        "tool": {
+          "description": "Tool name (one of SessionMCPToolName for the session-state server).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool",
+        "input"
+      ],
+      "title": "MCPRequest",
+      "type": "object"
+    },
+    "MCPSelectionRequirement": {
+      "additionalProperties": false,
+      "description": "Predicate describing what feature selection a tool needs (e.g. \"at least one Track\", \"exactly one Point\"). Closes audit \u00a73.1 row 18. Slot names match shared/utils/src/mcp-types.ts (`kind`, `min`, `max`).",
+      "properties": {
+        "kind": {
+          "description": "Feature kind this requirement applies to. Supports flat values (e.g. \"TRACK\", \"POINT\") and dot-delimited hierarchical paths (e.g. \"TRACK.SEGMENT\").",
+          "type": "string"
+        },
+        "max": {
+          "description": "Maximum number of features of this kind allowed.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "min": {
+          "description": "Minimum number of features of this kind required.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "min"
+      ],
+      "title": "MCPSelectionRequirement",
+      "type": "object"
+    },
+    "MCPToolDefinition": {
+      "additionalProperties": false,
+      "description": "Static catalogue entry advertised by the MCP server. Closes audit \u00a73.1 row 19. `input_schema` and `annotations` are free-form per Article XV.2 \u2014 `input_schema` is a JSON-Schema fragment and `annotations` carries open-ended `debrief:*` keys (colons in key names cannot be slot-modelled).",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/Any",
+          "description": "Debrief-specific annotations (`debrief:selectionRequirements`, `debrief:category`, `debrief:version`, `debrief:outputKind`, `debrief:uiCategory`). Free-form per Article XV.2."
+        },
+        "description": {
+          "description": "Human-readable tool description.",
+          "type": "string"
+        },
+        "input_schema": {
+          "$ref": "#/$defs/Any",
+          "description": "JSON-Schema fragment describing the tool's input payload. Free-form per Article XV.2 \u2014 consumers narrow at point of use."
+        },
+        "name": {
+          "description": "Tool identifier.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "input_schema",
+        "annotations"
+      ],
+      "title": "MCPToolDefinition",
+      "type": "object"
+    },
+    "MCPToolResponse": {
+      "additionalProperties": false,
+      "description": "Successful MCP tool response. Closes audit \u00a73.1 row 16. The `duration_ms` slot preserves the wire format used by the live MCP server and replay subsystem.",
+      "properties": {
+        "content": {
+          "description": "Ordered list of content items returned by the tool.",
+          "items": {
+            "$ref": "#/$defs/MCPContentItem"
+          },
+          "type": "array"
+        },
+        "duration_ms": {
+          "description": "Wall-clock duration of the tool invocation in milliseconds.",
+          "type": "integer"
+        },
+        "is_error": {
+          "description": "Reserved for streaming partial-error responses (additive over the live wire format).",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "structured_content": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Reserved for top-level free-form payload (e.g. vega-spec) \u2014 Article XV.2 exception. Additive over the live wire format."
+        }
+      },
+      "required": [
+        "content",
+        "duration_ms"
+      ],
+      "title": "MCPToolResponse",
+      "type": "object"
+    },
     "MarkerSymbolEnum": {
       "description": "Marker shapes for tool parameter choices (superset of PointShapeEnum)",
       "enum": [
@@ -1142,6 +1447,23 @@
             "array",
             "null"
           ]
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -1253,6 +1575,23 @@
           },
           "type": [
             "array",
+            "null"
+          ]
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
             "null"
           ]
         }
@@ -1373,6 +1712,23 @@
           "description": "Associated track identifier (optional)",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
             "null"
           ]
         }
@@ -1509,6 +1865,16 @@
       ],
       "title": "PlatformRecord",
       "type": "object"
+    },
+    "PlaybackStateEnum": {
+      "description": "Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.",
+      "enum": [
+        "stopped",
+        "playing",
+        "paused"
+      ],
+      "title": "PlaybackStateEnum",
+      "type": "string"
     },
     "PlotSummary": {
       "additionalProperties": false,
@@ -1812,6 +2178,23 @@
           "description": "Number of unique vertices (excluding ring closure point)",
           "minimum": 3,
           "type": "integer"
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -1898,6 +2281,16 @@
       ],
       "title": "PolygonProperties",
       "type": "object"
+    },
+    "PolygonSourceEnum": {
+      "description": "Provenance of a Scene's stored polygon geometry. Render-side consumers use this to decide whether to trust the on-disk polygon ('bounds') or recompute it from (viewport, map dimensions) when the stored polygon pre-dates Spec #258 ('placeholder') or was hand-drawn ('manual').",
+      "enum": [
+        "bounds",
+        "placeholder",
+        "manual"
+      ],
+      "title": "PolygonSourceEnum",
+      "type": "string"
     },
     "PositionStyle": {
       "additionalProperties": false,
@@ -2193,6 +2586,23 @@
             "array",
             "null"
           ]
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -2320,6 +2730,23 @@
             "string",
             "null"
           ]
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -2338,6 +2765,16 @@
         "scatter"
       ],
       "title": "ReferencePointPatternEnum",
+      "type": "string"
+    },
+    "ReplayStatusEnum": {
+      "description": "Outcome of resolving a logged tool invocation at replay time.",
+      "enum": [
+        "unchanged",
+        "version_drift",
+        "tool_removed"
+      ],
+      "title": "ReplayStatusEnum",
       "type": "string"
     },
     "ResultCategoryEnum": {
@@ -2411,14 +2848,65 @@
     },
     "SceneProperties": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "time_range": {}
+            },
+            "required": [
+              "time_range"
+            ]
+          },
+          "then": {
+            "properties": {
+              "viewport_end": {}
+            },
+            "required": [
+              "viewport_end"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "viewport_end": {}
+            },
+            "required": [
+              "viewport_end"
+            ]
+          },
+          "then": {
+            "properties": {
+              "time_range": {}
+            },
+            "required": [
+              "time_range"
+            ]
+          }
+        }
+      ],
       "description": "Properties class for a Scene child Feature. A Scene is a single captured moment in a Storyboard \u2014 viewport, timestamp, and per-feature visibility.",
       "properties": {
+        "_polygon_source": {
+          "$ref": "#/$defs/PolygonSourceEnum",
+          "description": "Provenance of the scene's stored polygon geometry (Spec #258). 'bounds' = computed from real Leaflet map bounds at capture time; 'placeholder' = pre-#258 ~100m square; 'manual' = reserved for future user-drawn rectangles. Render-side consumers recompute the polygon from (viewport, map dimensions) when this value is anything other than 'bounds' (including absent, for legacy scenes). The stored geometry is NEVER rewritten on read (Article III.2 source preservation)."
+        },
+        "creation_order": {
+          "description": "Per-Storyboard monotonic sequence value assigned by the platform at capture time. Acts as the secondary sort key for Scenes \u2014 when two Scenes share a `timestamp` the one with the lower `creation_order` comes first. Unique within a Storyboard; gaps are permitted (left by deletion). The platform \u2014 not the client \u2014 is the source of truth. Introduced by #259; absent on pre-#259 plots which are rejected at load (no migration shim \u2014 Article XIV pre-release freedom).",
+          "minimum": 0,
+          "type": "integer"
+        },
         "description": {
           "description": "Markdown per-scene narrative",
           "type": [
             "string",
             "null"
           ]
+        },
+        "display_mode": {
+          "$ref": "#/$defs/DisplayModeEnum",
+          "description": "Time-controller display mode at capture time (full = entire track history; trail = only the tail behind each platform). Reuses DisplayModeEnum from session-state.yaml. Optional for legacy compatibility (Spec #258): readers MUST leave the time controller untouched when this slot is absent (FR-003). Writers populate it from session.displayMode at the moment the scene is created."
         },
         "feature_set_hash": {
           "description": "SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids.",
@@ -2465,14 +2953,18 @@
           "type": "string"
         },
         "time_range": {
-          "description": "Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TimeRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "For instant Scenes (#215 default): MUST be absent. For time-range Scenes (#263): a TimeRange sub-record. When present, the Scene is the time-range flavour and `viewport_end` MUST also be present. See cross-field rule `scene-flavour-xor-rule`."
         },
         "timestamp": {
-          "description": "ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard). MUST be unique within a Storyboard.",
+          "description": "ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard) as the primary sort key. Multiple Scenes MAY share the same timestamp; ties are broken by `creation_order` ascending (see #259).",
           "format": "date-time",
           "type": "string"
         },
@@ -2485,9 +2977,37 @@
           "minimum": 0,
           "type": "integer"
         },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "viewport": {
           "$ref": "#/$defs/Viewport",
           "description": "Map viewport camera state at capture time"
+        },
+        "viewport_end": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Viewport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Map viewport camera state at the end of a time-range Scene (#263). MUST be present if and only if `time_range` is present. Reuses the Viewport sub-record (`bearing` MUST be 0). For instant Scenes this slot MUST be absent."
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "visible_feature_ids": {
           "description": "Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective.",
@@ -2504,12 +3024,49 @@
         "title",
         "viewport",
         "timestamp",
+        "creation_order",
         "visible_feature_ids",
         "feature_set_hash",
         "thumbnail_asset_ref",
         "transition_duration_ms"
       ],
       "title": "SceneProperties",
+      "type": "object"
+    },
+    "SceneThumbnailAssetEntry": {
+      "additionalProperties": false,
+      "description": "A single STAC Item asset entry produced by Storyboarding (#216) for one\nvariant of one Scene's thumbnail. Always appears as part of a\npair in an Item's `assets` map: a large entry under the key\n`scene-thumbnail-{ULID}` and a small entry under the key\n`scene-thumbnail-{ULID}-sm`, where `{ULID}` is the owning Scene's\nidentifier (matches SceneProperties.id).\n\nWhy ULID: the owning Scene's id; lets every per-Scene asset be\ntraced back to its Scene without an explicit foreign-key field\nin the asset payload.\n\nWhy pairs: the Storyboarding capture pipeline produces both\nsizes atomically (800x600 large for inspection; 200x150 small\nfor timeline strips). A single-variant entry is a defect \u2014 see\nschema rule scene-thumbnail-pair-rule-001.\n\nLifecycle: created when a Scene is captured. Deleted when the\nScene is deleted (garbage-collection invariant \u2014 see schema\nrule scene-thumbnail-orphan-rule-001). Both rules are enforced\nby the debrief-stac audit module; the JSON Schema layer\nenforces the value shape and key format only (see schema rule\nscene-thumbnail-key-format-rule-001).\n\nSupersedes the spec-241 placeholder `item_assets[\"scene-thumbnail\"]`\nand the `^scene-thumbnail(-.+)?$` patternProperties rule.",
+      "properties": {
+        "href": {
+          "description": "URI-reference relative to the Item directory; conventionally ./scene-thumbnails/scene-{ULID}.png (large) or ./scene-thumbnails/scene-{ULID}-sm.png (small).",
+          "type": "string"
+        },
+        "roles": {
+          "description": "Exactly [\"thumbnail\"]. Storyboarding-derived thumbnails are not declared as overview (which is reserved for plot-level overviews of dimensions 600x800).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "description": "Optional human label. Storyboarding writer emits \"Scene thumbnail\" (large) or \"Scene thumbnail (small)\" (small).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "const": "image/png",
+          "description": "Always image/png \u2014 Storyboarding capture writes PNGs only.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "href",
+        "type",
+        "roles"
+      ],
+      "title": "SceneThumbnailAssetEntry",
       "type": "object"
     },
     "SegmentMetadata": {
@@ -2888,6 +3445,24 @@
       "title": "SensorData",
       "type": "object"
     },
+    "SessionMCPToolName": {
+      "description": "Authoritative list of session-state MCP tool names. Must mirror the `TOOLS` const at services/session-state/src/server/mcp.ts. Research R-001: replaces the TS-only `type ToolName = keyof typeof TOOLS` projection with a cross-language permissible-values enum.",
+      "enum": [
+        "session.getState",
+        "session.getTemporalState",
+        "session.getSpatialState",
+        "session.getFeaturesState",
+        "session.getDocumentState",
+        "session.setCurrentTime",
+        "session.setViewport",
+        "session.setSelection",
+        "session.setHiddenFeatures",
+        "session.setPlaybackRate",
+        "session.setRotation"
+      ],
+      "title": "SessionMCPToolName",
+      "type": "string"
+    },
     "SnapshotLinks": {
       "additionalProperties": false,
       "description": "Doubly-linked references to adjacent snapshots.",
@@ -3162,8 +3737,8 @@
           ]
         },
         "schema_version": {
-          "description": "Schema version. Starts at 1. Monotonically non-decreasing across edits; bumped only by migrations.",
-          "minimum": 1,
+          "description": "Schema version. Bumped to 2 by #259 (relax timestamp uniqueness + add `SceneProperties.creation_order`). Pre-#259 plots carrying `schema_version: 1` are rejected at load with `UnsupportedSchemaVersionError` \u2014 no in-place migration is provided (Article XIV pre-release freedom; FR-010 in #259 spec). Monotonically non-decreasing across edits; bumped only by migrations or breaking schema changes.",
+          "minimum": 2,
           "type": "integer"
         },
         "tags": {
@@ -3173,6 +3748,23 @@
           },
           "type": [
             "array",
+            "null"
+          ]
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
             "null"
           ]
         }
@@ -3278,30 +3870,129 @@
     },
     "SystemStateProperties": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state_type": {
+                "const": "temporal"
+              }
+            },
+            "required": [
+              "state_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "end_time": {},
+              "start_time": {}
+            },
+            "required": [
+              "start_time",
+              "end_time"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state_type": {
+                "const": "spatial"
+              }
+            },
+            "required": [
+              "state_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "viewport": {}
+            },
+            "required": [
+              "viewport"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state_type": {
+                "const": "selection"
+              }
+            },
+            "required": [
+              "state_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selected_ids": {}
+            },
+            "required": [
+              "selected_ids"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state_type": {
+                "const": "active_storyboard"
+              }
+            },
+            "required": [
+              "state_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "active_storyboard_id": {}
+            },
+            "required": [
+              "active_storyboard_id"
+            ]
+          }
+        }
+      ],
       "description": "Properties for SYSTEM features storing application state",
       "properties": {
-        "bbox": {
-          "description": "Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state",
-          "items": {
-            "type": "number"
-          },
+        "active_storyboard_id": {
+          "description": "Storyboard properties.id the analyst last pinned for this plot (#237)",
           "type": [
-            "array",
+            "string",
             "null"
           ]
         },
-        "center": {
-          "description": "Map center [longitude, latitude] - for spatial state",
-          "items": {
-            "type": "number"
-          },
+        "current_time": {
+          "description": "Playhead position at save (ISO-8601). When present, must lie within [start_time, end_time] (enforced by the load validator, not the schema).",
+          "format": "date-time",
           "type": [
-            "array",
+            "string",
             "null"
           ]
+        },
+        "display_mode": {
+          "$ref": "#/$defs/DisplayModeEnum",
+          "description": "Track visualization mode for this plot."
         },
         "end_time": {
-          "description": "Viewport end time (ISO8601) - for temporal state",
+          "description": "Analytical window end (ISO8601) - for temporal state",
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "filter_end_time": {
+          "description": "Visible-window filter end (ISO-8601). Absent = unbounded end.",
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "filter_start_time": {
+          "description": "Visible-window filter start (ISO-8601). Absent = unbounded start.",
           "format": "date-time",
           "type": [
             "string",
@@ -3313,6 +4004,15 @@
           "const": "SYSTEM",
           "description": "Feature type discriminator"
         },
+        "playback_rate": {
+          "description": "Playback speed multiplier for this plot (0.1-100).",
+          "maximum": 100.0,
+          "minimum": 0.1,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
         "provenance": {
           "description": "PROV-aligned provenance records (append-only log of tool operations)",
           "items": {
@@ -3320,6 +4020,15 @@
           },
           "type": [
             "array",
+            "null"
+          ]
+        },
+        "rotation": {
+          "description": "Map rotation in degrees (0-360).",
+          "maximum": 360,
+          "minimum": 0,
+          "type": [
+            "number",
             "null"
           ]
         },
@@ -3333,8 +4042,15 @@
             "null"
           ]
         },
+        "selected_primary": {
+          "description": "Primary selection path for properties display.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "start_time": {
-          "description": "Viewport start time (ISO8601) - for temporal state",
+          "description": "Analytical window start (ISO8601) - for temporal state",
           "format": "date-time",
           "type": [
             "string",
@@ -3343,14 +4059,29 @@
         },
         "state_type": {
           "$ref": "#/$defs/SystemStateTypeEnum",
-          "description": "Discriminator for state variant (temporal, spatial, selection)"
+          "description": "Discriminator for state variant (temporal, spatial, selection, active_storyboard)"
         },
-        "zoom": {
-          "description": "Map zoom level - for spatial state",
-          "type": [
-            "number",
-            "null"
-          ]
+        "step_size": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TimeStep"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Playback step granularity for this plot."
+        },
+        "viewport": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ViewportPolygon"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Saved map viewport (ViewportPolygon). Identity-mapped to SpatialSlice.viewport."
         }
       },
       "required": [
@@ -3365,7 +4096,8 @@
       "enum": [
         "temporal",
         "spatial",
-        "selection"
+        "selection",
+        "active_storyboard"
       ],
       "title": "SystemStateTypeEnum",
       "type": "string"
@@ -3573,6 +4305,23 @@
         "text": {
           "description": "Text content to display",
           "type": "string"
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -3582,6 +4331,104 @@
       ],
       "title": "TextAnnotationProperties",
       "type": "object"
+    },
+    "TimeFilter": {
+      "additionalProperties": false,
+      "description": "Constraints on the visible time window (epoch milliseconds; null = unbounded)",
+      "properties": {
+        "end": {
+          "description": "Filter end as epoch milliseconds (null/missing = unbounded on the end)",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "start": {
+          "description": "Filter start as epoch milliseconds (null/missing = unbounded on the start)",
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "title": "TimeFilter",
+      "type": "object"
+    },
+    "TimeInstant": {
+      "additionalProperties": false,
+      "description": "A point in time with dual representations (FR-032, FR-033)",
+      "properties": {
+        "epoch": {
+          "description": "Milliseconds since Unix epoch",
+          "type": "integer"
+        },
+        "iso": {
+          "description": "ISO 8601 UTC format string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "epoch",
+        "iso"
+      ],
+      "title": "TimeInstant",
+      "type": "object"
+    },
+    "TimeRange": {
+      "additionalProperties": false,
+      "description": "Time interval for a time-range Scene (#263). The interval is closed on both ends. `end` MUST be strictly greater than `start`. Introduced by Spec #263 to make `SceneProperties.time_range` a first-class slot.",
+      "properties": {
+        "end": {
+          "description": "ISO-8601 instant; the slider position at the second (confirm) capture action. MUST be strictly greater than `start`.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "start": {
+          "description": "ISO-8601 instant; the slider position at the first capture action. By convention CRUD writes the owning Scene's `timestamp` into this slot, but the system does not depend on the two being equal \u2014 ordering reads `time_range?.start ?? timestamp`.",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeRange",
+      "type": "object"
+    },
+    "TimeStep": {
+      "additionalProperties": false,
+      "description": "Step size for discrete time navigation (FR-008)",
+      "properties": {
+        "unit": {
+          "$ref": "#/$defs/TimeUnitEnum",
+          "description": "Unit of the step"
+        },
+        "value": {
+          "description": "Numeric step value",
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "TimeStep",
+      "type": "object"
+    },
+    "TimeUnitEnum": {
+      "description": "Units for time step navigation",
+      "enum": [
+        "millisecond",
+        "second",
+        "minute",
+        "hour",
+        "day"
+      ],
+      "title": "TimeUnitEnum",
+      "type": "string"
     },
     "TimestampedPosition": {
       "additionalProperties": false,
@@ -3683,10 +4530,118 @@
       "title": "ToolCategoryEnum",
       "type": "string"
     },
+    "ToolDefinition": {
+      "additionalProperties": false,
+      "description": "Consumer-facing flattened view of a tool catalogue entry. Closes audit \u00a73.1 row 22. Slot names match `apps/web-shell/src/mocks/calcService.ts` (`min_tracks`, `max_tracks`, `min_features` \u2014 preserved as-is).",
+      "properties": {
+        "description": {
+          "description": "Brief description.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique tool identifier.",
+          "type": "string"
+        },
+        "maxTracks": {
+          "description": "Maximum number of tracks (absent = no upper limit).",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "minFeatures": {
+          "description": "Minimum number of features required (any type).",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "minTracks": {
+          "description": "Minimum number of tracks required.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "title": "ToolDefinition",
+      "type": "object"
+    },
+    "ToolExecutionResultForReplay": {
+      "additionalProperties": false,
+      "description": "Minimal tool-execution result returned by the Replay Engine's `execute_tool` callback. Closes audit \u00a73.1 row 6. Distinct from `ToolResultForLog` (no inheritance) because the replay path's observable surface is intentionally narrower \u2014 see services/session-state/src/log/types.ts:373.",
+      "properties": {
+        "artifact_href": {
+          "description": "Path to an exported artifact (for non-GeoJSON tool results).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "duration_ms": {
+          "description": "Wall-clock duration of the replay invocation in milliseconds.",
+          "type": "integer"
+        },
+        "features": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "GeoJSON FeatureCollection produced by the tool during replay. Free-form per Article XV.2."
+        },
+        "result_id": {
+          "description": "Stable result identifier (used by the activity panel).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "success": {
+          "description": "Whether the tool succeeded.",
+          "type": "boolean"
+        },
+        "tool_version": {
+          "description": "Tool version observed at replay time.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "success",
+        "duration_ms"
+      ],
+      "title": "ToolExecutionResultForReplay",
+      "type": "object"
+    },
     "ToolParameter": {
       "additionalProperties": false,
       "description": "A configurable parameter for a tool. Supports string, number, boolean, and enum types with optional default values, explicit choices, and schema-defined parameter type references.",
       "properties": {
+        "choices": {
+          "description": "Explicit choice list for enum-typed parameters when the client cannot (or chooses not to) resolve a schema-defined `param_type`. Used by both the ToolMatch picker (shared/components) and the VS Code activity-panel adapter (apps/vscode/src/services/mcpToolAdapter.ts). Added under spec 222 (P2) to collapse the drift cluster attributed to ToolParameter (audit \u00a73.2 rows 37 and 86).",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "default_value": {
           "description": "Default value if not provided",
           "type": [
@@ -3724,6 +4679,93 @@
         "description"
       ],
       "title": "ToolParameter",
+      "type": "object"
+    },
+    "ToolParameterMeta": {
+      "additionalProperties": false,
+      "description": "Tunable parameter metadata recorded alongside a tool result for provenance. Closes audit \u00a73.1 row 21. Matches the live web-shell mock shape \u2014 three slots tracking value, default-ness, and whether the parameter is operator-tunable.",
+      "properties": {
+        "default": {
+          "description": "Whether the parameter took its default value.",
+          "type": "boolean"
+        },
+        "tunable": {
+          "description": "Whether the parameter is operator-tunable.",
+          "type": "boolean"
+        },
+        "value": {
+          "$ref": "#/$defs/Any",
+          "description": "Parameter value used during the invocation."
+        }
+      },
+      "required": [
+        "value",
+        "default",
+        "tunable"
+      ],
+      "title": "ToolParameterMeta",
+      "type": "object"
+    },
+    "ToolResult": {
+      "additionalProperties": false,
+      "description": "Logical tool invocation result as seen by the consumer (after the MCP layer has unwrapped MCPToolResponse). Closes audit \u00a73.1 row 20. Slot names match `apps/web-shell/src/mocks/calcService.ts` \u2014 includes `resultLayer`, `resultLayers`, `parameters`, `datasets` which are free-form per Article XV.2 (their inner shapes are tool-specific).",
+      "properties": {
+        "datasets": {
+          "description": "Optional dataset results for the Results panel (range-bearing charts, etc). Each entry shaped like `{ filename: string, envelope: Record<string, unknown> }`.",
+          "items": {
+            "$ref": "#/$defs/Any"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "message": {
+          "description": "Status / explanation message.",
+          "type": "string"
+        },
+        "parameters": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional record of operator-tunable parameters and their values (keyed by parameter name, values shaped like ToolParameterMeta). Free-form per Article XV.2 (a LinkML `inlined_as_dict` of ToolParameterMeta would express it, but consumers already build a plain `Record<string, ToolParameterMeta>` and narrow on the way out \u2014 keeping it free-form preserves the live wire shape)."
+        },
+        "resultLayer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional single result layer (e.g. bounding-box polygon)."
+        },
+        "resultLayers": {
+          "description": "Optional multiple result layers (e.g. buffer-zone polygons).",
+          "items": {
+            "$ref": "#/$defs/Any"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "success": {
+          "description": "Whether the tool succeeded.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success",
+        "message"
+      ],
+      "title": "ToolResult",
       "type": "object"
     },
     "ToolResultAnnotations": {
@@ -3772,6 +4814,99 @@
         "label"
       ],
       "title": "ToolResultAnnotations",
+      "type": "object"
+    },
+    "ToolResultForLog": {
+      "additionalProperties": false,
+      "description": "Persisted tool-result shape written by the live tool-result logger and read back by the replay subsystem. Closes audit \u00a73.1 row 4. Slot names match `services/session-state/src/log/types.ts:97` verbatim so existing log fixtures under the session-state fixtures directories continue to deserialise unchanged (FR-011).",
+      "properties": {
+        "artifact_href": {
+          "description": "Path to an exported artifact (for non-GeoJSON tool results).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "duration_ms": {
+          "description": "Wall-clock duration of the tool invocation in milliseconds.",
+          "type": "integer"
+        },
+        "features": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "GeoJSON FeatureCollection produced by the tool. Free-form per Article XV.2 (the tool's output shape is its own contract)."
+        },
+        "input_state": {
+          "description": "Pre-tool geometry snapshot for mutation tools \u2014 passed through to LogEntry. Free-form per Article XV.2 (the inner InputFeatureState shape is owned by #224 session-state).",
+          "items": {
+            "$ref": "#/$defs/Any"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "result_type": {
+          "description": "Hierarchical result type (e.g. mutation/track/smoothed).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_feature_ids": {
+          "description": "IDs of input features used to generate this result.",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "success": {
+          "description": "Whether the tool succeeded.",
+          "type": "boolean"
+        },
+        "tool_id": {
+          "description": "Tool identifier (mirrors LogEntry.was_generated_by.tool).",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "success",
+        "duration_ms"
+      ],
+      "title": "ToolResultForLog",
+      "type": "object"
+    },
+    "ToolsUpdateMessage": {
+      "additionalProperties": false,
+      "description": "Push notification from the extension host to the activity-panel webview when the tool catalogue changes. Closes audit \u00a73.1 row 28. `payload` is free-form per Article XV.2 \u2014 its inner shape `{ tools: ToolsPanelItem[], hasToolInventory?, hasSelection? }` is narrowed at the activity-panel consumer.",
+      "properties": {
+        "payload": {
+          "$ref": "#/$defs/Any",
+          "description": "Nested payload `{ tools, hasToolInventory?, hasSelection? }`. Free-form per Article XV.2."
+        },
+        "type": {
+          "const": "tools:update",
+          "description": "Discriminator \u2014 always the literal `tools:update`.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "payload"
+      ],
+      "title": "ToolsUpdateMessage",
       "type": "object"
     },
     "TrackFeature": {
@@ -3976,6 +5111,16 @@
             "null"
           ]
         },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "vessel_class": {
           "description": "Full vessel classification path override using slash-separated notation (e.g., surface/warship/frigate/type23). When set, overrides registry-derived path.",
           "pattern": "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$",
@@ -3997,6 +5142,13 @@
           "pattern": "^[a-z0-9-]+$",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
             "null"
           ]
         }
@@ -4173,6 +5325,23 @@
             "array",
             "null"
           ]
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -4183,6 +5352,46 @@
         "style"
       ],
       "title": "VectorAnnotationProperties",
+      "type": "object"
+    },
+    "VertexMetadata": {
+      "additionalProperties": false,
+      "description": "Optional, sparse per-vertex annotation attached to a feature. One entry corresponds to one vertex of the parent feature's geometry, identified by the structured `path` slot following the `selectionPath` convention (research note R-008). Carrying any of label/tags/note triggers persistence; an entry with all three absent MUST be omitted on write (the writer's flush function prunes). Path shape depends on parent geometry:\n  Track       -> \"positions/<int>\"\n  Polygon     -> \"rings/<int>/vertices/<int>\"\n  LineString  -> \"vertices/<int>\"\n  MultiPoint  -> \"vertices/<int>\"\n  Point       -> \"vertex/0\"",
+      "properties": {
+        "label": {
+          "description": "Free-text short label.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "note": {
+          "description": "Free-text long note.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "description": "Structured vertex address following the selectionPath convention. The class-level regex accepts the union of all per-geometry path shapes; the writer additionally checks that the path matches the parent geometry's specific shape at flush time. Acts as the identity for an entry within a feature's `vertex_metadata` list \u2014 duplicates MUST be rejected by validators.",
+          "pattern": "^(positions/[0-9]+|rings/[0-9]+/vertices/[0-9]+|vertices/[0-9]+|vertex/0)$",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Free-text tag list. Order is not significant.",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "VertexMetadata",
       "type": "object"
     },
     "VesselDomainEnum": {
@@ -4225,6 +5434,33 @@
         "bearing"
       ],
       "title": "Viewport",
+      "type": "object"
+    },
+    "ViewportPolygon": {
+      "additionalProperties": false,
+      "description": "Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)",
+      "properties": {
+        "coordinates": {
+          "description": "Four corners in clockwise order [NW, NE, SE, SW]",
+          "items": {
+            "$ref": "#/$defs/Coordinate"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        },
+        "zoom": {
+          "description": "Map zoom level for restoring the view (optional)",
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "ViewportPolygon",
       "type": "object"
     },
     "WasGeneratedBy": {

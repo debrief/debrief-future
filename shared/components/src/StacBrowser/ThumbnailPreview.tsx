@@ -39,7 +39,9 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
     );
   }
 
-  const thumbnailSrc = item.thumbnailHref ?? null;
+  // spec 241: prefer the large overview (800x600) for the preview pane;
+  // fall back to the small thumbnail when the overview hasn't been captured.
+  const thumbnailSrc = item.overviewHref ?? item.thumbnailHref ?? null;
   const showFallback = !thumbnailSrc || imageError;
 
   return (

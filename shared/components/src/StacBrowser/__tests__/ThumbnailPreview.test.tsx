@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ThumbnailPreview } from '../ThumbnailPreview';
 import type { CatalogOverviewItem } from '../../filter-engine/types';
 
-function makeItem(id: string, title: string, thumbnailHref?: string): CatalogOverviewItem {
+function makeItem(id: string, title: string, overviewHref?: string): CatalogOverviewItem {
   return {
     id,
     title,
@@ -12,8 +12,11 @@ function makeItem(id: string, title: string, thumbnailHref?: string): CatalogOve
     datetime: '2024-01-01T00:00:00Z',
     startDatetime: null,
     endDatetime: null,
-    thumbnailHref: thumbnailHref ?? null,
-    thumbnailSmHref: null,
+    // spec 241: ThumbnailPreview prefers overviewHref (800x600) for the
+    // preview pane and only falls back to thumbnailHref when overview is
+    // missing.
+    thumbnailHref: null,
+    overviewHref: overviewHref ?? null,
   };
 }
 
@@ -23,17 +26,28 @@ describe('ThumbnailPreview', () => {
     expect(screen.getByText('Select a plot to preview')).toBeTruthy();
   });
 
-  it('renders thumbnail image when item has thumbnailHref', () => {
-    const item = makeItem('a', 'Alpha', '/path/to/thumbnail.png');
+  it('renders overview image when item has overviewHref', () => {
+    const item = makeItem('a', 'Alpha', '/path/to/overview.png');
     render(<ThumbnailPreview item={item} items={[item]} />);
     const img = screen.getByTestId('thumbnail-preview-image') as HTMLImageElement;
-    expect(img.src).toContain('/path/to/thumbnail.png');
+    expect(img.src).toContain('/path/to/overview.png');
   });
 
-  it('renders fallback when item has no thumbnailHref', () => {
+  it('renders fallback when item has no overviewHref or thumbnailHref', () => {
     const item = makeItem('a', 'Alpha');
     render(<ThumbnailPreview item={item} items={[item]} />);
     expect(screen.getByTestId('thumbnail-preview-fallback')).toBeTruthy();
+  });
+
+  it('falls back to small thumbnailHref when overview is missing', () => {
+    const item: CatalogOverviewItem = {
+      ...makeItem('b', 'Bravo'),
+      thumbnailHref: '/path/to/small.png',
+      overviewHref: null,
+    };
+    render(<ThumbnailPreview item={item} items={[item]} />);
+    const img = screen.getByTestId('thumbnail-preview-image') as HTMLImageElement;
+    expect(img.src).toContain('/path/to/small.png');
   });
 
   it('fires onOpen on double-click', () => {

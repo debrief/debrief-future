@@ -1,0 +1,50 @@
+/**
+ * ViewportLockBanner styles — top-edge overlay with click-to-unlock.
+ * Spec 260 / FR-005.
+ *
+ * Pointer-events discipline (per /speckit.review 4A): the OUTER container
+ * is `pointer-events: none` so that map gestures (pan, click, etc.) and
+ * — critically — clicks on the LeafletToolbar (which sits at the same
+ * z-index region) are never intercepted by the banner's bounding rect.
+ * Only the INNER button opts back in via `pointer-events: auto`.
+ *
+ * Do NOT flip the outer container to `pointer-events: auto` "to make it
+ * easier to click" — that regresses the toolbar-occlusion fix.
+ */
+
+.debrief-viewport-lock-banner {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--debrief-z-overlay, 1000);
+  /* MUST stay none — see file header. */
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+}
+
+.debrief-viewport-lock-banner__button {
+  /* MUST stay auto — the only opt-in for clicks. */
+  pointer-events: auto;
+  padding: 6px 14px;
+  border-radius: var(--debrief-radius-sm);
+  background-color: var(--debrief-bg-primary);
+  color: var(--debrief-text-primary);
+  font-size: 13px;
+  line-height: 1.4;
+  font-family: inherit;
+  box-shadow: var(--debrief-shadow-md);
+  border: 1px solid var(--debrief-border-color);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.debrief-viewport-lock-banner__button:hover {
+  background-color: var(--debrief-bg-tertiary);
+}
+
+.debrief-viewport-lock-banner__button:focus {
+  outline: 2px solid var(--debrief-color-primary);
+  outline-offset: 2px;
+}

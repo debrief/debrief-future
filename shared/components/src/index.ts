@@ -44,9 +44,20 @@ export type {
 export { MapView } from './MapView';
 export type { MapViewProps, FlyToTarget } from './MapView';
 export {
+  applyClickToSelection,
+  getPlatformModifierKey,
+  isMacPlatform,
+  isPlatformModifier,
+} from './utils/applyClickToSelection';
+export type {
+  SelectionClickEvent,
+  SelectionState,
+  NextSelection,
+  PlatformModifierKey,
+} from './utils/applyClickToSelection';
+export {
   SceneRectangleLayer,
   geoJsonPolygonToLeafletCoords,
-  computeFillOpacity,
   computeOverlapRanks,
 } from './MapView/SceneRectangleLayer';
 export type { SceneRectangleLayerProps } from './MapView/SceneRectangleLayer';
@@ -354,6 +365,9 @@ export type {
 // Storyboard CRUD module (Feature: 215-storyboarding-schema)
 export * from './storyboard';
 
+// Storyboard playback primitives (Feature: 263-time-range-scenes)
+export * from './storyboardPlayback';
+
 // Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback + 218-storyboarding-edit + 230-storyboard-edit-wiring)
 export {
   StoryboardPanel,
@@ -366,10 +380,18 @@ export {
   UndoToast,
   StaleBadge,
   SceneOverflowMenu,
+  // 235 — first-capture inline naming row + duplicate-timestamp banner.
+  NamingRow,
+  CollisionBanner,
   useStoryboardEditReducer,
   storyboardEditReducer,
   createInitialStoryboardEditState,
   composeSceneEditViewModels,
+  composeNamingRowViewModel,
+  composeCollisionBannerViewModel,
+  COLLISION_OFFSET_CAP,
+  // 234 FR-003 / ADR-027 — shared callback-adapter for stories + harness
+  useStoryOnlyMockHandlers,
 } from './panels/StoryboardPanel';
 export type {
   StoryboardPanelProps,
@@ -398,6 +420,23 @@ export type {
   UndoToastDescriptor,
   StaleFlagEntry,
   ThemeVariant,
+  // 235 — first-capture naming row + collision banner types
+  NamingRowProps,
+  NamingRowReducerState,
+  NamingRowPushState,
+  NamingRowViewModel,
+  CollisionBannerProps,
+  CollisionBannerReducerState,
+  CollisionBannerPushState,
+  CollisionBannerViewModel,
+  // 234 FR-003 / ADR-027 — types for the shared callback-adapter helper
+  MockPortKnobs,
+  MockHandlers,
+  MockHandlersFixture,
+  MockHandlersInitial,
+  MockHandlersHandle,
+  MockOutboundRecorder,
+  UseStoryOnlyMockHandlersOptions,
 } from './panels/StoryboardPanel';
 
 // NL → CQL2 generator + live transport (#188, #190, #191).

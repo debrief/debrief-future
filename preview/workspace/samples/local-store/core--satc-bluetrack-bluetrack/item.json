@@ -1,8 +1,10 @@
 {
   "type": "Feature",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "id": "core--satc-bluetrack-bluetrack",
   "geometry": {
@@ -41,7 +43,7 @@
   "properties": {
     "title": "Saxon Warrior: Satc Bluetrack Bluetrack",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Saxon Warrior: Satc Bluetrack Bluetrack — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Richmond.",
+    "description": "Saxon Warrior: Satc Bluetrack Bluetrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Richmond.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-12T13:13:14+00:00",
     "debrief:platforms": [
@@ -63,6 +65,19 @@
       "active-search",
       "radar-detection",
       "track-merge"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
     ]
   },
   "links": [
@@ -110,23 +125,41 @@
         "source_path": "/tmp/debrief-regen-4x2tftum/satc--bluetrack__BlueTrack.rep",
         "load_timestamp": "2026-04-13T23:12:33.654951Z",
         "tool_version": "0.1.0"
-      }
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:33.654Z",
+      "file:size": 18017,
+      "file:checksum": "1220f5afa1914f60bf37cfafde5e8c29d67d471aaf628ff7def317a0aa22983f5b33"
     },
     "thumbnail": {
       "href": "./thumbnail.png",
       "type": "image/png",
-      "title": "Plot thumbnail",
+      "title": "Plot thumbnail (200x150)",
       "roles": [
         "thumbnail"
-      ]
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 7088,
+      "file:checksum": "1220a28859c300136738fb6a84c62a9df492a111c9bfa56042a01fbf7495351bf389"
     },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
+    "overview": {
+      "href": "./overview.png",
       "type": "image/png",
-      "title": "Plot thumbnail (small)",
+      "title": "Plot overview (800x600)",
       "roles": [
-        "thumbnail"
-      ]
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 18820,
+      "file:checksum": "122091e356e9a3e297ae2c41a2f8e183ce0f50305bbb8a9522fbf29611c9d3ad81a9"
     }
   }
 }

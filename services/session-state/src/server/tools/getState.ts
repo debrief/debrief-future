@@ -11,15 +11,16 @@ import type {
   FeaturesSlice,
   DocumentSlice,
   ResultsSlice,
+  PlotSlice,
 } from '../../types/index.js';
 
 export interface GetStateInput {
-  slice?: 'temporal' | 'spatial' | 'features' | 'document' | 'results';
+  slice?: 'temporal' | 'spatial' | 'features' | 'document' | 'results' | 'plot';
 }
 
 export interface GetStateOutput {
   success: boolean;
-  state?: SessionState | TemporalSlice | SpatialSlice | FeaturesSlice | DocumentSlice | ResultsSlice;
+  state?: SessionState | TemporalSlice | SpatialSlice | FeaturesSlice | DocumentSlice | ResultsSlice | PlotSlice;
   error?: string;
 }
 
@@ -51,6 +52,7 @@ export function getState(
           rotation: state.rotation,
           drawingMode: state.drawingMode,
           drawingPaletteIndex: state.drawingPaletteIndex,
+          viewportLocked: state.viewportLocked,
         },
         features: {
           featureCollectionUri: state.featureCollectionUri,
@@ -65,6 +67,10 @@ export function getState(
         results: {
           resultLayers: state.resultLayers,
           lastToolExecution: state.lastToolExecution,
+        },
+        plot: {
+          isReadOnly: state.isReadOnly,
+          readOnlyReason: state.readOnlyReason,
         },
       },
     };
@@ -92,6 +98,7 @@ export function getState(
           rotation: state.rotation,
           drawingMode: state.drawingMode,
           drawingPaletteIndex: state.drawingPaletteIndex,
+          viewportLocked: state.viewportLocked,
         },
       };
     case 'features':
@@ -118,6 +125,14 @@ export function getState(
         state: {
           resultLayers: state.resultLayers,
           lastToolExecution: state.lastToolExecution,
+        },
+      };
+    case 'plot':
+      return {
+        success: true,
+        state: {
+          isReadOnly: state.isReadOnly,
+          readOnlyReason: state.readOnlyReason,
         },
       };
     default:

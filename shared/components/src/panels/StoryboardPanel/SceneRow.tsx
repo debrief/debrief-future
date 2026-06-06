@@ -18,11 +18,12 @@ export interface SceneRowProps {
   /** When true, the row renders with bolder styling + `data-active="true"` —
    *  used by Feature 217 to highlight the current transport scene. */
   readonly active?: boolean;
-  /** When true, the chevron glyph renders in its expanded (▼) state and
-   *  the row's `aria-expanded` is true. From #230 panel reducer. */
+  /** When true, this row's edit dialog is open — surfaced as
+   *  `data-edit-form-open="true"` for styling/tests. */
   readonly editFormOpen?: boolean;
   onClick(sceneId: string): void;
-  /** #230 FR-001 — chevron click / double-click / keyboard disclosure. */
+  /** Opens the per-Scene edit dialog (double-click shortcut; the primary
+   *  trigger is the ⋯ overflow menu's Edit item). */
   onExpandToggle?(sceneId: string): void;
   /** #230 FR-003 — overflow menu open (right-click / Shift+F10). */
   onOverflowMenuOpen?(sceneId: string, anchorRect: DOMRect): void;
@@ -48,18 +49,12 @@ export function SceneRow({
 
   const handleDoubleClick = (e: React.MouseEvent): void => {
     if (scene.state.kind === 'pending') return;
-    // Guard: double-click on the chevron or overflow trigger should not
-    // also fire a row-level dblclick (stopPropagation is set on those).
+    // Guard: double-click on the overflow trigger should not also fire a
+    // row-level dblclick (stopPropagation is set on it).
     if (onExpandToggle) {
       e.preventDefault();
       onExpandToggle(scene.sceneId);
     }
-  };
-
-  const handleChevronClick = (e: React.MouseEvent): void => {
-    e.stopPropagation();
-    if (scene.state.kind === 'pending') return;
-    onExpandToggle?.(scene.sceneId);
   };
 
   const handleContextMenu = (e: React.MouseEvent): void => {
@@ -89,15 +84,16 @@ export function SceneRow({
     }
   };
   const isPending = scene.state.kind === 'pending';
-  const chevronLabel = editFormOpen
-    ? `Collapse edit form for ${scene.title}`
-    : `Expand edit form for ${scene.title}`;
   return (
+    // 234 US3 fix (FR-022): role="listitem" was paired with role="list"
+    // on the parent SceneList; both removed because the parent
+    // interleaves rows with StaleBadge overlays (axe-core
+    // aria-required-children — critical). Accessible name remains via
+    // aria-label. Double-click opens the per-Scene edit dialog; all
+    // commands are reached via the ⋯ overflow menu.
     <div
       ref={rowRef}
-      role="listitem"
       aria-label={`${scene.dtgLabel} — ${scene.title}`}
-      aria-expanded={onExpandToggle ? editFormOpen : undefined}
       data-testid="scene-row"
       data-scene-id={scene.sceneId}
       data-state={scene.state.kind}
@@ -113,43 +109,20 @@ export function SceneRow({
         display: 'flex',
         gap: 8,
         padding: 6,
+        marginBottom: 6,
         alignItems: 'flex-start',
         cursor: isPending ? 'default' : 'pointer',
         opacity: isPending ? 0.6 : 1,
+        // Card border so adjacent Scenes are visually separated even when
+        // the captured thumbnail has a white/light background.
+        border: '1px solid var(--vscode-widget-border, var(--vscode-panel-border, #3c3c3c))',
+        borderRadius: 4,
         outline: active ? '2px solid var(--vscode-focusBorder, #007acc)' : 'none',
         background: active
           ? 'var(--vscode-list-activeSelectionBackground, rgba(0, 122, 204, 0.15))'
-          : 'transparent',
+          : 'var(--vscode-editorWidget-background, transparent)',
       }}
     >
-      {onExpandToggle !== undefined && !isPending && (
-        <button
-          type="button"
-          aria-label={chevronLabel}
-          aria-expanded={editFormOpen}
-          data-testid="scene-row-chevron"
-          className="storyboard-scene-row__chevron"
-          onClick={handleChevronClick}
-          onDoubleClick={(e): void => {
-            e.stopPropagation();
-          }}
-          style={{
-            flex: '0 0 auto',
-            width: 18,
-            height: 18,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            color: 'inherit',
-            cursor: 'pointer',
-            fontSize: 10,
-          }}
-        >
-          <span aria-hidden="true">{editFormOpen ? '▼' : '▶'}</span>
-        </button>
-      )}
       {isPending ? (
         <div
           className="storyboard-scene-row__placeholder"

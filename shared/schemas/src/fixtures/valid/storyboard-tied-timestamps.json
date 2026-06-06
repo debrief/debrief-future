@@ -1,0 +1,181 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "01JBXYZABC0000000000000600",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-5.0, 50.0],
+            [-4.9, 50.0],
+            [-4.9, 50.1],
+            [-5.0, 50.1],
+            [-5.0, 50.0]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "STORYBOARD",
+        "id": "01JBXYZABC0000000000000600",
+        "name": "Tied Timestamps Demo",
+        "schema_version": 2,
+        "tags": [],
+        "provenance": [
+          {
+            "activity_id": "70000000-0000-4000-8000-000000000001",
+            "timestamp": "2026-04-20T09:00:00Z",
+            "agent": "alice",
+            "was_generated_by": {
+              "tool": "storyboard-crud",
+              "tool_version": "1.0.0",
+              "parameters": [{ "value": "create" }]
+            },
+            "used": [],
+            "generated": ["01JBXYZABC0000000000000600"],
+            "execution_duration": "PT0S"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "01JBXYZABC0000000000000601",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-5.0, 50.0],
+            [-4.9, 50.0],
+            [-4.9, 50.1],
+            [-5.0, 50.1],
+            [-5.0, 50.0]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "STORYBOARD_SCENE",
+        "id": "01JBXYZABC0000000000000601",
+        "storyboard_id": "01JBXYZABC0000000000000600",
+        "title": "Wide overview",
+        "viewport": { "center": [-4.95, 50.05], "zoom": 8, "bearing": 0 },
+        "timestamp": "2026-04-20T10:00:00Z",
+        "time_range": null,
+        "visible_feature_ids": [],
+        "feature_set_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "thumbnail_asset_ref": "thumbnails/tied-a.png",
+        "transition_duration_ms": 500,
+        "creation_order": 0,
+        "tags": [],
+        "provenance": [
+          {
+            "activity_id": "70000001-0000-4000-8000-000000000002",
+            "timestamp": "2026-04-20T10:00:00Z",
+            "agent": "alice",
+            "was_generated_by": {
+              "tool": "storyboard-crud",
+              "tool_version": "1.0.0",
+              "parameters": [{ "value": "create" }]
+            },
+            "used": [],
+            "generated": ["01JBXYZABC0000000000000601"],
+            "execution_duration": "PT0S"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "01JBXYZABC0000000000000602",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-5.0, 50.0],
+            [-4.9, 50.0],
+            [-4.9, 50.1],
+            [-5.0, 50.1],
+            [-5.0, 50.0]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "STORYBOARD_SCENE",
+        "id": "01JBXYZABC0000000000000602",
+        "storyboard_id": "01JBXYZABC0000000000000600",
+        "title": "Zoom on contact",
+        "viewport": { "center": [-4.95, 50.05], "zoom": 12, "bearing": 0 },
+        "timestamp": "2026-04-20T10:00:00Z",
+        "time_range": null,
+        "visible_feature_ids": [],
+        "feature_set_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "thumbnail_asset_ref": "thumbnails/tied-b.png",
+        "transition_duration_ms": 500,
+        "creation_order": 1,
+        "tags": [],
+        "provenance": [
+          {
+            "activity_id": "70000002-0000-4000-8000-000000000003",
+            "timestamp": "2026-04-20T10:00:00Z",
+            "agent": "alice",
+            "was_generated_by": {
+              "tool": "storyboard-crud",
+              "tool_version": "1.0.0",
+              "parameters": [{ "value": "create" }]
+            },
+            "used": [],
+            "generated": ["01JBXYZABC0000000000000602"],
+            "execution_duration": "PT0S"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "01JBXYZABC0000000000000603",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-5.0, 50.0],
+            [-4.9, 50.0],
+            [-4.9, 50.1],
+            [-5.0, 50.1],
+            [-5.0, 50.0]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "STORYBOARD_SCENE",
+        "id": "01JBXYZABC0000000000000603",
+        "storyboard_id": "01JBXYZABC0000000000000600",
+        "title": "Zoom on ownship",
+        "viewport": { "center": [-4.90, 50.10], "zoom": 12, "bearing": 0 },
+        "timestamp": "2026-04-20T10:00:00Z",
+        "time_range": null,
+        "visible_feature_ids": [],
+        "feature_set_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "thumbnail_asset_ref": "thumbnails/tied-c.png",
+        "transition_duration_ms": 500,
+        "creation_order": 2,
+        "tags": [],
+        "provenance": [
+          {
+            "activity_id": "70000003-0000-4000-8000-000000000004",
+            "timestamp": "2026-04-20T10:00:00Z",
+            "agent": "alice",
+            "was_generated_by": {
+              "tool": "storyboard-crud",
+              "tool_version": "1.0.0",
+              "parameters": [{ "value": "create" }]
+            },
+            "used": [],
+            "generated": ["01JBXYZABC0000000000000603"],
+            "execution_duration": "PT0S"
+          }
+        ]
+      }
+    }
+  ]
+}

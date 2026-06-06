@@ -9,6 +9,7 @@
 import type {
   SelectionRequirement as SchemaSelectionRequirement,
   Tool as SchemaTool,
+  ToolParameter as ToolParameterSchema,
 } from '@debrief/schemas';
 
 /**
@@ -19,26 +20,24 @@ export type SelectionRequirement = SchemaSelectionRequirement;
 
 /**
  * A configurable parameter for a tool, extracted from MCP annotations.
- * Uses view-layer field names (valueType, defaultValue) adapted from
- * the schema's snake_case conventions (type, default_value).
+ *
+ * Schema-rooted on `ToolParameter` from `@debrief/schemas` (LinkML
+ * `tool.yaml`) and narrowed with the VS Code camelCase view-layer field
+ * names (`valueType`, `defaultValue`, `paramType`). The schema base
+ * contributes `name`, `description`, `required`, and the new `choices`
+ * slot (added under spec 222 P2 to collapse the drift cluster — audit
+ * §3.2 rows 37 and 86). Per FR-004 (R4 import-based schema rooting) the
+ * audit treats this file as schema-rooted.
  */
-// eslint-disable-next-line no-restricted-syntax -- camelCase VS Code-local adapter over @debrief/schemas.ToolParameter (snake_case); follow-up to consolidate, #214 scope-adjacent
-export interface ToolParameter {
-  /** Parameter identifier */
-  name: string;
+// eslint-disable-next-line no-restricted-syntax -- consumer-narrowing of @debrief/schemas.ToolParameter via Omit + intersection — schema-rooted per spec 222 §FR-004 (R4 import-based classification); replaces the pre-existing camelCase adapter (#214 scope-adjacent)
+export type ToolParameter = Omit<ToolParameterSchema, 'type' | 'default_value' | 'param_type'> & {
   /** Value type (mapped from schema's "type" field) */
   valueType: 'string' | 'number' | 'boolean' | 'enum';
-  /** Human-readable description */
-  description: string;
-  /** Whether parameter is required */
-  required?: boolean;
   /** Default value (mapped from schema's "default_value" field) */
   defaultValue?: unknown;
-  /** Explicit choices (for enum type) */
-  choices?: string[];
   /** Schema-defined parameter type name (from x-debrief-param-type) */
   paramType?: string;
-}
+};
 
 /**
  * Tool definition — extends schema's Tool with VS Code-specific fields.
@@ -203,8 +202,14 @@ export class ToolMatchService {
   }
 }
 
-// Canonical Safe GeoJSON types from @debrief/utils (T02)
-import type { SafeFeatureCollection } from '@debrief/utils';
+// Result-carrying GeoJSON collection type from @debrief/schemas (#212).
+// IngressFeatureCollection (schema-derived, geometry may be null) rather than
+// RawGeoJSONFeatureCollection: a ResultLayer / ToolExecutionResult is populated
+// unconditionally from the MCP tool-result parse boundary (an Ingress boundary
+// per spec FR-005) and flows on to the host→webview message DTOs (also Ingress,
+// FR-006). Typing it Ingress keeps the whole result pipeline cast-free and
+// preserves the RFC-7946 null-geometry channel end-to-end (SC-004).
+import type { IngressFeatureCollection } from '@debrief/schemas';
 
 /**
  * Tool execution state
@@ -291,7 +296,7 @@ export interface ResultLayer {
   executionId: string;
 
   /** GeoJSON FeatureCollection of results */
-  features: SafeFeatureCollection;
+  features: IngressFeatureCollection;
 
   /** Layer styling configuration */
   style: LayerStyle;
@@ -360,7 +365,7 @@ export interface ToolExecutionResult {
   success: boolean;
 
   /** Result features (if success) */
-  features?: SafeFeatureCollection;
+  features?: IngressFeatureCollection;
 
   /** Error message (if failed) */
   error?: string;

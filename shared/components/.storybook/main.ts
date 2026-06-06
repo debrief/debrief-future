@@ -50,11 +50,21 @@ const config: StorybookConfig = {
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...config.resolve.alias,
+      // #273 — web-shell stories transitively import @debrief/briefing-export.
+      // Resolve it (and the storyboard subpath it imports) to source BEFORE
+      // the general @debrief/components alias so prefix-matching does not
+      // mangle `@debrief/components/storyboard` into `src/index.ts/storyboard`.
+      '@debrief/briefing-export': path.resolve(__dirname, '../../briefing-export/src/index.ts'),
+      '@debrief/components/storyboard': path.resolve(__dirname, '../src/storyboard/index.ts'),
       // Resolve @debrief/components to source files for Storybook builds
       '@debrief/components': path.resolve(__dirname, '../src/index.ts'),
       // Resolve @debrief/schemas to generated TypeScript types
       '@debrief/schemas': path.resolve(__dirname, '../../../shared/schemas/src/generated/typescript/index.ts'),
-      // Resolve @debrief/session-state to browser-safe shim (web-shell stories import it)
+      // Resolve @debrief/session-state to browser-safe shim (web-shell stories import it).
+      // The `/browser` subpath (added by spec #192) points at the package's
+      // own browser entry — it MUST be listed BEFORE the bare-package alias
+      // so the prefix match wins (vite resolves aliases in declaration order).
+      '@debrief/session-state/browser': path.resolve(__dirname, '../../../services/session-state/src/browser.ts'),
       '@debrief/session-state': path.resolve(__dirname, '../../../apps/web-shell/src/session-state-browser.ts'),
       '@test-data': path.resolve(__dirname, '../../../apps/vscode/test-data'),
     };

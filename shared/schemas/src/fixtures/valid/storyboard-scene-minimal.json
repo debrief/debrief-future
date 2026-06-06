@@ -20,7 +20,7 @@
         "kind": "STORYBOARD",
         "id": "01JBXYZABC0000000000000010",
         "name": "Demo Storyboard",
-        "schema_version": 1,
+        "schema_version": 2,
         "tags": [],
         "provenance": [
           {
@@ -66,6 +66,7 @@
         "feature_set_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "thumbnail_asset_ref": "thumbnails/demo-scene-01.png",
         "transition_duration_ms": 500,
+        "creation_order": 0,
         "tags": [],
         "provenance": [
           {

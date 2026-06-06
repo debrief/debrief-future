@@ -2,9 +2,17 @@ id: https://debrief.info/schemas/session-state
 name: session_state
 title: Debrief Session State Schema
 description: >-
-  LinkML schema for session state management in the Debrief VS Code extension.
-  Tracks temporal navigation, spatial viewport, feature selection, and document lifecycle.
-  Feature 024-document-session-state.
+  LinkML schema for the in-memory session-state store slices used by the
+  Debrief frontends (temporal navigation, spatial viewport, feature selection,
+  document lifecycle, tool results, browser filter).
+
+  Feature 261 retired the `.debrief-session` sidecar: the persisted
+  `SessionFile` / `SessionState` root classes were deleted, and the shared
+  value types (Coordinate, ViewportPolygon, TimeInstant/Range/Filter/Step,
+  PlaybackStateEnum, DisplayModeEnum, TimeUnitEnum) were consolidated into
+  common.yaml (FR-002a). All persisted plot state now lives in
+  features.geojson as SystemState features + per-feature `visible` flags.
+  The slice classes below describe the in-memory store shape only.
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -15,50 +23,13 @@ default_range: string
 
 imports:
   - linkml:types
+  - common
 
 # ============================================================================
 # Enums
 # ============================================================================
 
 enums:
-  PlaybackStateEnum:
-    description: >-
-      Current state of time playback. Component consumers treat
-      `stopped` as equivalent to `paused`. See ADR-022 in
-      docs/project_notes/decisions.md.
-    permissible_values:
-      stopped:
-        description: Playback is stopped
-      playing:
-        description: Playback is running
-      paused:
-        description: Playback is paused
-
-  DisplayModeEnum:
-    description: >-
-      Track visualization display mode. `full` renders the entire track
-      regardless of current time; `trail` renders a snail-trail from
-      track start up to current time.
-    permissible_values:
-      full:
-        description: Render the entire track regardless of current time
-      trail:
-        description: Render a snail-trail from track start up to current time
-
-  TimeUnitEnum:
-    description: Units for time step navigation
-    permissible_values:
-      millisecond:
-        description: Milliseconds
-      second:
-        description: Seconds
-      minute:
-        description: Minutes
-      hour:
-        description: Hours
-      day:
-        description: Days
-
   AddressingMode:
     description: How addresses in a selection path level are interpreted (Feature 053)
     permissible_values:
@@ -70,93 +41,12 @@ enums:
 # ============================================================================
 # Core Types
 # ============================================================================
+# NB: Coordinate, ViewportPolygon, TimeInstant, TimeRange, TimeFilter, TimeStep
+# (and the PlaybackStateEnum / DisplayModeEnum / TimeUnitEnum enums) are now
+# defined once in common.yaml (feature 261, FR-002a) and referenced here via
+# the `common` import above.
 
 classes:
-
-  TimeInstant:
-    description: A point in time with dual representations (FR-032, FR-033)
-    attributes:
-      epoch:
-        description: Milliseconds since Unix epoch
-        range: integer
-        required: true
-      iso:
-        description: ISO 8601 UTC format string
-        range: string
-        required: true
-        pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$"
-
-  TimeRange:
-    description: A temporal interval with inclusive start and end
-    attributes:
-      start:
-        description: Start of interval
-        range: TimeInstant
-        required: true
-      end:
-        description: End of interval
-        range: TimeInstant
-        required: true
-    rules:
-      - postconditions:
-          description: Start must be less than or equal to end
-          # start.epoch <= end.epoch
-
-  TimeFilter:
-    description: Constraints on the visible time window (epoch milliseconds; null = unbounded)
-    attributes:
-      start:
-        description: Filter start as epoch milliseconds (null/missing = unbounded on the start)
-        range: integer
-        required: false
-      end:
-        description: Filter end as epoch milliseconds (null/missing = unbounded on the end)
-        range: integer
-        required: false
-
-  TimeStep:
-    description: Step size for discrete time navigation (FR-008)
-    attributes:
-      value:
-        description: Numeric step value
-        range: float
-        required: true
-        minimum_value: 0
-      unit:
-        description: Unit of the step
-        range: TimeUnitEnum
-        required: true
-
-  Coordinate:
-    description: A geographic coordinate [longitude, latitude]
-    attributes:
-      longitude:
-        description: Longitude in degrees (-180 to 180)
-        range: float
-        required: true
-        minimum_value: -180
-        maximum_value: 180
-      latitude:
-        description: Latitude in degrees (-90 to 90)
-        range: float
-        required: true
-        minimum_value: -90
-        maximum_value: 90
-
-  ViewportPolygon:
-    description: Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)
-    attributes:
-      coordinates:
-        description: Four corners in clockwise order [NW, NE, SE, SW]
-        range: Coordinate
-        multivalued: true
-        required: true
-        minimum_cardinality: 4
-        maximum_cardinality: 4
-      zoom:
-        description: Map zoom level for restoring the view (optional)
-        range: float
-        required: false
 
   LevelDefinition:
     description: >-
@@ -198,7 +88,7 @@ classes:
         required: true
 
 # ============================================================================
-# State Slices
+# State Slices (in-memory store shape; not persisted as-is — see feature 261)
 # ============================================================================
 
   TemporalSlice:
@@ -337,66 +227,4 @@ classes:
       temporal_filter_active:
         description: Whether the timeline range is used as a temporal filter
         range: boolean
-        required: true
-
-# ============================================================================
-# Root Entity
-# ============================================================================
-
-  SessionState:
-    description: Root entity containing all session state slices (FR-001, FR-002)
-    tree_root: true
-    attributes:
-      schemaVersion:
-        description: Schema version for persistence compatibility (FR-026)
-        range: string
-        required: true
-        pattern: "^\\d+\\.\\d+\\.\\d+$"
-      temporal:
-        description: Time-related state
-        range: TemporalSlice
-        required: true
-      spatial:
-        description: Geographic view state
-        range: SpatialSlice
-        required: true
-      features:
-        description: Feature-related state
-        range: FeaturesSlice
-        required: true
-      document:
-        description: Editor state
-        range: DocumentSlice
-        required: true
-
-# ============================================================================
-# Persistence Schema
-# ============================================================================
-
-  SessionFile:
-    description: Persisted session file format (FR-024)
-    attributes:
-      $schema:
-        description: JSON Schema URI
-        range: string
-      version:
-        description: Schema version
-        range: string
-        required: true
-        pattern: "^\\d+\\.\\d+\\.\\d+$"
-      savedAt:
-        description: When the session was saved (ISO 8601)
-        range: string
-        required: true
-      temporal:
-        description: Temporal state (excluding ephemeral playbackState)
-        range: TemporalSlice
-        required: true
-      spatial:
-        description: Spatial state
-        range: SpatialSlice
-        required: true
-      features:
-        description: Features state
-        range: FeaturesSlice
         required: true

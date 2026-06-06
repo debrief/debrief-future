@@ -10,6 +10,7 @@ export * from './features.js';
 export * from './document.js';
 export * from './results.js';
 export * from './browser-filter.js';
+export * from './plot.js';
 
 // Import for composite types
 import type { TemporalSlice, TemporalActions } from './temporal.js';
@@ -18,16 +19,9 @@ import type { FeaturesSlice, FeaturesActions } from './features.js';
 import type { DocumentSlice, DocumentActions } from './document.js';
 import type { ResultsSlice, ResultsActions } from './results.js';
 import type { BrowserFilterSlice, BrowserFilterActions } from './browser-filter.js';
+import type { PlotSlice, PlotActions } from './plot.js';
 
 /**
- * Schema version for persistence compatibility (FR-026).
- *
- * Bumped to 1.1.0 by feature 203 (spatial types consolidation): ViewportPolygon
- * coordinates switch from tuple form `[lon, lat]` to object form
- * `{ longitude, latitude }`, handled inline at load time by `coerceViewport`.
- */
-export const SCHEMA_VERSION = '1.1.0';
-
 /**
  * Complete session state combining all slices (FR-001, FR-002).
  * This is the flat store structure used by Zustand.
@@ -38,12 +32,14 @@ export type SessionStore = TemporalSlice &
   DocumentSlice &
   ResultsSlice &
   BrowserFilterSlice &
+  PlotSlice &
   TemporalActions &
   SpatialActions &
   FeaturesActions &
   DocumentActions &
   ResultsActions &
-  BrowserFilterActions & {
+  BrowserFilterActions &
+  PlotActions & {
     /** Reset all state to defaults */
     reset: () => void;
   };
@@ -62,6 +58,7 @@ export interface SessionState {
   features: FeaturesSlice;
   document: DocumentSlice;
   results: ResultsSlice;
+  plot: PlotSlice;
 }
 
 /**
@@ -72,25 +69,20 @@ export interface SessionActions
     SpatialActions,
     FeaturesActions,
     DocumentActions,
-    ResultsActions {
+    ResultsActions,
+    PlotActions {
   /** Reset all state to defaults */
   reset: () => void;
 }
 
-/**
- * Persistent state - what gets saved to file (FR-024).
- * Excludes ephemeral fields: playbackState, dirty, undo/redo stacks.
- */
-export interface PersistentSessionState {
-  schemaVersion: string;
-  savedAt: string;
-  temporal: Omit<TemporalSlice, 'playbackState'>;
-  spatial: SpatialSlice;
-  features: FeaturesSlice;
-}
+// PersistentSessionState (the `.debrief-session` sidecar's on-disk shape) was
+// removed in feature 261 together with the sidecar I/O. Plot state now lives in
+// features.geojson as SystemState features + per-feature `visible` flags.
 
 /**
  * State snapshot for undo/redo history.
  * UI-only fields — data changes tracked by Log Service (073-undo-redo-split).
+ * `plot` is derived host-capability metadata (not analyst-authored) and so is
+ * excluded from undo per spec #192 R-009.
  */
-export type StateSnapshot = Omit<SessionState, 'document'>;
+export type StateSnapshot = Omit<SessionState, 'document' | 'plot'>;

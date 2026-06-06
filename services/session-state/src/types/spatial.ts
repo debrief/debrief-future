@@ -33,6 +33,13 @@ export interface SpatialSlice {
   drawingMode: DrawingMode;
   /** Index into the drawing colour palette — EPHEMERAL (FR-096) */
   drawingPaletteIndex: number;
+  /**
+   * When true, the map's viewport (centre + zoom) is frozen — see spec 260.
+   * Disables Leaflet's six interaction handlers and the toolbar zoom/fit
+   * buttons; banner is rendered. EPHEMERAL — never persisted into
+   * .debrief.json (excluded via Omit on PersistentSessionState.spatial).
+   */
+  viewportLocked: boolean;
 }
 
 /**
@@ -43,6 +50,7 @@ export const DEFAULT_SPATIAL_SLICE: SpatialSlice = {
   rotation: 0,
   drawingMode: null,
   drawingPaletteIndex: 0,
+  viewportLocked: false,
 };
 
 /**
@@ -54,6 +62,8 @@ export interface SpatialActions {
   setDrawingMode: (mode: DrawingMode) => void;
   /** Increment the drawing palette colour index (FR-096) */
   incrementDrawingPaletteIndex: () => void;
+  /** Toggle the viewport lock (spec 260 — FR-001..FR-006) */
+  setViewportLocked: (locked: boolean) => void;
   /** Get the derived center point (not stored) */
   getCenter: () => Coordinate | null;
 }

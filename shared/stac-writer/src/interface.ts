@@ -1,0 +1,248 @@
+/**
+ * Host-agnostic STAC writer interface — the persistence boundary mandated by
+ * Constitution Article IV.4. Both VS Code (Node fs) and web-shell (IndexedDB)
+ * implement this interface. Browser-safe — no Node imports allowed here.
+ *
+ * See specs/236-web-shell-stac-writes/contracts/stac-writer.ts for the
+ * normative contract.
+ */
+
+// PropertiesProvenanceEntry is LinkML-derived (spec 240). Imported here for
+// local use in PatchItemInput; re-exported below for downstream consumers.
+import type { PropertiesProvenanceEntry } from '@debrief/components/PropertiesPanel/provenanceTypes';
+// StacItem and StacAsset are LinkML-derived (spec 223). Both ends of the
+// persistence boundary (web-shell mock, VS Code stacService) now reference
+// the same generated class, closing spec 223 Decision 1B / A-009 (no
+// projection cast at call sites).
+import type { StacAsset, StacItem } from '@debrief/schemas';
+// RawGeoJSONFeatureCollection is the generated parse-boundary FeatureCollection
+// (RFC 7946 §3.3) the schema uses for STAC item payloads. Reused — not
+// re-listed — by CommitPlotSaveInput.featureCollection (Article IV.5).
+import type { RawGeoJSONFeatureCollection } from '@debrief/schemas';
+
+// ─── Core context ──────────────────────────────────────────────────────────
+
+export interface StoreContext {
+  /** Discriminator. Adaptors set this once at construction. */
+  readonly kind: 'fs' | 'idb';
+  /** Wall-clock source — overridable for tests. */
+  readonly nowMs: () => number;
+  /** Random ID generator (UUID/ULID) — overridable for tests. */
+  readonly randomId: () => string;
+}
+
+// ─── STAC item shape (re-exported from @debrief/schemas) ──────────────────
+//
+// Both `StacItem` and `StacAsset` are LinkML-rooted at
+// shared/schemas/src/linkml/stac.yaml and exposed through
+// @debrief/schemas. Re-export from this package preserves the
+// previously-published API surface so existing consumers do not
+// have to update their import paths.
+
+export type { StacAsset, StacItem };
+// Re-export the generated parse-boundary FeatureCollection so consumers can
+// import it alongside CommitPlotSaveInput without a second import path.
+export type { RawGeoJSONFeatureCollection };
+
+// Re-export the LinkML-derived PropertiesProvenanceEntry so downstream
+// consumers see no change — same name, same import path, plus the schema
+// contract underneath. See spec 240 / research R2 for the migration rationale.
+export type { PropertiesProvenanceEntry };
+
+// ─── Capability ────────────────────────────────────────────────────────────
+
+export interface CapabilityReport {
+  /** True iff the writer can persist. False in private mode, denied
+   *  browser policy, or when IndexedDB is missing. VS Code: always true. */
+  readonly available: boolean;
+  /** True iff `navigator.storage.persisted()` is true (web-shell) or
+   *  the directory is writable (VS Code). */
+  readonly persistent: boolean;
+  /** Set when `available` is false; drives the structured error message. */
+  readonly reason?: 'unavailable' | 'quota' | 'denied' | 'idb-version-mismatch';
+}
+
+// ─── Operation inputs / results ────────────────────────────────────────────
+
+export interface WriteItemInput {
+  readonly ctx: StoreContext;
+  readonly itemPath: string;
+  readonly item: StacItem;
+  readonly mode: 'create' | 'replace';
+}
+export interface WriteItemResult {
+  readonly writtenPath: string;
+}
+
+export interface PatchItemInput {
+  readonly ctx: StoreContext;
+  readonly itemPath: string;
+  readonly patch: Record<string, unknown>;
+  readonly overrideFields: ReadonlyArray<string>;
+  readonly provenance: Pick<PropertiesProvenanceEntry, 'tool' | 'fields'>;
+  readonly packageVersion: string;
+}
+export interface PatchItemResult {
+  readonly updatedProperties: Record<string, unknown>;
+  readonly overrides: ReadonlyArray<string>;
+  readonly activityId: string;
+}
+
+export interface WriteAssetInput {
+  readonly ctx: StoreContext;
+  readonly itemPath: string;
+  readonly assetHref: string;
+  /** Browser-safe: Uint8Array for binary, string for text/JSON. */
+  readonly body: Uint8Array | string;
+  readonly mediaType: string;
+  readonly assetEntry: {
+    readonly key: string;
+    readonly roles?: ReadonlyArray<string>;
+    readonly title?: string;
+    readonly extra?: Record<string, unknown>;
+  };
+}
+export interface WriteAssetResult {
+  readonly assetPath: string;
+  readonly assetKey: string;
+}
+
+export interface WriteSceneThumbnailPairInput {
+  readonly ctx: StoreContext;
+  readonly stacItemPath: string;
+  readonly sceneId: string;
+  readonly largePngBase64: string;
+  readonly smallPngBase64: string;
+}
+export interface WriteSceneThumbnailPairResult {
+  readonly assetKey: string;
+  readonly largePath: string;
+  readonly smallPath: string;
+}
+
+export interface WritePlotThumbnailPairInput {
+  readonly ctx: StoreContext;
+  /** Item path relative to the catalog root (e.g. `core--boat1/item.json`). */
+  readonly stacItemPath: string;
+  /** Base64-encoded PNG bytes for the 800x600 overview. */
+  readonly largePngBase64: string;
+  /** Base64-encoded PNG bytes for the 200x150 thumbnail. */
+  readonly smallPngBase64: string;
+}
+export interface WritePlotThumbnailPairResult {
+  /** Catalog-relative path of the written thumbnail PNG. */
+  readonly thumbnailPath: string;
+  /** Catalog-relative path of the written overview PNG. */
+  readonly overviewPath: string;
+}
+
+// ─── Atomic plot save (feature 268) ──────────────────────────────────────────
+//
+// `commitPlotSave` persists the whole save unit (feature collection + optional
+// thumbnail pair + the item.json metadata they imply) as ONE atomic unit, and
+// `reconcilePlotSave` heals an interrupted save on open. See
+// specs/268-save-atomicity/contracts/stac-writer-commit.ts for the normative
+// contract and behavioural assertions (C1–C5).
+
+export interface CommitPlotSaveInput {
+  readonly ctx: StoreContext;
+  /** Catalog-relative item path, e.g. `core--boat1/item.json`. */
+  readonly stacItemPath: string;
+  /** Full feature collection to persist (features.geojson / geojson payload). */
+  readonly featureCollection: RawGeoJSONFeatureCollection;
+  /**
+   * Thumbnail pair to commit alongside the feature collection. Omitted when
+   * capture was skipped (best-effort) or unsupported (web-shell host).
+   * Derived from the existing thumbnail-write input — not re-listed
+   * (Article IV.5).
+   */
+  readonly thumbnails?: Pick<
+    WritePlotThumbnailPairInput,
+    'largePngBase64' | 'smallPngBase64'
+  >;
+}
+export interface CommitPlotSaveResult {
+  /** Catalog-relative path written for the feature collection. */
+  readonly featuresPath: string;
+  /** Catalog-relative thumbnail path, or null when none committed. */
+  readonly thumbnailPath: string | null;
+  /** Catalog-relative overview path, or null when none committed. */
+  readonly overviewPath: string | null;
+}
+
+export interface ReconcilePlotSaveInput {
+  readonly ctx: StoreContext;
+  readonly stacItemPath: string;
+}
+export interface ReconcilePlotSaveResult {
+  /** True iff leftover state was acted on (drives the non-blocking notice). */
+  readonly recovered: boolean;
+  /**
+   * `clean`          — nothing to reconcile.
+   * `rolled-back`    — pre-commit temps discarded; last-good kept (FR-008).
+   * `rolled-forward` — post-commit renames completed; new version (FR-007).
+   */
+  readonly outcome: 'clean' | 'rolled-back' | 'rolled-forward';
+}
+
+export interface DeleteItemInput {
+  readonly ctx: StoreContext;
+  readonly itemPath: string;
+}
+export interface DeleteItemResult {
+  readonly removedPath: string;
+}
+
+export interface DeleteAssetInput {
+  readonly ctx: StoreContext;
+  readonly itemPath: string;
+  readonly assetKey: string;
+}
+export interface DeleteAssetResult {
+  readonly removedAssetPath: string | null;
+}
+
+// ─── The writer interface ──────────────────────────────────────────────────
+
+export interface StacWriter {
+  capability(): Promise<CapabilityReport>;
+  writeItem(input: WriteItemInput): Promise<WriteItemResult>;
+  patchItem(input: PatchItemInput): Promise<PatchItemResult>;
+  writeAsset(input: WriteAssetInput): Promise<WriteAssetResult>;
+  writeSceneThumbnailPair(
+    input: WriteSceneThumbnailPairInput,
+  ): Promise<WriteSceneThumbnailPairResult>;
+  writePlotThumbnailPair(
+    input: WritePlotThumbnailPairInput,
+  ): Promise<WritePlotThumbnailPairResult>;
+  /**
+   * Persist the whole save unit (feature collection + optional thumbnails +
+   * the STAC item metadata they imply) atomically. MUST be all-or-nothing: on
+   * rejection no part of the new state is observable to a later reader
+   * (FR-001/FR-002) and the previously-persisted plot is intact
+   * (FR-006/FR-010). MUST route the feature-collection write through this
+   * boundary (FR-004).
+   */
+  commitPlotSave(input: CommitPlotSaveInput): Promise<CommitPlotSaveResult>;
+  /**
+   * Inspect the store for leftovers from an interrupted `commitPlotSave` and
+   * resolve them to a single coherent state WITHOUT prompting the user
+   * (FR-007/FR-008). MUST be called before the plot is read on open, MUST be
+   * idempotent, and returns whether a recovery happened so the host can show a
+   * non-blocking notice.
+   */
+  reconcilePlotSave(
+    input: ReconcilePlotSaveInput,
+  ): Promise<ReconcilePlotSaveResult>;
+  deleteItem(input: DeleteItemInput): Promise<DeleteItemResult>;
+  deleteAsset(input: DeleteAssetInput): Promise<DeleteAssetResult>;
+}
+
+// ─── Stored item (IndexedDB schema layer; exposed for overlay-merge) ──────
+
+export interface StoredItem {
+  readonly kind: 'overlay' | 'standalone';
+  readonly record: StacItem;
+  readonly baseRevision?: string;
+  readonly mtimeMs: number;
+}

@@ -46,6 +46,8 @@ This constitution establishes the immutable principles governing all development
 1. **Services never touch UI** — Python services return data only. All display and interaction decisions belong to frontends.
 2. **Frontends never persist** — frontends orchestrate calls to services. All data writes go through services.
 3. **Services have zero MCP dependency** — domain logic lives in pure Python libraries. MCP wrappers are thin, replaceable layers.
+4. **Persistence-host abstraction.** Frontends may persist data only via the unified writer abstraction. Browser-native stores (IndexedDB, OPFS, File System Access API) qualify as a persistence backend **only** when accessed through this abstraction — frontends never own a divergent write code path. The writer abstraction is the persistence boundary; both Node-side hosts and browser-side hosts route their writes through it. Each host implements the abstraction once, against its native backend; the rest of the system depends only on the interface. Machine-enforced via ESLint (`no-direct-persistence-in-frontend`).
+5. **Boundary types are derived, not rewritten.** Any type defined at a cross-boundary surface (host↔webview message, service↔frontend payload, persistence DTO, MCP envelope, snapshot, request/response) that represents a *subset* of an existing typed source MUST be expressed structurally — `Pick<T, …>`, `Omit<T, …>`, `Partial<T>`, a generated-schema export, or a schema-derived runtime validator (Zod, Pydantic) — never by re-listing the source's fields verbatim. When the source type grows a field, the boundary type's authors must make an explicit pick/omit decision; structural derivation makes that decision a compile error rather than a silent drop on the wire. Hand-rewritten subset types at boundaries are forbidden. Where structural derivation is genuinely impossible, the boundary type must carry a compile-time exhaustiveness guard against the source (`type _Exhaustive = Exclude<keyof Source, keyof Dto | 'intentionally_omitted'> extends never ? true : never`) so source-type growth still surfaces at the boundary. Machine-enforced where practical via lint rules.
 
 ---
 
@@ -189,7 +191,7 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 4. **Schema types are canonical** — types generated from LinkML schemas must be fully typed with no `Any`/`any` in the output. Generated types are production code and meet the same standards.
 5. **Type boundaries are explicit** — every point where untyped data enters the system (JSON parsing, external API responses, user input) must validate through a typed model before the data is used in application code.
 6. **CI enforces compliance** — type checking for all languages must run as a required CI step. PRs with type violations cannot be merged.
-7. **Type assertions are expert overrides** — casting to a loose type (`as Record<string, unknown>`, `as unknown as T`, `cast()`) at a data boundary is an assertion that the type system cannot verify. These require a `// SAFETY:` justification comment and explicit human reviewer approval in the PR. If a generated type or runtime validator exists for the data shape, you must use it instead. If neither exists, create one — the need for a cast usually means a type is missing from the schema.
+7. **Type assertions are expert overrides** — an *unchecked cast* is an assertion the type system cannot verify, and is the repeating root cause of silent data bugs. This covers casting to a loose type (`as Record<string, unknown>`, `as unknown as T`, `cast()`) **and casting to an inline object type that fabricates a shape** (`x as { id: string }`) — the latter is especially dangerous because it looks precise while asserting fields the source type never declares (see ADR-038: `feature.properties as { id }` invented a `properties.id` the schema does not define, silently dropping data). The rule: **validate at the trust boundary with the type system** (a generated type, schema-derived runtime validator, or type guard), and **use no unchecked cast anywhere else**. If a generated type, validator, or guard exists for the shape you must use it instead of a cast; if none exists, create one — the need for a cast usually means a type is missing from the schema. Any genuinely unavoidable boundary cast requires a `// SAFETY:` justification comment and explicit human reviewer approval in the PR. Machine-enforced via ESLint `no-restricted-syntax` over `TSAsExpression` (bans `as Record`, `as unknown`, and inline-object `as { … }` casts).
 
 ---
 
@@ -202,4 +204,4 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 
 ---
 
-*Document version: 1.4 — March 2026*
+*Document version: 1.5 — May 2026*

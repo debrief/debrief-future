@@ -18,10 +18,20 @@ import {
   isMultiPolygonFeature,
   isExpandableFeature,
 } from '../utils/types';
+import { isStoryboardFeature, isSceneFeature } from '../storyboard/types';
 
 // ─── Types ──────────────────────────────────────────────────────────
 
-export type DisplayItemType = 'feature' | 'position' | 'point' | 'polygon' | 'segment' | 'group' | 'sensor' | 'contact';
+export type DisplayItemType =
+  | 'feature'
+  | 'storyboard'
+  | 'position'
+  | 'point'
+  | 'polygon'
+  | 'segment'
+  | 'group'
+  | 'sensor'
+  | 'contact';
 
 export interface DisplayItem {
   /** Discriminator for the row kind */
@@ -42,6 +52,13 @@ export interface DisplayItem {
   feature: DebriefFeature | null;
   /** Child index within parent (null for top-level features) */
   index: number | null;
+  /**
+   * Scene count for `'storyboard'` rows (Spec #258 / FR-013). Always
+   * present on storyboard rows (including empty storyboards, which carry
+   * `childCount: 0` and `isExpandable: false`). Absent on every other row
+   * type.
+   */
+  childCount?: number;
 }
 
 // ─── Label helpers ──────────────────────────────────────────────────
@@ -108,8 +125,96 @@ export function flattenFeatures(
 ): DisplayItem[] {
   const items: DisplayItem[] = [];
 
+  // Spec #258 / FR-010 — bucket STORYBOARD_SCENE features under their
+  // matching STORYBOARD parent. Build a sceneId-set up front so the main
+  // loop can skip scenes whose parent is present (consumed by the
+  // storyboard branch below). Scenes whose `storyboard_id` matches no
+  // STORYBOARD feature fall back to top-level rendering with a
+  // `console.warn` (Article I.3 — no silent failure).
+  const storyboardIds = new Set<string>();
+  for (const f of features) {
+    const sbTest = f as unknown as Parameters<typeof isStoryboardFeature>[0];
+    if (isStoryboardFeature(sbTest)) {
+      storyboardIds.add(sbTest.properties.id);
+    }
+  }
+  const consumedSceneIds = new Set<string>();
+
   for (const feature of features) {
     const featureId = feature.id;
+    const sceneTest = feature as unknown as Parameters<typeof isSceneFeature>[0];
+    const sbTest = feature as unknown as Parameters<typeof isStoryboardFeature>[0];
+
+    // Storyboard parent row — Spec #258 / US4 (FR-010, FR-013, NEW-C).
+    if (isStoryboardFeature(sbTest)) {
+      const storyboardId = sbTest.properties.id;
+      const children: typeof features = [];
+      for (const candidate of features) {
+        const ct = candidate as unknown as Parameters<typeof isSceneFeature>[0];
+        if (!isSceneFeature(ct)) continue;
+        if (ct.properties.storyboard_id !== storyboardId) continue;
+        children.push(candidate);
+        consumedSceneIds.add(candidate.id);
+      }
+      // Stable order: scenes ordered by timestamp ascending (their
+      // canonical playback order).
+      children.sort((a, b) => {
+        const at = (a as unknown as { properties: { timestamp: string } }).properties.timestamp;
+        const bt = (b as unknown as { properties: { timestamp: string } }).properties.timestamp;
+        if (at < bt) return -1;
+        if (at > bt) return 1;
+        return 0;
+      });
+
+      const childCount = children.length;
+      const isExpandable = childCount > 0;
+      const isExpanded = isExpandable && expandedIds.has(featureId);
+      items.push({
+        type: 'storyboard',
+        id: featureId,
+        label: '',
+        sublabel: null,
+        depth: 0,
+        parentId: null,
+        isExpandable,
+        feature,
+        index: null,
+        childCount,
+      });
+
+      if (!isExpanded) continue;
+      for (const child of children) {
+        items.push({
+          type: 'feature',
+          id: child.id,
+          label: '',
+          sublabel: null,
+          depth: 1,
+          parentId: featureId,
+          isExpandable: false,
+          feature: child,
+          index: null,
+        });
+      }
+      continue;
+    }
+
+    // Scene already consumed by a storyboard parent — skip the duplicate
+    // top-level emission.
+    if (isSceneFeature(sceneTest) && consumedSceneIds.has(feature.id)) {
+      continue;
+    }
+
+    // Orphan scene fallback — emit at top level and log a warning.
+    if (isSceneFeature(sceneTest) && !storyboardIds.has(sceneTest.properties.storyboard_id)) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Scene with orphan storyboard_id',
+        feature.id,
+        sceneTest.properties.storyboard_id,
+      );
+    }
+
     const expandable = isExpandableFeature(feature);
     const isExpanded = expandable && expandedIds.has(featureId);
 

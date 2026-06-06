@@ -9,6 +9,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ActivityPanel } from '@debrief/components';
 import { Bootstrap } from './_bootstrap';
+import { useStoryboardPanelProps } from './storyboardPanelApp';
 
 // Import codicon font CSS for vscrui icons (esbuild loads as text string)
 import codiconCss from 'vscrui/dist/codicon.css';
@@ -25,6 +26,7 @@ import type {
 } from '@debrief/components';
 import type { DebriefFeature } from '@debrief/components';
 import type { MatchResult } from '@debrief/components';
+import type { ToolsUpdateMessage as ToolsUpdateMessageSchema } from '@debrief/schemas';
 
 // VS Code API type
 declare function acquireVsCodeApi(): {
@@ -50,14 +52,20 @@ interface TemporalUpdateMessage {
   };
 }
 
-interface ToolsUpdateMessage {
-  type: 'tools:update';
+/**
+ * Schema-rooted on `ToolsUpdateMessage` from `@debrief/schemas` (LinkML
+ * `mcp.yaml`) and narrowed with the concrete payload shape used by the
+ * activity panel. The schema base contributes the `type: 'tools:update'`
+ * literal discriminator; this projection materialises the live payload
+ * shape. Per FR-004 the audit treats this file as schema-rooted.
+ */
+type ToolsUpdateMessage = Omit<ToolsUpdateMessageSchema, 'payload'> & {
   payload: {
     tools: ToolsPanelItem[];
     hasToolInventory?: boolean;
     hasSelection?: boolean;
   };
-}
+};
 
 interface LayersUpdateMessage {
   type: 'layers:update';
@@ -201,6 +209,11 @@ function ActivityPanelApp(): React.ReactElement {
     vscode.postMessage(message);
   }, []);
 
+  // Storyboard is the 5th section of the shared ActivityPanel — build its
+  // live props (reducer + postMessage wiring) and hand them to ActivityPanel,
+  // which renders the child <StoryboardPanel/>.
+  const storyboard = useStoryboardPanelProps(vscode);
+
   return (
     <div className="activity-panel-webview">
       <ActivityPanel
@@ -222,6 +235,7 @@ function ActivityPanelApp(): React.ReactElement {
         collapseState={collapseState}
         onCollapseStateChange={handleCollapseChange}
         onMessage={handleMessage}
+        storyboard={storyboard}
       />
     </div>
   );

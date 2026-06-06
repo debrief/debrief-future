@@ -1,0 +1,17 @@
+{
+  "_comment": "T032 — non-orphan valid bundle: assets contain a paired scene-thumbnail set whose ULID matches a Scene in features.geojson. audit_scene_thumbnail_orphans returns [].",
+  "type": "Feature",
+  "id": "plot-non-orphan-fixture",
+  "assets": {
+    "scene-thumbnail-01HSCENA8M9N0P1Q2R3S4T5V6W": {
+      "href": "./scene-thumbnails/scene-01HSCENA8M9N0P1Q2R3S4T5V6W.png",
+      "type": "image/png",
+      "roles": ["thumbnail"]
+    },
+    "scene-thumbnail-01HSCENA8M9N0P1Q2R3S4T5V6W-sm": {
+      "href": "./scene-thumbnails/scene-01HSCENA8M9N0P1Q2R3S4T5V6W-sm.png",
+      "type": "image/png",
+      "roles": ["thumbnail"]
+    }
+  }
+}

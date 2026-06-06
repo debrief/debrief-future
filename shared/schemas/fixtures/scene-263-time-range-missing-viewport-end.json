@@ -1,0 +1,38 @@
+{
+  "type": "Feature",
+  "id": "01HZ263263263263263263263B",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [-1.5, 50.5],
+        [-1.5, 51.0],
+        [-1.0, 51.0],
+        [-1.0, 50.5],
+        [-1.5, 50.5]
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "STORYBOARD_SCENE",
+    "id": "01HZ263263263263263263263B",
+    "storyboard_id": "01HZ7777777777777777777777",
+    "title": "INVALID-MISSING-VIEWPORT-END",
+    "viewport": {
+      "center": [-1.25, 50.75],
+      "zoom": 11.0,
+      "bearing": 0
+    },
+    "timestamp": "2026-05-15T12:00:00Z",
+    "time_range": {
+      "start": "2026-05-15T12:00:00Z",
+      "end": "2026-05-15T12:01:30Z"
+    },
+    "visible_feature_ids": ["track-001"],
+    "feature_set_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "thumbnail_asset_ref": "scene-thumbnail-01HZ263263263263263263263B",
+    "transition_duration_ms": 500,
+    "creation_order": 2,
+    "_polygon_source": "bounds"
+  }
+}

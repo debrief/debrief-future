@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import type { PathOptions, LatLngBoundsExpression } from 'leaflet';
+import type { Map as LeafletMap, PathOptions, LatLngBoundsExpression } from 'leaflet';
 import type { DebriefFeature, DebriefFeatureCollection, Bounds, DisplayMode } from '../utils/types';
 import { calculateBounds, expandBounds } from '@debrief/utils';
 import { getFeatureColor, getFeatureLabel } from '../utils/labels';
@@ -15,6 +15,8 @@ import type { DrawingMode } from './LeafletToolbar';
 import { SceneRectangleLayer } from './SceneRectangleLayer';
 import type { SceneRectangleLayerProps } from './SceneRectangleLayer';
 import { DrawingGuidanceOverlay } from './DrawingGuidanceOverlay/DrawingGuidanceOverlay';
+import { ViewportLockBanner } from './ViewportLockBanner/ViewportLockBanner';
+import { isPlatformModifier, type SelectionClickEvent } from '../utils/applyClickToSelection';
 import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
@@ -42,8 +44,15 @@ export interface MapViewProps {
   /** Set of selected feature IDs */
   selectedIds?: Set<string>;
 
-  /** Callback when a feature is clicked */
-  onSelect?: (featureId: string, event: React.MouseEvent) => void;
+  /**
+   * Callback when a feature is clicked.
+   *
+   * **Breaking change (#192 Phase 5)**: the payload is now a
+   * `SelectionClickEvent` (`{ target, modifier, shift }`) rather than
+   * `(featureId, event)`. Pair with `applyClickToSelection` from
+   * `@debrief/components` to derive the next selection set.
+   */
+  onSelect?: (event: SelectionClickEvent) => void;
 
   /** Callback when clicking empty space (for clearing selection) */
   onBackgroundClick?: () => void;
@@ -75,6 +84,43 @@ export interface MapViewProps {
 
   /** Tile layer attribution */
   tileLayerAttribution?: string;
+
+  /**
+   * URL of the tile served when an XYZ slot is missing or unreachable
+   * (Leaflet `TileLayer.options.errorTileUrl`). Set by the briefing
+   * renderer SPA (spec #264) to `./tiles/placeholder.png` so that
+   * out-of-bundle Scene viewports show a neutral placeholder rather
+   * than triggering a network fallback. Defaults to undefined — Leaflet
+   * shows a transparent tile, matching today's behaviour.
+   */
+  errorTileUrl?: string;
+
+  /**
+   * Maximum zoom level for the tile layer (`TileLayer.options.maxZoom`).
+   * The briefing renderer passes its bundled-zoom cap so users can't
+   * zoom past the cache. Defaults to undefined — Leaflet picks the
+   * library default (18), matching today's behaviour.
+   */
+  maxZoom?: number;
+
+  /**
+   * When true, tiles are not repeated horizontally across the
+   * antimeridian (`TileLayer.options.noWrap`). The briefing renderer
+   * sets this to keep playback bounded to the captured tile set.
+   * Defaults to false (Leaflet's default — tiles wrap), matching
+   * today's behaviour.
+   */
+  noWrap?: boolean;
+
+  /**
+   * Value passed through as the `crossOrigin` attribute on the
+   * underlying `<TileLayer>`. Pass `false` to omit the attribute
+   * entirely (required under `file://` origin in current Chrome /
+   * Edge — the attribute is meaningless there and CAUSES the tile
+   * to fail to load if set). Defaults to `'anonymous'` (today's
+   * behaviour, unchanged for non-briefing consumers).
+   */
+  tileLayerCrossOrigin?: 'anonymous' | 'use-credentials' | false;
 
   /** CSS class name */
   className?: string;
@@ -126,6 +172,17 @@ export interface MapViewProps {
   onFlyToComplete?: (token: number) => void;
 
   /**
+   * PR #627 — callback invoked once with the Leaflet `Map` instance after the
+   * `MapContainer` has mounted. Hosts can store this in a ref and read the
+   * live viewport synchronously via `map.getCenter()` / `map.getZoom()` /
+   * `map.getBounds()` at capture time, bypassing every async queue between
+   * Leaflet and `session-state.viewport`. The MapView never owns the
+   * resulting reference — it's the consumer's responsibility to drop it on
+   * unmount.
+   */
+  onMapReady?: (map: LeafletMap) => void;
+
+  /**
    * The Scene Features to render as faint rectangles on the map. When
    * provided, a `SceneRectangleLayer` is rendered inside the `MapContainer`.
    */
@@ -143,6 +200,22 @@ export interface MapViewProps {
    * `SceneRectangleLayer`). See `map-view-flyto.md` §5 / FR-PLAY-015.
    */
   shouldRenderInBaseLayer?: (feature: GeoJSON.Feature) => boolean;
+
+  // ── Spec 260 — viewport lock ─────────────────────────────────────────
+  /**
+   * When `true`, every Leaflet gesture handler that can change the map's
+   * centre or zoom (drag, scroll-wheel, double-click, pinch/touch, box,
+   * keyboard) is disabled and the on-map `ViewportLockBanner` is shown.
+   * Restoring to `false` re-enables only the handlers that were enabled
+   * BEFORE the lock — a host-disabled handler stays disabled (spec FR-006).
+   */
+  viewportLocked?: boolean;
+
+  /**
+   * Toggle callback — fires from the on-map banner (click-to-unlock) and
+   * from the `L` keyboard shortcut. The host owns the lock state.
+   */
+  onViewportLockChange?: (locked: boolean) => void;
 }
 
 /**
@@ -161,6 +234,141 @@ export interface FlyToTarget {
   readonly durationMs: number;
 }
 
+// ─── Vertex hit-testing for annotation geometries (#192 Phase 9 / US-7) ───
+//
+// Polygon / LineString / MultiPoint / Point layers don't expose per-vertex
+// DOM handles, so we hit-test the click location against each rendered
+// vertex and — if the click falls within `VERTEX_HIT_RADIUS_PX` of one —
+// emit the geometry-specific structured selection path. Falls through to
+// feature-level emission otherwise (clicking the body of a polygon, for
+// example, still selects the whole feature).
+//
+// The path shapes mirror data-model.md § 1.3:
+//   - Polygon    → `rings/R/vertices/V`
+//   - LineString → `vertices/V`
+//   - MultiPoint → `vertices/V`
+//   - Point      → `vertex/0`
+//
+// Tracks keep their existing per-point selection path (`positions/N`) via
+// `PositionSymbolsLayer` — that route is unchanged.
+
+const VERTEX_HIT_RADIUS_PX = 12;
+
+/**
+ * Result of hit-testing a click against a feature's vertices.
+ * `null` → no vertex within radius; caller falls back to feature-level select.
+ */
+type VertexHit = string | null;
+
+/**
+ * Hit-test the click container-point against each vertex of the feature's
+ * geometry — within `VERTEX_HIT_RADIUS_PX` counts as a hit. Returns the
+ * closest matching vertex's structured sub-path (relative to the feature
+ * root) or `null` if no vertex is within radius.
+ *
+ * Pixel-distance hit testing matches how the analyst perceives "clicking
+ * a vertex": a click that's 8 px from a vertex on a Polygon edge resolves
+ * to that vertex even if the click latlng isn't exactly on the vertex
+ * latlng. The Leaflet click event's `containerPoint` is already in pixel
+ * coordinates — we project each vertex into the same space via
+ * `map.latLngToContainerPoint`.
+ */
+function hitTestVertex(
+  map: L.Map,
+  clickPt: L.Point,
+  geometry: GeoJSON.Geometry | null | undefined,
+): VertexHit {
+  if (!geometry) return null;
+
+  const distPx = (lonLat: GeoJSON.Position): number => {
+    const lon = lonLat[0];
+    const lat = lonLat[1];
+    if (typeof lon !== 'number' || typeof lat !== 'number') return Number.POSITIVE_INFINITY;
+    // eslint-disable-next-line no-restricted-syntax
+    const pt = map.latLngToContainerPoint(L.latLng(lat, lon));
+    const dx = pt.x - clickPt.x;
+    const dy = pt.y - clickPt.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  let bestHit: VertexHit = null;
+  let bestDist = VERTEX_HIT_RADIUS_PX;
+
+  if (geometry.type === 'Polygon') {
+    const rings = geometry.coordinates;
+    for (let r = 0; r < rings.length; r += 1) {
+      const ring = rings[r];
+      if (!ring) continue;
+      for (let v = 0; v < ring.length; v += 1) {
+        const pt = ring[v];
+        if (!pt) continue;
+        const d = distPx(pt);
+        if (d <= bestDist) {
+          bestDist = d;
+          bestHit = `rings/${r}/vertices/${v}`;
+        }
+      }
+    }
+    return bestHit;
+  }
+
+  if (geometry.type === 'LineString') {
+    const coords = geometry.coordinates;
+    for (let v = 0; v < coords.length; v += 1) {
+      const pt = coords[v];
+      if (!pt) continue;
+      const d = distPx(pt);
+      if (d <= bestDist) {
+        bestDist = d;
+        bestHit = `vertices/${v}`;
+      }
+    }
+    return bestHit;
+  }
+
+  if (geometry.type === 'MultiPoint') {
+    const coords = geometry.coordinates;
+    for (let v = 0; v < coords.length; v += 1) {
+      const pt = coords[v];
+      if (!pt) continue;
+      const d = distPx(pt);
+      if (d <= bestDist) {
+        bestDist = d;
+        bestHit = `vertices/${v}`;
+      }
+    }
+    return bestHit;
+  }
+
+  if (geometry.type === 'Point') {
+    const pt = geometry.coordinates;
+    const d = distPx(pt);
+    if (d <= bestDist) {
+      // FR-028: a Point's single implicit vertex is always reachable when
+      // the click is anywhere near it.
+      bestHit = 'vertex/0';
+    }
+    return bestHit;
+  }
+
+  return null;
+}
+
+/**
+ * The six Leaflet gesture handlers disabled while the viewport is locked
+ * (spec 260 / FR-003). Drag, wheel, double-click, pinch/touch, drag-rectangle
+ * box-zoom, keyboard panning.
+ */
+const VIEWPORT_LOCK_HANDLER_KEYS = [
+  'dragging',
+  'scrollWheelZoom',
+  'doubleClickZoom',
+  'touchZoom',
+  'boxZoom',
+  'keyboard',
+] as const;
+type ViewportLockHandlerKey = (typeof VIEWPORT_LOCK_HANDLER_KEYS)[number];
+
 // Component to handle map events, auto-fit, and programmatic viewport control
 function MapController({
   bounds,
@@ -172,6 +380,8 @@ function MapController({
   onZoomChange,
   onBoundsChange,
   onBackgroundClick,
+  onMapReady,
+  viewportLocked,
 }: {
   bounds: Bounds | null;
   autoFitBounds: boolean;
@@ -182,9 +392,58 @@ function MapController({
   onZoomChange?: (zoom: number) => void;
   onBoundsChange?: (bounds: Bounds) => void;
   onBackgroundClick?: () => void;
+  onMapReady?: (map: LeafletMap) => void;
+  viewportLocked: boolean;
 }) {
   const map = useMap();
   const prevBoundsRef = useRef<Bounds | null>(null);
+
+  // Spec 260 — capture each handler's enabled state at lock-on, restore only
+  // those entries that were enabled before. A host that pre-disabled
+  // `keyboard` (e.g. for measurement-tool mode) keeps it disabled after
+  // unlock. The snapshot is per-lock-cycle; cleared at unlock.
+  const lockHandlerSnapshotRef = useRef<Record<ViewportLockHandlerKey, boolean> | null>(null);
+
+  useEffect(() => {
+    if (viewportLocked) {
+      if (lockHandlerSnapshotRef.current !== null) return; // idempotent — already locked
+      const snapshot: Record<ViewportLockHandlerKey, boolean> = {
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        touchZoom: false,
+        boxZoom: false,
+        keyboard: false,
+      };
+      for (const key of VIEWPORT_LOCK_HANDLER_KEYS) {
+        const handler = (map as unknown as Record<string, { enabled?: () => boolean; disable?: () => void } | undefined>)[key];
+        if (handler && typeof handler.enabled === 'function' && typeof handler.disable === 'function') {
+          snapshot[key] = handler.enabled();
+          handler.disable();
+        }
+      }
+      lockHandlerSnapshotRef.current = snapshot;
+    } else {
+      const snapshot = lockHandlerSnapshotRef.current;
+      if (snapshot === null) return; // idempotent — already unlocked
+      for (const key of VIEWPORT_LOCK_HANDLER_KEYS) {
+        if (!snapshot[key]) continue; // host had it disabled — preserve that
+        const handler = (map as unknown as Record<string, { enable?: () => void } | undefined>)[key];
+        if (handler && typeof handler.enable === 'function') {
+          handler.enable();
+        }
+      }
+      lockHandlerSnapshotRef.current = null;
+    }
+  }, [map, viewportLocked]);
+
+  // PR #627 — hand the Leaflet map instance to the host as soon as it's
+  // available so capture-time viewport queries can read it synchronously.
+  useEffect(() => {
+    onMapReady?.(map);
+    // intentionally fires once per (map, callback) pair; callback identity
+    // changes are caller-controlled via useCallback.
+  }, [map, onMapReady]);
 
   // #230 FR-050 — emit an initial bounds report as soon as Leaflet is
   // ready, so downstream capture flows don't fail with "map has not
@@ -249,12 +508,24 @@ function MapController({
     }
   }, [map, viewport]);
 
-  // Handle programmatic fit bounds trigger
+  // Handle programmatic fit bounds trigger.
+  //
+  // PR #625: the previous implementation depended on `bounds` and only
+  // gated on `fitBoundsTrigger > 0`, which meant that *any* feature-set
+  // change (e.g. a new STORYBOARD_SCENE polygon during capture)
+  // recomputed `bounds`, re-ran this effect, and re-fired `fitBounds` —
+  // snapping the map back to fit-to-all-features even though the host
+  // explicitly sent `refitBounds: false`. Track the last value we
+  // fired on and only fire when the trigger has actually advanced.
+  const lastFiredFitTrigger = useRef<number | undefined>(undefined);
   useEffect(() => {
-    if (fitBoundsTrigger !== undefined && fitBoundsTrigger > 0 && bounds) {
-      const [minLon, minLat, maxLon, maxLat] = expandBounds(bounds, 0.1);
-      map.fitBounds([[minLat, minLon], [maxLat, maxLon]] as LatLngBoundsExpression);
-    }
+    if (fitBoundsTrigger === undefined) return;
+    if (fitBoundsTrigger <= 0) return;
+    if (fitBoundsTrigger === lastFiredFitTrigger.current) return;
+    if (!bounds) return;
+    lastFiredFitTrigger.current = fitBoundsTrigger;
+    const [minLon, minLat, maxLon, maxLat] = expandBounds(bounds, 0.1);
+    map.fitBounds([[minLat, minLon], [maxLat, maxLon]] as LatLngBoundsExpression);
   }, [map, fitBoundsTrigger, bounds]);
 
   // Handle animated flyTo (#217 FR-PLAY-004). Fires on token change so
@@ -291,6 +562,18 @@ function MapController({
       onZoomChange?.(map.getZoom());
     },
     moveend: () => {
+      // PR #626 — fire `onZoomChange` BEFORE `onBoundsChange`.
+      // For animated `setView`/`fitBounds` calls Leaflet fires
+      // `moveend` *before* `zoomend`, so a webview that tracks zoom in
+      // a ref updated only by `onZoomChange` ends up posting the
+      // PREVIOUS zoom alongside the new bounds. On the next capture
+      // the host reads that stale zoom from `state.viewport`, and the
+      // post-capture `flyToViewport` restores to (correct centre,
+      // STALE wide zoom) — visible as the map panning out at the end
+      // of the first capture. Fire `onZoomChange` first so the ref is
+      // fresh by the time `onBoundsChange` triggers the
+      // `viewportChanged` post.
+      onZoomChange?.(map.getZoom());
       const mapBounds = map.getBounds();
       onBoundsChange?.([
         mapBounds.getWest(),
@@ -338,6 +621,10 @@ export function MapView({
   fitBoundsTrigger,
   tileLayerUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   tileLayerAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  errorTileUrl,
+  maxZoom,
+  noWrap = false,
+  tileLayerCrossOrigin = 'anonymous',
   className,
   style,
   height = 400,
@@ -351,9 +638,12 @@ export function MapView({
   onShapeCreated,
   flyToTarget,
   onFlyToComplete,
+  onMapReady,
   sceneRectangles,
   onSceneRectangleClick,
   shouldRenderInBaseLayer,
+  viewportLocked = false,
+  onViewportLockChange,
 }: MapViewProps) {
   // Base-layer filter — defaults to excluding Storyboard parent + Scene
   // features so they are never rendered in the main GeoJSON layer.
@@ -533,12 +823,47 @@ export function MapView({
       layer.bindPopup(popupLines.join('<br/>'), { maxWidth: 400 });
 
       // Click handler — works for all features including decomposed
-      // MultiPolygon child polygons (which now have IDs like "parent/polygons/0")
+      // MultiPolygon child polygons (which now have IDs like "parent/polygons/0").
+      //
+      // Emits the new `SelectionClickEvent` shape (#192 Phase 5). Modifier
+      // detection routes through `isPlatformModifier` so Mac analysts get
+      // `Cmd` and everyone else gets `Ctrl` without per-host wiring.
+      //
+      // #192 Phase 9 (US-7 / T070): for Polygon / LineString / MultiPoint /
+      // Point geometries, hit-test the click against rendered vertices
+      // first. A click within `VERTEX_HIT_RADIUS_PX` of a vertex emits the
+      // structured sub-path (e.g. `featureId/rings/0/vertices/3`) so the
+      // sub-feature editor opens for that vertex. Clicks on the body of
+      // the geometry (away from any vertex) keep the feature-level emit.
+      // Track-point selection continues to flow through
+      // `PositionSymbolsLayer` (unchanged by this phase).
       layer.on('click', (e) => {
-        e.originalEvent.stopPropagation();
+        const original = e.originalEvent;
+        original.stopPropagation();
         // eslint-disable-next-line no-restricted-syntax
-        onSelect?.(featureId, e.originalEvent as unknown as React.MouseEvent);
-      // eslint-disable-next-line no-restricted-syntax
+        const leafletMap = (e as unknown as { target?: { _map?: L.Map } }).target?._map
+          // eslint-disable-next-line no-restricted-syntax
+          ?? (layer as unknown as { _map?: L.Map })._map
+          ?? null;
+        // eslint-disable-next-line no-restricted-syntax
+        const containerPoint = (e as unknown as { containerPoint?: L.Point }).containerPoint;
+        let target = String(featureId);
+        if (leafletMap !== null && containerPoint !== undefined) {
+          // eslint-disable-next-line no-restricted-syntax
+          const geom = feature.geometry;
+          const vertexPath = hitTestVertex(leafletMap, containerPoint, geom);
+          if (vertexPath !== null) {
+            target = `${String(featureId)}/${vertexPath}`;
+          }
+        }
+        onSelect?.({
+          target,
+          modifier: isPlatformModifier({
+            ctrlKey: original.ctrlKey,
+            metaKey: original.metaKey,
+          }),
+          shift: original.shiftKey === true,
+        });
       });
 
       // Apply per-ring styles for ZONE MultiPolygon features
@@ -647,8 +972,31 @@ export function MapView({
     ...style,
   };
 
+  // Spec 260 (Story 3) — `L` shortcut toggles the viewport lock when the map
+  // root has focus. Bound on the container <div> (NOT at document level) so
+  // typing 'l' into a Scene description field is unaffected. The listener
+  // remains active even while the Leaflet `keyboard` handler is disabled by
+  // the lock — the user MUST be able to exit via this shortcut.
+  //
+  // First-of-its-kind single-letter map shortcut — backlog #261 captures the
+  // convention work for adding more (custom hook, key registry, etc.).
+  const handleRootKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (!onViewportLockChange) return;
+    if (event.key !== 'l' && event.key !== 'L') return;
+    if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('input, textarea, [contenteditable="true"]')) return;
+    event.preventDefault();
+    onViewportLockChange(!viewportLocked);
+  };
+
   return (
-    <div className={`debrief-mapview ${className ?? ''}`} style={containerStyle}>
+    <div
+      className={`debrief-mapview ${className ?? ''}`}
+      style={containerStyle}
+      tabIndex={0}
+      onKeyDown={handleRootKeyDown}
+    >
       <MapContainer
         center={initialCenter}
         zoom={initialZoom}
@@ -656,7 +1004,16 @@ export function MapView({
         style={{ height: '100%', width: '100%' }}
         zoomControl={!showToolbar}
       >
-        <TileLayer url={tileLayerUrl} attribution={tileLayerAttribution} crossOrigin="anonymous" />
+        <TileLayer
+          url={tileLayerUrl}
+          attribution={tileLayerAttribution}
+          {...(tileLayerCrossOrigin === false
+            ? {}
+            : { crossOrigin: tileLayerCrossOrigin })}
+          {...(errorTileUrl ? { errorTileUrl } : {})}
+          {...(maxZoom !== undefined ? { maxZoom } : {})}
+          {...(noWrap ? { noWrap: true } : {})}
+        />
 
         {showToolbar && (
           <LeafletToolbar
@@ -665,6 +1022,7 @@ export function MapView({
             drawingMode={drawingMode}
             onDrawingModeChange={onDrawingModeChange}
             onShapeCreated={onShapeCreated}
+            viewportLocked={viewportLocked}
           />
         )}
 
@@ -678,6 +1036,8 @@ export function MapView({
           onZoomChange={onZoomChange}
           onBoundsChange={onBoundsChange}
           onBackgroundClick={onBackgroundClick}
+          onMapReady={onMapReady}
+          viewportLocked={viewportLocked}
         />
 
         {sceneRectangles && (
@@ -738,6 +1098,10 @@ export function MapView({
           ))}
       </MapContainer>
       <DrawingGuidanceOverlay drawingMode={drawingMode ?? null} />
+      <ViewportLockBanner
+        locked={viewportLocked}
+        onUnlock={() => onViewportLockChange?.(false)}
+      />
     </div>
   );
 }

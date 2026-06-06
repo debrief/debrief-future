@@ -113,6 +113,184 @@ export const Capturing: Story = {
   },
 };
 
+// ─── #271 — overlap warning for time-range Scenes ─────────────────────
+
+const OVERLAP_SCENES: SceneRowViewModel[] = [
+  makeSceneRow('scene-1', '2026-04-20T10:00:00.000Z', 'Approach run'),
+  makeSceneRow('scene-2', '2026-04-20T10:15:00.000Z', 'Egress leg'),
+  makeSceneRow('scene-3', '2026-04-20T11:00:00.000Z', 'Final approach'),
+  makeSceneRow('scene-4', '2026-04-20T11:30:00.000Z', 'Contact datum'),
+];
+
+/** Minimal per-row edit view-model carrying just the overlap warning. */
+function overlapVm(
+  sceneId: string,
+  title: string,
+  timestamp: string,
+  overlapsWith: ReadonlyArray<{ sceneId: string; title: string }> = [],
+): import('./types').SceneEditViewModel {
+  return {
+    sceneId,
+    title,
+    description: null,
+    timestamp,
+    titleIsEditing: false,
+    editFormOpen: false,
+    pendingDelete: false,
+    stale: false,
+    unresolvedFeatureIds: [],
+    missingData: { kind: 'ok' },
+    overlapsWith,
+  };
+}
+
+// Static overlap relationships for the story (mirrors what a host's
+// `detectSceneOverlaps` would return for OVERLAP_SCENES).
+const OVERLAP_PARTNERS: Record<string, ReadonlyArray<{ sceneId: string; title: string }>> = {
+  'scene-1': [{ sceneId: 'scene-2', title: 'Egress leg' }],
+  'scene-2': [{ sceneId: 'scene-1', title: 'Approach run' }],
+};
+
+function pairKey(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+/**
+ * Interactive panel that mirrors a host's dismissal handling: clicking
+ * Dismiss adds the pair to local state, which removes the warning from both
+ * rows on the next render. Used by both the screenshot and dismiss E2E.
+ */
+function OverlapWarningStory(): React.ReactElement {
+  const [dismissed, setDismissed] = React.useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
+  const sceneEditViewModels: Record<string, import('./types').SceneEditViewModel> = {};
+  for (const row of OVERLAP_SCENES) {
+    const partners = (OVERLAP_PARTNERS[row.sceneId] ?? []).filter(
+      (p) => !dismissed.has(pairKey(row.sceneId, p.sceneId)),
+    );
+    sceneEditViewModels[row.sceneId] = overlapVm(
+      row.sceneId,
+      row.title,
+      row.timestampIso,
+      partners,
+    );
+  }
+  return (
+    <StoryboardPanel
+      scenes={OVERLAP_SCENES}
+      activeStoryboardName="Exercise Alpha"
+      captureInFlight={false}
+      onCaptureClick={() => undefined}
+      onSceneRowClick={() => undefined}
+      sceneEditViewModels={sceneEditViewModels}
+      onSceneOverlapDismiss={(sceneId, partnerSceneIds): void => {
+        setDismissed((prev) => {
+          const next = new Set(prev);
+          for (const partnerId of partnerSceneIds) {
+            next.add(pairKey(sceneId, partnerId));
+          }
+          return next;
+        });
+      }}
+    />
+  );
+}
+
+/**
+ * Two time-range Scenes whose windows overlap (Approach run 10:00–10:30 and
+ * Egress leg 10:15–10:45) each carry a passive warning naming the other.
+ * The non-overlapping time-range Scene and the instant Scene stay clean.
+ * Clicking Dismiss clears the warning on both rows.
+ */
+export const WithOverlapWarnings: Story = {
+  render: () => <OverlapWarningStory />,
+};
+
+// ─── #273 — live Preview control variants ─────────────────────────────
+
+/**
+ * Preview button enabled — sits beside Capture in the header. Provided
+ * `onPreview` makes the button render; ≥1 scene makes it actionable.
+ */
+export const WithPreview: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    onPreview: () => undefined,
+  },
+};
+
+/**
+ * Preview button disabled — the active storyboard has no scenes, so the
+ * button renders but is disabled with an explanatory tooltip (FR-007).
+ */
+export const PreviewDisabledNoScenes: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    onPreview: () => undefined,
+  },
+};
+
+// ─── Spec 260 — viewport-lock padlock variants ────────────────────────
+
+/**
+ * Padlock toggle unlocked — open-padlock glyph, `aria-pressed="false"`.
+ * The control sits immediately to the left of Capture.
+ */
+export const ViewportUnlocked: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    viewportLocked: false,
+    onViewportLockToggle: () => undefined,
+    hasActivePlot: true,
+  },
+};
+
+/**
+ * Padlock toggle locked — closed-padlock glyph, `aria-pressed="true"`,
+ * highlighted background. Demonstrates the visual relationship to Capture.
+ */
+export const ViewportLocked: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    viewportLocked: true,
+    onViewportLockToggle: () => undefined,
+    hasActivePlot: true,
+  },
+};
+
+/**
+ * Padlock toggle disabled — no plot loaded (spec 260 / FR-013).
+ */
+export const ViewportLockEmptyState: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    viewportLocked: false,
+    onViewportLockToggle: () => undefined,
+    hasActivePlot: false,
+  },
+};
+
 // ─── #217 stories ─────────────────────────────────────────────────────
 
 const TRANSPORT_AT_1: TransportViewModel = {
@@ -214,117 +392,411 @@ export const HardBlockModalStory: StoryObj<typeof HardBlockModal> = {
   ),
 };
 
-// ─── #218 edit-suite stories (T064) ─────────────────────────────────
+// ─── #218 edit-suite stories (T064; upgraded to interactive in #234 T023..T026) ───
 
-const EDIT_VM_BASE = {
+import {
+  useStoryOnlyMockHandlers,
+  composeSceneEditViewModels,
+  type MockHandlersFixture,
+  type MockHandlersInitial,
+  type MockPortKnobs,
+  type SceneEditViewModel,
+  type StoryboardEditViewModel,
+} from './index';
+
+const EDIT_VM_BASE: SceneEditViewModel = {
   sceneId: 'scene-1',
   title: 'Exercise start — North channel',
-  description: null as string | null,
+  description: null,
   timestamp: '2026-04-20T14:00:00.000Z',
   titleIsEditing: false,
   editFormOpen: false,
   pendingDelete: false,
   stale: false,
-  unresolvedFeatureIds: [] as readonly string[],
-  missingData: { kind: 'ok' as const },
+  unresolvedFeatureIds: [],
+  missingData: { kind: 'ok' },
 };
 
-export const WithEditForm: Story = {
-  args: {
-    scenes: SCENES_THREE,
+const STORYBOARD_EDIT_VM: StoryboardEditViewModel = {
+  storyboardId: 'sb-alpha',
+  name: 'Exercise Alpha',
+  description: 'Surface-group exercise — North channel',
+  nameIsEditing: false,
+  descriptionExpanded: false,
+  sceneCount: SCENES_THREE.length,
+};
+
+/**
+ * Build the helper-shaped fixture for the four edit-suite stories. All
+ * stories share the same three scenes; per-row edit VM overrides are
+ * passed by each story to set the starting condition (e.g. WithEditForm
+ * pre-opens scene-1's edit form).
+ */
+function makeEditFixture(
+  perRowOverrides: Partial<Record<string, Partial<SceneEditViewModel>>>,
+): MockHandlersFixture {
+  const sceneEditViewModels: Record<string, SceneEditViewModel> = {};
+  for (const row of SCENES_THREE) {
+    const baseForRow: SceneEditViewModel = {
+      ...EDIT_VM_BASE,
+      sceneId: row.sceneId,
+      title: row.title,
+      timestamp: row.timestampIso,
+    };
+    sceneEditViewModels[row.sceneId] = {
+      ...baseForRow,
+      ...perRowOverrides[row.sceneId],
+    };
+  }
+  return {
+    storyboards: [
+      {
+        storyboardId: 'sb-alpha',
+        name: 'Exercise Alpha',
+        sceneCount: SCENES_THREE.length,
+        lastModifiedIso: '2026-04-20T14:35:00.000Z',
+      },
+      {
+        storyboardId: 'sb-bravo',
+        name: 'Exercise Bravo',
+        sceneCount: 0,
+        lastModifiedIso: '2026-04-20T13:00:00.000Z',
+      },
+    ],
+    activeStoryboardId: 'sb-alpha',
     activeStoryboardName: 'Exercise Alpha',
-    captureInFlight: false,
-    onCaptureClick: () => undefined,
-    onSceneRowClick: () => undefined,
-    sceneEditViewModels: {
-      'scene-1': {
-        ...EDIT_VM_BASE,
-        description: '**Brief:** contact gained bearing 023°. Hold course.',
-        editFormOpen: true,
+    scenes: SCENES_THREE,
+    sceneEditViewModels,
+    storyboardEditViewModel: STORYBOARD_EDIT_VM,
+  };
+}
+
+interface InteractiveStoryArgs {
+  /** Storybook control: enable copy-to-other failure for a sceneId. */
+  readonly induceCopyFailure?: string;
+  /** Storybook control: enable refresh-thumbnail failure for a sceneId. */
+  readonly induceRefreshFailure?: string;
+}
+
+interface InteractivePanelProps {
+  readonly fixture: MockHandlersFixture;
+  readonly initial?: MockHandlersInitial;
+  readonly knobs?: MockPortKnobs;
+}
+
+/**
+ * Renders the panel with the shared callback-adapter wired in. Each
+ * edit-suite story uses this in its `render` function.
+ */
+function InteractiveStoryboardPanel({
+  fixture,
+  initial,
+  knobs,
+}: InteractivePanelProps): React.ReactElement {
+  const { state, handlers } = useStoryOnlyMockHandlers(fixture, {
+    initial,
+    knobs,
+  });
+  const sceneEditViewModels = composeSceneEditViewModels(state);
+  return (
+    <StoryboardPanel
+      scenes={state.sceneRows}
+      activeStoryboardName={state.activeStoryboardName}
+      captureInFlight={state.captureInFlight}
+      storyboards={
+        state.storyboards.length > 0 ? state.storyboards : undefined
+      }
+      activeStoryboardId={state.activeStoryboardId}
+      currentSceneId={state.currentSceneId}
+      transport={state.transport}
+      sceneEditViewModels={sceneEditViewModels}
+      storyboardEditViewModel={state.storyboardEditViewModel ?? undefined}
+      pendingUndoToast={state.pendingUndoToast}
+      overflowMenuOpenFor={state.overflowMenuOpenFor}
+      overflowMenuAnchorRect={state.overflowMenuAnchorRect}
+      {...handlers}
+    />
+  );
+}
+
+export const WithEditForm: StoryObj<InteractiveStoryArgs> = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Choose "Edit scene…" from a row\'s ⋯ menu (or double-click the row) to open the edit dialog. Save persists the new title/description via the reducer; Cancel discards. Driven by the shared `useStoryOnlyMockHandlers` helper (Feature 234, ADR-027).',
       },
     },
-    onSceneTitleRenameCommit: () => undefined,
-    onSceneDescriptionSubmit: () => undefined,
-    onSceneDeleteRequested: () => undefined,
-    onSceneUpdateToCurrentClicked: () => undefined,
-    onSceneDuplicateClicked: () => undefined,
-    onSceneCopyToOtherClicked: () => undefined,
-    onSceneRefreshThumbnailClicked: () => undefined,
   },
-};
-
-export const WithUndoToast: Story = {
-  args: {
-    scenes: SCENES_THREE,
-    activeStoryboardName: 'Exercise Alpha',
-    captureInFlight: false,
-    onCaptureClick: () => undefined,
-    onSceneRowClick: () => undefined,
-    pendingUndoToast: {
-      sceneId: 'scene-2',
-      sceneTitle: 'Contact with surface group',
-      deletedAt: '2026-04-24T12:00:00.000Z',
-      canUndo: true,
-    },
-    sceneEditViewModels: {
-      'scene-2': {
-        ...EDIT_VM_BASE,
-        sceneId: 'scene-2',
-        title: 'Contact with surface group',
-        pendingDelete: true,
-      },
-    },
-    onSceneUndoDeleteClicked: () => undefined,
-  },
-};
-
-export const WithStaleBadge: Story = {
-  args: {
-    scenes: SCENES_THREE,
-    activeStoryboardName: 'Exercise Alpha',
-    captureInFlight: false,
-    onCaptureClick: () => undefined,
-    onSceneRowClick: () => undefined,
-    sceneEditViewModels: {
-      'scene-2': {
-        ...EDIT_VM_BASE,
-        sceneId: 'scene-2',
-        title: 'Contact with surface group',
-        stale: true,
-        unresolvedFeatureIds: ['track-alpha', 'track-bravo'],
-      },
-    },
-    onSceneRefreshThumbnailClicked: () => undefined,
-  },
-};
-
-export const WithMissingDataRemediation: Story = {
-  args: {
-    scenes: SCENES_THREE,
-    activeStoryboardName: 'Exercise Alpha',
-    captureInFlight: false,
-    onCaptureClick: () => undefined,
-    onSceneRowClick: () => undefined,
-    sceneEditViewModels: {
-      'scene-3': {
-        ...EDIT_VM_BASE,
-        sceneId: 'scene-3',
-        title: 'Bearing-only track lock',
-        description: null,
-        timestamp: '2026-04-20T14:35:00.000Z',
-        editFormOpen: true,
-        missingData: {
-          kind: 'missing-features',
-          ids: ['track-alpha', 'track-bravo', 'track-charlie'],
+  render: () => (
+    <InteractiveStoryboardPanel
+      fixture={makeEditFixture({
+        'scene-1': {
+          description: '**Brief:** contact gained bearing 023°. Hold course.',
         },
+      })}
+    />
+  ),
+};
+
+export const WithUndoToast: StoryObj<InteractiveStoryArgs> = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Right-click (or Shift+F10) any row → Delete to remove it; the Undo toast appears, click Undo to restore. Driven by the shared `useStoryOnlyMockHandlers` helper (Feature 234, ADR-027).',
       },
     },
-    onSceneTitleRenameCommit: () => undefined,
-    onSceneDescriptionSubmit: () => undefined,
-    onSceneDeleteRequested: () => undefined,
+  },
+  render: () => (
+    <InteractiveStoryboardPanel fixture={makeEditFixture({})} />
+  ),
+};
+
+export const WithStaleBadge: StoryObj<InteractiveStoryArgs> = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Scene 2 starts stale; click its overflow → Refresh thumbnail to clear the badge. Toggle the `induceRefreshFailure` arg to "scene-2" to exercise the per-Scene failure branch (FR-043).',
+      },
+    },
+  },
+  argTypes: {
+    induceRefreshFailure: {
+      control: 'select',
+      options: [undefined, 'scene-1', 'scene-2', 'scene-3'],
+      description:
+        'Feature 234 FR-043 — when set, refresh on the matching sceneId routes to the failure branch (badge stays).',
+    },
+  },
+  args: {
+    induceRefreshFailure: undefined,
+  },
+  render: (args) => (
+    <InteractiveStoryboardPanel
+      fixture={makeEditFixture({})}
+      initial={{ staleSceneIds: ['scene-2'] }}
+      knobs={{ induceRefreshFailure: args.induceRefreshFailure }}
+    />
+  ),
+};
+
+export const WithMissingDataRemediation: StoryObj<InteractiveStoryArgs> = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Scene 3 starts in a missing-features state. Tab through the panel — focus lands on the remediation affordance with a visible focus ring; press Enter to dispatch the remediation action.',
+      },
+    },
+  },
+  render: () => (
+    <InteractiveStoryboardPanel
+      fixture={makeEditFixture({
+        'scene-3': {
+          editFormOpen: true,
+          missingData: {
+            kind: 'missing-features',
+            ids: ['track-alpha', 'track-bravo', 'track-charlie'],
+          },
+        },
+      })}
+      initial={{
+        missingDataBySceneId: {
+          'scene-3': ['track-alpha', 'track-bravo', 'track-charlie'],
+        },
+      }}
+    />
+  ),
+};
+
+// ─────────────────────────────────────────────────────────────────────
+// Feature 235 — first-capture naming row + duplicate-timestamp banner
+// ─────────────────────────────────────────────────────────────────────
+
+/**
+ * The empty rail with the primary "Create storyboard" affordance — the
+ * name-first entry point. (The header still carries a "Capture" button for
+ * the capture-first flow.)
+ */
+export const EmptyWithCreateButton: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: null,
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    onCreateStoryboard: () => undefined,
+  },
+};
+
+/**
+ * First-capture inline naming row. Pre-filled with the plot's default
+ * name; analyst can edit, confirm, or cancel without ever leaving the
+ * rail.
+ */
+export const FirstCaptureNamingRow: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: null,
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    namingRowViewModel: {
+      visible: true,
+      pendingName: 'Plot Alpha — storyboard',
+      defaultName: 'Plot Alpha — storyboard',
+      collisionWith: null,
+      canConfirm: true,
+    },
+    onNamingRowTextChanged: () => undefined,
+    onNamingRowConfirm: () => undefined,
+    onNamingRowCancel: () => undefined,
+  },
+};
+
+/**
+ * First-capture naming row, but the analyst typed a name that already
+ * exists on this plot. The inline collision warning fires; Confirm is
+ * disabled until they pick a unique name.
+ */
+export const FirstCaptureNamingRowWithCollision: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: null,
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    namingRowViewModel: {
+      visible: true,
+      pendingName: 'Exercise Alpha',
+      defaultName: 'Plot Alpha — storyboard',
+      collisionWith: 'Exercise Alpha',
+      canConfirm: false,
+    },
+    onNamingRowTextChanged: () => undefined,
+    onNamingRowConfirm: () => undefined,
+    onNamingRowCancel: () => undefined,
+  },
+};
+
+/**
+ * Duplicate-timestamp collision banner — Replace / Offset / Cancel.
+ * Anchored in the rail above the existing Scene list. The map and time
+ * controller in the host's central area remain operable.
+ */
+export const DuplicateTimestampBanner: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    collisionBannerViewModel: {
+      visible: true,
+      conflictingSceneId: 'scene-2',
+      conflictingSceneTitle: 'Contact with surface group',
+      proposedTimestamp: '2026-04-20T14:15:00.000Z',
+      proposedTimestampDtg: '201415Z APR 26',
+      offsetCount: 0,
+      offsetCapReached: false,
+      offsetWouldExceedTimeRange: false,
+      offsetButtonHidden: false,
+      cause: 'capture',
+    },
+    onCollisionReplace: () => undefined,
+    onCollisionOffset: () => undefined,
+    onCollisionCancel: () => undefined,
+  },
+};
+
+/**
+ * After 60 Offset presses, the banner replaces the Offset button with
+ * an inline cap-reached message; only Replace and Cancel remain.
+ */
+export const DuplicateTimestampBannerOffsetCapped: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    collisionBannerViewModel: {
+      visible: true,
+      conflictingSceneId: 'scene-2',
+      conflictingSceneTitle: 'Contact with surface group',
+      proposedTimestamp: '2026-04-20T14:16:00.000Z',
+      proposedTimestampDtg: '201416Z APR 26',
+      offsetCount: 60,
+      offsetCapReached: true,
+      offsetWouldExceedTimeRange: false,
+      offsetButtonHidden: true,
+      cause: 'capture',
+    },
+    onCollisionReplace: () => undefined,
+    onCollisionOffset: () => undefined,
+    onCollisionCancel: () => undefined,
+  },
+};
+
+/**
+ * FR-CAP-017a — when the next Offset would push past the plot's time
+ * range, the banner replaces the Offset button with the inline
+ * time-range message.
+ */
+export const DuplicateTimestampBannerExceedsTimeRange: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    collisionBannerViewModel: {
+      visible: true,
+      conflictingSceneId: 'scene-3',
+      conflictingSceneTitle: 'Bearing-only track lock',
+      proposedTimestamp: '2026-04-20T14:35:00.000Z',
+      proposedTimestampDtg: '201435Z APR 26',
+      offsetCount: 4,
+      offsetCapReached: false,
+      offsetWouldExceedTimeRange: true,
+      offsetButtonHidden: true,
+      cause: 'capture',
+    },
+    onCollisionReplace: () => undefined,
+    onCollisionOffset: () => undefined,
+    onCollisionCancel: () => undefined,
+  },
+};
+
+/**
+ * Visualises a Scene row with the Update-to-current affordance — the
+ * primary maintenance op that re-anchors a Scene to live state in-row.
+ * Re-uses the #218 visual treatment; included here so the new stories
+ * file references it for E2E.
+ */
+export const RowWithUpdateToCurrent: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    sceneEditViewModels: {
+      'scene-2': {
+        sceneId: 'scene-2',
+        title: 'Contact with surface group',
+        description: null,
+        timestamp: '2026-04-20T14:15:00.000Z',
+        titleIsEditing: false,
+        editFormOpen: true,
+        pendingDelete: false,
+        stale: false,
+        unresolvedFeatureIds: [],
+        missingData: { kind: 'ok' },
+      },
+    },
     onSceneUpdateToCurrentClicked: () => undefined,
-    onSceneDuplicateClicked: () => undefined,
-    onSceneCopyToOtherClicked: () => undefined,
-    onSceneRefreshThumbnailClicked: () => undefined,
   },
 };

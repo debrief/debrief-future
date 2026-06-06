@@ -1,8 +1,10 @@
 {
   "type": "Feature",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "id": "core--b-rate-ownship",
   "geometry": {
@@ -41,7 +43,7 @@
   "properties": {
     "title": "Saxon Warrior: B Rate Ownship",
     "datetime": "1900-12-12T06:35:03.910000+00:00",
-    "description": "Saxon Warrior: B Rate Ownship — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Defender.",
+    "description": "Saxon Warrior: B Rate Ownship \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Defender.",
     "start_datetime": "1900-12-12T06:35:03.910000+00:00",
     "end_datetime": "1900-12-12T10:00:07.910000+00:00",
     "debrief:platforms": [
@@ -64,6 +66,19 @@
       "active-search",
       "passive-search",
       "visual-sighting"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
     ]
   },
   "links": [
@@ -111,23 +126,41 @@
         "source_path": "/tmp/debrief-regen-4x2tftum/B_Rate_Ownship.rep",
         "load_timestamp": "2026-04-13T23:12:30.697779Z",
         "tool_version": "0.1.0"
-      }
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:30.697Z",
+      "file:size": 116689,
+      "file:checksum": "1220d3ffb542a93a75d88ece1cf03c19388ad0f1c17ed58aea749a805f9a4e0eae75"
     },
     "thumbnail": {
       "href": "./thumbnail.png",
       "type": "image/png",
-      "title": "Plot thumbnail",
+      "title": "Plot thumbnail (200x150)",
       "roles": [
         "thumbnail"
-      ]
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 9249,
+      "file:checksum": "1220111816a28481dfa1a393a1e0cc05c89ffc13955a00bb43ae70ad3ff326a0241e"
     },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
+    "overview": {
+      "href": "./overview.png",
       "type": "image/png",
-      "title": "Plot thumbnail (small)",
+      "title": "Plot overview (800x600)",
       "roles": [
-        "thumbnail"
-      ]
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 28891,
+      "file:checksum": "12209e41971e6cd637b7f7d67b77aae68bfc249bb03eeb06923625c799cfa918446b"
     }
   }
 }

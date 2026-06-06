@@ -278,6 +278,23 @@
             "string",
             "null"
           ]
+        },
+        "vertex_metadata": {
+          "description": "Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract \u00a7Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance \u2014 see spec #192, contracts/vertex-metadata-slot.md.",
+          "items": {
+            "$ref": "#/$defs/VertexMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -439,6 +456,46 @@
         "new_value"
       ],
       "title": "TuneAnnotation",
+      "type": "object"
+    },
+    "VertexMetadata": {
+      "additionalProperties": false,
+      "description": "Optional, sparse per-vertex annotation attached to a feature. One entry corresponds to one vertex of the parent feature's geometry, identified by the structured `path` slot following the `selectionPath` convention (research note R-008). Carrying any of label/tags/note triggers persistence; an entry with all three absent MUST be omitted on write (the writer's flush function prunes). Path shape depends on parent geometry:\n  Track       -> \"positions/<int>\"\n  Polygon     -> \"rings/<int>/vertices/<int>\"\n  LineString  -> \"vertices/<int>\"\n  MultiPoint  -> \"vertices/<int>\"\n  Point       -> \"vertex/0\"",
+      "properties": {
+        "label": {
+          "description": "Free-text short label.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "note": {
+          "description": "Free-text long note.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "description": "Structured vertex address following the selectionPath convention. The class-level regex accepts the union of all per-geometry path shapes; the writer additionally checks that the path matches the parent geometry's specific shape at flush time. Acts as the identity for an entry within a feature's `vertex_metadata` list \u2014 duplicates MUST be rejected by validators.",
+          "pattern": "^(positions/[0-9]+|rings/[0-9]+/vertices/[0-9]+|vertices/[0-9]+|vertex/0)$",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Free-text tag list. Order is not significant.",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "VertexMetadata",
       "type": "object"
     },
     "WasGeneratedBy": {

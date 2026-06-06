@@ -15,12 +15,14 @@ import {
   formatDtg,
   getActiveStoryboardDefault,
   isSceneFeature,
+  listScenesOrdered,
+  detectSceneOverlaps,
+  overlapPairKey,
   type StoryboardPlot,
-  type SceneFeature,
   type SceneEditViewModel,
   type StoryboardEditViewModel,
 } from '@debrief/components';
-import type { SceneRowViewModel } from '@debrief/components';
+import type { SceneRowViewModel, OverlapPartner } from '@debrief/components';
 import type { SessionManager } from '../services/sessionManager';
 import type { MapPanel } from '../webview/mapPanel';
 import type { StoryboardPlaybackService, StoryboardPlaybackSnapshot } from '../services/storyboardPlayback';
@@ -30,9 +32,27 @@ import type {
   StoryboardPanelMessage,
   ExtensionToStoryboardPanelMessage,
   SceneUndoToastDescriptor,
+  NamingRowPushState,
+  CollisionBannerPushState,
 } from '../types/storyboardPanelMessages';
 
 const VIEW_TYPE = 'debrief.storyboardPanel';
+
+/**
+ * Resolution of the inline naming row (#235). `null` = analyst cancelled.
+ */
+export type NamingRowResolution = { readonly name: string } | null;
+
+/**
+ * Resolution of the inline collision banner (#235).
+ *  - `replace` — analyst clicked Replace; capture command should delete + retry.
+ *  - `offset` — analyst clicked Offset (+1 s); capture command advances and re-checks.
+ *  - `cancel` — analyst dismissed the banner.
+ */
+export type CollisionBannerResolution =
+  | { readonly kind: 'replace'; readonly conflictingSceneId: string }
+  | { readonly kind: 'offset' }
+  | { readonly kind: 'cancel' };
 
 export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = VIEW_TYPE;
@@ -41,16 +61,56 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
    * Public accessor for the active webview (#220 theme relay).
    */
   public get webview(): vscode.Webview | undefined {
-    return this.view?.webview;
+    return this.activeWebview;
+  }
+
+  /**
+   * The webview this provider posts to. After the UX-review flatten the
+   * Storyboard renders as a section *inside* the Activity webview, so the
+   * provider no longer owns a view — it attaches to the Activity webview
+   * via {@link attachWebview}. The legacy `this.view` path is retained for
+   * completeness (the view is no longer registered in package.json).
+   */
+  private get activeWebview(): vscode.Webview | undefined {
+    return this.attachedWebview ?? this.view?.webview;
   }
 
   private view: vscode.WebviewView | undefined;
+  private attachedWebview: vscode.Webview | undefined;
+  private attachedMessageDisposable: vscode.Disposable | undefined;
   private webviewReady = false;
   private pendingMessages: ExtensionToStoryboardPanelMessage[] = [];
   private sessionChangeDisposable: vscode.Disposable | undefined;
   private getMapPanel: () => MapPanel | undefined = () => undefined;
   private playbackService: StoryboardPlaybackService | undefined;
   private editService: StoryboardEditService | undefined;
+  private authorisedStoreRoot: string | null = null;
+
+  /**
+   * #235 — current host-driven prompt slices. Tracked so `refresh()` and
+   * `applySnapshot()` can re-include them on every push (the analyst must
+   * still see the row/banner after, e.g., a `setActiveStoryboard` triggers
+   * a refresh mid-flow).
+   */
+  private currentNamingRow: NamingRowPushState | null = null;
+  private currentCollisionBanner: CollisionBannerPushState | null = null;
+  /**
+   * #271 — session-scoped set of dismissed overlap pair keys
+   * (`overlapPairKey`). Never persisted. Pruned to the currently-active
+   * overlap set on every refresh so a re-created pair re-warns (FR-009).
+   */
+  private dismissedOverlapPairs = new Set<string>();
+
+  /**
+   * #235 — pending resolvers for the host-driven prompts. The capture
+   * command awaits these; inbound action posts from the panel resolve them.
+   * Stale messages (no resolver) are dropped silently per
+   * contracts/panel-messages.md §C.
+   */
+  private namingRowResolver: ((r: NamingRowResolution) => void) | null = null;
+  private collisionResolver:
+    | ((r: CollisionBannerResolution) => void)
+    | null = null;
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -94,6 +154,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   ): void {
     this.view = webviewView;
     this.webviewReady = false;
+    this.authorisedStoreRoot = null;
 
     webviewView.webview.options = {
       enableScripts: true,
@@ -111,11 +172,45 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     webviewView.onDidDispose(() => {
       this.view = undefined;
       this.webviewReady = false;
+      this.authorisedStoreRoot = null;
     });
   }
 
+  /**
+   * Attach to a host-owned webview (the Activity webview). The Activity
+   * provider builds the HTML + sets `webview.options`; this provider only
+   * posts messages and registers its own `onDidReceiveMessage` listener.
+   * VS Code permits multiple listeners per webview, and neither switch
+   * throws on unrecognised message types, so the two providers coexist on
+   * one webview without cross-talk. The webview JS posts `{type:'ready'}`
+   * once mounted, which flushes any queued messages + triggers a refresh.
+   */
+  public attachWebview(webview: vscode.Webview): void {
+    this.attachedWebview = webview;
+    this.webviewReady = false;
+    this.authorisedStoreRoot = null;
+    this.attachedMessageDisposable?.dispose();
+    this.attachedMessageDisposable = webview.onDidReceiveMessage(
+      (message: StoryboardPanelMessage) => {
+        this.handleMessage(message);
+      },
+    );
+  }
+
+  /**
+   * Detach from the host webview (called when the Activity view disposes).
+   */
+  public detachWebview(): void {
+    this.attachedMessageDisposable?.dispose();
+    this.attachedMessageDisposable = undefined;
+    this.attachedWebview = undefined;
+    this.webviewReady = false;
+    this.authorisedStoreRoot = null;
+  }
+
   public refresh(): void {
-    if (!this.view) {return;}
+    const webview = this.activeWebview;
+    if (!webview) {return;}
     const plotFeatures = this.getMapPanel()?.getCurrentFeatures() ?? [];
     const plot: StoryboardPlot = plotFromFeatures(plotFeatures);
     const activeStoryboard = getActiveStoryboardDefault(plot);
@@ -124,7 +219,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     const scenes: SceneRowViewModel[] = this.computeSceneRowViewModels(
       plot,
       activeId,
-      this.view.webview,
+      webview,
     );
     // #230 T017 — enrich refresh payload with edit view-models so the
     // panel reducer hydrates without round-trips.
@@ -133,12 +228,21 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     // (review 13A from #218 / FR-008 of #230). Do not introduce per-Scene
     // cross-plot lookups here.
     const docUri = this.sessionManager.getActiveDocumentUri();
+    // #271 — compute time-range overlap warnings once for the active
+    // Storyboard, applying session dismissals, then prune the dismissal set
+    // to the still-active overlaps so a re-created pair warns afresh (FR-009).
+    const overlaps =
+      activeId !== null
+        ? detectSceneOverlaps(plot, activeId, this.dismissedOverlapPairs)
+        : new Map<string, readonly OverlapPartner[]>();
+    this.pruneDismissedOverlapPairs(plot, activeId);
     const sceneEditViewModels: Record<string, SceneEditViewModel> = {};
     for (const row of scenes) {
       sceneEditViewModels[row.sceneId] = this.composeSceneEditViewModel(
         plot,
         row,
         docUri,
+        overlaps.get(row.sceneId) ?? [],
       );
     }
     const storyboardEditViewModel: StoryboardEditViewModel | null =
@@ -161,6 +265,8 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       sceneEditViewModels,
       pendingUndoToast,
       storyboardEditViewModel,
+      namingRow: this.currentNamingRow,
+      collisionBanner: this.currentCollisionBanner,
     });
   }
 
@@ -175,6 +281,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     plot: StoryboardPlot,
     row: SceneRowViewModel,
     documentUri: string | null,
+    overlapsWith: readonly OverlapPartner[],
   ): SceneEditViewModel {
     const svc = this.editService;
     const staleFlag =
@@ -206,7 +313,38 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       stale: staleFlag?.stale ?? false,
       unresolvedFeatureIds: staleFlag?.unresolvedFeatureIds ?? [],
       missingData: { kind: 'ok' },
+      overlapsWith,
     };
+  }
+
+  /**
+   * #271 — drop dismissed overlap pair keys that no longer correspond to an
+   * active (undismissed) overlap, so a pair that is pulled apart and later
+   * re-overlapped warns afresh (FR-009 / contract C4.4). Pure set bookkeeping.
+   */
+  private pruneDismissedOverlapPairs(
+    plot: StoryboardPlot,
+    activeStoryboardId: string | null,
+  ): void {
+    if (this.dismissedOverlapPairs.size === 0) {
+      return;
+    }
+    // Re-detect WITHOUT dismissals to learn the full set of currently-active
+    // overlap pairs, then intersect the dismissed set with it.
+    const activePairs = new Set<string>();
+    if (activeStoryboardId !== null) {
+      const raw = detectSceneOverlaps(plot, activeStoryboardId);
+      for (const [sceneId, partners] of raw) {
+        for (const partner of partners) {
+          activePairs.add(overlapPairKey(sceneId, partner.sceneId));
+        }
+      }
+    }
+    for (const key of [...this.dismissedOverlapPairs]) {
+      if (!activePairs.has(key)) {
+        this.dismissedOverlapPairs.delete(key);
+      }
+    }
   }
 
   /**
@@ -253,12 +391,23 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     const docUri = this.sessionManager.getActiveDocumentUri();
     const plotFeatures = this.getMapPanel()?.getCurrentFeatures() ?? [];
     const plot: StoryboardPlot = plotFromFeatures(plotFeatures);
+    // #271 — keep overlap warnings visible during playback snapshots too.
+    const overlaps =
+      snapshot.activeStoryboardId !== null
+        ? detectSceneOverlaps(
+            plot,
+            snapshot.activeStoryboardId,
+            this.dismissedOverlapPairs,
+          )
+        : new Map<string, readonly OverlapPartner[]>();
+    this.pruneDismissedOverlapPairs(plot, snapshot.activeStoryboardId);
     const sceneEditViewModels: Record<string, SceneEditViewModel> = {};
     for (const row of enrichedScenes) {
       sceneEditViewModels[row.sceneId] = this.composeSceneEditViewModel(
         plot,
         row,
         docUri,
+        overlaps.get(row.sceneId) ?? [],
       );
     }
     let storyboardEditViewModel: StoryboardEditViewModel | null = null;
@@ -304,17 +453,107 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       sceneEditViewModels,
       pendingUndoToast,
       storyboardEditViewModel,
+      namingRow: this.currentNamingRow,
+      collisionBanner: this.currentCollisionBanner,
     });
   }
 
   private resolveThumbnailHrefForActiveItem(sceneId: string): string {
-    if (!this.view) {return '';}
+    const webview = this.activeWebview;
+    if (!webview) {return '';}
     const stacItemPath = this.getStacItemDirectory();
-    return this.resolveThumbnailHref(this.view.webview, stacItemPath, sceneId);
+    return this.resolveThumbnailHref(webview, stacItemPath, sceneId);
   }
 
   public setCaptureInFlight(inFlight: boolean): void {
     this.post({ type: 'captureInFlight', inFlight });
+  }
+
+  /**
+   * #235 — push a naming-row state to the panel. `null` clears the slice.
+   * Most callers should use `promptStoryboardName` instead — that helper
+   * pairs the push with a Promise that resolves on the analyst's reply.
+   */
+  public setNamingRow(state: NamingRowPushState | null): void {
+    this.currentNamingRow = state;
+    this.refresh();
+  }
+
+  /**
+   * #235 — push a collision-banner state to the panel. `null` clears it.
+   * Most callers should use `promptCollisionResolution` instead.
+   */
+  public setCollisionBanner(state: CollisionBannerPushState | null): void {
+    this.currentCollisionBanner = state;
+    this.refresh();
+  }
+
+  /**
+   * #235 — show the inline naming row and await the analyst's reply.
+   * Resolves with `{ name }` on confirm or `null` on cancel. Always clears
+   * the slice before resolving.
+   *
+   * Replaces the legacy `vscode.window.showInputBox` quick-pick that
+   * occluded the map (FR-VIS-022/023, SC-009).
+   */
+  public async promptStoryboardName(args: {
+    readonly defaultName: string;
+    readonly knownNames: readonly string[];
+  }): Promise<NamingRowResolution> {
+    // If a previous prompt was somehow still pending (host bug), reject it.
+    if (this.namingRowResolver !== null) {
+      const stale = this.namingRowResolver;
+      this.namingRowResolver = null;
+      stale(null);
+    }
+    this.setNamingRow({
+      visible: true,
+      defaultName: args.defaultName,
+      knownNames: args.knownNames,
+    });
+    return new Promise<NamingRowResolution>((resolve) => {
+      this.namingRowResolver = (r): void => {
+        this.namingRowResolver = null;
+        this.setNamingRow(null);
+        resolve(r);
+      };
+    });
+  }
+
+  /**
+   * #235 — show the inline collision banner and await the analyst's reply.
+   * The caller drives the offset count + proposedTimestamp; this method
+   * just renders whatever banner state is supplied and resolves on the
+   * next inbound resolution action. Does NOT clear the slice on
+   * `offset` — the caller re-pushes a fresh banner via `setCollisionBanner`
+   * (or this method again) after recomputing offsets.
+   *
+   * Replaces the legacy modal `vscode.window.showInformationMessage(…,
+   * { modal: true }, 'Replace', 'Offset (+1 s)')` that occluded the map
+   * (FR-VIS-022/023, SC-009).
+   */
+  public async promptCollisionResolution(
+    state: CollisionBannerPushState,
+  ): Promise<CollisionBannerResolution> {
+    if (this.collisionResolver !== null) {
+      const stale = this.collisionResolver;
+      this.collisionResolver = null;
+      stale({ kind: 'cancel' });
+    }
+    this.setCollisionBanner(state);
+    return new Promise<CollisionBannerResolution>((resolve) => {
+      this.collisionResolver = (r): void => {
+        this.collisionResolver = null;
+        // Offset is special: the caller will re-push a fresh banner with
+        // updated offsetCount + proposedTimestamp + offsetWouldExceedTimeRange,
+        // so we leave `currentCollisionBanner` in place. Replace and Cancel
+        // both end the flow → clear it.
+        if (r.kind !== 'offset') {
+          this.setCollisionBanner(null);
+        }
+        resolve(r);
+      };
+    });
   }
 
   private computeSceneRowViewModels(
@@ -324,15 +563,10 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   ): SceneRowViewModel[] {
     if (activeStoryboardId === null) {return [];}
     const stacItemPath = this.getStacItemDirectory();
-    const scenes: SceneFeature[] = [];
-    for (const f of plot.features) {
-      if (isSceneFeature(f) && f.properties.storyboard_id === activeStoryboardId) {
-        scenes.push(f);
-      }
-    }
-    scenes.sort((a, b) =>
-      a.properties.timestamp < b.properties.timestamp ? -1 : a.properties.timestamp > b.properties.timestamp ? 1 : 0,
-    );
+    // #259 — canonical ordering is (timestamp, creation_order) ASC. The
+    // panel must use the shared helper so tied-timestamp groups appear in
+    // capture order, matching the playback transport (FR-006).
+    const scenes = listScenesOrdered(plot, activeStoryboardId);
     return scenes.map((scene) => {
       const thumbnailHref = this.resolveThumbnailHref(
         webview,
@@ -369,8 +603,37 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     const plot = panel?.getCurrentPlot();
     const store = panel?.getCurrentStore?.();
     if (!plot || !store?.path || !plot.itemPath) {return null;}
+    // Scene thumbnails live under `{store.path}/{plot.itemPath}/scene-thumbnails/`,
+    // outside the extension's own `dist/`. The webview will block image
+    // requests there unless the store root is whitelisted in
+    // `localResourceRoots`. Authorise it lazily here — the active store
+    // can change across sessions, so we re-set options when it does.
+    this.authoriseStoreRoot(store.path);
     const full = path.join(store.path, plot.itemPath);
     return path.dirname(full);
+  }
+
+  /**
+   * Ensure the webview is authorised to read files under `storePath`
+   * (where scene thumbnails are written). Idempotent per `storePath` —
+   * we only re-set `webview.options` when the active store changes.
+   */
+  private authoriseStoreRoot(storePath: string): void {
+    const webview = this.activeWebview;
+    if (!webview) {return;}
+    if (this.authorisedStoreRoot === storePath) {return;}
+    // Re-set the (shared) webview's resource roots to include the STAC store
+    // where scene thumbnails live. We keep dist + node_modules so the Activity
+    // bundle + codicons continue to resolve after we widen the roots.
+    webview.options = {
+      enableScripts: true,
+      localResourceRoots: [
+        vscode.Uri.joinPath(this.extensionUri, 'dist'),
+        vscode.Uri.joinPath(this.extensionUri, 'node_modules'),
+        vscode.Uri.file(storePath),
+      ],
+    };
+    this.authorisedStoreRoot = storePath;
   }
 
   private handleMessage(message: StoryboardPanelMessage): void {
@@ -382,6 +645,12 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
         break;
       case 'capture-clicked':
         void vscode.commands.executeCommand('debrief.captureScene');
+        break;
+      case 'preview-clicked':
+        // #273 — live preview of the active storyboard in a new browser tab.
+        void vscode.commands.executeCommand('debrief.storyboard.preview', {
+          storyboardId: message.storyboardId,
+        });
         break;
       case 'scene-row-clicked':
         // #217: scene-row-clicked now drives transport (goToScene via
@@ -416,7 +685,11 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
         void vscode.commands.executeCommand('debrief.storyboard.rename');
         break;
       case 'delete-storyboard-requested':
-        void vscode.commands.executeCommand('debrief.storyboard.delete');
+        // The panel header confirms inline before sending this, so skip the
+        // command's native modal to avoid a double confirm.
+        void vscode.commands.executeCommand('debrief.storyboard.delete', {
+          skipConfirm: true,
+        });
         break;
       case 'log':
         if (message.level === 'error') {
@@ -523,6 +796,77 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
           }),
         );
         break;
+
+      // #235 — naming row + collision banner resolutions.
+      // Stale-message defence (contracts/panel-messages.md §C): drop the
+      // action when no resolver is registered or when the host's own
+      // current slice has been cleared / mismatched.
+      case 'naming-row-confirm': {
+        if (
+          this.namingRowResolver !== null &&
+          this.currentNamingRow !== null &&
+          this.currentNamingRow.visible
+        ) {
+          this.namingRowResolver({ name: message.name });
+        }
+        break;
+      }
+      case 'naming-row-cancel': {
+        if (
+          this.namingRowResolver !== null &&
+          this.currentNamingRow !== null &&
+          this.currentNamingRow.visible
+        ) {
+          this.namingRowResolver(null);
+        }
+        break;
+      }
+      case 'collision-replace': {
+        if (
+          this.collisionResolver !== null &&
+          this.currentCollisionBanner !== null &&
+          this.currentCollisionBanner.visible &&
+          this.currentCollisionBanner.conflictingSceneId ===
+            message.conflictingSceneId
+        ) {
+          this.collisionResolver({
+            kind: 'replace',
+            conflictingSceneId: message.conflictingSceneId,
+          });
+        }
+        break;
+      }
+      case 'collision-offset': {
+        if (
+          this.collisionResolver !== null &&
+          this.currentCollisionBanner !== null &&
+          this.currentCollisionBanner.visible
+        ) {
+          this.collisionResolver({ kind: 'offset' });
+        }
+        break;
+      }
+      case 'collision-cancel': {
+        if (
+          this.collisionResolver !== null &&
+          this.currentCollisionBanner !== null &&
+          this.currentCollisionBanner.visible
+        ) {
+          this.collisionResolver({ kind: 'cancel' });
+        }
+        break;
+      }
+      case 'scene-overlap-dismiss': {
+        // #271 — session-scoped dismissal. Mark every named pair dismissed
+        // and re-render; no Scene data is touched.
+        for (const partnerId of message.partnerSceneIds) {
+          this.dismissedOverlapPairs.add(
+            overlapPairKey(message.sceneId, partnerId),
+          );
+        }
+        this.refresh();
+        break;
+      }
     }
   }
 
@@ -548,17 +892,19 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   private post(message: ExtensionToStoryboardPanelMessage): void {
-    if (this.view && this.webviewReady) {
-      void this.view.webview.postMessage(message);
+    const webview = this.activeWebview;
+    if (webview && this.webviewReady) {
+      void webview.postMessage(message);
     } else {
       this.pendingMessages.push(message);
     }
   }
 
   private flushPending(): void {
-    if (!this.view) {return;}
+    const webview = this.activeWebview;
+    if (!webview) {return;}
     for (const msg of this.pendingMessages) {
-      void this.view.webview.postMessage(msg);
+      void webview.postMessage(msg);
     }
     this.pendingMessages = [];
   }
@@ -600,6 +946,20 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     this.sessionChangeDisposable?.dispose();
     this.sessionChangeDisposable = undefined;
     this.view = undefined;
+    // Cancel any in-flight prompts so the awaiting capture command
+    // unblocks instead of leaking.
+    if (this.namingRowResolver !== null) {
+      const r = this.namingRowResolver;
+      this.namingRowResolver = null;
+      r(null);
+    }
+    if (this.collisionResolver !== null) {
+      const r = this.collisionResolver;
+      this.collisionResolver = null;
+      r({ kind: 'cancel' });
+    }
+    this.currentNamingRow = null;
+    this.currentCollisionBanner = null;
   }
 }
 

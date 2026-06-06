@@ -12,7 +12,7 @@
  * casts by all four input shapes used across the monorepo:
  *
  *   - `DebriefFeature[]`           — LinkML-generated; from `@debrief/schemas`
- *   - `SafeFeature[]`              — hand-written; `geometry: SafeGeometry | null`; from `@debrief/utils/types`
+ *   - `IngressFeature[]`           — schema-derived permissive boundary (`geometry: …| null`); from `@debrief/schemas`
  *   - `RawGeoJSONFeature[]`         — raw JSON parse; from `@debrief/schemas`
  *   - `DebriefFeatureCollection`   — collection object; auto-unwrapped to `.features[]` inside `calculateBounds`
  *
@@ -39,10 +39,11 @@ export type { Bounds };
  *
  * Private to this module — it is **not** exported from `@debrief/utils`. Keeping
  * it private avoids committing to a third public feature type alongside
- * `RawGeoJSONFeature` and `SafeFeature`. Every in-tree feature type
- * (`RawGeoJSONFeature` from `@debrief/schemas`, `SafeFeature`, `DebriefFeature`
- * and its variants) is assignable to `ReadonlyArray<BoundsInputFeature>` via
- * TypeScript's structural subtyping — so no call site needs an `as`-cast.
+ * `RawGeoJSONFeature` and `IngressFeature`. Every in-tree feature type
+ * (`RawGeoJSONFeature` and `IngressFeature` from `@debrief/schemas`,
+ * `DebriefFeature` and its variants) is assignable to
+ * `ReadonlyArray<BoundsInputFeature>` via TypeScript's structural subtyping —
+ * so no call site needs an `as`-cast.
  *
  * The optional `bbox` field supports the pre-computed-bbox fast-path (FR-008):
  * when a feature carries a valid 4-number bbox tuple, `calculateBounds` uses
@@ -180,7 +181,7 @@ function isFeatureCollectionInput(
  * Calculate bounds from an array of GeoJSON-like features or a FeatureCollection.
  *
  * Accepts any of the four supported input shapes without casts:
- * `DebriefFeature[]`, `SafeFeature[]`, `RawGeoJSONFeature[]`, and
+ * `DebriefFeature[]`, `IngressFeature[]`, `RawGeoJSONFeature[]`, and
  * `DebriefFeatureCollection` / plain GeoJSON `FeatureCollection` objects.
  * FeatureCollection-shaped inputs are auto-unwrapped to their `.features` array
  * at the top of the function body (FR-001).

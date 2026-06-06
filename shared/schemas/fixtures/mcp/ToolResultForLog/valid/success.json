@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "duration_ms": 42,
+  "tool_id": "track-length",
+  "result_type": "artifact/text",
+  "source_feature_ids": ["track-1"],
+  "features": {
+    "type": "FeatureCollection",
+    "features": []
+  }
+}

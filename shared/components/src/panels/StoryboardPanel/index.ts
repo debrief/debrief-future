@@ -17,6 +17,8 @@ export { UndoToast } from './UndoToast';
 export type { UndoToastProps, UndoToastState } from './UndoToast';
 export { StaleBadge } from './StaleBadge';
 export type { StaleBadgeProps } from './StaleBadge';
+export { OverlapBadge } from './OverlapBadge';
+export type { OverlapBadgeProps } from './OverlapBadge';
 export { SceneOverflowMenu } from './SceneOverflowMenu';
 export type {
   SceneOverflowMenuProps,
@@ -31,12 +33,18 @@ export type {
   MissingDataReason,
   SceneEditViewModel,
   StoryboardEditViewModel,
+  NamingRowViewModel,
+  CollisionBannerViewModel,
+  OverlapPartner,
 } from './types';
 export {
   useStoryboardEditReducer,
   storyboardEditReducer,
   createInitialStoryboardEditState,
   composeSceneEditViewModels,
+  composeNamingRowViewModel,
+  composeCollisionBannerViewModel,
+  COLLISION_OFFSET_CAP,
 } from './useStoryboardEditReducer';
 export type {
   StoryboardEditAction,
@@ -47,4 +55,29 @@ export type {
   UndoToastDescriptor,
   StaleFlagEntry,
   ThemeVariant,
+  NamingRowReducerState,
+  CollisionBannerReducerState,
+  NamingRowPushState,
+  CollisionBannerPushState,
 } from './useStoryboardEditReducer';
+export { NamingRow } from './NamingRow';
+export type { NamingRowProps } from './NamingRow';
+export { CollisionBanner } from './CollisionBanner';
+export type { CollisionBannerProps } from './CollisionBanner';
+
+// 234 FR-003 / ADR-027 — shared callback-adapter helper for stories +
+// harness. Re-exported so consumers go through the package surface; the
+// __testing__/ path is forbidden in apps/vscode/src/** by the FR-044
+// ESLint rule.
+export {
+  useStoryOnlyMockHandlers,
+} from './__testing__/storyOnlyMockHandlers';
+export type {
+  MockPortKnobs,
+  MockHandlers,
+  MockHandlersFixture,
+  MockHandlersInitial,
+  MockHandlersHandle,
+  MockOutboundRecorder,
+  UseStoryOnlyMockHandlersOptions,
+} from './__testing__/storyOnlyMockHandlers';

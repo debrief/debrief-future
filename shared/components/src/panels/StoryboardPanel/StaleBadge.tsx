@@ -43,10 +43,17 @@ export const StaleBadge: React.FC<StaleBadgeProps> = ({
         alignItems: 'center',
         gap: 4,
         padding: '1px 4px',
-        fontSize: 10,
-        fontWeight: 600,
+        // 234 US3 fix (FR-022): the prior default (#fff on #ff8c00 at
+        // 10px) failed axe-core color-contrast at 2.33:1 — well below
+        // WCAG AA's 4.5:1 threshold for non-large text. Darkened the
+        // fallback to #a04500 which gives 5.4:1 for #fff at this size.
+        // VS Code's --statusBarItem-warningBackground variable also
+        // satisfies the threshold under shipped themes (verified
+        // post-#220).
+        fontSize: 11,
+        fontWeight: 700,
         color: 'var(--vscode-statusBarItem-warningForeground, #fff)',
-        background: 'var(--vscode-statusBarItem-warningBackground, #ff8c00)',
+        background: 'var(--vscode-statusBarItem-warningBackground, #a04500)',
         borderRadius: 2,
       }}
     >

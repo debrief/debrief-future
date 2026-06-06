@@ -1,6 +1,6 @@
 {
   "type": "Collection",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "id": "local-store",
   "description": "Debrief analysis catalog",
   "links": [
@@ -451,10 +451,15 @@
       "href": "./core--workspace-boat2/item.json",
       "type": "application/geo+json",
       "title": "workspace__boat2 (core)"
+    },
+    {
+      "rel": "license",
+      "href": "./LICENSE",
+      "title": "Sample-catalog license (Debrief internal use)"
     }
   ],
   "title": "Debrief Legacy Sample Data",
-  "license": "proprietary",
+  "license": "other",
   "extent": {
     "spatial": {
       "bbox": [
@@ -3893,5 +3898,50 @@
       "visual-sighting",
       "zig-zag"
     ]
+  },
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "providers": [
+    {
+      "name": "Debrief",
+      "roles": [
+        "producer",
+        "host"
+      ],
+      "url": "https://debrief.info"
+    }
+  ],
+  "item_assets": {
+    "features": {
+      "type": "application/geo+json",
+      "roles": [
+        "data"
+      ],
+      "title": "Plot features"
+    },
+    "thumbnail": {
+      "type": "image/png",
+      "roles": [
+        "thumbnail"
+      ],
+      "title": "Thumbnail (200x150)"
+    },
+    "overview": {
+      "type": "image/png",
+      "roles": [
+        "overview"
+      ],
+      "title": "Overview (800x600)"
+    },
+    "source": {
+      "type": "application/octet-stream",
+      "roles": [
+        "source"
+      ],
+      "title": "Source data (placeholder; per-item keys are source-*)"
+    }
   }
 }

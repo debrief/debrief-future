@@ -24,10 +24,12 @@ imports:
   - log-entry
   - system-record
   - stac-extension
+  - stac
   - raw-geojson
   - session-state
   - tool-result
   - storyboard
+  - mcp
 
 # Root schema imports all modules - no additional classes needed here.
 # All entity definitions are in their respective module files:

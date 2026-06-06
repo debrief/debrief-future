@@ -83,9 +83,9 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
       aria-selected={highlighted}
     >
       <div className="exercise-list-item-row__thumbnail">
-        {item.thumbnailSmHref ? (
+        {item.thumbnailHref ? (
           <img
-            src={item.thumbnailSmHref}
+            src={item.thumbnailHref}
             alt={`Thumbnail for ${item.title}`}
             className="exercise-list-item-row__raster-thumbnail"
             data-testid="raster-thumbnail"
@@ -99,7 +99,7 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
             }}
           />
         ) : null}
-        <div style={item.thumbnailSmHref ? { display: 'none' } : undefined}>
+        <div style={item.thumbnailHref ? { display: 'none' } : undefined}>
           <SpatialThumbnail
             bbox={item.bbox}
             trackData={trackData}
@@ -129,8 +129,8 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
         </div>
 
         <div className="exercise-list-item-row__meta" data-testid="exercise-item-meta">
-          {vesselInfo.visible.map((vc) => (
-            <span key={vc} className="exercise-list-item-row__tag">{vc}</span>
+          {vesselInfo.visible.map((vc, i) => (
+            <span key={`${vc}-${i}`} className="exercise-list-item-row__tag">{vc}</span>
           ))}
           {vesselInfo.overflow > 0 && (
             <span className="exercise-list-item-row__overflow">
@@ -138,8 +138,8 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
             </span>
           )}
 
-          {tagInfo.visible.map((tag) => (
-            <span key={tag} className="exercise-list-item-row__tag">{tag}</span>
+          {tagInfo.visible.map((tag, i) => (
+            <span key={`${tag}-${i}`} className="exercise-list-item-row__tag">{tag}</span>
           ))}
           {tagInfo.overflow > 0 && (
             <span className="exercise-list-item-row__overflow">

@@ -1,8 +1,10 @@
 {
   "type": "Feature",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "id": "core--shorter-os",
   "geometry": {
@@ -41,7 +43,7 @@
   "properties": {
     "title": "Saxon Warrior: Shorter Os",
     "datetime": "2009-07-22T04:08:20+00:00",
-    "description": "Saxon Warrior: Shorter Os — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including USS Otto Sverdrup.",
+    "description": "Saxon Warrior: Shorter Os \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including USS Otto Sverdrup.",
     "start_datetime": "2009-07-22T04:08:20+00:00",
     "end_datetime": "2009-07-22T05:26:04+00:00",
     "debrief:platforms": [
@@ -65,6 +67,19 @@
       "active-search",
       "minefield",
       "radar-detection"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
     ]
   },
   "links": [
@@ -112,23 +127,41 @@
         "source_path": "/tmp/debrief-regen-4x2tftum/shorter_os.dpf",
         "load_timestamp": "2026-04-13T23:12:33.721104Z",
         "tool_version": "0.1.0"
-      }
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:33.721Z",
+      "file:size": 233810,
+      "file:checksum": "1220689cfff4eea633833e7366f327632520e8a5f1ee6148789f26b6906e4c081b69"
     },
     "thumbnail": {
       "href": "./thumbnail.png",
       "type": "image/png",
-      "title": "Plot thumbnail",
+      "title": "Plot thumbnail (200x150)",
       "roles": [
         "thumbnail"
-      ]
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 11775,
+      "file:checksum": "1220a32933e424e1d8c0d8078ae06c2febfefd5074d5e92580f4d51aa4032933d389"
     },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
+    "overview": {
+      "href": "./overview.png",
       "type": "image/png",
-      "title": "Plot thumbnail (small)",
+      "title": "Plot overview (800x600)",
       "roles": [
-        "thumbnail"
-      ]
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 31499,
+      "file:checksum": "1220687106a3d29a2259c2846636c9f03cb6c02f1947b7ceecd9a577a017fa80abfd"
     }
   }
 }

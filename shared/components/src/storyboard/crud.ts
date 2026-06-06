@@ -37,8 +37,10 @@ setUseStrictShallowCopy(false);
 import type {
   GeoJSONPolygon,
   LogEntry,
+  PolygonSource,
   SceneProperties,
   StoryboardProperties,
+  TimeRange,
   Viewport,
   WasGeneratedBy,
 } from "@debrief/schemas";
@@ -46,12 +48,14 @@ import type {
 import { formatDtg } from "./dtg";
 import {
   DuplicateStoryboardNameError,
-  DuplicateTimestampError,
   OrphanSceneError,
   ReservedSlotViolationError,
+  SceneFlavourXorViolationError,
+  SceneTimeRangeEndNotAfterStartError,
   ThumbnailDeepCopyFailedError,
   UnknownSceneError,
   UnknownStoryboardError,
+  CreationOrderOutOfRangeError,
 } from "./errors";
 import {
   canonicaliseVisibleFeatureIds,
@@ -108,11 +112,50 @@ function makeBoundingPolygon(
   };
 }
 
-function viewportToPolygon(viewport: Viewport): GeoJSONPolygon {
-  // MVP: derive a minimal square around the center using a tiny delta in
-  // degrees. Downstream specs (#217) will replace this with a true bbox
-  // computation from zoom. We keep a non-degenerate polygon so schema
-  // validation passes.
+/**
+ * Structural bounds-shape used by Spec #258 scene capture. Keeps `crud.ts`
+ * platform-agnostic — callers convert Leaflet's `LatLngBounds` (or any other
+ * source) to this POJO before invoking `createScene` / `updateScene`.
+ */
+export interface SceneBounds {
+  /** Western longitude in degrees (-180 to 180). */
+  readonly west: number;
+  /** Southern latitude in degrees (-90 to 90). */
+  readonly south: number;
+  /** Eastern longitude in degrees (-180 to 180). */
+  readonly east: number;
+  /** Northern latitude in degrees (-90 to 90). */
+  readonly north: number;
+}
+
+/**
+ * Convert a four-corner bounding box to a closed GeoJSON Polygon ring
+ * `[SW, NW, NE, SE, SW]`. The `source` value is informational — callers
+ * persist it on the scene's `_polygon_source` slot for render-side
+ * provenance (Spec #258 / FR-006).
+ */
+export function bboxToPolygon(
+  bounds: SceneBounds,
+  source: PolygonSource,
+): GeoJSONPolygon {
+  // `source` is part of the helper's contract — callers always tell us why
+  // they're computing the polygon — but the geometry itself is the same;
+  // the provenance value is persisted separately on `_polygon_source` by
+  // the caller. Reference it in a no-op so TypeScript's noUnusedParameters
+  // is satisfied while keeping the param on the surface (intent signalling).
+  void source;
+  return makeBoundingPolygon(bounds.west, bounds.south, bounds.east, bounds.north);
+}
+
+/**
+ * Legacy fallback when callers do not supply real bounds (e.g. headless
+ * callers that only have a `Viewport`). Synthesises a non-degenerate ~100m
+ * square around the viewport centre — schema-valid but visually misleading.
+ * Spec #258 / FR-006 expects render-side consumers to recompute the polygon
+ * when `_polygon_source !== 'bounds'`, so this fallback is no longer the
+ * audience-facing rectangle.
+ */
+function placeholderPolygonFromViewport(viewport: Viewport): GeoJSONPolygon {
   const lon = viewport.center[0];
   const lat = viewport.center[1];
   if (lon === undefined || lat === undefined) {
@@ -174,19 +217,22 @@ function findStoryboardIdByName(
   return null;
 }
 
-function findConflictingSceneTimestamp(
-  plot: Plot,
-  storyboardId: string,
-  timestamp: string,
-  excludeSceneId?: string,
-): SceneFeature | null {
+/**
+ * Compute the next monotonic `creation_order` for a new Scene in the given
+ * Storyboard (per-Storyboard scope, FR-004 / FR-005). Returns 0 for an
+ * empty Storyboard, otherwise `max(existing creation_order) + 1`. Always
+ * appends to the tail — never reuses gaps left by deletions, since that
+ * would break FR-011 (new Scenes appear after existing tied-group members).
+ */
+function nextCreationOrder(plot: Plot, storyboardId: string): number {
+  let max = -1;
   for (const f of plot.features) {
     if (!isSceneFeature(f)) continue;
     if (f.properties.storyboard_id !== storyboardId) continue;
-    if (excludeSceneId !== undefined && f.properties.id === excludeSceneId) continue;
-    if (f.properties.timestamp === timestamp) return f;
+    const co = f.properties.creation_order;
+    if (co > max) max = co;
   }
-  return null;
+  return max + 1;
 }
 
 function assertViewportBearingZero(viewport: Viewport): void {
@@ -319,7 +365,7 @@ export async function createStoryboard(
     id: newId,
     name: input.name,
     description: input.description,
-    schema_version: 1,
+    schema_version: 2,
     tags: [],
     provenance: [logEntry],
   };
@@ -450,10 +496,46 @@ export interface CreateSceneInput {
   title?: string;
   description?: string;
   viewport: Viewport;
+  /**
+   * Real map bounds at capture time (Spec #258 / FR-004). When supplied, the
+   * scene's stored polygon is `bboxToPolygon(bounds, polygonSource ?? 'bounds')`
+   * and `_polygon_source` is recorded so the renderer trusts the on-disk
+   * geometry. When omitted, the scene falls back to the pre-#258 placeholder
+   * polygon and `_polygon_source` defaults to `'placeholder'` — the renderer
+   * then recomputes the rectangle from `(viewport, map dimensions)` at draw
+   * time (FR-006).
+   */
+  bounds?: SceneBounds;
+  /** Polygon provenance — defaults to `'bounds'` when `bounds` is provided,
+   *  `'placeholder'` otherwise. Explicit override permitted for restore /
+   *  migrate paths that preserve historical provenance. */
+  polygonSource?: PolygonSource;
+  /** Time-controller display mode at capture time (Spec #258 / FR-001).
+   *  Optional — legacy capture call sites omit it; readers tolerate the
+   *  slot being absent on playback (FR-003). */
+  displayMode?: SceneProperties["display_mode"];
   timestamp: string;
   visibleFeatureIds: string[];
   thumbnailAssetRef: string;
   transitionDurationMs?: number;
+  /**
+   * Time-range flavour pair (#263). MUST be supplied together or both omitted:
+   *
+   * - **Instant flavour** (default): omit both `timeRange` and `viewportEnd`.
+   *   The captured Scene has `time_range = undefined` and
+   *   `viewport_end = undefined`. Behaviour identical to #215.
+   * - **Time-range flavour**: supply both `timeRange` (with
+   *   `timeRange.end > timeRange.start`) and `viewportEnd`. The captured
+   *   Scene records both slots and plays back as a synchronised viewport +
+   *   slider scrub (per #263 FR-PLAY-001..006).
+   *
+   * Mixed-presence inputs (`timeRange` without `viewportEnd` or vice versa)
+   * throw `SceneFlavourXorViolationError`. Reversed/zero ranges throw
+   * `SceneTimeRangeEndNotAfterStartError`. Both errors fire before any
+   * mutation, so the plot is left untouched on rejection.
+   */
+  timeRange?: TimeRange;
+  viewportEnd?: Viewport;
   actor: string;
   now?: string;
   idOverride?: string;
@@ -487,16 +569,28 @@ export async function createScene(
     throw new OrphanSceneError("<new-scene>", input.storyboardId);
   }
   assertViewportBearingZero(input.viewport);
-  const conflict = findConflictingSceneTimestamp(
-    plot,
-    input.storyboardId,
-    input.timestamp,
-  );
-  if (conflict !== null) {
-    throw new DuplicateTimestampError(
-      input.timestamp,
-      conflict.properties.id,
+  // #263 — Scene flavour XOR (input-side). Reject before any mutation so the
+  // plot is untouched on rejection. The `idOverride ?? "<new-scene>"` shape
+  // mirrors the OrphanSceneError above (an id may not yet exist).
+  const sceneIdForError = input.idOverride ?? "<new-scene>";
+  const trPresent = input.timeRange !== undefined;
+  const vePresent = input.viewportEnd !== undefined;
+  if (trPresent !== vePresent) {
+    throw new SceneFlavourXorViolationError(
+      sceneIdForError,
+      trPresent,
+      vePresent,
     );
+  }
+  if (input.timeRange !== undefined && input.viewportEnd !== undefined) {
+    assertViewportBearingZero(input.viewportEnd);
+    if (!(input.timeRange.end > input.timeRange.start)) {
+      throw new SceneTimeRangeEndNotAfterStartError(
+        sceneIdForError,
+        input.timeRange.start,
+        input.timeRange.end,
+      );
+    }
   }
   const canonical = canonicaliseVisibleFeatureIds(input.visibleFeatureIds);
   const hash = await computeFeatureSetHash(canonical);
@@ -504,6 +598,7 @@ export async function createScene(
   const now = input.now ?? defaultNow();
   const activityId = input.activityIdOverride ?? defaultUuid();
   const title = input.title ?? formatDtg(input.timestamp);
+  const creationOrder = nextCreationOrder(plot, input.storyboardId);
   const op = describesInsertMiddle(plot, input.storyboardId, input.timestamp)
     ? "insert-middle"
     : "create";
@@ -517,6 +612,12 @@ export async function createScene(
     activityId,
     rationale: input.rationale,
   });
+  const polygonSource: PolygonSource =
+    input.polygonSource ?? (input.bounds !== undefined ? "bounds" : "placeholder");
+  const geometry =
+    input.bounds !== undefined
+      ? bboxToPolygon(input.bounds, polygonSource)
+      : placeholderPolygonFromViewport(input.viewport);
   const props: SceneProperties = {
     kind: "STORYBOARD_SCENE",
     id: newId,
@@ -529,13 +630,20 @@ export async function createScene(
     feature_set_hash: hash,
     thumbnail_asset_ref: input.thumbnailAssetRef,
     transition_duration_ms: input.transitionDurationMs ?? 500,
+    creation_order: creationOrder,
+    ...(input.displayMode !== undefined && { display_mode: input.displayMode }),
+    // #263 — time-range flavour pair. Either both present or both omitted;
+    // the input-side XOR check above guarantees this is well-formed.
+    ...(input.timeRange !== undefined && { time_range: input.timeRange }),
+    ...(input.viewportEnd !== undefined && { viewport_end: input.viewportEnd }),
+    _polygon_source: polygonSource,
     tags: [],
     provenance: [logEntry],
   };
   const sceneFeature: SceneFeature = {
     type: "Feature",
     id: newId,
-    geometry: viewportToPolygon(input.viewport),
+    geometry,
     properties: props,
   };
   const nextPlot = appendFeatureAndRecomputeHull(
@@ -550,6 +658,13 @@ export interface UpdateScenePatch {
   title?: string;
   description?: string;
   viewport?: Viewport;
+  /** Spec #258 — see {@link CreateSceneInput.bounds}. When supplied alongside
+   *  a viewport change, the polygon is regenerated from these bounds and
+   *  `_polygon_source` is set to `'bounds'`. */
+  bounds?: SceneBounds;
+  polygonSource?: PolygonSource;
+  /** Spec #258 — see {@link CreateSceneInput.displayMode}. */
+  displayMode?: SceneProperties["display_mode"];
   timestamp?: string;
   visibleFeatureIds?: string[];
   thumbnailAssetRef?: string;
@@ -576,23 +691,9 @@ export async function updateScene(
   if (patch.viewport !== undefined) {
     assertViewportBearingZero(patch.viewport);
   }
-  if (
-    patch.timestamp !== undefined &&
-    patch.timestamp !== existing.properties.timestamp
-  ) {
-    const conflict = findConflictingSceneTimestamp(
-      plot,
-      existing.properties.storyboard_id,
-      patch.timestamp,
-      existing.properties.id,
-    );
-    if (conflict !== null) {
-      throw new DuplicateTimestampError(
-        patch.timestamp,
-        conflict.properties.id,
-      );
-    }
-  }
+  // #259 — timestamp equality no longer rejected. updateScene preserves the
+  // existing Scene's creation_order; reorder operations live in
+  // reorderSceneInTiedGroup (see Phase 6).
   let newHash: string | undefined;
   let canonical: string[] | undefined;
   if (patch.visibleFeatureIds !== undefined) {
@@ -619,6 +720,16 @@ export async function updateScene(
   // and reuse every other Feature reference. This bypasses immer's per-
   // Feature draft proxy creation, which dominates p95 at 100k+ positions
   // (FR-TEST-024).
+  let nextPolygonSource: PolygonSource | undefined;
+  let nextGeometry: GeoJSONPolygon | undefined;
+  if (patch.viewport !== undefined) {
+    nextPolygonSource =
+      patch.polygonSource ?? (patch.bounds !== undefined ? "bounds" : "placeholder");
+    nextGeometry =
+      patch.bounds !== undefined
+        ? bboxToPolygon(patch.bounds, nextPolygonSource)
+        : placeholderPolygonFromViewport(patch.viewport);
+  }
   const nextScene: SceneFeature = {
     ...existing,
     properties: {
@@ -637,11 +748,11 @@ export async function updateScene(
       ...(patch.transitionDurationMs !== undefined && {
         transition_duration_ms: patch.transitionDurationMs,
       }),
+      ...(patch.displayMode !== undefined && { display_mode: patch.displayMode }),
+      ...(nextPolygonSource !== undefined && { _polygon_source: nextPolygonSource }),
       provenance: [...(existing.properties.provenance ?? []), logEntry],
     },
-    ...(patch.viewport !== undefined && {
-      geometry: viewportToPolygon(patch.viewport),
-    }),
+    ...(nextGeometry !== undefined && { geometry: nextGeometry }),
   };
   const newFeatures = plot.features.slice();
   newFeatures[idx] = nextScene as unknown as PlotFeature;
@@ -715,23 +826,9 @@ export async function duplicateScene(
   const idx = findSceneIndex(plot, input.sceneId);
   if (idx === -1) throw new UnknownSceneError(input.sceneId);
   const source = plot.features[idx] as unknown as SceneFeature;
-  if (input.newTimestamp === source.properties.timestamp) {
-    throw new DuplicateTimestampError(
-      input.newTimestamp,
-      source.properties.id,
-    );
-  }
-  const conflict = findConflictingSceneTimestamp(
-    plot,
-    source.properties.storyboard_id,
-    input.newTimestamp,
-  );
-  if (conflict !== null) {
-    throw new DuplicateTimestampError(
-      input.newTimestamp,
-      conflict.properties.id,
-    );
-  }
+  // #259 — timestamp equality no longer rejected. The duplicate always
+  // receives a fresh creation_order so FC-I4 stays intact within the
+  // source Storyboard even when newTimestamp === source.timestamp.
   const canonical = canonicaliseVisibleFeatureIds(
     source.properties.visible_feature_ids,
   );
@@ -758,6 +855,7 @@ export async function duplicateScene(
     title: formatDtg(input.newTimestamp),
     visible_feature_ids: canonical,
     feature_set_hash: hash,
+    creation_order: nextCreationOrder(plot, source.properties.storyboard_id),
     provenance: [logEntry],
   };
   const duplicated: SceneFeature = {
@@ -801,14 +899,9 @@ export async function copySceneToOtherStoryboard(
     throw new UnknownStoryboardError(input.destinationStoryboardId);
   }
   const newTimestamp = input.newTimestamp ?? source.properties.timestamp;
-  const conflict = findConflictingSceneTimestamp(
-    plot,
-    input.destinationStoryboardId,
-    newTimestamp,
-  );
-  if (conflict !== null) {
-    throw new DuplicateTimestampError(newTimestamp, conflict.properties.id);
-  }
+  // #259 — timestamp equality on the destination Storyboard is no longer
+  // rejected. Fresh creation_order is assigned for the destination scope
+  // (see props composition below).
 
   // Run the deep copy BEFORE entering the immer draft. If it rejects, the
   // caller's plot is byte-identical (we haven't started drafting). Wrap the
@@ -851,6 +944,7 @@ export async function copySceneToOtherStoryboard(
     visible_feature_ids: canonical,
     feature_set_hash: hash,
     thumbnail_asset_ref: copiedAssetRef,
+    creation_order: nextCreationOrder(plot, input.destinationStoryboardId),
     provenance: [logEntry],
   };
   const copied: SceneFeature = {
@@ -871,28 +965,6 @@ export async function copySceneToOtherStoryboard(
 // #218 additive extensions — kept inside the CRUD module so every write path
 // continues to flow through one boundary (FR-EDIT-022 / SC-009).
 // ---------------------------------------------------------------------------
-
-/**
- * Thin wrapper over the internal `findConflictingSceneTimestamp` helper so
- * `StoryboardEditService.updateSceneToCurrent` can pre-flight the
- * duplicate-timestamp check before invoking the thumbnail pipeline (review
- * 1A). Returns the conflicting Scene or `null`. Pass `excludingSceneId` to
- * skip self (required when checking an existing Scene's new timestamp);
- * pass `null` for new-Scene checks.
- */
-export function checkSceneTimestamp(
-  plot: Plot,
-  storyboardId: string,
-  timestamp: string,
-  excludingSceneId: string | null,
-): SceneFeature | null {
-  return findConflictingSceneTimestamp(
-    plot,
-    storyboardId,
-    timestamp,
-    excludingSceneId === null ? undefined : excludingSceneId,
-  );
-}
 
 /**
  * Storyboard-level `describe` mutation — mirrors `renameStoryboard` in
@@ -972,23 +1044,17 @@ export async function restoreScene(
     );
   }
   assertViewportBearingZero(input.viewport);
-  const conflict = findConflictingSceneTimestamp(
-    plot,
-    input.storyboardId,
-    input.timestamp,
-  );
-  if (conflict !== null) {
-    throw new DuplicateTimestampError(
-      input.timestamp,
-      conflict.properties.id,
-    );
-  }
+  // #259 — timestamp equality no longer rejected. The restored Scene gets a
+  // fresh creation_order from the current Storyboard tail rather than
+  // honouring the original; mid-sequence collision with Scenes captured
+  // after the original deletion would otherwise violate FC-I4.
   const canonical = canonicaliseVisibleFeatureIds(input.visibleFeatureIds);
   const hash = await computeFeatureSetHash(canonical);
   const newId = input.idOverride ?? generateUlid();
   const now = input.now ?? defaultNow();
   const activityId = input.activityIdOverride ?? defaultUuid();
   const title = input.title ?? formatDtg(input.timestamp);
+  const restoreCreationOrder = nextCreationOrder(plot, input.storyboardId);
   const restoreEntry = buildStoryboardCrudLogEntry({
     op: "restore",
     actor: input.actor,
@@ -999,6 +1065,15 @@ export async function restoreScene(
     activityId,
     rationale: input.rationale,
   });
+  // `restoreScene` is a byte-identical recreation of a previously-deleted
+  // Scene; honour the input's `polygonSource` provenance verbatim if given,
+  // else fall back to the same defaults as `createScene`.
+  const restorePolygonSource: PolygonSource =
+    input.polygonSource ?? (input.bounds !== undefined ? "bounds" : "placeholder");
+  const restoreGeometry =
+    input.bounds !== undefined
+      ? bboxToPolygon(input.bounds, restorePolygonSource)
+      : placeholderPolygonFromViewport(input.viewport);
   const props: SceneProperties = {
     kind: "STORYBOARD_SCENE",
     id: newId,
@@ -1011,13 +1086,16 @@ export async function restoreScene(
     feature_set_hash: hash,
     thumbnail_asset_ref: input.thumbnailAssetRef,
     transition_duration_ms: input.transitionDurationMs ?? 500,
+    creation_order: restoreCreationOrder,
+    ...(input.displayMode !== undefined && { display_mode: input.displayMode }),
+    _polygon_source: restorePolygonSource,
     tags: [],
     provenance: [...input.preservedProvenance, restoreEntry],
   };
   const sceneFeature: SceneFeature = {
     type: "Feature",
     id: newId,
-    geometry: viewportToPolygon(input.viewport),
+    geometry: restoreGeometry,
     properties: props,
   };
   const nextPlot = appendFeatureAndRecomputeHull(
@@ -1026,6 +1104,117 @@ export async function restoreScene(
     input.storyboardId,
   );
   return { plot: nextPlot, scene: sceneFeature };
+}
+
+// ---------------------------------------------------------------------------
+// #259 — reorderSceneInTiedGroup
+// ---------------------------------------------------------------------------
+
+export interface ReorderSceneInTiedGroupInput {
+  sceneId: string;
+  /** 0-based position within the tied-timestamp group. */
+  newPositionInGroup: number;
+}
+
+/**
+ * Re-sequence the `creation_order` of Scenes in a tied-timestamp group so
+ * the target Scene lands at `newPositionInGroup` (FR-007). The tied group
+ * is "all Scenes in the same Storyboard sharing the target's timestamp"
+ * — the target is always one of them, so `tied_group_size >= 1`.
+ *
+ * Algorithm:
+ *   1. Locate the target Scene; collect the tied group sorted by current
+ *      `creation_order`.
+ *   2. Bounds-check `newPositionInGroup ∈ [0, tied_group_size)`.
+ *   3. Capture `groupMin = min(creation_order)` of the tied group.
+ *   4. Remove the target from the sorted list; re-insert at the new
+ *      position.
+ *   5. Re-assign `creation_order = groupMin + i` to the i-th member of
+ *      the new list. Non-group Scenes are untouched (their values may sit
+ *      below `groupMin` or above `groupMax` — the re-sequencing only
+ *      permutes existing values within the group).
+ *
+ * Sync, pure — no provenance entry is emitted (the operation is a pure
+ * ordering rearrangement; consumers that need an audit trail should log
+ * separately via `buildStoryboardCrudLogEntry`).
+ */
+export function reorderSceneInTiedGroup(
+  plot: Plot,
+  input: ReorderSceneInTiedGroupInput,
+): { plot: Plot } {
+  const idx = findSceneIndex(plot, input.sceneId);
+  if (idx === -1) throw new UnknownSceneError(input.sceneId);
+  const target = plot.features[idx] as unknown as SceneFeature;
+  const storyboardId = target.properties.storyboard_id;
+  const timestamp = target.properties.timestamp;
+
+  // Collect the tied group sorted by creation_order ASC.
+  const tied: SceneFeature[] = [];
+  for (const f of plot.features) {
+    if (!isSceneFeature(f)) continue;
+    if (f.properties.storyboard_id !== storyboardId) continue;
+    if (f.properties.timestamp !== timestamp) continue;
+    tied.push(f);
+  }
+  tied.sort((a, b) => a.properties.creation_order - b.properties.creation_order);
+
+  if (
+    input.newPositionInGroup < 0 ||
+    input.newPositionInGroup >= tied.length
+  ) {
+    throw new CreationOrderOutOfRangeError(
+      storyboardId,
+      input.sceneId,
+      input.newPositionInGroup,
+      tied.length,
+    );
+  }
+
+  // Single-Scene tied group: only newPositionInGroup === 0 is permitted
+  // (already enforced by the bounds check above); it's a no-op.
+  if (tied.length === 1) {
+    return { plot };
+  }
+
+  // Capture group_min before mutation.
+  const firstScene = tied[0];
+  if (firstScene === undefined) {
+    return { plot };
+  }
+  const groupMin = firstScene.properties.creation_order;
+
+  // Build the new sorted list: remove target, insert at newPositionInGroup.
+  const withoutTarget = tied.filter(
+    (s) => s.properties.id !== input.sceneId,
+  );
+  withoutTarget.splice(input.newPositionInGroup, 0, target);
+
+  // Map sceneId -> new creation_order.
+  const reassignments = new Map<string, number>();
+  for (let i = 0; i < withoutTarget.length; i++) {
+    const scene = withoutTarget[i];
+    if (scene === undefined) continue;
+    reassignments.set(scene.properties.id, groupMin + i);
+  }
+
+  // Apply by shallow-copying only the affected Scenes — preserves
+  // structural sharing for all other Features (FR-MODULE-022).
+  const newFeatures = plot.features.map((f) => {
+    if (!isSceneFeature(f)) return f;
+    const newCo = reassignments.get(f.properties.id);
+    if (newCo === undefined) return f;
+    if (newCo === f.properties.creation_order) return f;
+    const nextScene: SceneFeature = {
+      ...f,
+      properties: {
+        ...f.properties,
+        creation_order: newCo,
+      },
+    };
+    return nextScene as unknown as PlotFeature;
+  });
+
+  return { plot: { ...plot, features: newFeatures } };
 }
 
 // Re-export the LogEntry type alias for downstream test clarity.

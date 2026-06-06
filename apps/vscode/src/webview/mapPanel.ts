@@ -36,7 +36,6 @@ import {
   type DrawingMode,
 } from '@debrief/session-state';
 import { DuplicateImportError } from '../types/import';
-import type { SafeFeature } from '@debrief/utils';
 import {
   calculateBounds,
   mergeBounds,
@@ -45,7 +44,7 @@ import {
 } from '@debrief/utils';
 import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@debrief/components';
 import { isTrackFeature } from '@debrief/components';
-import type { TrackProperties, Viewport, SceneFeature } from '@debrief/schemas';
+import type { IngressFeature, TrackProperties, Viewport, SceneFeature } from '@debrief/schemas';
 import type { SceneRectangleSnapshot } from './messages';
 
 // eslint-disable-next-line no-restricted-syntax -- VS Code-local MapPanel is the extension host wrapper; name collides with @debrief/components.MapPanel (React component). Follow-up to rename the host class, #214 scope-adjacent
@@ -98,9 +97,46 @@ export class MapPanel {
   private temporalUnsubscribe?: () => void;
   private hiddenUnsubscribe?: () => void;
   private drawingUnsubscribe?: () => void;
+  /** Spec 260 — push `viewportLocked` from store to webview on change. */
+  private viewportLockUnsubscribe?: () => void;
   private sessionChangeDisposable?: vscode.Disposable;
   private viewportUpdateTimeout?: NodeJS.Timeout;
+  /**
+   * PR #625 — webview-reported viewport waiting to be written into
+   * session-state. Kept as a field (not a closure inside the timer
+   * callback) so `flushPendingViewportUpdate` can apply it synchronously
+   * — `captureScene` calls flush at the top of every capture so the
+   * read of `state.viewport` always sees the latest user pan, even if
+   * the debounce timer is still in flight (otherwise the first scene
+   * is captured at the *previous* viewport, the initial-fit value).
+   */
+  private pendingViewportUpdate?: {
+    coordinates: { longitude: number; latitude: number }[];
+    zoom: number;
+  };
   private static readonly VIEWPORT_DEBOUNCE_MS = 100;
+
+  /**
+   * PR #625 — echo-suppression key for the spatial→webview push.
+   *
+   * The spatial subscription posts `setViewport(center, zoom)` to the webview
+   * whenever session-state's viewport changes. `center` is computed as
+   * `avg(corners.lat), avg(corners.lng)` — which is NOT the same as
+   * Leaflet's `map.getCenter()` in Mercator projection (the lat-midpoint of
+   * a bounds rectangle differs from the screen-pixel-centre lat by the
+   * projection's non-linearity). So when the user pans, the chain is:
+   *   1. webview moveend → host viewportChanged → debounce → setViewport(corners).
+   *   2. Subscription fires → posts setViewport(avg-centre) BACK to webview.
+   *   3. Webview map.setView(avg-centre) → map shifts off Leaflet's
+   *      original pixel-centre.
+   *
+   * That shift is the "jump to one side" reported on PR #623's preview. To
+   * suppress it, `handleViewportChanged` records the key it is about to
+   * write into session-state; the subscription then sees the matching key
+   * and skips the echo. Programmatic viewport changes (session load,
+   * scene navigation) still push, because they don't pre-set the key.
+   */
+  private lastSentViewportKey = '';
 
   private constructor(
     panel: vscode.WebviewPanel,
@@ -207,6 +243,13 @@ export class MapPanel {
 
     // Update panel title
     this.panel.title = plot.title;
+
+    // Spec 260 / FR-012 — opening a different plot force-unlocks the
+    // viewport. Done BEFORE the loadPlot message goes out so the
+    // webview's first paint at the new plot is unlocked.
+    if (this.activeSession) {
+      this.activeSession.getState().setViewportLocked(false);
+    }
 
     // Send to webview
     this.postMessage({
@@ -504,6 +547,24 @@ export class MapPanel {
   private thumbnailCaptureResolve: ((result: { largePngBase64: string | null; smallPngBase64: string | null }) => void) | null = null;
 
   /**
+   * PR #627 — pending resolver for `requestCurrentViewport`. The host RPC
+   * round-trips through the webview message channel so the resolver pairs
+   * with the in-flight request; `null` between requests.
+   */
+  private currentViewportResolve:
+    | ((result: {
+        center: [number, number];
+        zoom: number;
+        bounds: [
+          [number, number],
+          [number, number],
+          [number, number],
+          [number, number],
+        ];
+      } | null) => void)
+    | null = null;
+
+  /**
    * Request thumbnail capture from the webview.
    * Returns base64-encoded PNG data for both large and small thumbnails,
    * or null values if capture fails.
@@ -524,6 +585,44 @@ export class MapPanel {
       const requestId = `thumb-${Date.now()}`;
       this.postMessage({
         type: 'requestThumbnailCapture',
+        requestId,
+      });
+    });
+  }
+
+  /**
+   * PR #627 — synchronous-ish RPC to read the live Leaflet viewport from
+   * the webview, used by `captureScene` to guarantee the captured viewport
+   * matches what the analyst is looking at right now (not whatever stale
+   * value `state.viewport` may have lagging behind the moveend → debounce
+   * chain). Returns `null` on timeout or if Leaflet hasn't reported ready
+   * yet — the caller falls back to `state.viewport` in that case.
+   */
+  public requestCurrentViewport(timeoutMs: number = 1000): Promise<{
+    center: [number, number];
+    zoom: number;
+    bounds: [
+      [number, number],
+      [number, number],
+      [number, number],
+      [number, number],
+    ];
+  } | null> {
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        this.currentViewportResolve = null;
+        resolve(null);
+      }, timeoutMs);
+
+      this.currentViewportResolve = (result) => {
+        clearTimeout(timer);
+        this.currentViewportResolve = null;
+        resolve(result);
+      };
+
+      const requestId = `viewport-${Date.now()}`;
+      this.postMessage({
+        type: 'requestCurrentViewport',
         requestId,
       });
     });
@@ -594,6 +693,11 @@ export class MapPanel {
       this._onFeaturesChanged.fire(this.currentFeatures.slice());
       return;
     }
+    // In-place feature update (Scene capture appends a STORYBOARD_SCENE,
+    // edit suite renames/deletes Scenes, etc.). Suppress refitBounds so
+    // the user's current pan/zoom is preserved — refitting would snap
+    // back to the plot's loaded bbox and erase context the user was
+    // composing into the Scene.
     this.postMessage({
       type: 'loadPlot',
       plot: {
@@ -603,6 +707,7 @@ export class MapPanel {
         bbox: this.currentPlot.bbox,
         timeExtent: this.currentPlot.timeExtent,
       },
+      refitBounds: false,
     });
     this._onFeaturesChanged.fire(this.currentFeatures.slice());
   }
@@ -658,11 +763,19 @@ export class MapPanel {
                   ring.map((pt) => [pt[0] as number, pt[1] as number] as const),
                 )
               : [[]];
+          // Spec #258 / FR-006 — preserve polygon provenance across the
+          // host→webview message boundary. Without this, the webview's
+          // `pickPolygonForRender` never sees `'bounds'` and falls back to
+          // the legacy recompute path even for newly-captured scenes,
+          // shrinking rectangles to whatever `map.getSize()` happened to
+          // return at memo time.
+          const polygonSource = s.properties._polygon_source;
           return {
             sceneId: s.properties.id,
             viewport: s.properties.viewport,
             timestamp: s.properties.timestamp,
             polygon,
+            ...(polygonSource !== undefined && { polygonSource }),
           };
         });
     this.postMessage({
@@ -748,31 +861,39 @@ export class MapPanel {
     this.temporalUnsubscribe?.();
     this.hiddenUnsubscribe?.();
     this.drawingUnsubscribe?.();
+    this.viewportLockUnsubscribe?.();
     this.spatialUnsubscribe = undefined;
     this.selectionUnsubscribe = undefined;
     this.temporalUnsubscribe = undefined;
     this.hiddenUnsubscribe = undefined;
     this.drawingUnsubscribe = undefined;
+    this.viewportLockUnsubscribe = undefined;
 
     this.activeSession = session ?? undefined;
 
     if (session) {
-      // Subscribe to spatial (viewport) changes
-      // Track last viewport sent to map to avoid redundant messages
-      let lastSentViewportKey = '';
+      // Subscribe to spatial (viewport) changes.
+      //
+      // The key is shared with `handleViewportChanged` (member field
+      // `lastSentViewportKey`) so the host can mark a viewport "already
+      // sent to the webview" *before* the round-trip starts — see the
+      // field's doc-comment for the rationale.
       this.spatialUnsubscribe = subscribeToSpatial(session, (spatial) => {
         const zoom = spatial.viewport?.zoom;
         if (spatial.viewport !== null && zoom !== undefined) {
-          // Calculate center from coordinates: [NW, NE, SE, SW] in object form
-          // { longitude, latitude } after feature 203.
-          const coords = spatial.viewport.coordinates;
-          const centerLng = (coords[0]!.longitude + coords[1]!.longitude + coords[2]!.longitude + coords[3]!.longitude) / 4;
-          const centerLat = (coords[0]!.latitude + coords[1]!.latitude + coords[2]!.latitude + coords[3]!.latitude) / 4;
-          const viewportKey = `${centerLat.toFixed(6)},${centerLng.toFixed(6)},${zoom}`;
+          const viewportKey = this.viewportPolygonKey(
+            spatial.viewport.coordinates,
+            zoom,
+          );
 
-          // Only send if actually different from last sent
-          if (viewportKey !== lastSentViewportKey) {
-            lastSentViewportKey = viewportKey;
+          if (viewportKey !== this.lastSentViewportKey) {
+            this.lastSentViewportKey = viewportKey;
+            const coords = spatial.viewport.coordinates;
+            const centerLng =
+              (coords[0]!.longitude + coords[1]!.longitude + coords[2]!.longitude + coords[3]!.longitude) /
+              4;
+            const centerLat =
+              (coords[0]!.latitude + coords[1]!.latitude + coords[2]!.latitude + coords[3]!.latitude) / 4;
             this.postMessage({
               type: 'setViewport',
               viewport: {
@@ -856,42 +977,121 @@ export class MapPanel {
           }
         }
       );
+
+      // Spec 260 — push viewportLocked changes to the webview so the banner,
+      // toolbar disabled state, and padlock all reflect the canonical store.
+      type ViewportLockState = { viewportLocked: boolean };
+      const viewportLockSelector = (state: SessionStoreWithUndo): ViewportLockState => ({
+        viewportLocked: state.viewportLocked,
+      });
+      this.viewportLockUnsubscribe = subscribeToSlice(
+        session,
+        viewportLockSelector,
+        (curr: ViewportLockState, prev: ViewportLockState) => {
+          if (curr.viewportLocked !== prev.viewportLocked) {
+            this.postMessage({
+              type: 'setViewportLocked',
+              viewportLocked: curr.viewportLocked,
+            });
+          }
+        }
+      );
     }
   }
 
   /**
-   * Handle viewport change from webview with debouncing (Feature: 029)
+   * Handle viewport change from webview with debouncing (Feature: 029).
+   * PR #625 — keeps the pending viewport in a field so
+   * `flushPendingViewportUpdate` can apply it synchronously from
+   * `captureScene` (kills the first-scene-captured-at-initial-fit race).
    */
   private handleViewportChanged(viewport: {
     center: [number, number];
     zoom: number;
     bounds?: [[number, number], [number, number], [number, number], [number, number]];
   }): void {
-    // Clear existing timeout
+    if (!viewport.bounds) {
+      return;
+    }
+    this.pendingViewportUpdate = {
+      // bounds is [NW, NE, SE, SW] in GeoJSON tuple order [lng, lat];
+      // feature 203 consolidated ViewportPolygon on the canonical
+      // object form, so convert at this boundary via fromGeoJSONCoord.
+      coordinates: viewport.bounds.map(fromGeoJSONCoord),
+      zoom: viewport.zoom,
+    };
     if (this.viewportUpdateTimeout) {
       clearTimeout(this.viewportUpdateTimeout);
     }
-
-    // Debounce viewport updates to session state
     this.viewportUpdateTimeout = setTimeout(() => {
-      if (this.activeSession && viewport.bounds) {
-        // bounds is [NW, NE, SE, SW] in GeoJSON tuple order [lng, lat];
-        // feature 203 consolidated ViewportPolygon on the canonical
-        // object form, so convert at this boundary via fromGeoJSONCoord.
-        const newViewport = {
-          coordinates: viewport.bounds.map(fromGeoJSONCoord),
-          zoom: viewport.zoom,
-        };
-        // Only update if viewport actually changed (avoid feedback loop)
-        const state: SessionStoreWithUndo = this.activeSession.getState();
-        const currentViewport = state.viewport;
-        if (!currentViewport ||
-            JSON.stringify(currentViewport.coordinates) !== JSON.stringify(newViewport.coordinates) ||
-            currentViewport.zoom !== newViewport.zoom) {
-          state.setViewport(newViewport);
-        }
-      }
+      this.viewportUpdateTimeout = undefined;
+      this.applyPendingViewportUpdate();
     }, MapPanel.VIEWPORT_DEBOUNCE_MS);
+  }
+
+  /**
+   * Synchronously force any in-flight viewport debounce to apply now.
+   * Called by `captureScene` so a fresh user pan that has not yet
+   * cleared the 100 ms debounce is still written into session-state
+   * before the capture reads `state.viewport`. Without this, the very
+   * first scene after a pan gets the initial-fit viewport, not what the
+   * analyst composed.
+   */
+  public flushPendingViewportUpdate(): void {
+    if (this.viewportUpdateTimeout) {
+      clearTimeout(this.viewportUpdateTimeout);
+      this.viewportUpdateTimeout = undefined;
+    }
+    this.applyPendingViewportUpdate();
+  }
+
+  /**
+   * Write the latest pending viewport into session-state.
+   * Echo-suppresses the host→webview round-trip by priming
+   * `lastSentViewportKey` before the state mutation — the spatial
+   * subscription's synchronous callback then sees a matching key and
+   * skips the redundant `setViewport` push (the push would shift the
+   * map off pixel-centre by Mercator distortion, see PR #625 commit).
+   */
+  private applyPendingViewportUpdate(): void {
+    const pending = this.pendingViewportUpdate;
+    if (!pending || !this.activeSession) {
+      return;
+    }
+    this.pendingViewportUpdate = undefined;
+
+    const state: SessionStoreWithUndo = this.activeSession.getState();
+    const currentViewport = state.viewport;
+    if (
+      currentViewport &&
+      JSON.stringify(currentViewport.coordinates) === JSON.stringify(pending.coordinates) &&
+      currentViewport.zoom === pending.zoom
+    ) {
+      return;
+    }
+    this.lastSentViewportKey = this.viewportPolygonKey(
+      pending.coordinates,
+      pending.zoom,
+    );
+    state.setViewport(pending);
+  }
+
+  /**
+   * Build the canonical key used by the spatial echo-suppression logic.
+   * Centred on the same `avg(corners)` value the subscription would
+   * post to the webview, so the two sites agree on what "already sent"
+   * means.
+   */
+  private viewportPolygonKey(
+    coords: ReadonlyArray<{ longitude: number; latitude: number }>,
+    zoom: number,
+  ): string {
+    const centerLng =
+      (coords[0]!.longitude + coords[1]!.longitude + coords[2]!.longitude + coords[3]!.longitude) /
+      4;
+    const centerLat =
+      (coords[0]!.latitude + coords[1]!.latitude + coords[2]!.latitude + coords[3]!.latitude) / 4;
+    return `${centerLat.toFixed(6)},${centerLng.toFixed(6)},${zoom}`;
   }
 
   /**
@@ -905,6 +1105,7 @@ export class MapPanel {
     this.selectionUnsubscribe?.();
     this.temporalUnsubscribe?.();
     this.drawingUnsubscribe?.();
+    this.viewportLockUnsubscribe?.();
     this.sessionChangeDisposable?.dispose();
     if (this.viewportUpdateTimeout) {
       clearTimeout(this.viewportUpdateTimeout);
@@ -952,7 +1153,7 @@ export class MapPanel {
     for (const rl of this.resultLayers) {
       if (!rl.artifactHref) {
         for (const f of rl.features.features) {
-          // eslint-disable-next-line no-restricted-syntax -- SafeFeature → DebriefFeature bridge
+          // eslint-disable-next-line no-restricted-syntax -- RawGeoJSONFeature → DebriefFeature bridge
           allFeatures.push(f as unknown as DebriefFeature);
         }
       }
@@ -990,6 +1191,25 @@ export class MapPanel {
           this.postMessage({
             type: 'setDisplayMode',
             displayMode: state.displayMode,
+          });
+          // Seed drawing state into freshly-mounted webview (#108) — the
+          // change-subscription path above only fires on changes, so the
+          // initial values must be flushed here. Posted unconditionally
+          // (including null/0) so the webview cannot confuse "host has no
+          // opinion" with "host says null"; see research.md Decision 3.
+          this.postMessage({
+            type: 'setDrawingMode',
+            drawingMode: state.drawingMode,
+          });
+          this.postMessage({
+            type: 'setDrawingPaletteIndex',
+            paletteIndex: state.drawingPaletteIndex,
+          });
+          // Spec 260 — seed viewport lock state. Always sent so the webview
+          // padlock / banner / toolbar start consistent with the store.
+          this.postMessage({
+            type: 'setViewportLocked',
+            viewportLocked: state.viewportLocked,
           });
         }
         break;
@@ -1064,6 +1284,15 @@ export class MapPanel {
         }
         break;
 
+      case 'viewportLockChanged':
+        // Spec 260 — user toggled the lock via banner / padlock / shortcut.
+        // The store update fires the subscription which echoes the new
+        // value back via setViewportLocked.
+        if (this.activeSession) {
+          this.activeSession.getState().setViewportLocked(message.viewportLocked);
+        }
+        break;
+
       case 'thumbnailCaptureResponse':
         // Handle thumbnail capture response (#174)
         if (this.thumbnailCaptureResolve) {
@@ -1071,6 +1300,23 @@ export class MapPanel {
             largePngBase64: message.largePngBase64,
             smallPngBase64: message.smallPngBase64,
           });
+        }
+        break;
+
+      case 'currentViewportResponse':
+        // PR #627 — pair the response with the in-flight resolver. On
+        // `success === false` (Leaflet not ready) report `null` so the
+        // caller falls back to `state.viewport`.
+        if (this.currentViewportResolve) {
+          if (message.success) {
+            this.currentViewportResolve({
+              center: message.center,
+              zoom: message.zoom,
+              bounds: message.bounds,
+            });
+          } else {
+            this.currentViewportResolve(null);
+          }
         }
         break;
 
@@ -1332,14 +1578,13 @@ export class MapPanel {
       });
 
       // Convert to the format StacService expects
-      const safeFeatures = parseResult.features.flatMap((f: SafeFeature) => {
+      const safeFeatures = parseResult.features.flatMap((f: IngressFeature) => {
         if (!f.geometry) { return []; }
         return [{
           type: 'Feature' as const,
-          geometry: {
-            type: f.geometry.type,
-            coordinates: f.geometry.coordinates as number[] | number[][],
-          },
+          // f.geometry is a typed RawGeoJSONFeature geometry post null-guard —
+          // pass it through directly (no reconstruction / coordinate cast).
+          geometry: f.geometry,
           properties: f.properties,
         }];
       });
@@ -1486,7 +1731,7 @@ export class MapPanel {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${cspSource} data: https:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${cspSource} data: https:; connect-src https:;">
   <title>Debrief Map</title>
   <link rel="stylesheet" href="${stylesUri.toString()}">
   <style>

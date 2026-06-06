@@ -190,8 +190,8 @@
 
 - [x] T041 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/174-thumbnail-capture/evidence/test-summary.md`
 - [x] T042 Create usage demonstration in `specs/174-thumbnail-capture/evidence/usage-example.md`
-- [ ] T043 [P] Capture theme screenshots (light/dark/vscode) of ThumbnailPreview to `specs/174-thumbnail-capture/evidence/screenshots/`
-- [ ] T044 Capture interaction GIF showing gallery prev/next navigation to `specs/174-thumbnail-capture/evidence/screenshots/interaction.gif`
+- [x] T043 [P] Capture theme screenshots (light/dark/vscode) of ThumbnailPreview to `specs/174-thumbnail-capture/evidence/screenshots/`
+- [x] T044 Capture interaction GIF showing gallery prev/next navigation to `specs/174-thumbnail-capture/evidence/screenshots/interaction.gif`
 - [x] T045 [P] Capture sample STAC item.json with thumbnail assets to `specs/174-thumbnail-capture/evidence/sample-item.json`
 
 ### Media Content
@@ -201,7 +201,7 @@
 
 ### PR Creation
 
-- [ ] T048 Create PR and publish blog: run `/speckit.pr`
+- [x] T048 Create PR and publish blog: run `/speckit.pr` — published via `/publish` workflow as debrief.github.io#94 (2026-05-01); feature itself shipped earlier across debrief-future PRs #378/#379/#381/#459/#464
 
 **Task T048 must run last. It depends on all evidence and media tasks being complete.**
 

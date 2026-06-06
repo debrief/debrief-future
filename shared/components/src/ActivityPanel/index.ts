@@ -11,3 +11,13 @@ export type {
   ToolsPanelProps,
 } from './types';
 export { DEFAULT_COLLAPSE_STATE } from './types';
+export { useStagedEdits } from './useStagedEdits';
+export type {
+  UseStagedEditsApi,
+  StagedEdits,
+  ProvenancePath,
+  FieldKey as StagedEditsFieldKey,
+  FeatureEditableProperties,
+  VertexEditableProperties,
+  FeatureForEdit,
+} from './useStagedEdits';

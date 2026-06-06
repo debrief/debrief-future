@@ -1,0 +1,441 @@
+id: https://debrief.info/schemas/mcp
+name: mcp
+title: Debrief MCP Transport Envelopes
+description: >-
+  LinkML schema for MCP / tool-system transport envelopes between
+  Python services and TypeScript consumers. Resolves audit #206 §3.1
+  cluster attributed to #222 — 17 hand-typed declarations across
+  six source files. Article XV exception: several free-form payload
+  fields retain `range: Any` — see spec.md §Edge Cases #3 and the
+  `raw-geojson.yaml` `JsonObject` precedent.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  - tool          # for ToolCategoryEnum, ToolParameter (canonical)
+
+# ============================================================================
+# Enums
+# ============================================================================
+
+enums:
+
+  SessionMCPToolName:
+    description: >-
+      Authoritative list of session-state MCP tool names. Must mirror the
+      `TOOLS` const at services/session-state/src/server/mcp.ts. Research
+      R-001: replaces the TS-only `type ToolName = keyof typeof TOOLS`
+      projection with a cross-language permissible-values enum.
+    permissible_values:
+      session.getState: {}
+      session.getTemporalState: {}
+      session.getSpatialState: {}
+      session.getFeaturesState: {}
+      session.getDocumentState: {}
+      session.setCurrentTime: {}
+      session.setViewport: {}
+      session.setSelection: {}
+      session.setHiddenFeatures: {}
+      session.setPlaybackRate: {}
+      session.setRotation: {}
+
+  MCPContentItemTypeEnum:
+    description: Discriminator for MCPContentItem variants.
+    permissible_values:
+      text: {}
+      resource_link: {}
+      image: {}
+      structured: {}
+
+  MCPParamTypeEnum:
+    description: JSON-Schema-compatible primitive types for tool parameters.
+    permissible_values:
+      string: {}
+      number: {}
+      integer: {}
+      boolean: {}
+      array: {}
+      object: {}
+
+  ReplayStatusEnum:
+    description: Outcome of resolving a logged tool invocation at replay time.
+    permissible_values:
+      unchanged: {}
+      version_drift: {}
+      tool_removed: {}
+
+# ============================================================================
+# Group 1 — Envelopes (P1)
+# ============================================================================
+#
+# Slot names match the live wire format used by current consumers
+# (apps/vscode/src/services/calcService.ts, apps/web-shell/src/services/toolService.ts,
+# services/session-state/src/server/mcp.ts). Several fields are `range: Any`
+# — see spec §Edge Cases #3 (Article XV.2 free-form-payload exception)
+# and the `raw-geojson.yaml` `JsonObject` precedent.
+
+classes:
+
+  MCPRequest:
+    description: >-
+      MCP tool invocation envelope. Sent by consumers (VS Code, web-shell)
+      to the MCP server. Closes audit §3.1 row 13.
+    attributes:
+      tool:
+        description: Tool name (one of SessionMCPToolName for the session-state server).
+        range: string
+        required: true
+      input:
+        description: >-
+          Free-form per-tool input payload (Article XV.2 exception — narrowed
+          by per-tool Pydantic input model at dispatch).
+        range: Any
+        required: true
+
+  MCPContentItem:
+    description: >-
+      A single MCP content item (resource, text, or image). Carries
+      Debrief-specific annotations (debrief:* keys) on every item.
+      Closes audit §3.1 row 15.
+    attributes:
+      type:
+        description: >-
+          Content-item discriminator. Current consumers emit `resource`,
+          `text`, `image`. Kept as string to remain additive over any
+          future MCP content-item types.
+        range: string
+        required: true
+      resource:
+        description: >-
+          Nested resource descriptor `{ uri, mimeType, text }` when
+          type=resource. Free-form per Article XV.2 (the inner shape is
+          driven by individual tool authors).
+        range: Any
+      text:
+        description: Body text when type=text.
+        range: string
+      data:
+        description: Base64-encoded payload when type=image.
+        range: string
+      mimeType:
+        description: IANA media type when type=image or type=resource.
+        range: string
+      annotations:
+        description: >-
+          Debrief-specific annotations (`debrief:resultType`, `debrief:label`,
+          `debrief:sourceFeatures`, etc). Free-form per Article XV.2 because
+          the key set is open-ended and uses colons (`debrief:*`) that LinkML
+          cannot constrain as slot names.
+        range: Any
+        required: true
+
+  MCPToolResponse:
+    description: >-
+      Successful MCP tool response. Closes audit §3.1 row 16. The
+      `duration_ms` slot preserves the wire format used by the live
+      MCP server and replay subsystem.
+    attributes:
+      content:
+        description: Ordered list of content items returned by the tool.
+        range: MCPContentItem
+        multivalued: true
+        required: true
+      duration_ms:
+        description: Wall-clock duration of the tool invocation in milliseconds.
+        range: integer
+        required: true
+      is_error:
+        description: >-
+          Reserved for streaming partial-error responses (additive over
+          the live wire format).
+        range: boolean
+      structured_content:
+        description: >-
+          Reserved for top-level free-form payload (e.g. vega-spec) — Article
+          XV.2 exception. Additive over the live wire format.
+        range: Any
+
+  MCPErrorResponse:
+    description: >-
+      MCP error response envelope. Closes audit §3.1 row 17. The error
+      payload is nested (matches the JSON-RPC convention used by the live
+      server).
+    attributes:
+      error:
+        description: >-
+          Nested error object `{ code, message, data: { debrief:errorCategory,
+          debrief:affectedFeatures } }`. Free-form per Article XV.2 because
+          the inner `data` map uses colon-bearing keys outside LinkML slot
+          syntax.
+        range: Any
+        required: true
+      duration_ms:
+        description: Wall-clock duration before failure.
+        range: integer
+
+# ============================================================================
+# Group 2 — Discovery (P2)
+# ============================================================================
+#
+# Tool catalogue advertised by the MCP server and consumed by the
+# ToolMatch UI, the VS Code tool adapter, and the web-shell mock service.
+# Slot names match live wire format (snake_case where it's already
+# snake_case, camelCase where the live shape uses camelCase).
+
+  MCPParamSchema:
+    description: >-
+      JSON-Schema-like parameter fragment used inside
+      MCPToolDefinition.input_schema. Closes audit §3.1 rows 1 and 27
+      (two-site drift). Open at the wire level — consumers narrow with
+      additional fields (`enum`, `default`, `x-debrief-param-type`) via
+      intersection in the local adapter modules.
+    attributes:
+      type:
+        description: JSON-Schema primitive type (string / number / integer / boolean / array / object).
+        range: string
+      description:
+        description: Human-readable parameter description.
+        range: string
+
+  MCPSelectionRequirement:
+    description: >-
+      Predicate describing what feature selection a tool needs (e.g. "at
+      least one Track", "exactly one Point"). Closes audit §3.1 row 18.
+      Slot names match shared/utils/src/mcp-types.ts (`kind`, `min`, `max`).
+    attributes:
+      kind:
+        description: >-
+          Feature kind this requirement applies to. Supports flat values
+          (e.g. "TRACK", "POINT") and dot-delimited hierarchical paths
+          (e.g. "TRACK.SEGMENT").
+        range: string
+        required: true
+      min:
+        description: Minimum number of features of this kind required.
+        range: integer
+        required: true
+      max:
+        description: Maximum number of features of this kind allowed.
+        range: integer
+
+  MCPToolDefinition:
+    description: >-
+      Static catalogue entry advertised by the MCP server. Closes audit
+      §3.1 row 19. `input_schema` and `annotations` are free-form per
+      Article XV.2 — `input_schema` is a JSON-Schema fragment and
+      `annotations` carries open-ended `debrief:*` keys (colons in key
+      names cannot be slot-modelled).
+    attributes:
+      name:
+        description: Tool identifier.
+        range: string
+        required: true
+      description:
+        description: Human-readable tool description.
+        range: string
+        required: true
+      input_schema:
+        description: >-
+          JSON-Schema fragment describing the tool's input payload.
+          Free-form per Article XV.2 — consumers narrow at point of use.
+        range: Any
+        required: true
+      annotations:
+        description: >-
+          Debrief-specific annotations (`debrief:selectionRequirements`,
+          `debrief:category`, `debrief:version`, `debrief:outputKind`,
+          `debrief:uiCategory`). Free-form per Article XV.2.
+        range: Any
+        required: true
+
+  ToolParameterMeta:
+    description: >-
+      Tunable parameter metadata recorded alongside a tool result for
+      provenance. Closes audit §3.1 row 21. Matches the live web-shell
+      mock shape — three slots tracking value, default-ness, and
+      whether the parameter is operator-tunable.
+    attributes:
+      value:
+        description: Parameter value used during the invocation.
+        range: Any
+        required: true
+      default:
+        description: Whether the parameter took its default value.
+        range: boolean
+        required: true
+      tunable:
+        description: Whether the parameter is operator-tunable.
+        range: boolean
+        required: true
+
+  ToolDefinition:
+    description: >-
+      Consumer-facing flattened view of a tool catalogue entry. Closes
+      audit §3.1 row 22. Slot names match `apps/web-shell/src/mocks/calcService.ts`
+      (`min_tracks`, `max_tracks`, `min_features` — preserved as-is).
+    attributes:
+      id:
+        description: Unique tool identifier.
+        range: string
+        required: true
+      name:
+        description: Human-readable name.
+        range: string
+        required: true
+      description:
+        description: Brief description.
+        range: string
+        required: true
+      minTracks:
+        description: Minimum number of tracks required.
+        range: integer
+      maxTracks:
+        description: Maximum number of tracks (absent = no upper limit).
+        range: integer
+      minFeatures:
+        description: Minimum number of features required (any type).
+        range: integer
+
+  ToolResult:
+    description: >-
+      Logical tool invocation result as seen by the consumer (after the
+      MCP layer has unwrapped MCPToolResponse). Closes audit §3.1 row 20.
+      Slot names match `apps/web-shell/src/mocks/calcService.ts` —
+      includes `resultLayer`, `resultLayers`, `parameters`, `datasets`
+      which are free-form per Article XV.2 (their inner shapes are
+      tool-specific).
+    attributes:
+      success:
+        description: Whether the tool succeeded.
+        range: boolean
+        required: true
+      message:
+        description: Status / explanation message.
+        range: string
+        required: true
+      resultLayer:
+        description: Optional single result layer (e.g. bounding-box polygon).
+        range: Any
+      resultLayers:
+        description: Optional multiple result layers (e.g. buffer-zone polygons).
+        range: Any
+        multivalued: true
+      parameters:
+        description: >-
+          Optional record of operator-tunable parameters and their values
+          (keyed by parameter name, values shaped like ToolParameterMeta).
+          Free-form per Article XV.2 (a LinkML `inlined_as_dict` of
+          ToolParameterMeta would express it, but consumers already build
+          a plain `Record<string, ToolParameterMeta>` and narrow on the way
+          out — keeping it free-form preserves the live wire shape).
+        range: Any
+      datasets:
+        description: >-
+          Optional dataset results for the Results panel (range-bearing
+          charts, etc). Each entry shaped like
+          `{ filename: string, envelope: Record<string, unknown> }`.
+        range: Any
+        multivalued: true
+
+# ============================================================================
+# Group 3 — Replay / Logging (P3)
+# ============================================================================
+
+  ToolResultForLog:
+    description: >-
+      Persisted tool-result shape written by the live tool-result logger
+      and read back by the replay subsystem. Closes audit §3.1 row 4.
+      Slot names match `services/session-state/src/log/types.ts:97`
+      verbatim so existing log fixtures under the session-state
+      fixtures directories continue to deserialise unchanged (FR-011).
+    attributes:
+      success:
+        description: Whether the tool succeeded.
+        range: boolean
+        required: true
+      features:
+        description: >-
+          GeoJSON FeatureCollection produced by the tool. Free-form per
+          Article XV.2 (the tool's output shape is its own contract).
+        range: Any
+      duration_ms:
+        description: Wall-clock duration of the tool invocation in milliseconds.
+        range: integer
+        required: true
+      result_type:
+        description: Hierarchical result type (e.g. mutation/track/smoothed).
+        range: string
+      source_feature_ids:
+        description: IDs of input features used to generate this result.
+        range: string
+        multivalued: true
+      artifact_href:
+        description: Path to an exported artifact (for non-GeoJSON tool results).
+        range: string
+      tool_id:
+        description: Tool identifier (mirrors LogEntry.was_generated_by.tool).
+        range: string
+      input_state:
+        description: >-
+          Pre-tool geometry snapshot for mutation tools — passed through
+          to LogEntry. Free-form per Article XV.2 (the inner
+          InputFeatureState shape is owned by #224 session-state).
+        range: Any
+        multivalued: true
+
+  ToolExecutionResultForReplay:
+    description: >-
+      Minimal tool-execution result returned by the Replay Engine's
+      `execute_tool` callback. Closes audit §3.1 row 6. Distinct from
+      `ToolResultForLog` (no inheritance) because the replay path's
+      observable surface is intentionally narrower — see
+      services/session-state/src/log/types.ts:373.
+    attributes:
+      success:
+        description: Whether the tool succeeded.
+        range: boolean
+        required: true
+      features:
+        description: >-
+          GeoJSON FeatureCollection produced by the tool during replay.
+          Free-form per Article XV.2.
+        range: Any
+      duration_ms:
+        description: Wall-clock duration of the replay invocation in milliseconds.
+        range: integer
+        required: true
+      tool_version:
+        description: Tool version observed at replay time.
+        range: string
+      artifact_href:
+        description: Path to an exported artifact (for non-GeoJSON tool results).
+        range: string
+      result_id:
+        description: Stable result identifier (used by the activity panel).
+        range: string
+
+  ToolsUpdateMessage:
+    description: >-
+      Push notification from the extension host to the activity-panel
+      webview when the tool catalogue changes. Closes audit §3.1 row 28.
+      `payload` is free-form per Article XV.2 — its inner shape
+      `{ tools: ToolsPanelItem[], hasToolInventory?, hasSelection? }`
+      is narrowed at the activity-panel consumer.
+    attributes:
+      type:
+        description: Discriminator — always the literal `tools:update`.
+        range: string
+        required: true
+        equals_string: tools:update
+      payload:
+        description: >-
+          Nested payload `{ tools, hasToolInventory?, hasSelection? }`.
+          Free-form per Article XV.2.
+        range: Any
+        required: true

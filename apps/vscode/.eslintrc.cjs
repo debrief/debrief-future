@@ -47,6 +47,27 @@ module.exports = {
         objectLiteralTypeAssertions: 'never',
       },
     ],
+    // 234 FR-044 — production code under apps/vscode/src/** must NEVER
+    // import from a __testing__/ surface. Those surfaces (e.g. the
+    // story-only mock-port helper) are scaffolding for stories + harness
+    // and would leak fixture-only behaviour into the VS Code extension.
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            group: [
+              '**/__testing__/**',
+              '**/__testing__/*',
+              '@debrief/components/**/__testing__/*',
+              '@debrief/components/**/__testing__/**',
+            ],
+            message:
+              'Production code in apps/vscode/src/** must not import from __testing__/. Those modules are story/harness-only (Feature 234 FR-044). Move what you need into a non-__testing__/ public surface, or wire the test seam through PortContext.',
+          },
+        ],
+      },
+    ],
     'no-restricted-syntax': [
       'error',
       {

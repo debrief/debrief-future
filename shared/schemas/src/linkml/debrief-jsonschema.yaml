@@ -28,3 +28,4 @@ imports:
   - raw-geojson
   - tool-result
   - storyboard
+  - mcp

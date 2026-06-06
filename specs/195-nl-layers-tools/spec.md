@@ -2,8 +2,26 @@
 
 **Feature Branch**: `195-nl-layers-tools`
 **Created**: 2026-04-18
-**Status**: Draft
+**Status**: REJECTED 2026-04-27
 **Input**: Backlog #195 — "[E10] NL search in Layers & Tools panels. Extend NL-mode to other VS Code webview surfaces once #191 proves out in the Catalog Overview; FilterBar `llmClient` prop carries over, wiring is presentational (requires #191)."
+
+## Rejection Notice (2026-04-27)
+
+**This feature is not being implemented.** Decision recorded during `/speckit.clarify` after the implementation start surfaced two problems:
+
+1. **The "wiring is presentational" premise was false.** Layers and Tools panels do not render `FilterBar`. Spreading the NL UI to them would require a new shared component, per-panel taxonomy builders, threading `nlConfig` and two `LLMClient` instances into the Activity Panel webview, and ~600–900 LOC of work — substantially more than the original Medium-complexity estimate. (See `plan.md` for the full re-plan that was drafted before rejection.)
+
+2. **Neither panel has a discoverability problem that NL search would meaningfully address.** Layers shows tens of features in one open plot; the analyst can already see them on the map and visually select. Tools is already partitioned into "applicable to current selection" vs "inactive with explanation"; that partition does most of the discoverability work. A per-panel NL filter bar would consume Activity Panel real estate without proportional value.
+
+**The NL pipeline still has long-term value** — but as **agentic orchestration**, not as a filter bar. An analyst phrase like "show me submarine tracks where speed dropped below 5 kts during Saxon Warrior" should drive Debrief-Future to: resolve the time/exercise scope via STAC + CQL2 (#191's pipeline), load matching plots, narrow to matching features, identify the relevant tool from the MCP-exposed inventory, run it, and return annotated results. That capability — NL → tool selection + invocation, not NL → filter UI — is captured in a successor epic.
+
+**Artefacts in this directory** (`spec.md`, `plan.md`, `evidence/opening-context.md`, `tasks.md`) are retained as a postmortem reference. They document the spec/codebase mismatch and the architectural design that would have been required.
+
+---
+
+*The original specification follows for historical reference.*
+
+---
 
 ## Overview
 

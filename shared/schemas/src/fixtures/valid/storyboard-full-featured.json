@@ -21,7 +21,7 @@
         "id": "01JBXYZABC0000000000000100",
         "name": "Op Harrier — full session",
         "description": "Full three-scene walk-through of a tactical exchange.",
-        "schema_version": 1,
+        "schema_version": 2,
         "tags": ["brief", "tactical"],
         "provenance": [
           {
@@ -81,6 +81,7 @@
         "feature_set_hash": "0975b081de860586c31f0917c91f606af5de563acfaaf4b5cd6ed036c5e78753",
         "thumbnail_asset_ref": "thumbnails/harrier-scene-01.png",
         "transition_duration_ms": 500,
+        "creation_order": 0,
         "tags": [],
         "provenance": [
           {
@@ -127,6 +128,7 @@
         "feature_set_hash": "2cc0afc98eb6ea6e9586d38db9792d7144f20c466850bd6bb8e8d329106b2e08",
         "thumbnail_asset_ref": "thumbnails/harrier-scene-02.png",
         "transition_duration_ms": 500,
+        "creation_order": 1,
         "tags": [],
         "provenance": [
           {
@@ -173,6 +175,7 @@
         "feature_set_hash": "eca36bc78c7889848479aec94c1fbaf0516733549c4fce8d2511d77dc9336dfd",
         "thumbnail_asset_ref": "thumbnails/harrier-scene-03.png",
         "transition_duration_ms": 500,
+        "creation_order": 2,
         "tags": [],
         "provenance": [
           {

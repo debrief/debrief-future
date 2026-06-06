@@ -1,0 +1,9 @@
+{
+  "type": "text",
+  "text": "Hello from the tool.",
+  "annotations": {
+    "debrief:resultType": "artifact/text",
+    "debrief:label": "Greeting",
+    "debrief:sourceFeatures": ["track-1"]
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "exercise-alpha",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -4.156,
+          50.261
+        ],
+        [
+          -4.03,
+          50.261
+        ],
+        [
+          -4.03,
+          50.333
+        ],
+        [
+          -4.156,
+          50.333
+        ],
+        [
+          -4.156,
+          50.261
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -4.156,
+    50.261,
+    -4.03,
+    50.333
+  ],
+  "properties": {
+    "title": "Exercise Alpha",
+    "description": "Naval exercise south of Plymouth, January 2024",
+    "datetime": "2024-01-15T09:30:00Z",
+    "start_datetime": "2024-01-15T09:30:00Z",
+    "end_datetime": "2024-01-15T14:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-alpha.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    },
+    "range-bearing-track-hms-defender-track-uss-freedom": {
+      "href": "./assets/range-bearing-track-hms-defender-track-uss-freedom.json",
+      "type": "application/json",
+      "title": "range-bearing-track-hms-defender-track-uss-freedom.json",
+      "roles": [
+        "result"
+      ],
+      "debrief:toolId": "range-bearing",
+      "debrief:sourceFeatures": [
+        "track-hms-defender",
+        "track-uss-freedom"
+      ]
+    },
+    "range-bearing-track-uss-freedom-track-hms-defender": {
+      "href": "./assets/range-bearing-track-uss-freedom-track-hms-defender.json",
+      "type": "application/json",
+      "title": "range-bearing-track-uss-freedom-track-hms-defender.json",
+      "roles": [
+        "result"
+      ],
+      "debrief:toolId": "range-bearing",
+      "debrief:sourceFeatures": [
+        "track-uss-freedom",
+        "track-hms-defender"
+      ]
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}

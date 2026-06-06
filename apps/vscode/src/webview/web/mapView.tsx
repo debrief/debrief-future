@@ -11,8 +11,9 @@
 
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
+import type { Map as LeafletMap } from 'leaflet';
 import { MapView, createDrawnFeature, getPaletteStyleOverrides, captureMapAsDataUrl, downscaleDataUrl } from '@debrief/components';
-import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProvenance, FlyToTarget, SceneRectangleLayerProps } from '@debrief/components';
+import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProvenance, FlyToTarget, SceneRectangleLayerProps, SelectionClickEvent } from '@debrief/components';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
@@ -56,15 +57,34 @@ function MapViewApp(): React.ReactElement {
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number } | undefined>();
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
 
-  // Drawing state — wired to session-state via message bridge (#108)
+  // Drawing state — host-driven mirror (#108). Authoritative value lives in
+  // the session-state spatial slice on the extension host. These useState
+  // values are seeded by the `webviewReady` flush in mapPanel.ts and kept
+  // fresh by the host's change-subscription push (setDrawingMode /
+  // setDrawingPaletteIndex messages). Do not promote them back to "source
+  // of truth" — write paths go via `drawingModeChanged` to the host.
   const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
   const [paletteIndex, setPaletteIndex] = useState(0);
+
+  // Spec 260 — viewport lock state. Host-driven (mirrors `drawingMode`
+  // pattern above). Seeded by `webviewReady` flush + kept fresh by
+  // `setViewportLocked` messages from the host's spatial subscription.
+  // The webview never owns the lock state; toggle requests go via
+  // `viewportLockChanged` messages.
+  const [viewportLocked, setViewportLockedState] = useState<boolean>(false);
 
   // Notify extension when drawing mode changes (session-state bridge, #108)
   const handleDrawingModeChange = useCallback((mode: DrawingMode) => {
     setDrawingMode(mode); // update local state for immediate UI feedback
     vscode.postMessage({ type: 'drawingModeChanged', drawingMode: mode });
+  }, []);
+
+  // Spec 260 — viewport lock toggle handler. Optimistic local update +
+  // post-back to host so the round-trip is invisible to the user.
+  const handleViewportLockChange = useCallback((locked: boolean) => {
+    setViewportLockedState(locked);
+    vscode.postMessage({ type: 'viewportLockChanged', viewportLocked: locked });
   }, []);
 
   // Temporal state
@@ -109,7 +129,13 @@ function MapViewApp(): React.ReactElement {
         case 'loadPlot':
           setPlotFeatures(msg.plot.features);
           setResultFeatures([]);
-          setFitBoundsTrigger(prev => prev + 1);
+          // Only refit when the host explicitly requests it (default true
+          // for back-compat). In-place feature updates — e.g. Scene
+          // capture sending a `setFeatures` reload — pass `refitBounds:
+          // false` to preserve the user's pan/zoom.
+          if (msg.refitBounds !== false) {
+            setFitBoundsTrigger(prev => prev + 1);
+          }
           break;
         case 'setSelection':
           setSelectedIds(new Set(msg.featureIds));
@@ -166,6 +192,12 @@ function MapViewApp(): React.ReactElement {
         case 'setDrawingPaletteIndex':
           setPaletteIndex(msg.paletteIndex);
           break;
+        case 'setViewportLocked':
+          // Spec 260 — host pushes the canonical lock state. May be
+          // identical to our local optimistic update (no-op) or different
+          // (plot switch force-unlocks while user had locked).
+          setViewportLockedState(msg.viewportLocked);
+          break;
         case 'flyTo':
           setFlyToTarget({
             token: msg.token,
@@ -214,18 +246,74 @@ function MapViewApp(): React.ReactElement {
             }
           })();
           break;
+        case 'requestCurrentViewport': {
+          // PR #627 — answer the host's RPC for the live Leaflet viewport.
+          // Read directly from `map.getCenter()`/`getZoom()`/`getBounds()`
+          // so the response reflects the user's actual view RIGHT NOW,
+          // bypassing the moveend → postMessage → debounce → state.viewport
+          // chain that can be stale at first-capture time.
+          const map = leafletMapRef.current;
+          if (!map) {
+            vscode.postMessage({
+              type: 'currentViewportResponse',
+              requestId: msg.requestId,
+              success: false,
+              center: [0, 0],
+              zoom: 0,
+              bounds: [[0, 0], [0, 0], [0, 0], [0, 0]],
+              error: 'leaflet map not ready',
+            });
+            break;
+          }
+          const centre = map.getCenter();
+          const zoom = map.getZoom();
+          const mapBounds = map.getBounds();
+          const west = mapBounds.getWest();
+          const east = mapBounds.getEast();
+          const south = mapBounds.getSouth();
+          const north = mapBounds.getNorth();
+          // 4 corners in NW, NE, SE, SW order, each [lng, lat] — same
+          // shape `viewportChanged` already uses.
+          const bounds: [
+            [number, number],
+            [number, number],
+            [number, number],
+            [number, number],
+          ] = [
+            [west, north],
+            [east, north],
+            [east, south],
+            [west, south],
+          ];
+          vscode.postMessage({
+            type: 'currentViewportResponse',
+            requestId: msg.requestId,
+            success: true,
+            // `Viewport.center` is [longitude, latitude]; convert from
+            // Leaflet's LatLng order before reporting.
+            center: [centre.lng, centre.lat],
+            zoom,
+            bounds,
+          });
+          break;
+        }
       }
     };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
   }, []);
 
-  // Selection callback
-  const handleSelect = useCallback((featureId: string) => {
+  // Selection callback — Phase 5 (#192) switched MapView's `onSelect` to
+  // emit a `SelectionClickEvent` (`{ target, modifier, shift }`). For now
+  // the VS Code host still routes selection through the single-feature
+  // `selectionChanged` message; modifier-aware multi-select wiring will
+  // follow once the host slice mirrors `selection.featureIds` back to the
+  // webview. Re-introduce `applyClickToSelection` then.
+  const handleSelect = useCallback((event: SelectionClickEvent) => {
     vscode.postMessage({
       type: 'selectionChanged',
       selection: {
-        featureIds: [featureId],
+        featureIds: [event.target],
       },
     });
   }, []);
@@ -241,6 +329,16 @@ function MapViewApp(): React.ReactElement {
   // Track current zoom so bounds-change emissions carry a real zoom
   // rather than the prior hard-coded `10`. handleZoomChange updates this.
   const currentZoomRef = useRef<number>(10);
+
+  // PR #627 — Leaflet map instance reference, populated by the MapView's
+  // `onMapReady` callback once Leaflet has mounted. Used to answer the
+  // `requestCurrentViewport` RPC at capture time without going through the
+  // moveend → debounce → session-state chain (which can be stale for the
+  // very first capture if the analyst hasn't panned since composing).
+  const leafletMapRef = useRef<LeafletMap | null>(null);
+  const handleMapReady = useCallback((map: LeafletMap) => {
+    leafletMapRef.current = map;
+  }, []);
 
   // Viewport change callback. #230 FR-050: emit a full `viewportChanged`
   // including the polygon bounds so `mapPanel.handleViewportChanged` can
@@ -340,7 +438,14 @@ function MapViewApp(): React.ReactElement {
         feature_set_hash: '',
         thumbnail_asset_ref: '',
         transition_duration_ms: 500,
-        schema_version: 1,
+        // #259 — required creation_order on SceneProperties.
+        creation_order: 0,
+        // Spec #258 / FR-006 — restore provenance so `pickPolygonForRender`
+        // trusts the stored polygon for `'bounds'` captures and only
+        // recomputes for legacy / placeholder scenes.
+        ...(snap.polygonSource !== undefined && {
+          _polygon_source: snap.polygonSource,
+        }),
       },
     }));
     // Cast once at the boundary — the synthetic object is structurally
@@ -462,7 +567,10 @@ function MapViewApp(): React.ReactElement {
       onShapeCreated={handleShapeCreated}
       flyToTarget={flyToTarget}
       onFlyToComplete={handleFlyToComplete}
+      onMapReady={handleMapReady}
       sceneRectangles={sceneRectangleProps}
+      viewportLocked={viewportLocked}
+      onViewportLockChange={handleViewportLockChange}
       height="100vh"
     />
   );

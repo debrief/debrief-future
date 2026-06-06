@@ -265,6 +265,197 @@ export class AnalysisPage {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Multi-feature selection helpers (#192 Phase 5)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Detect the platform modifier key from `navigator.platform` inside the
+   * page. macOS → `Meta`, everything else → `Control`. Tests that mock
+   * `navigator.platform` via `addInitScript` will see the mocked value.
+   *
+   * Returns the Playwright `KeyboardModifier` string accepted by `click`.
+   */
+  async getPlatformModifierName(): Promise<'Meta' | 'Control'> {
+    const isMac = await this.page.evaluate(() => {
+      const platform = navigator.platform ?? '';
+      return /Mac|iP(hone|od|ad)/.test(platform);
+    });
+    return isMac ? 'Meta' : 'Control';
+  }
+
+  /**
+   * Click a single feature, either on the map or in the Layers panel.
+   *
+   * - `source: 'layers'` clicks the FeatureList row whose
+   *   `data-testid="feature-row-<id>"` matches.
+   * - `source: 'map'` clicks the Leaflet SVG path/marker overlay. Leaflet
+   *   does NOT expose feature ids on the rendered DOM, so the page-object
+   *   looks the feature up by index via `__sessionStore.featureCollection`
+   *   and clicks the matching `.leaflet-interactive` element by index.
+   *
+   * Both routes converge on the shared `applyClickToSelection` glue
+   * (#192 Phase 5); the resulting `selection.featureIds` transition is
+   * identical between sources.
+   *
+   * @param id  Feature ID
+   * @param options.modifier  If true, hold the platform modifier (Cmd on
+   *                          Mac / Ctrl elsewhere) during the click.
+   * @param options.source    `'map'` or `'layers'` — defaults to `'map'`.
+   */
+  async selectFeature(
+    id: string,
+    options: { modifier?: boolean; source?: 'map' | 'layers' } = {},
+  ): Promise<void> {
+    const source = options.source ?? 'map';
+    const modifiers = options.modifier
+      ? ([await this.getPlatformModifierName()] as Array<'Meta' | 'Control'>)
+      : ([] as Array<'Meta' | 'Control'>);
+    const clickOpts = modifiers.length > 0 ? { modifiers } : {};
+
+    if (source === 'map') {
+      const featureIndex = await this.page.evaluate((target) => {
+        // window.__currentPlotFeatures is exposed by the web-shell for
+        // test introspection; the Leaflet GeoJSON overlay renders
+        // `.leaflet-interactive` in the same array order.
+        const features =
+          (
+            window as unknown as {
+              __currentPlotFeatures?: Array<{ id?: string | number }>;
+            }
+          ).__currentPlotFeatures ?? [];
+        return features.findIndex((f) => String(f.id) === target);
+      }, id);
+      if (featureIndex < 0) {
+        throw new Error(`selectFeature: feature id "${id}" not in __currentPlotFeatures`);
+      }
+      // `force` is sometimes needed when an overlay sits on top of an SVG path.
+      await this.mapFeatures.nth(featureIndex).click({ ...clickOpts, force: true });
+      return;
+    }
+
+    // Layers-panel row. The FeatureList is virtualised via @tanstack/
+    // react-virtual; after the first selection expands the Properties
+    // form below, the Layers section can shrink and the target row
+    // gets virtualised out of view, so a plain `click()` times out at
+    // 30 s. `scrollIntoViewIfNeeded()` walks up the scroll parents
+    // until the row is in view (Playwright handles virtualised lists
+    // by triggering scroll which the virtualiser observes).
+    const row = this.page.getByTestId(`feature-row-${id}`);
+    await row.scrollIntoViewIfNeeded();
+    await row.locator('.debrief-feature-row__content').click(clickOpts);
+  }
+
+  /**
+   * Select multiple features in click order. The first click is plain;
+   * every subsequent click holds the platform modifier (so the resulting
+   * `selection.featureIds` is `[id0, id1, ..., idN]`).
+   *
+   * @param ids       Feature IDs in click order.
+   * @param options.source  `'map'` or `'layers'`.
+   */
+  async selectFeatures(
+    ids: ReadonlyArray<string>,
+    options: { source?: 'map' | 'layers' } = {},
+  ): Promise<void> {
+    const source = options.source ?? 'map';
+    for (let i = 0; i < ids.length; i++) {
+      // eslint-disable-next-line no-await-in-loop -- clicks must be sequential
+      await this.selectFeature(ids[i]!, { modifier: i > 0, source });
+    }
+  }
+
+  /**
+   * Read `selection.featureIds` from the session-state store. Used by
+   * Playwright specs to assert the post-click selection-set shape.
+   */
+  async getSelectedFeatureIds(): Promise<string[]> {
+    return await this.page.evaluate(() => {
+      // window.__sessionStore is exposed for test introspection.
+      return window.__sessionStore.getState().selection.featureIds;
+    });
+  }
+
+  /**
+   * Read `selection.primary` from the session-state store.
+   */
+  async getSelectedPrimary(): Promise<string | null> {
+    return await this.page.evaluate(() => {
+      return window.__sessionStore.getState().selection.primary ?? null;
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Phase 4 (US-2): sub-feature (vertex) selection helpers
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Select a single vertex on a feature by writing through the
+   * session-state store.
+   *
+   * Why store-driven and not a DOM click:
+   *   Leaflet `CircleMarker` / `Marker` elements rendered by
+   *   `PositionSymbolsLayer` are SVG `<circle>` / `<img>` nodes inside
+   *   the Leaflet pane. They do NOT carry the position index on a
+   *   queryable DOM attribute — the only stable per-position handle is
+   *   the selection-state path string (`<featureId>/positions/<N>`)
+   *   that `PositionSymbolsLayer` already uses for highlight rendering.
+   *   The `window.__sessionStore` test-introspection handle exposes
+   *   `setSelection(featureIds, primary)` directly, so the page object
+   *   sets `featureIds = [fullPath]` and `primary = fullPath`. This
+   *   matches the exact selection shape that a real per-position click
+   *   would produce once that interaction is wired (Phase 9), and
+   *   exercises the full resolver → dispatcher → SubFeatureEditorMode
+   *   path under test.
+   *
+   * @param featureId The parent feature's id.
+   * @param path      The vertex path relative to the feature (e.g.
+   *                  `positions/4`). Concatenated with the feature id
+   *                  to form the full selection-path primary key.
+   */
+  async selectVertex(featureId: string, path: string): Promise<void> {
+    const fullPath = `${featureId}/${path}`;
+    // We write both `featureIds` and `primary` as the full structured
+    // path. The web-shell host currently passes only `selectedFeatureIds`
+    // (not the full `selection` object) into `ActivityPanel`; the panel
+    // then synthesises `primary` from `selectedFeatureIds[0]` when no
+    // `selection` prop is present. By putting the structured path on
+    // featureIds[0], the resolver receives a primary that mirrors the
+    // structured path verbatim and the vertex-bearing branch fires.
+    // The resolver tolerates this — it parses each featureId, takes the
+    // root for feature-map lookups, and reduces multi-feature roots
+    // independently.
+    await this.page.evaluate(
+      ({ ids, primary }) => {
+        window.__sessionStore.getState().setSelection(ids, primary);
+      },
+      { ids: [fullPath], primary: fullPath },
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Phase 3 helpers (US-1) — feature-editor workflow (#192 T031)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Type a tag value into the FeatureEditorMode's `tags` ArrayWidget input
+   * and press Enter to commit it. Commits go through
+   * `useStagedEdits.setFeatureField` per Phase 3 wiring.
+   *
+   * Requires the FeatureEditorMode to be visible — call after
+   * `selectFeature(id, { source: 'layers' })`.
+   *
+   * @param value  The tag string to add. Must be non-empty (the
+   *               ArrayWidget rejects empty / duplicate / non-enum values
+   *               at the widget level — those edge cases are not the
+   *               concern of this Phase 3 helper).
+   */
+  async editTag(value: string): Promise<void> {
+    const input = this.page.getByTestId('array-widget-input-tags');
+    await input.fill(value);
+    await input.press('Enter');
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Panel Tabs (GoldenLayout)
   // ─────────────────────────────────────────────────────────────────────────────
 
@@ -389,5 +580,62 @@ export class AnalysisPage {
     await fitButton.click();
     // Allow the map to animate to the new bounds
     await this.page.waitForTimeout(500);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Drawing state introspection (#108)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Playhead-clamp notification (#267)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * The non-blocking clamp notification surfaced when an orphaned saved playhead
+   * is moved to the window edge on load (spec 267, FR-003). An always-visible,
+   * auto-dismissing App-level toast (not tab-gated), distinct from the #259
+   * error banner.
+   */
+  get clampNotification(): Locator {
+    return this.page.getByTestId('playhead-clamp-toast');
+  }
+
+  /**
+   * Read the session-state playhead (`currentTime`, epoch ms) via the
+   * `window.__sessionStore` test-introspection handle. Used to assert the
+   * playhead landed on the window edge after a tolerant clamp.
+   */
+  async getCurrentTime(): Promise<number | null> {
+    return await this.page.evaluate(() => window.__sessionStore.getState().currentTime);
+  }
+
+  /**
+   * Read the session-state time window (`timeRange`, epoch ms) so a test can
+   * assert the clamped playhead equals the window's `start`/`end`.
+   */
+  async getTimeRange(): Promise<{ start: number; end: number } | null> {
+    return await this.page.evaluate(() => window.__sessionStore.getState().timeRange);
+  }
+
+  /**
+   * Read the current drawingMode from the session-state store via the
+   * test-introspection handle exposed at `window.__sessionStore`. Used by
+   * Playwright specs that need to assert the store value directly without
+   * scraping toolbar DOM state.
+   */
+  async getDrawingMode(): Promise<string | null> {
+    return await this.page.evaluate(
+      () => window.__sessionStore.getState().drawingMode,
+    );
+  }
+
+  /**
+   * Read the current drawingPaletteIndex from the session-state store via
+   * the same test-introspection handle.
+   */
+  async getDrawingPaletteIndex(): Promise<number> {
+    return await this.page.evaluate(
+      () => window.__sessionStore.getState().drawingPaletteIndex,
+    );
   }
 }

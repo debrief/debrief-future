@@ -1,0 +1,13 @@
+{
+  "href": "./thumbnail.png",
+  "type": "image/png",
+  "title": "Thumbnail",
+  "roles": ["thumbnail"],
+  "file:size": 13719,
+  "file:checksum": "122021be77fa4f174fb3505aece2bdd15224513c7acf98342fcd9945bb08521fa312",
+  "proj:shape": [150, 200],
+  "debrief:provenance": {
+    "source_path": "/tmp/source.rep",
+    "load_timestamp": "2024-01-01T00:00:00Z"
+  }
+}

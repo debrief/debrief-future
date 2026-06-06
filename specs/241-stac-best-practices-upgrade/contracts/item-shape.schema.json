@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://debrief.info/specs/241/contracts/item-shape.schema.json",
+  "title": "Debrief STAC Item shape — 1.1.0 conformance contract",
+  "description": "Asserts the additional fields and constraints introduced by spec 241 on top of the official STAC 1.1 Item Schema. This contract DOES NOT replace the official schema — both must validate.",
+  "type": "object",
+  "required": ["type", "stac_version", "stac_extensions", "id", "geometry", "properties", "assets", "links"],
+  "properties": {
+    "type": { "const": "Feature" },
+    "stac_version": { "const": "1.1.0" },
+    "stac_extensions": {
+      "type": "array",
+      "contains": {
+        "enum": [
+          "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+          "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+          "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+        ]
+      },
+      "minItems": 3
+    },
+    "properties": {
+      "type": "object",
+      "required": ["created", "updated", "license", "providers", "datetime"],
+      "properties": {
+        "created": { "type": "string", "format": "date-time" },
+        "updated": { "type": "string", "format": "date-time" },
+        "license": {
+          "type": "string",
+          "not": { "enum": ["proprietary", "various"] }
+        },
+        "providers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "roles"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "roles": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "enum": ["licensor", "producer", "processor", "host"] }
+              },
+              "url": { "type": "string", "format": "uri" },
+              "description": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "required": ["features"],
+      "not": {
+        "anyOf": [
+          {
+            "properties": {
+              "thumbnail": {
+                "properties": { "proj:shape": { "const": [600, 800] } }
+              }
+            },
+            "required": ["thumbnail"]
+          }
+        ]
+      },
+      "properties": {
+        "features": {
+          "type": "object",
+          "required": ["href", "type", "roles"],
+          "properties": {
+            "type": { "const": "application/geo+json" },
+            "roles": { "const": ["data"] }
+          }
+        },
+        "thumbnail": {
+          "type": "object",
+          "required": ["href", "type", "roles", "proj:shape"],
+          "properties": {
+            "type": { "const": "image/png" },
+            "roles": { "const": ["thumbnail"] },
+            "proj:shape": { "const": [150, 200] }
+          }
+        },
+        "overview": {
+          "type": "object",
+          "required": ["href", "type", "roles", "proj:shape"],
+          "properties": {
+            "type": { "const": "image/png" },
+            "roles": { "const": ["overview"] },
+            "proj:shape": { "const": [600, 800] }
+          }
+        }
+      },
+      "patternProperties": {
+        "^source(-.+)?$": {
+          "type": "object",
+          "required": ["href", "roles", "processing:software", "processing:datetime"],
+          "properties": {
+            "roles": { "const": ["source"] },
+            "processing:software": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": { "type": "string" }
+            },
+            "processing:datetime": { "type": "string", "format": "date-time" }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "comment": "Storyboard-derived per-scene thumbnails are governed by the dedicated overlay shipped by spec 243 — see shared/schemas/contracts/scene-thumbnail-asset.schema.json (LinkML class SceneThumbnailAssetEntry). The overlay enforces the patternProperties wrapper, ULID key format (scene-thumbnail-key-format-rule-001), and per-entry value shape via $ref into the LinkML-generated bundle. Pair invariant (scene-thumbnail-pair-rule-001) and orphan rule (scene-thumbnail-orphan-rule-001) are enforced by the debrief-stac audit module — not by JSON Schema.",
+          "$ref": "https://debrief.info/schemas/contracts/scene-thumbnail-asset.schema.json"
+        }
+      ]
+    }
+  }
+}

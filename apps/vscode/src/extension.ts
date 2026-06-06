@@ -40,6 +40,12 @@ import { registerCommands } from './commands';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 import { registerStoryboardTransportCommands } from './commands/storyboardTransport';
 import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
+import {
+  exportStoryboardAsBriefingZip,
+  createDefaultExportHostDeps,
+} from './commands/exportStoryboardAsBriefingZip';
+import { previewStoryboard } from './commands/previewStoryboard';
+import { BriefingPreviewServer } from './services/briefingPreviewServer';
 import { registerStoryboardEditCommands } from './commands/storyboardEdit';
 import { registerNlSearchCommands } from './commands/nlSearchCommands';
 import { StoryboardEditService } from './services/storyboardEdit';
@@ -57,7 +63,7 @@ import {
   type PlaybackPanelView,
   type PlaybackTimeRangeView,
 } from './services/storyboardPlayback';
-import { formatDtg } from '@debrief/components';
+import { formatDtg, getPlotFeatureId } from '@debrief/components';
 import { calculateViewportCenter } from '@debrief/utils';
 import type { DebriefFeature } from '@debrief/components';
 
@@ -230,6 +236,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     modalPromptPort,
     visibilityPort,
     formatDtg,
+    // T-HOIST (spec #264) — the three vscode-backed defaults are now
+    // wired here at the instantiation site rather than baked into the
+    // (now shared) service module.
+    showErrorMessage: (msg) => void vscode.window.showErrorMessage(msg),
+    setContext: (key, value) =>
+      void vscode.commands.executeCommand('setContext', key, value),
+    showInformationMessage: (msg) => void vscode.window.showInformationMessage(msg),
   });
   context.subscriptions.push({ dispose: (): void => storyboardPlaybackService.dispose() });
 
@@ -359,9 +372,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       const hiddenIds = new Set(state?.hiddenFeatureIds ?? []);
       const visibleFeatureIds: string[] = [];
       for (const f of features) {
-        const props = f.properties as { id?: string | null } | null;
-        const id = props?.id;
-        if (typeof id !== 'string' || id.length === 0) {continue;}
+        // ADR-038: canonical identity is the top-level GeoJSON `id`.
+        const id = getPlotFeatureId(f);
+        if (id === undefined) {continue;}
         if (hiddenIds.has(id)) {continue;}
         visibleFeatureIds.push(id);
       }
@@ -489,7 +502,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
                   properties: { __datasets: payload.datasets },
                 },
                 // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
-              ] as unknown as Array<import('@debrief/utils').SafeFeature>,
+              ] as unknown as Array<import('@debrief/schemas').RawGeoJSONFeature>,
             },
           },
           sourceFeatureIds: ['e2e-track-1', 'e2e-track-2'],
@@ -741,11 +754,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       resultsPanelProvider,
       { webviewOptions: { retainContextWhenHidden: true } },
     ),
-    vscode.window.registerWebviewViewProvider(
-      'debrief.storyboardPanel',
-      storyboardPanelProvider,
-    )
+    // Storyboard is no longer a standalone view — it renders as the 5th
+    // section of the Activity panel (UX-review flatten). The Storyboard
+    // provider attaches to the Activity webview instead of registering a
+    // view of its own.
   );
+
+  // Wire the Storyboard provider to attach to the Activity webview.
+  activityPanelProvider.setStoryboardProvider(storyboardPanelProvider);
 
   // Register outline provider for selection
   context.subscriptions.push(
@@ -992,6 +1008,96 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     sessionManager,
   );
 
+  // Spec #264 — export the active Storyboard as an air-gapped briefing zip.
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'debrief.storyboard.exportAsBriefingZip',
+      async (args: { storyboardId?: string; documentUri?: vscode.Uri } | undefined) => {
+        const documentUri =
+          args?.documentUri ?? vscode.window.activeTextEditor?.document.uri;
+        if (!documentUri) {
+          void vscode.window.showErrorMessage(
+            'No active plot document. Open a plot before exporting a briefing.',
+          );
+          return;
+        }
+        if (!args?.storyboardId) {
+          void vscode.window.showErrorMessage(
+            'No Storyboard selected. Invoke this command from the Storyboard overflow menu.',
+          );
+          return;
+        }
+        type ReadPlotResult = Awaited<
+          ReturnType<ReturnType<typeof createDefaultExportHostDeps>['readPlot']>
+        >;
+        const deps = createDefaultExportHostDeps(context, async (uri) => {
+          // Plot files are JSON FeatureCollections on disk. Read once,
+          // load the sidecar item.json if present.
+          const plotBytes = await vscode.workspace.fs.readFile(uri);
+          const fc = JSON.parse(new TextDecoder().decode(plotBytes)) as ReadPlotResult['fc'];
+          const itemUri = vscode.Uri.joinPath(uri, '..', 'item.json');
+          let item: ReadPlotResult['item'];
+          try {
+            const itemBytes = await vscode.workspace.fs.readFile(itemUri);
+            item = JSON.parse(new TextDecoder().decode(itemBytes)) as ReadPlotResult['item'];
+          } catch {
+            item = {
+              type: 'Feature',
+              stac_version: '1.1.0',
+              id: uri.fsPath,
+              properties: { title: uri.fsPath.split('/').pop() ?? 'Plot' },
+              assets: {},
+              links: [],
+            };
+          }
+          const itemDir = vscode.Uri.joinPath(uri, '..').fsPath;
+          return { fc, item, itemDir };
+        });
+        await exportStoryboardAsBriefingZip(
+          { storyboardId: args.storyboardId, documentUri },
+          deps,
+        );
+      },
+    ),
+  );
+
+  // Spec #273 — live preview of the active Storyboard in a new browser tab.
+  // A single ephemeral loopback server (lazily started on first preview)
+  // serves the bundled renderer + the scoped features; disposed on
+  // deactivation via context.subscriptions.
+  const briefingPreviewServer = new BriefingPreviewServer({
+    staticRoot: vscode.Uri.joinPath(
+      context.extensionUri,
+      'resources',
+      'briefing-renderer-static',
+    ).fsPath,
+  });
+  context.subscriptions.push({ dispose: () => briefingPreviewServer.dispose() });
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'debrief.storyboard.preview',
+      async (args: { storyboardId?: string } | undefined) => {
+        if (!args?.storyboardId) {
+          void vscode.window.showErrorMessage(
+            'No active Storyboard to preview. Select a Storyboard with at least one scene.',
+          );
+          return;
+        }
+        await previewStoryboard(
+          { storyboardId: args.storyboardId },
+          {
+            getPlotFeatures: () => mapPanel?.getCurrentFeatures() ?? [],
+            server: briefingPreviewServer,
+            asExternalUri: async (url) =>
+              (await vscode.env.asExternalUri(vscode.Uri.parse(url))).toString(),
+            openExternal: (url) => Promise.resolve(vscode.env.openExternal(vscode.Uri.parse(url))),
+            showError: (msg) => void vscode.window.showErrorMessage(msg),
+          },
+        );
+      },
+    ),
+  );
+
   // Subscribe the Storyboard panel provider to the service's snapshot
   // stream so every transport step / CRUD op / lifecycle transition
   // refreshes the panel view.
@@ -1089,6 +1195,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         stacItemPath,
         actor: sessionManager.actor,
         trigger: { source: 'programmatic' },
+        // #235 — panel-driven first-capture naming + collision banner
+        panelView: storyboardPanelProvider,
       };
       await captureScene(ctx, {
         setCaptureInFlight: (inFlight: boolean) =>

@@ -7,6 +7,7 @@
 
 import { test, expect } from '@playwright/test';
 import { CatalogPage, AnalysisPage } from '../pages';
+import { collapsePropertiesSection } from '../fixtures/properties-collapse';
 
 // Time Controller integration tests — verifies playback, layer selection, and navigation.
 test.describe('Time Controller', () => {
@@ -40,6 +41,7 @@ test.describe('Time Controller', () => {
     test('double-click opens analysis view', async () => {
       // Open the first item
       const analysisPage = await catalogPage.openFirstItem();
+      await collapsePropertiesSection(analysisPage.page);
 
       // Verify analysis view is displayed
       expect(await analysisPage.isVisible()).toBe(true);
@@ -50,6 +52,7 @@ test.describe('Time Controller', () => {
     test('opening Exercise Alpha loads time data', async ({ page }) => {
       // Open the first exercise item (should be Exercise Alpha based on sort order)
       const analysisPage = await catalogPage.openFirstItem();
+      await collapsePropertiesSection(analysisPage.page);
 
       // Verify the analysis page loaded
       expect(await analysisPage.isVisible()).toBe(true);
@@ -80,6 +83,7 @@ test.describe('Time Controller', () => {
 
     test.beforeEach(async () => {
       analysisPage = await catalogPage.openFirstItem();
+      await collapsePropertiesSection(analysisPage.page);
     });
 
     test('TimeController is in ready state when plot has time data', async () => {
@@ -151,6 +155,7 @@ test.describe('Time Controller', () => {
 
     test.beforeEach(async () => {
       analysisPage = await catalogPage.openFirstItem();
+      await collapsePropertiesSection(analysisPage.page);
     });
 
     test('layers panel shows features with names', async () => {
@@ -208,6 +213,7 @@ test.describe('Time Controller', () => {
     test('back button returns to catalog', async () => {
       // Open analysis view
       const analysisPage = await catalogPage.openFirstItem();
+      await collapsePropertiesSection(analysisPage.page);
       expect(await analysisPage.isVisible()).toBe(true);
 
       // Click back

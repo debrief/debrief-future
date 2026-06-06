@@ -11,6 +11,12 @@
  * #216 consumers keep compiling unchanged (plan.md design-fix 3).
  */
 
+import type { ReactNode } from "react";
+import type { SceneFeature } from "@debrief/schemas";
+import type { OverlapPartner } from "../../storyboard/overlap";
+
+export type { OverlapPartner };
+
 export interface SceneRowViewModel {
   /** ULID of the Scene. */
   readonly sceneId: string;
@@ -88,6 +94,14 @@ export interface SceneEditViewModel {
     | { readonly kind: 'ok' }
     | { readonly kind: 'missing-features'; readonly ids: readonly string[] }
     | { readonly kind: 'out-of-range'; readonly scenario: 'before-start' | 'after-end' };
+  /**
+   * #271 — time-range Scenes (in the same Storyboard) whose windows overlap
+   * this Scene's window, AFTER session dismissals are applied. Empty or
+   * omitted ⇒ no overlap warning. Optional + defaulted so existing fixtures
+   * and hosts compile unchanged. Populated by each host from the shared
+   * `detectSceneOverlaps` helper.
+   */
+  readonly overlapsWith?: readonly OverlapPartner[];
 }
 
 /**
@@ -102,6 +116,50 @@ export interface StoryboardEditViewModel {
   readonly sceneCount: number;
 }
 
+/**
+ * First-capture inline naming row (#235 data-model §NamingRowState).
+ *
+ * Presentational projection of the host's `namingRow` push slice plus the
+ * panel's own `pendingName` typing state.
+ */
+export interface NamingRowViewModel {
+  readonly visible: boolean;
+  readonly pendingName: string;
+  readonly defaultName: string;
+  /** Existing storyboard name that collides with the trimmed `pendingName`,
+   *  or `null` when no collision. Drives the inline warning slot. */
+  readonly collisionWith: string | null;
+  /** Derived: `pendingName.trim() !== '' && collisionWith === null`. */
+  readonly canConfirm: boolean;
+}
+
+/**
+ * Duplicate-timestamp inline collision banner (#235 data-model §CollisionBannerState).
+ *
+ * Anchored above the conflicting Scene row when visible; presents
+ * Replace / Offset / Cancel. The Offset button is hidden by the panel
+ * when `offsetCapReached` is true (FR-CAP-017 cap of 60) OR when the
+ * host signals `offsetWouldExceedTimeRange` via the push payload
+ * (FR-CAP-017a) — surfaced through `offsetButtonHidden`.
+ */
+export interface CollisionBannerViewModel {
+  readonly visible: boolean;
+  readonly conflictingSceneId: string | null;
+  readonly conflictingSceneTitle: string | null;
+  readonly proposedTimestamp: string | null;
+  /** `formatDtg(proposedTimestamp)` — presentational only. */
+  readonly proposedTimestampDtg: string | null;
+  readonly offsetCount: number;
+  /** Derived: `offsetCount >= 60`. */
+  readonly offsetCapReached: boolean;
+  /** Mirror of the host's `offsetWouldExceedTimeRange` flag (FR-CAP-017a). */
+  readonly offsetWouldExceedTimeRange: boolean;
+  /** Derived: `offsetCapReached || offsetWouldExceedTimeRange`. The Offset
+   *  button is rendered only when this is `false`. */
+  readonly offsetButtonHidden: boolean;
+  readonly cause: 'capture' | 'update-to-current' | null;
+}
+
 export interface StoryboardPanelProps {
   /** Ordered by `timestampIso` ascending. Empty when no active Storyboard. */
   readonly scenes: readonly SceneRowViewModel[];
@@ -114,6 +172,10 @@ export interface StoryboardPanelProps {
   /** Fires on row click; #217 wires this to the playback service's
    *  click-to-select transport. */
   onSceneRowClick(sceneId: string): void;
+  /** Optional host-supplied banner rendered at the very top of the panel
+   *  (e.g. web-shell's "session-only — captures won't persist" notice).
+   *  Kept generic so the shared panel carries no host-specific concepts. */
+  readonly banner?: ReactNode;
 
   // ── NEW in #217 — all optional + defaulted (design-fix 3) ───────────
 
@@ -180,6 +242,16 @@ export interface StoryboardPanelProps {
   onSceneCopyToOtherClicked?(sceneId: string): void;
   onSceneRefreshThumbnailClicked?(sceneId: string): void;
   onStoryboardRefreshAllStaleClicked?(storyboardId: string): void;
+
+  // ── NEW in #271 — overlap warning dismissal ─────────────────────────
+  /**
+   * Fires when the analyst dismisses the overlap warning on a Scene row.
+   * Carries every partner Scene named on that badge so the host can mark
+   * each unordered pair dismissed (session-scoped, not persisted). The
+   * panel does NOT track dismissal state — the host owns it and reflects
+   * the result back via `SceneEditViewModel.overlapsWith` on the next push.
+   */
+  onSceneOverlapDismiss?(sceneId: string, partnerSceneIds: readonly string[]): void;
   onStoryboardNameRenameCommit?(storyboardId: string, newName: string): void;
   onStoryboardDescriptionSubmit?(storyboardId: string, description: string | null): void;
 
@@ -207,4 +279,91 @@ export interface StoryboardPanelProps {
   onSceneEditFormCancel?(sceneId: string): void;
   /** Fires when the analyst dismisses the Undo toast (close button). */
   onUndoToastDismiss?(): void;
+
+  // ── NEW in #235 — first-capture naming row + collision banner ──────
+  // All optional + defaulted so #216/#217/#218/#230 fixtures keep
+  // compiling. When the host has set its `namingRow` / `collisionBanner`
+  // slice, the panel renders the corresponding inline affordance.
+
+  /** First-capture naming-row view-model. When `visible:false` (or
+   *  omitted) the panel does not render the inline naming row. */
+  readonly namingRowViewModel?: NamingRowViewModel;
+  /** Duplicate-timestamp collision-banner view-model. When `visible:false`
+   *  (or omitted) the panel does not render the inline banner. */
+  readonly collisionBannerViewModel?: CollisionBannerViewModel;
+
+  /** Fires when the analyst types in the naming-row input. The panel
+   *  forwards the new text; the host echoes it back as `pendingName` on
+   *  the next push. */
+  onNamingRowTextChanged?(pendingName: string): void;
+  /** Fires when the analyst presses Enter or clicks Confirm in the
+   *  naming row with a non-empty, non-colliding name. The panel passes
+   *  the trimmed `name`. */
+  onNamingRowConfirm?(name: string): void;
+  /** Fires when the analyst presses Escape, clicks Cancel, or clicks
+   *  outside the naming row. */
+  onNamingRowCancel?(): void;
+
+  /** Fires when the analyst clicks Replace in the collision banner.
+   *  Carries the `conflictingSceneId` so the host can verify it matches
+   *  its own slice (stale-message defence per `contracts/panel-messages.md`). */
+  onCollisionReplace?(conflictingSceneId: string): void;
+  /** Fires when the analyst clicks Offset (+1 s). The panel does NOT
+   *  compute the new timestamp; the host advances and re-pushes. */
+  onCollisionOffset?(): void;
+  /** Fires when the analyst clicks Cancel in the collision banner. */
+  onCollisionCancel?(): void;
+
+  // ── NEW in spec 260 — viewport-lock padlock toggle ─────────────────────
+  /**
+   * Current viewport-lock state. When `true`, the padlock toggle in the
+   * panel header is rendered as pressed (`aria-pressed="true"`) with the
+   * closed-padlock glyph. Optional + defaulted so existing fixtures keep
+   * compiling unchanged.
+   */
+  readonly viewportLocked?: boolean;
+  /**
+   * Fires when the analyst clicks the padlock toggle. The panel does NOT
+   * track its own lock state — the host owns it and reflects the new value
+   * back via `viewportLocked`. Disabled when there is no active plot.
+   */
+  onViewportLockToggle?(): void;
+  /**
+   * Whether a plot is currently loaded. When false, the padlock toggle is
+   * rendered disabled (spec 260 / FR-013). Defaults to `true` when omitted
+   * so existing fixtures (which always pass scenes implying an active
+   * plot) behave as before.
+   */
+  readonly hasActivePlot?: boolean;
+
+  // ── NEW in #258 — display-mode capture & restore ──────────────────────
+  /**
+   * Fires whenever a Scene becomes the "current" Scene — panel-row click,
+   * map-rectangle click, transport advance, or playback step (Spec #258 /
+   * FR-002). Hosts wire this to `session.setDisplayMode(scene.properties
+   * .display_mode)` so the captured display mode is restored alongside
+   * the viewport flyTo. Legacy scenes without `display_mode` leave the
+   * time controller untouched (FR-003).
+   *
+   * Article IV.1 — the panel only signals which Scene is now active; the
+   * host applies any time-controller mutation at its own boundary.
+   */
+  onSceneActivated?(scene: SceneFeature): void;
+
+  // ── NEW in #273 — live Preview control (FR-001, FR-002, FR-007) ────────
+  /**
+   * Fires when the analyst clicks the header **Preview** button. The host
+   * opens the finished-briefing player in a new tab, loaded live from the
+   * active storyboard's features (VS Code: loopback server; web-shell:
+   * blob URL). When omitted, the Preview button is not rendered — idiomatic
+   * gating so legacy/Storybook consumers keep compiling unchanged (C-A1/C-A3).
+   */
+  onPreview?(): void;
+  /**
+   * Whether the active storyboard can be previewed. When `false`, the
+   * Preview button is disabled with an explanatory tooltip (FR-007 / C-A2)
+   * — e.g. no active storyboard, or it has zero scenes. Defaults to
+   * `scenes.length > 0` when omitted.
+   */
+  readonly canPreview?: boolean;
 }

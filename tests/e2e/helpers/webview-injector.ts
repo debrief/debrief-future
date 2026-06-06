@@ -103,7 +103,34 @@ export async function installMultiWebviewInterceptor(
       (window as any).__webviewInterceptorInstalled = true;
       (window as any).__webviewContentSent = false;
       (window as any).__webviewContentCount = 0;
+      // Map of webview iframe id (the `id` query param baked into
+      // `pre/index.html`'s URL) → captured port.  Stored so test
+      // helpers can re-post a fresh `content` message for a specific
+      // iframe when its initial queue slot was the wrong bundle —
+      // the queue's index-based dispatch is intrinsically racy when
+      // openvscode-server re-mounts iframes mid-session.
+      (window as any).__webviewPortsById = (window as any).__webviewPortsById ?? {};
       let queueIndex = 0;
+
+      const buildContentMessage = (content: { html: string; allowScripts: boolean }) => ({
+        channel: 'content' as const,
+        args: {
+          contents: content.html,
+          title: 'E2E Webview Content',
+          options: {
+            allowScripts: content.allowScripts,
+            allowForms: content.allowScripts,
+            allowMultipleAPIAcquire: false,
+          },
+          state: undefined,
+          cspSource: '',
+          confirmBeforeClose: 'keyboardOnly',
+        },
+      });
+
+      // Expose the message-builder so helpers can re-post fresh
+      // content via a stored port.
+      (window as any).__buildWebviewContentMessage = buildContentMessage;
 
       window.addEventListener(
         'message',
@@ -113,22 +140,33 @@ export async function installMultiWebviewInterceptor(
             if (queueIndex < args.queue.length) queueIndex++;
 
             const port = e.ports[0];
-            port.postMessage({
-              channel: 'content',
-              args: {
-                contents: content.html,
-                title: 'E2E Webview Content',
-                options: {
-                  allowScripts: content.allowScripts,
-                  allowForms: content.allowScripts,
-                  allowMultipleAPIAcquire: false,
-                },
-                state: undefined,
-                cspSource: '',
-                confirmBeforeClose: 'keyboardOnly',
-              },
-            });
             const origPostMessage = port.postMessage.bind(port);
+
+            // Stash the un-wrapped port indexed by the source iframe's
+            // id query param so helpers can later re-deliver content
+            // bypass-the-block.  We grab the id from the source
+            // iframe's URL, which we look up via the message event's
+            // source window.
+            try {
+              const iframes = document.querySelectorAll('iframe.webview');
+              for (const f of Array.from(iframes)) {
+                if ((f as HTMLIFrameElement).contentWindow === e.source) {
+                  const url = new URL((f as HTMLIFrameElement).src);
+                  const id = url.searchParams.get('id');
+                  if (id) {
+                    (window as any).__webviewPortsById[id] = origPostMessage;
+                  }
+                  break;
+                }
+              }
+            } catch {
+              // best-effort
+            }
+
+            origPostMessage(buildContentMessage(content));
+            // Block any subsequent `content` messages pushed by the
+            // workbench (which would overwrite our bundle), but allow
+            // helpers to call the stashed `origPostMessage` directly.
             port.postMessage = function (msg: any, ...rest: any[]) {
               if (msg?.channel === 'content') return;
               return origPostMessage(msg, ...rest);

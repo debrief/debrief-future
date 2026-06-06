@@ -127,7 +127,7 @@ function SynchronizedComponents() {
           <MapView
             features={sampleFeatures}
             selectedIds={selectedIds}
-            onSelect={handleSelect}
+            onSelect={(e) => handleSelect(e.target)}
             onBackgroundClick={handleBackgroundClick}
             height={360}
           />
@@ -220,7 +220,7 @@ function SynchronizedWithHook() {
         <MapView
           features={sampleFeatures}
           selectedIds={selection.selectedIds}
-          onSelect={handleSelect}
+          onSelect={(e) => handleSelect(e.target)}
           onBackgroundClick={selection.clear}
           height={400}
         />

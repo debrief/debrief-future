@@ -1,4 +1,5 @@
 // AUTO-GENERATED — DO NOT EDIT
+export type VertexMetadataPath = string;
 export type ToolId = string;
 /**
 * Discriminator for GeoJSON feature types
@@ -268,10 +269,12 @@ export enum SystemStateTypeEnum {
     
     /** Time viewport state (start/end times) */
     temporal = "temporal",
-    /** Map viewport state (bbox, zoom) */
+    /** Map viewport state (ViewportPolygon) */
     spatial = "spatial",
     /** Feature selection state (selected IDs) */
     selection = "selection",
+    /** Per-plot active-Storyboard pin (#237) */
+    active_storyboard = "active_storyboard",
 };
 /**
 * Array centre calculation mode for towed array sensors
@@ -322,6 +325,58 @@ export enum LineLabelPositionEnum {
     MIDDLE = "MIDDLE",
     /** At the far end of the bearing line */
     END = "END",
+};
+/**
+* Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
+*/
+export enum PlaybackStateEnum {
+    
+    /** Playback is stopped */
+    stopped = "stopped",
+    /** Playback is running */
+    playing = "playing",
+    /** Playback is paused */
+    paused = "paused",
+};
+/**
+* Template-literal derivation of the permissible playback states from
+* PlaybackStateEnum. Narrows the `playbackState` field on TemporalSlice
+* so TypeScript rejects an unknown state at compile time (Feature 205 /
+* FR-007).
+*/
+export type PlaybackState = `${PlaybackStateEnum}`;
+/**
+* Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.
+*/
+export enum DisplayModeEnum {
+    
+    /** Render the entire track regardless of current time */
+    full = "full",
+    /** Render a snail-trail from track start up to current time */
+    trail = "trail",
+};
+/**
+* Template-literal derivation of the permissible display modes from
+* DisplayModeEnum. Narrows the `displayMode` field on TemporalSlice so
+* TypeScript rejects an unknown mode at compile time (Feature 205 /
+* FR-007).
+*/
+export type DisplayMode = `${DisplayModeEnum}`;
+/**
+* Units for time step navigation
+*/
+export enum TimeUnitEnum {
+    
+    /** Milliseconds */
+    millisecond = "millisecond",
+    /** Seconds */
+    second = "second",
+    /** Minutes */
+    minute = "minute",
+    /** Hours */
+    hour = "hour",
+    /** Days */
+    day = "day",
 };
 /**
 * Semantic discriminator for provenance records. Consumers use this field to choose rendering or handling behaviour independently of visual tool-category grouping. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading tool-category.
@@ -417,56 +472,17 @@ export enum FileProvDirectionEnum {
     target = "target",
 };
 /**
-* Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
+* Discriminator for STAC top-level objects. STAC mandates exactly these three values for `type`:
+  - "Feature"     → StacItem
+  - "Catalog"     → StacCatalog
+  - "Collection"  → StacCollection
+Used with the `equals_string` constraint on each class's `type` slot so the generated TypeScript carries a literal-string discriminator (Research R-001).
 */
-export enum PlaybackStateEnum {
+export enum StacTypeEnum {
     
-    /** Playback is stopped */
-    stopped = "stopped",
-    /** Playback is running */
-    playing = "playing",
-    /** Playback is paused */
-    paused = "paused",
-};
-/**
-* Template-literal derivation of the permissible playback states from
-* PlaybackStateEnum. Narrows the `playbackState` field on TemporalSlice
-* so TypeScript rejects an unknown state at compile time (Feature 205 /
-* FR-007).
-*/
-export type PlaybackState = `${PlaybackStateEnum}`;
-/**
-* Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.
-*/
-export enum DisplayModeEnum {
-    
-    /** Render the entire track regardless of current time */
-    full = "full",
-    /** Render a snail-trail from track start up to current time */
-    trail = "trail",
-};
-/**
-* Template-literal derivation of the permissible display modes from
-* DisplayModeEnum. Narrows the `displayMode` field on TemporalSlice so
-* TypeScript rejects an unknown mode at compile time (Feature 205 /
-* FR-007).
-*/
-export type DisplayMode = `${DisplayModeEnum}`;
-/**
-* Units for time step navigation
-*/
-export enum TimeUnitEnum {
-    
-    /** Milliseconds */
-    millisecond = "millisecond",
-    /** Seconds */
-    second = "second",
-    /** Minutes */
-    minute = "minute",
-    /** Hours */
-    hour = "hour",
-    /** Days */
-    day = "day",
+    Feature = "Feature",
+    Catalog = "Catalog",
+    Collection = "Collection",
 };
 /**
 * How addresses in a selection path level are interpreted (Feature 053)
@@ -504,6 +520,139 @@ export enum ErrorCategory {
     /** Required feature or data not found */
     resource_not_found = "resource_not_found",
 };
+/**
+* Provenance of a Scene's stored polygon geometry. Render-side consumers use this to decide whether to trust the on-disk polygon ('bounds') or recompute it from (viewport, map dimensions) when the stored polygon pre-dates Spec #258 ('placeholder') or was hand-drawn ('manual').
+*/
+export enum PolygonSourceEnum {
+    
+    /** Polygon was computed from real Leaflet map bounds at capture time (post-#258 norm). Renderers trust the on-disk geometry. */
+    bounds = "bounds",
+    /** Pre-#258 ~100m placeholder square or otherwise non-bounds-derived. Renderers recompute from (viewport, map dimensions); the on-disk value is preserved (Article III.2 source preservation). */
+    placeholder = "placeholder",
+    /** Reserved for future user-drawn rectangles. Renderers recompute (current behaviour) until manual editing of scene geometry ships. */
+    manual = "manual",
+};
+/**
+* Template-literal derivation of the permissible polygon-source values
+* from PolygonSourceEnum. Narrows the `_polygon_source` field on
+* SceneProperties so TypeScript rejects an unknown provenance value at
+* compile time (Feature 258).
+*/
+export type PolygonSource = `${PolygonSourceEnum}`;
+/**
+* Authoritative list of session-state MCP tool names. Must mirror the `TOOLS` const at services/session-state/src/server/mcp.ts. Research R-001: replaces the TS-only `type ToolName = keyof typeof TOOLS` projection with a cross-language permissible-values enum.
+*/
+export enum SessionMCPToolName {
+    
+    sessionFULL_STOPgetState = "session.getState",
+    sessionFULL_STOPgetTemporalState = "session.getTemporalState",
+    sessionFULL_STOPgetSpatialState = "session.getSpatialState",
+    sessionFULL_STOPgetFeaturesState = "session.getFeaturesState",
+    sessionFULL_STOPgetDocumentState = "session.getDocumentState",
+    sessionFULL_STOPsetCurrentTime = "session.setCurrentTime",
+    sessionFULL_STOPsetViewport = "session.setViewport",
+    sessionFULL_STOPsetSelection = "session.setSelection",
+    sessionFULL_STOPsetHiddenFeatures = "session.setHiddenFeatures",
+    sessionFULL_STOPsetPlaybackRate = "session.setPlaybackRate",
+    sessionFULL_STOPsetRotation = "session.setRotation",
+};
+/**
+* Discriminator for MCPContentItem variants.
+*/
+export enum MCPContentItemTypeEnum {
+    
+    text = "text",
+    resource_link = "resource_link",
+    image = "image",
+    structured = "structured",
+};
+/**
+* JSON-Schema-compatible primitive types for tool parameters.
+*/
+export enum MCPParamTypeEnum {
+    
+    string = "string",
+    number = "number",
+    integer = "integer",
+    boolean = "boolean",
+    array = "array",
+    object = "object",
+};
+/**
+* Outcome of resolving a logged tool invocation at replay time.
+*/
+export enum ReplayStatusEnum {
+    
+    unchanged = "unchanged",
+    version_drift = "version_drift",
+    tool_removed = "tool_removed",
+};
+
+
+/**
+ * A geographic coordinate [longitude, latitude]
+ */
+export interface Coordinate {
+    /** Longitude in degrees (-180 to 180) */
+    longitude: number,
+    /** Latitude in degrees (-90 to 90) */
+    latitude: number,
+}
+
+
+/**
+ * Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)
+ */
+export interface ViewportPolygon {
+    /** Four corners in clockwise order [NW, NE, SE, SW] */
+    coordinates: Coordinate[],
+    /** Map zoom level for restoring the view (optional) */
+    zoom?: number,
+}
+
+
+/**
+ * A point in time with dual representations (FR-032, FR-033)
+ */
+export interface TimeInstant {
+    /** Milliseconds since Unix epoch */
+    epoch: number,
+    /** ISO 8601 UTC format string */
+    iso: string,
+}
+
+
+/**
+ * Time interval for a time-range Scene (#263). The interval is closed on both ends. `end` MUST be strictly greater than `start`. Introduced by Spec #263 to make `SceneProperties.time_range` a first-class slot.
+ */
+export interface TimeRange {
+    /** ISO-8601 instant; the slider position at the first capture action. By convention CRUD writes the owning Scene's `timestamp` into this slot, but the system does not depend on the two being equal — ordering reads `time_range?.start ?? timestamp`. */
+    start: string,
+    /** ISO-8601 instant; the slider position at the second (confirm) capture action. MUST be strictly greater than `start`. */
+    end: string,
+}
+
+
+/**
+ * Constraints on the visible time window (epoch milliseconds; null = unbounded)
+ */
+export interface TimeFilter {
+    /** Filter start as epoch milliseconds (null/missing = unbounded on the start) */
+    start?: number,
+    /** Filter end as epoch milliseconds (null/missing = unbounded on the end) */
+    end?: number,
+}
+
+
+/**
+ * Step size for discrete time navigation (FR-008)
+ */
+export interface TimeStep {
+    /** Numeric step value */
+    value: number,
+    /** Unit of the step */
+    unit: string,
+}
 
 
 /**
@@ -514,8 +663,32 @@ export interface BaseFeatureProperties {
     kind: string,
     /** Free-text labels assigned to this feature by the analyst */
     tags?: string[],
+    /** Whether this feature is shown on the map. Absent or true means visible; false means hidden. Replaces the session sidecar's hiddenFeatureIds denylist (feature 261). Per-feature visibility travels with the feature inside features.geojson. */
+    visible?: boolean,
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
+    /** Sparse list of per-vertex metadata, keyed by `path`. Empty arrays MUST be omitted from the serialised feature (FR-010). Duplicate `path` values MUST be rejected by validators (contract §Cross-cutting #3). Every concrete subclass of `BaseFeatureProperties` gains this slot by inheritance — see spec #192, contracts/vertex-metadata-slot.md. */
+    vertex_metadata?: VertexMetadata[],
+}
+
+
+/**
+ * Optional, sparse per-vertex annotation attached to a feature. One entry corresponds to one vertex of the parent feature's geometry, identified by the structured `path` slot following the `selectionPath` convention (research note R-008). Carrying any of label/tags/note triggers persistence; an entry with all three absent MUST be omitted on write (the writer's flush function prunes). Path shape depends on parent geometry:
+  Track       -> "positions/<int>"
+  Polygon     -> "rings/<int>/vertices/<int>"
+  LineString  -> "vertices/<int>"
+  MultiPoint  -> "vertices/<int>"
+  Point       -> "vertex/0"
+ */
+export interface VertexMetadata {
+    /** Structured vertex address following the selectionPath convention. The class-level regex accepts the union of all per-geometry path shapes; the writer additionally checks that the path matches the parent geometry's specific shape at flush time. Acts as the identity for an entry within a feature's `vertex_metadata` list — duplicates MUST be rejected by validators. */
+    path: string,
+    /** Free-text short label. */
+    label?: string,
+    /** Free-text tag list. Order is not significant. */
+    tags?: string[],
+    /** Free-text long note. */
+    note?: string,
 }
 
 
@@ -1008,20 +1181,34 @@ export interface ReferenceLocation {
 export interface SystemStateProperties {
     /** Feature type discriminator */
     kind: string,
-    /** Discriminator for state variant (temporal, spatial, selection) */
+    /** Discriminator for state variant (temporal, spatial, selection, active_storyboard) */
     state_type: string,
-    /** Viewport start time (ISO8601) - for temporal state */
+    /** Analytical window start (ISO8601) - for temporal state */
     start_time?: string,
-    /** Viewport end time (ISO8601) - for temporal state */
+    /** Analytical window end (ISO8601) - for temporal state */
     end_time?: string,
-    /** Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state */
-    bbox?: number[],
-    /** Map zoom level - for spatial state */
-    zoom?: number,
-    /** Map center [longitude, latitude] - for spatial state */
-    center?: number[],
+    /** Playhead position at save (ISO-8601). When present, must lie within [start_time, end_time] (enforced by the load validator, not the schema). */
+    current_time?: string,
+    /** Visible-window filter start (ISO-8601). Absent = unbounded start. */
+    filter_start_time?: string,
+    /** Visible-window filter end (ISO-8601). Absent = unbounded end. */
+    filter_end_time?: string,
+    /** Track visualization mode for this plot. */
+    display_mode?: string,
+    /** Playback step granularity for this plot. */
+    step_size?: TimeStep,
+    /** Playback speed multiplier for this plot (0.1-100). */
+    playback_rate?: number,
+    /** Saved map viewport (ViewportPolygon). Identity-mapped to SpatialSlice.viewport. */
+    viewport?: ViewportPolygon,
+    /** Map rotation in degrees (0-360). */
+    rotation?: number,
     /** Array of selected feature IDs - for selection state */
     selected_ids?: string[],
+    /** Primary selection path for properties display. */
+    selected_primary?: string,
+    /** Storyboard properties.id the analyst last pinned for this plot (#237) */
+    active_storyboard_id?: string,
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
 }
@@ -1479,6 +1666,8 @@ export interface ToolParameter {
     default_value?: string,
     /** References a schema-defined parameter-type enum by name. When set, the client resolves enum values from generated types rather than using inline choices. */
     param_type?: string,
+    /** Explicit choice list for enum-typed parameters when the client cannot (or chooses not to) resolve a schema-defined `param_type`. Used by both the ToolMatch picker (shared/components) and the VS Code activity-panel adapter (apps/vscode/src/services/mcpToolAdapter.ts). Added under spec 222 (P2) to collapse the drift cluster attributed to ToolParameter (audit §3.2 rows 37 and 86). */
+    choices?: string[],
 }
 
 
@@ -1625,19 +1814,19 @@ export interface PropertiesProvenanceEntry {
 export interface StacExtensionProperties {
     /** Fully-resolved per-platform metadata array. Each entry represents one platform in the plot with merged registry + override data.
  */
-    platforms?: PlatformRecord[],
+    'debrief:platforms'?: PlatformRecord[],
     /** Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
  */
-    tags?: string[],
+    'debrief:tags'?: string[],
     /** Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
  */
-    feature_tags?: string[],
+    'debrief:feature_tags'?: string[],
     /** Flat list of field names on item.properties that the analyst has overridden via the Properties Panel. Auto-derivation routines (e.g. stacService.updateTemporalMetadata) MUST skip any field whose name appears here. Sorted alphabetically on write; deduplicated.
  */
-    overrides?: string[],
+    'debrief:overrides'?: string[],
     /** Per-commit provenance entries written by the Properties Panel. Bounded at 500 entries per item; overflow rotates to sibling provenance_log_archive.jsonl in the item directory. Append-only (Article III.3 — audit trail immutable).
  */
-    provenance_log?: PropertiesProvenanceEntry[],
+    'debrief:provenance_log'?: PropertiesProvenanceEntry[],
 }
 
 
@@ -1715,6 +1904,225 @@ export interface StacItemSummary {
 
 
 /**
+ * STAC provider entry. Captures organisations involved in producing or hosting the asset. STAC 1.1 spec — present in every live preview/workspace/samples/local-store/ item.json under `properties.providers`. Captured explicitly (rather than as a wildcard) because the shape is stable in the STAC spec.
+ */
+export interface StacProvider {
+    /** Organization or person responsible for providing the data. */
+    name: string,
+    /** Optional human-readable description. */
+    description?: string,
+    /** Roles played by this provider — "licensor", "producer", "processor", or "host". */
+    roles?: string[],
+    /** Provider homepage / contact URL. */
+    url?: string,
+}
+
+
+/**
+ * STAC Item `properties` block. Carries STAC-spec core fields (`datetime`, `start_datetime?`, `end_datetime?`, `title?`, `description?`, `license?`, `providers?`, `created?`, `updated?`) and mixes in `StacExtensionProperties` from stac-extension.yaml for the `debrief:*` extension fields (Research R-003).
+Open-record per Article XV.2 — the generator post-processor at `shared/schemas/scripts/generate.py` adds Pydantic `model_config = ConfigDict(extra='allow', ...)` and TypeScript `[key: string]: unknown` so additional `<extension>:<key>` keys (`processing:*`, `proj:*`, future extensions) pass through without rejection. Consumers narrow per extension via per-extension Zod / type-guard helpers (the pattern already established for `debrief:platforms`).
+ */
+export interface StacItemProperties extends StacExtensionProperties {
+    /** Item datetime per STAC spec (ISO 8601). May be null when start_datetime + end_datetime are set; the live fixtures always carry a non-null value so it is modelled as required string. */
+    datetime: string,
+    /** ISO 8601 range start. Required when datetime is null. */
+    start_datetime?: string,
+    /** ISO 8601 range end. Required when datetime is null. */
+    end_datetime?: string,
+    /** Human-readable plot title. */
+    title?: string,
+    /** Human-readable plot description. */
+    description?: string,
+    /** SPDX identifier or "other" (STAC 1.1 addition). */
+    license?: string,
+    /** Organisations involved in producing / hosting this plot. STAC 1.1 addition; present on every live preview/workspace/samples item. */
+    providers?: StacProvider[],
+    /** Processing-time creation timestamp (ISO 8601). */
+    created?: string,
+    /** Processing-time last-update timestamp (ISO 8601). */
+    updated?: string,
+    [key: string]: unknown,
+}
+
+
+/**
+ * A STAC 1.1 Item describing one plot. Closes audit §3.1 rows for `apps/vscode/src/types/stac.ts`, `apps/vscode/src/services/sceneThumbnailService.ts`, and `apps/web-shell/src/mocks/stacService.ts`. Persisted to `<store>/<catalog>/<plot-slug>/item.json`.
+ */
+export interface StacItem {
+    /** STAC discriminator — always "Feature" for Items. */
+    type: "Feature",
+    /** STAC version string — "1.0.0" or "1.1.0" (Research R-005). */
+    stac_version: string,
+    /** Optional STAC extension schema URIs. Absent on STAC 1.0 fixtures, present on STAC 1.1 fixtures (Research R-005). */
+    stac_extensions?: string[],
+    /** Item identifier (slug, UUID, or composite). */
+    id: string,
+    /** GeoJSON geometry — any_of union over the seven existing geometry classes in geojson.yaml. Reuses the same pattern as RawGeoJSONFeature.geometry. */
+    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | GeoJSONMultiPolygon,
+    /** Bounding box — either [west, south, east, north] (4-element 2D) or [west, south, min_alt, east, north, max_alt] (6-element 3D). Live fixtures use 4-element 2D (Research R-004). */
+    bbox: number[],
+    /** STAC Item properties — core fields + debrief: extension + open-record additional keys (Research R-002 / R-003). */
+    properties: StacItemProperties,
+    /** Catalog navigation links (`self`, `root`, `parent`, `derived_from`, etc.). Order is preserved. */
+    links: StacLink[],
+    /** Asset map keyed by arbitrary string (`features`, `thumbnail`, `overview`, `source-<id>`, `scene-thumbnail-<id>`). Open-record per Research R-002 — modelled as `range: unknown` here because the STAC wire format is a dict, not a list. The generator post-processor rewrites this to `dict[str, StacAsset]` (Pydantic) and `Record<string, StacAsset>` (TypeScript). */
+    assets: Record<string, StacAsset>,
+    /** Parent Collection ID, when the Item belongs to a Collection (STAC 1.1 optional field). */
+    collection?: string,
+}
+
+
+/**
+ * A flat STAC Catalog (no extent, no summaries). Closes audit §3.1 rows for `apps/vscode/src/types/stac.ts` and `apps/web-shell/src/mocks/stacService.ts`. Persisted to `<store>/<catalog>/catalog.json` for stores not upgraded to STAC 1.1 Collection.
+ */
+export interface StacCatalog {
+    /** STAC discriminator — always "Catalog" for flat Catalogs. */
+    type: "Catalog",
+    /** STAC version string ("1.0.0" or "1.1.0"). */
+    stac_version: string,
+    /** Optional STAC extension schema URIs. */
+    stac_extensions?: string[],
+    /** Catalog identifier. */
+    id: string,
+    /** Human-readable catalog title. */
+    title?: string,
+    /** STAC-mandated catalog description. */
+    description: string,
+    /** Catalog navigation links — `self`, `root`, `parent`, and one `item` per child Item. */
+    links: StacLink[],
+}
+
+
+/**
+ * A single link entry within `links[]`. Used by StacItem, StacCatalog, and StacCollection. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`.
+ */
+export interface StacLink {
+    /** Link relation (`self`, `root`, `parent`, `item`, `child`, `derived_from`, etc.). */
+    rel: string,
+    /** URI (relative or absolute) to the linked resource. */
+    href: string,
+    /** IANA media type of the linked resource. */
+    type?: string,
+    /** Human-readable link title. */
+    title?: string,
+}
+
+
+/**
+ * A single asset entry within `assets[<key>]`. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts` and the inline `StacItemAssets` alias at `apps/vscode/src/services/sceneThumbnailService.ts`.
+Open-record per Article XV.2 — accepts arbitrary extension keys (`file:checksum`, `file:size`, `processing:datetime`, `processing:software`, `proj:shape`, `debrief:provenance`, `debrief:toolId`, `debrief:sourceFeatures`) observed in the live fixtures. The generator post-processes this into Pydantic `extra='allow'` and TypeScript `[key: string]: unknown`.
+ */
+export interface StacAsset {
+    /** URI to the asset. Required on `StacItem.assets[<key>]` — STAC 1.1 mandates a concrete URI on Item assets. The declaration-only shape on `StacCollection.item_assets[<key>]` (no `href`) is covered by the sibling `StacItemAssetDefinition` class. */
+    href: string,
+    /** IANA media type. */
+    type?: string,
+    /** Human-readable asset title. */
+    title?: string,
+    /** Asset description (STAC 1.1 addition). */
+    description?: string,
+    /** Asset roles — "data", "thumbnail", "overview", "source", "result", etc. */
+    roles?: string[],
+    /** Identifier of the debrief-calc tool that produced this result asset. On-disk key is `debrief:toolId` (colon syntax preserved via slot_uri). Written by `addResultAsset`; read at `stacService.ts` (Feature 256 — replaces the hand-typed `asset as StacAsset & { 'debrief:toolId'?: string }` cast). */
+    'debrief:toolId'?: string,
+    /** ISO-8601 UTC timestamp recorded when a snapshot asset is written. On-disk key is `debrief:snapshotTimestamp` (colon syntax preserved via slot_uri). Written by `writeSnapshotAsset`. */
+    'debrief:snapshotTimestamp'?: string,
+    [key: string]: unknown,
+}
+
+
+/**
+ * Item Asset Definition Object — declares the shape of an asset that child Items in a Collection are expected to carry. Distinct from `StacAsset` because it does NOT carry an `href`; the asset URI lives on the concrete Item assets that conform to this template (see STAC 1.1 Item Asset Definition spec).
+Open-record per Article XV.2 — same boundary-loose semantics as `StacAsset` so item-asset declarations may carry extension keys. The generator post-processes this class with Pydantic `extra='allow'` and TypeScript `[key: string]: unknown`.
+ */
+export interface StacItemAssetDefinition {
+    /** IANA media type expected on child Item assets. */
+    type?: string,
+    /** Human-readable asset title. */
+    title?: string,
+    /** Asset description. */
+    description?: string,
+    /** Asset roles expected on child Item assets. */
+    roles?: string[],
+    [key: string]: unknown,
+}
+
+
+/**
+ * Spatial extent on a Collection. The wire shape is `{ "bbox": [[west, south, east, north], ...] }` — a list of bounding-box arrays. LinkML emits a flat `list[float]` / `number[]` which the post-processor in `shared/schemas/scripts/generate.py` rewrites to nested list-of-lists per Research R-011 (same precedent as GeoJSON coordinates).
+ */
+export interface StacSpatialExtent {
+    /** List of bounding-box arrays `[[w, s, e, n], ...]`. Each inner array is 4-element 2D or 6-element 3D. */
+    bbox: number[][],
+}
+
+
+/**
+ * Temporal extent on a Collection. The wire shape is `{ "interval": [[start, end], ...] }` — a list of `[start_iso, end_iso]` pairs (either side may be null per STAC spec). LinkML emits a flat `list[string]` which the post-processor rewrites to nested list-of-lists per Research R-011.
+ */
+export interface StacTemporalExtent {
+    /** List of `[start_datetime, end_datetime]` pairs. Either side may be null (unbounded). */
+    interval: (string | null)[][],
+}
+
+
+/**
+ * Spatial + temporal extent on a Collection. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`.
+ */
+export interface StacExtent {
+    /** Spatial extent — one or more bounding boxes. */
+    spatial: StacSpatialExtent,
+    /** Temporal extent — one or more start/end intervals. */
+    temporal: StacTemporalExtent,
+}
+
+
+/**
+ * Pre-aggregated extension summaries on a Collection. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`. Carries the debrief: extension summary fields plus open-record additional keys (Article XV.2 exception).
+ */
+export interface StacSummaries {
+    /** Aggregated per-platform metadata across all Items in the Collection. Same shape as StacExtensionProperties.platforms. Disk key is `debrief:platforms` (colon syntax preserved via slot_uri). */
+    'debrief:platforms'?: PlatformRecord[],
+    /** Aggregated plot-level tags across all Items in the Collection. Disk key is `debrief:tags`. */
+    'debrief:tags'?: string[],
+    /** Aggregated feature-level tags across all Items in the Collection. Disk key is `debrief:feature_tags`. */
+    'debrief:feature_tags'?: string[],
+    [key: string]: unknown,
+}
+
+
+/**
+ * A STAC 1.1 Collection — flat Catalog plus license, extent, optional summaries, optional providers, optional item_assets. Closes R4-masked audit row for `apps/vscode/src/types/stac.ts`. Persisted to `<store>/<catalog>/catalog.json` for stores upgraded to STAC 1.1.
+ */
+export interface StacCollection {
+    /** STAC discriminator — always "Collection". */
+    type: "Collection",
+    /** STAC version string (always "1.1.0" in current fixtures). */
+    stac_version: string,
+    /** Optional STAC extension schema URIs. */
+    stac_extensions?: string[],
+    /** Collection identifier. */
+    id: string,
+    /** Human-readable collection title. */
+    title?: string,
+    /** STAC-mandated collection description. */
+    description: string,
+    /** SPDX identifier or "other" (STAC 1.1 mandates this). */
+    license: string,
+    /** Spatial + temporal extent. */
+    extent: StacExtent,
+    /** Optional pre-aggregated extension summaries (open-record per Research R-002). */
+    summaries?: StacSummaries,
+    /** Organisations involved in producing / hosting this collection (STAC 1.1 addition). */
+    providers?: StacProvider[],
+    /** Optional Item-asset declarations (STAC 1.1 addition). Each entry is a `StacItemAssetDefinition` (no `href`) — distinct from the concrete `StacAsset` shape used by `StacItem.assets[<key>]`. The generator post-processor rewrites this to `dict[str, StacItemAssetDefinition]` (Pydantic) / `Record<string, StacItemAssetDefinition>` (TypeScript) so the call site narrows correctly. */
+    item_assets?: Record<string, StacItemAssetDefinition>,
+    /** Collection navigation links — `self`, `root`, `parent`, `item` entries pointing at child Items. */
+    links: StacLink[],
+}
+
+
+/**
  * Parse-boundary GeoJSON Feature (RFC 7946 §3.2). Consumers narrow this to a domain feature (TrackFeature, ReferenceLocation, SystemState, MultiPointFeature, MultiPolygonFeature) after validating the properties.kind discriminator. Narrowing is done via the existing isDebriefFeature / isTrackFeature / isReferenceLocation type guards in @debrief/schemas/unions.ts (TypeScript) and debrief_schemas.unions (Python). Note: geometry is REQUIRED — callers handling possibly-null geometry payloads (e.g. NarrativeEntry features) either narrow at the parse boundary or defer to the domain-specific feature class that allows the looser shape (see ADR-021 for the ingress-coercion deferral).
  */
 export interface RawGeoJSONFeature {
@@ -1741,72 +2149,6 @@ export interface RawGeoJSONFeatureCollection {
     features: RawGeoJSONFeature[],
     /** Optional bounding box, shaped as in RawGeoJSONFeature.bbox. */
     bbox?: number[],
-}
-
-
-/**
- * A point in time with dual representations (FR-032, FR-033)
- */
-export interface TimeInstant {
-    /** Milliseconds since Unix epoch */
-    epoch: number,
-    /** ISO 8601 UTC format string */
-    iso: string,
-}
-
-
-/**
- * A temporal interval with inclusive start and end
- */
-export interface TimeRange {
-    /** Start of interval */
-    start: TimeInstant,
-    /** End of interval */
-    end: TimeInstant,
-}
-
-
-/**
- * Constraints on the visible time window (epoch milliseconds; null = unbounded)
- */
-export interface TimeFilter {
-    /** Filter start as epoch milliseconds (null/missing = unbounded on the start) */
-    start?: number,
-    /** Filter end as epoch milliseconds (null/missing = unbounded on the end) */
-    end?: number,
-}
-
-
-/**
- * Step size for discrete time navigation (FR-008)
- */
-export interface TimeStep {
-    /** Numeric step value */
-    value: number,
-    /** Unit of the step */
-    unit: string,
-}
-
-
-/**
- * A geographic coordinate [longitude, latitude]
- */
-export interface Coordinate {
-    /** Longitude in degrees (-180 to 180) */
-    longitude: number,
-    /** Latitude in degrees (-90 to 90) */
-    latitude: number,
-}
-
-
-/**
- * Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)
- */
-export interface ViewportPolygon {
-    /** Four corners in clockwise order [NW, NE, SE, SW] */
-    coordinates: Coordinate[],
-    /** Map zoom level for restoring the view (optional) */
-    zoom?: number,
 }
 
 
@@ -1937,42 +2279,6 @@ export interface BrowserFilterSlice {
 
 
 /**
- * Root entity containing all session state slices (FR-001, FR-002)
- */
-export interface SessionState {
-    /** Schema version for persistence compatibility (FR-026) */
-    schemaVersion: string,
-    /** Time-related state */
-    temporal: TemporalSlice,
-    /** Geographic view state */
-    spatial: SpatialSlice,
-    /** Feature-related state */
-    features: FeaturesSlice,
-    /** Editor state */
-    document: DocumentSlice,
-}
-
-
-/**
- * Persisted session file format (FR-024)
- */
-export interface SessionFile {
-    /** JSON Schema URI */
-    $schema?: string,
-    /** Schema version */
-    version: string,
-    /** When the session was saved (ISO 8601) */
-    savedAt: string,
-    /** Temporal state (excluding ephemeral playbackState) */
-    temporal: TemporalSlice,
-    /** Spatial state */
-    spatial: SpatialSlice,
-    /** Features state */
-    features: FeaturesSlice,
-}
-
-
-/**
  * Slash-delimited hierarchical type path. Format: {top_type}/{domain}/{specific_type} Example: mutation/track/smoothed
 
  */
@@ -2099,7 +2405,7 @@ export interface StoryboardProperties extends BaseFeatureProperties {
     name: string,
     /** Markdown narrative description */
     description?: string,
-    /** Schema version. Starts at 1. Monotonically non-decreasing across edits; bumped only by migrations. */
+    /** Schema version. Bumped to 2 by #259 (relax timestamp uniqueness + add `SceneProperties.creation_order`). Pre-#259 plots carrying `schema_version: 1` are rejected at load with `UnsupportedSchemaVersionError` — no in-place migration is provided (Article XIV pre-release freedom; FR-010 in #259 spec). Monotonically non-decreasing across edits; bumped only by migrations or breaking schema changes. */
     schema_version: number,
 }
 
@@ -2120,10 +2426,14 @@ export interface SceneProperties extends BaseFeatureProperties {
     description?: string,
     /** Map viewport camera state at capture time */
     viewport: Viewport,
-    /** ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard). MUST be unique within a Storyboard. */
+    /** ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard) as the primary sort key. Multiple Scenes MAY share the same timestamp; ties are broken by `creation_order` ascending (see #259). */
     timestamp: string,
-    /** Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1. */
-    time_range?: string,
+    /** Per-Storyboard monotonic sequence value assigned by the platform at capture time. Acts as the secondary sort key for Scenes — when two Scenes share a `timestamp` the one with the lower `creation_order` comes first. Unique within a Storyboard; gaps are permitted (left by deletion). The platform — not the client — is the source of truth. Introduced by #259; absent on pre-#259 plots which are rejected at load (no migration shim — Article XIV pre-release freedom). */
+    creation_order: number,
+    /** For instant Scenes (#215 default): MUST be absent. For time-range Scenes (#263): a TimeRange sub-record. When present, the Scene is the time-range flavour and `viewport_end` MUST also be present. See cross-field rule `scene-flavour-xor-rule`. */
+    time_range?: TimeRange,
+    /** Map viewport camera state at the end of a time-range Scene (#263). MUST be present if and only if `time_range` is present. Reuses the Viewport sub-record (`bearing` MUST be 0). For instant Scenes this slot MUST be absent. */
+    viewport_end?: Viewport,
     /** Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective. */
     visible_feature_ids: string[],
     /** SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids. */
@@ -2132,6 +2442,10 @@ export interface SceneProperties extends BaseFeatureProperties {
     thumbnail_asset_ref: string,
     /** Playback transition duration in milliseconds. Default 500. */
     transition_duration_ms: number,
+    /** Time-controller display mode at capture time (full = entire track history; trail = only the tail behind each platform). Reuses DisplayModeEnum from session-state.yaml. Optional for legacy compatibility (Spec #258): readers MUST leave the time controller untouched when this slot is absent (FR-003). Writers populate it from session.displayMode at the moment the scene is created. */
+    display_mode?: DisplayMode,
+    /** Provenance of the scene's stored polygon geometry (Spec #258). 'bounds' = computed from real Leaflet map bounds at capture time; 'placeholder' = pre-#258 ~100m square; 'manual' = reserved for future user-drawn rectangles. Render-side consumers recompute the polygon from (viewport, map dimensions) when this value is anything other than 'bounds' (including absent, for legacy scenes). The stored geometry is NEVER rewritten on read (Article III.2 source preservation). */
+    _polygon_source?: PolygonSource,
 }
 
 
@@ -2162,6 +2476,244 @@ export interface SceneFeature {
     geometry: GeoJSONPolygon,
     /** Scene properties */
     properties: SceneProperties,
+}
+
+
+/**
+ * A single STAC Item asset entry produced by Storyboarding (#216) for one
+variant of one Scene's thumbnail. Always appears as part of a
+pair in an Item's `assets` map: a large entry under the key
+`scene-thumbnail-{ULID}` and a small entry under the key
+`scene-thumbnail-{ULID}-sm`, where `{ULID}` is the owning Scene's
+identifier (matches SceneProperties.id).
+
+Why ULID: the owning Scene's id; lets every per-Scene asset be
+traced back to its Scene without an explicit foreign-key field
+in the asset payload.
+
+Why pairs: the Storyboarding capture pipeline produces both
+sizes atomically (800x600 large for inspection; 200x150 small
+for timeline strips). A single-variant entry is a defect — see
+schema rule scene-thumbnail-pair-rule-001.
+
+Lifecycle: created when a Scene is captured. Deleted when the
+Scene is deleted (garbage-collection invariant — see schema
+rule scene-thumbnail-orphan-rule-001). Both rules are enforced
+by the debrief-stac audit module; the JSON Schema layer
+enforces the value shape and key format only (see schema rule
+scene-thumbnail-key-format-rule-001).
+
+Supersedes the spec-241 placeholder `item_assets["scene-thumbnail"]`
+and the `^scene-thumbnail(-.+)?$` patternProperties rule.
+ */
+export interface SceneThumbnailAssetEntry {
+    /** URI-reference relative to the Item directory; conventionally ./scene-thumbnails/scene-{ULID}.png (large) or ./scene-thumbnails/scene-{ULID}-sm.png (small). */
+    href: string,
+    /** Always image/png — Storyboarding capture writes PNGs only. */
+    type: string,
+    /** Exactly ["thumbnail"]. Storyboarding-derived thumbnails are not declared as overview (which is reserved for plot-level overviews of dimensions 600x800). */
+    roles: string[],
+    /** Optional human label. Storyboarding writer emits "Scene thumbnail" (large) or "Scene thumbnail (small)" (small). */
+    title?: string,
+}
+
+
+/**
+ * MCP tool invocation envelope. Sent by consumers (VS Code, web-shell) to the MCP server. Closes audit §3.1 row 13.
+ */
+export interface MCPRequest {
+    /** Tool name (one of SessionMCPToolName for the session-state server). */
+    tool: string,
+    /** Free-form per-tool input payload (Article XV.2 exception — narrowed by per-tool Pydantic input model at dispatch). */
+    input: unknown,
+}
+
+
+/**
+ * A single MCP content item (resource, text, or image). Carries Debrief-specific annotations (debrief:* keys) on every item. Closes audit §3.1 row 15.
+ */
+export interface MCPContentItem {
+    /** Content-item discriminator. Current consumers emit `resource`, `text`, `image`. Kept as string to remain additive over any future MCP content-item types. */
+    type: string,
+    /** Nested resource descriptor `{ uri, mimeType, text }` when type=resource. Free-form per Article XV.2 (the inner shape is driven by individual tool authors). */
+    resource?: unknown,
+    /** Body text when type=text. */
+    text?: string,
+    /** Base64-encoded payload when type=image. */
+    data?: string,
+    /** IANA media type when type=image or type=resource. */
+    mimeType?: string,
+    /** Debrief-specific annotations (`debrief:resultType`, `debrief:label`, `debrief:sourceFeatures`, etc). Free-form per Article XV.2 because the key set is open-ended and uses colons (`debrief:*`) that LinkML cannot constrain as slot names. */
+    annotations: unknown,
+}
+
+
+/**
+ * Successful MCP tool response. Closes audit §3.1 row 16. The `duration_ms` slot preserves the wire format used by the live MCP server and replay subsystem.
+ */
+export interface MCPToolResponse {
+    /** Ordered list of content items returned by the tool. */
+    content: MCPContentItem[],
+    /** Wall-clock duration of the tool invocation in milliseconds. */
+    duration_ms: number,
+    /** Reserved for streaming partial-error responses (additive over the live wire format). */
+    is_error?: boolean,
+    /** Reserved for top-level free-form payload (e.g. vega-spec) — Article XV.2 exception. Additive over the live wire format. */
+    structured_content?: unknown,
+}
+
+
+/**
+ * MCP error response envelope. Closes audit §3.1 row 17. The error payload is nested (matches the JSON-RPC convention used by the live server).
+ */
+export interface MCPErrorResponse {
+    /** Nested error object `{ code, message, data: { debrief:errorCategory, debrief:affectedFeatures } }`. Free-form per Article XV.2 because the inner `data` map uses colon-bearing keys outside LinkML slot syntax. */
+    error: unknown,
+    /** Wall-clock duration before failure. */
+    duration_ms?: number,
+}
+
+
+/**
+ * JSON-Schema-like parameter fragment used inside MCPToolDefinition.input_schema. Closes audit §3.1 rows 1 and 27 (two-site drift). Open at the wire level — consumers narrow with additional fields (`enum`, `default`, `x-debrief-param-type`) via intersection in the local adapter modules.
+ */
+export interface MCPParamSchema {
+    /** JSON-Schema primitive type (string / number / integer / boolean / array / object). */
+    type?: string,
+    /** Human-readable parameter description. */
+    description?: string,
+}
+
+
+/**
+ * Predicate describing what feature selection a tool needs (e.g. "at least one Track", "exactly one Point"). Closes audit §3.1 row 18. Slot names match shared/utils/src/mcp-types.ts (`kind`, `min`, `max`).
+ */
+export interface MCPSelectionRequirement {
+    /** Feature kind this requirement applies to. Supports flat values (e.g. "TRACK", "POINT") and dot-delimited hierarchical paths (e.g. "TRACK.SEGMENT"). */
+    kind: string,
+    /** Minimum number of features of this kind required. */
+    min: number,
+    /** Maximum number of features of this kind allowed. */
+    max?: number,
+}
+
+
+/**
+ * Static catalogue entry advertised by the MCP server. Closes audit §3.1 row 19. `input_schema` and `annotations` are free-form per Article XV.2 — `input_schema` is a JSON-Schema fragment and `annotations` carries open-ended `debrief:*` keys (colons in key names cannot be slot-modelled).
+ */
+export interface MCPToolDefinition {
+    /** Tool identifier. */
+    name: string,
+    /** Human-readable tool description. */
+    description: string,
+    /** JSON-Schema fragment describing the tool's input payload. Free-form per Article XV.2 — consumers narrow at point of use. */
+    input_schema: unknown,
+    /** Debrief-specific annotations (`debrief:selectionRequirements`, `debrief:category`, `debrief:version`, `debrief:outputKind`, `debrief:uiCategory`). Free-form per Article XV.2. */
+    annotations: unknown,
+}
+
+
+/**
+ * Tunable parameter metadata recorded alongside a tool result for provenance. Closes audit §3.1 row 21. Matches the live web-shell mock shape — three slots tracking value, default-ness, and whether the parameter is operator-tunable.
+ */
+export interface ToolParameterMeta {
+    /** Parameter value used during the invocation. */
+    value: unknown,
+    /** Whether the parameter took its default value. */
+    default: boolean,
+    /** Whether the parameter is operator-tunable. */
+    tunable: boolean,
+}
+
+
+/**
+ * Consumer-facing flattened view of a tool catalogue entry. Closes audit §3.1 row 22. Slot names match `apps/web-shell/src/mocks/calcService.ts` (`min_tracks`, `max_tracks`, `min_features` — preserved as-is).
+ */
+export interface ToolDefinition {
+    /** Unique tool identifier. */
+    id: string,
+    /** Human-readable name. */
+    name: string,
+    /** Brief description. */
+    description: string,
+    /** Minimum number of tracks required. */
+    minTracks?: number,
+    /** Maximum number of tracks (absent = no upper limit). */
+    maxTracks?: number,
+    /** Minimum number of features required (any type). */
+    minFeatures?: number,
+}
+
+
+/**
+ * Logical tool invocation result as seen by the consumer (after the MCP layer has unwrapped MCPToolResponse). Closes audit §3.1 row 20. Slot names match `apps/web-shell/src/mocks/calcService.ts` — includes `resultLayer`, `resultLayers`, `parameters`, `datasets` which are free-form per Article XV.2 (their inner shapes are tool-specific).
+ */
+export interface ToolResult {
+    /** Whether the tool succeeded. */
+    success: boolean,
+    /** Status / explanation message. */
+    message: string,
+    /** Optional single result layer (e.g. bounding-box polygon). */
+    resultLayer?: unknown,
+    /** Optional multiple result layers (e.g. buffer-zone polygons). */
+    resultLayers?: unknown[],
+    /** Optional record of operator-tunable parameters and their values (keyed by parameter name, values shaped like ToolParameterMeta). Free-form per Article XV.2 (a LinkML `inlined_as_dict` of ToolParameterMeta would express it, but consumers already build a plain `Record<string, ToolParameterMeta>` and narrow on the way out — keeping it free-form preserves the live wire shape). */
+    parameters?: unknown,
+    /** Optional dataset results for the Results panel (range-bearing charts, etc). Each entry shaped like `{ filename: string, envelope: Record<string, unknown> }`. */
+    datasets?: unknown[],
+}
+
+
+/**
+ * Persisted tool-result shape written by the live tool-result logger and read back by the replay subsystem. Closes audit §3.1 row 4. Slot names match `services/session-state/src/log/types.ts:97` verbatim so existing log fixtures under the session-state fixtures directories continue to deserialise unchanged (FR-011).
+ */
+export interface ToolResultForLog {
+    /** Whether the tool succeeded. */
+    success: boolean,
+    /** GeoJSON FeatureCollection produced by the tool. Free-form per Article XV.2 (the tool's output shape is its own contract). */
+    features?: unknown,
+    /** Wall-clock duration of the tool invocation in milliseconds. */
+    duration_ms: number,
+    /** Hierarchical result type (e.g. mutation/track/smoothed). */
+    result_type?: string,
+    /** IDs of input features used to generate this result. */
+    source_feature_ids?: string[],
+    /** Path to an exported artifact (for non-GeoJSON tool results). */
+    artifact_href?: string,
+    /** Tool identifier (mirrors LogEntry.was_generated_by.tool). */
+    tool_id?: string,
+    /** Pre-tool geometry snapshot for mutation tools — passed through to LogEntry. Free-form per Article XV.2 (the inner InputFeatureState shape is owned by #224 session-state). */
+    input_state?: unknown[],
+}
+
+
+/**
+ * Minimal tool-execution result returned by the Replay Engine's `execute_tool` callback. Closes audit §3.1 row 6. Distinct from `ToolResultForLog` (no inheritance) because the replay path's observable surface is intentionally narrower — see services/session-state/src/log/types.ts:373.
+ */
+export interface ToolExecutionResultForReplay {
+    /** Whether the tool succeeded. */
+    success: boolean,
+    /** GeoJSON FeatureCollection produced by the tool during replay. Free-form per Article XV.2. */
+    features?: unknown,
+    /** Wall-clock duration of the replay invocation in milliseconds. */
+    duration_ms: number,
+    /** Tool version observed at replay time. */
+    tool_version?: string,
+    /** Path to an exported artifact (for non-GeoJSON tool results). */
+    artifact_href?: string,
+    /** Stable result identifier (used by the activity panel). */
+    result_id?: string,
+}
+
+
+/**
+ * Push notification from the extension host to the activity-panel webview when the tool catalogue changes. Closes audit §3.1 row 28. `payload` is free-form per Article XV.2 — its inner shape `{ tools: ToolsPanelItem[], hasToolInventory?, hasSelection? }` is narrowed at the activity-panel consumer.
+ */
+export interface ToolsUpdateMessage {
+    /** Discriminator — always the literal `tools:update`. */
+    type: string,
+    /** Nested payload `{ tools, hasToolInventory?, hasSelection? }`. Free-form per Article XV.2. */
+    payload: unknown,
 }
 
 

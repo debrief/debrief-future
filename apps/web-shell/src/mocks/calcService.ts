@@ -8,8 +8,13 @@
 import type { Feature, LineString, Position, Polygon } from 'geojson';
 import type { ToolsPanelItem } from '@debrief/components';
 import { extractParameters } from '@debrief/components';
-import type { SafeFeature } from '@debrief/utils';
 import { synthesizeTableDataset } from '@debrief/utils';
+import type {
+  IngressFeature,
+  ToolDefinition as ToolDefinitionBase,
+  ToolParameterMeta as ToolParameterMetaSchema,
+  ToolResult as ToolResultBase,
+} from '@debrief/schemas';
 import { listTools, executeTool } from '../services/toolService';
 
 /** Feature with properties containing an id */
@@ -22,10 +27,14 @@ interface IdentifiableFeature extends Feature {
   };
 }
 
-/** Tool execution result */
-export interface ToolResult {
-  success: boolean;
-  message: string;
+/**
+ * Tool execution result. Schema-rooted on `ToolResult` from
+ * `@debrief/schemas` (LinkML mcp.yaml) and narrowed with GeoJSON-typed
+ * result layers and the dataset envelope shape used by the web-shell
+ * Results panel.
+ */
+// eslint-disable-next-line no-restricted-syntax -- consumer-narrowing of @debrief/schemas.ToolResult via Omit + intersection — schema-rooted per spec 222 §FR-004 (R4 import-based classification)
+export type ToolResult = Omit<ToolResultBase, 'resultLayer' | 'resultLayers' | 'parameters' | 'datasets'> & {
   /** Optional result layer (e.g., bounding box polygon) */
   resultLayer?: Feature;
   /** Optional multiple result layers (e.g., buffer zone polygons) */
@@ -34,7 +43,7 @@ export interface ToolResult {
   parameters?: Record<string, ToolParameterMeta>;
   /** Optional dataset results for the Results panel (range-bearing charts, etc.) */
   datasets?: Array<{ filename: string; envelope: Record<string, unknown> }>;
-}
+};
 
 /**
  * Calculate distance between two points using Haversine formula.
@@ -134,25 +143,22 @@ function bboxToPolygon(bbox: [number, number, number, number]): Feature<Polygon>
   };
 }
 
-/** Tunable parameter metadata returned alongside tool results */
-export interface ToolParameterMeta {
-  value: unknown;
-  default: boolean;
-  tunable: boolean;
-}
+/**
+ * Tunable parameter metadata returned alongside tool results.
+ * Re-exported directly from `@debrief/schemas` (LinkML `mcp.yaml`); the
+ * generated shape `{ value: unknown, default: boolean, tunable: boolean }`
+ * matches the live wire format byte-for-byte.
+ */
+// eslint-disable-next-line no-restricted-syntax -- thin re-export alias of @debrief/schemas.ToolParameterMeta — schema-rooted per spec 222 §FR-004 (R4 import-based classification)
+export type ToolParameterMeta = ToolParameterMetaSchema;
 
-/** Tool definition */
-interface ToolDefinition {
-  id: string;
-  name: string;
-  description: string;
-  /** Minimum number of tracks required */
-  minTracks?: number;
-  /** Maximum number of tracks (undefined = no limit) */
-  maxTracks?: number;
-  /** Minimum number of features required (any type) */
-  minFeatures?: number;
-}
+/**
+ * Tool definition.
+ * Re-exported directly from `@debrief/schemas` (LinkML `mcp.yaml`); the
+ * generated shape carries the `id`, `name`, `description`, `minTracks`,
+ * `maxTracks`, `minFeatures` slots used by the local TOOLS catalogue.
+ */
+type ToolDefinition = ToolDefinitionBase;
 
 const TOOLS: ToolDefinition[] = [
   {
@@ -235,17 +241,15 @@ function formatToolName(name: string): string {
     .join(' ');
 }
 
-/** Bridge geojson Feature[] to SafeFeature[] for executeTool. */
-function toSafeFeatures(features: Feature[]): SafeFeature[] {
+/** Bridge geojson Feature[] to IngressFeature[] for executeTool.
+ *  geometry may be null (RFC 7946 "unlocated" feature) — preserved, not dropped. */
+function toIngressFeatures(features: Feature[]): IngressFeature[] {
   return features.map(f => {
-    const geom: SafeFeature['geometry'] = f.geometry
-      ? { type: f.geometry.type, coordinates: (f.geometry as { coordinates: unknown }).coordinates }
-      : null;
-    const result: SafeFeature = {
+    const result: IngressFeature = {
       type: 'Feature' as const,
       ...(f.id != null ? { id: f.id as string | number } : {}),
-      geometry: geom,
-      properties: (f.properties ?? null) as SafeFeature['properties'],
+      geometry: (f.geometry ?? null) as IngressFeature['geometry'],
+      properties: f.properties ?? null,
     };
     return result;
   });
@@ -423,7 +427,7 @@ export function createMockCalcService(): MockCalcService {
           const params = collectedParams ?? defaultParams[toolId] ?? {};
           const response = executeTool(
             toolId,
-            toSafeFeatures(selectedFeatures),
+            toIngressFeatures(selectedFeatures),
             params,
           );
           const item = response.content[0];

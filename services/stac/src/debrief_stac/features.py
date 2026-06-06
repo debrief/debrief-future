@@ -242,7 +242,9 @@ def delete_features(
         item["bbox"] = list(bbox)
         item["geometry"] = _bbox_to_polygon(bbox)
     else:
-        item["bbox"] = None
+        # STAC 1.1 Item Schema forbids null bbox; omit the key entirely when
+        # there are no spatial features.
+        item.pop("bbox", None)
         item["geometry"] = None
 
     _save_plot(catalog_path, plot_id, item)

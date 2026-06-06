@@ -74,6 +74,21 @@ def generate_pydantic() -> bool:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
         content = result.stdout
 
+        # Post-process: gen-pydantic embeds the source YAML's *absolute* path in
+        # the LinkMLMeta `source_file` field. That path differs between a
+        # developer's machine (`/home/<user>/…/shared/schemas/src/linkml/debrief.yaml`)
+        # and the GitHub Actions runner (`/home/runner/work/debrief-future/debrief-future/…`),
+        # which trips the CI drift gate (spec 240 / T013) even though the
+        # schema content is byte-identical. Normalise to a stable repo-relative
+        # form so the committed artefact is environment-independent.
+        import re as _re_src
+
+        content = _re_src.sub(
+            r"'source_file':\s*'[^']*src/linkml/([^']+)'",
+            r"'source_file': 'src/linkml/\1'",
+            content,
+        )
+
         # Post-process: gen-pydantic emits dict[str, Any] in boilerplate classes
         # (ConfiguredBaseModel, LinkMLMeta). Replace with dict[str, object] to
         # eliminate Any from generated code. These are infrastructure classes,
@@ -147,6 +162,173 @@ def generate_pydantic() -> bool:
             r"\1 = Field(default=None, \2, \3",
             content,
         )
+
+        # Post-process: inject a Pydantic `model_validator` on
+        # `BaseFeatureProperties` that rejects duplicate `path` values in the
+        # inherited `vertex_metadata` slot (Spec #192,
+        # contracts/vertex-metadata-slot.md §Cross-cutting #3 — "Duplicate-
+        # path rejection MUST fail validation in all three implementations").
+        # The LinkML pydantic generator does not yet honour `identifier: true`
+        # on slots inlined as a list, so we add the constraint here. The
+        # validator is a no-op when `vertex_metadata` is None or empty, so it
+        # does not affect classes that never populate the slot.
+        _validator_marker = "class BaseFeatureProperties(ConfiguredBaseModel):"
+        if _validator_marker in content:
+            # The injection point is the end of the class body — just before
+            # the closing blank line followed by the next `class` definition.
+            idx = content.index(_validator_marker)
+            next_class = content.find("\nclass ", idx + len(_validator_marker))
+            assert next_class > 0, "Could not locate end of BaseFeatureProperties"
+            insertion = (
+                "\n"
+                "    @model_validator(mode='after')\n"
+                "    def _validate_vertex_metadata_unique_paths(self) -> 'BaseFeatureProperties':\n"
+                '        """Reject duplicate `path` values within `vertex_metadata`.\n'
+                "\n"
+                "        Spec #192 contract requires duplicate-path rejection across all\n"
+                "        three schema implementations. Injected post-generation; see\n"
+                "        scripts/generate.py.\n"
+                '        """\n'
+                "        vm = self.vertex_metadata\n"
+                "        if not vm:\n"
+                "            return self\n"
+                "        seen: set[str] = set()\n"
+                "        for entry in vm:\n"
+                "            if entry.path in seen:\n"
+                "                raise ValueError(\n"
+                '                    f"duplicate vertex_metadata path {entry.path!r} "\n'
+                '                    f"— each path must appear at most once per feature"\n'
+                "                )\n"
+                "            seen.add(entry.path)\n"
+                "        return self\n"
+            )
+            content = content[:next_class] + insertion + content[next_class:]
+            # Ensure `model_validator` is in the pydantic import group.
+            if "model_validator" not in content[: content.index(_validator_marker)]:
+                content = content.replace(
+                    "    field_validator,\n",
+                    "    field_validator,\n    model_validator,\n",
+                    1,
+                )
+        # ----------------------------------------------------------------------
+        # STAC cluster post-processing (Feature #223 / Research R-011)
+        # ----------------------------------------------------------------------
+        # LinkML cannot express list-of-lists slots directly, so the
+        # StacSpatialExtent.bbox and StacTemporalExtent.interval slots are
+        # authored as flat `multivalued` and rewritten here. Same precedent
+        # as the GeoJSON coordinate fixes above.
+        _stac_nested_pydantic_fixes = {
+            "StacSpatialExtent": (
+                "bbox: list[float]",
+                "bbox: list[list[float]]",
+            ),
+            "StacTemporalExtent": (
+                "interval: list[str]",
+                "interval: list[list[Optional[str]]]",
+            ),
+        }
+        for class_name, (old_type, new_type) in _stac_nested_pydantic_fixes.items():
+            class_marker = f"class {class_name}("
+            if class_marker in content:
+                idx = content.index(class_marker)
+                next_class = content.find("\nclass ", idx + 1)
+                block_end = next_class if next_class != -1 else len(content)
+                block = content[idx:block_end]
+                fixed_block = block.replace(old_type, new_type, 1)
+                if fixed_block == block:
+                    raise RuntimeError(
+                        f"generate.py: STAC nested-array post-processor had no "
+                        f"effect on {class_name} — gen-pydantic output no longer "
+                        f"contains the expected `{old_type}` token. Update "
+                        f"generate.py (Feature 223)."
+                    )
+                content = content[:idx] + fixed_block + content[block_end:]
+
+        # Rewrite the open-record asset map slot. Authored as `range: Any` in
+        # LinkML (which renders as `Any` in Pydantic), it must become a typed
+        # `dict[str, StacAsset]` so consumers get autocomplete on asset
+        # values. StacItem.assets is required; StacCollection.item_assets is
+        # optional. Note: the earlier post-processor at the top of this
+        # function rewrites `Optional[Any]` → `Optional[dict[str, object]]`,
+        # so we match the already-substituted form for the Collection slot.
+        _stac_assets_fixes: list[tuple[str, str, str]] = [
+            ("class StacItem(", "assets: Any = Field", "assets: dict[str, StacAsset] = Field"),
+            (
+                "class StacCollection(",
+                "item_assets: Optional[dict[str, object]] = Field",
+                "item_assets: Optional[dict[str, StacItemAssetDefinition]] = Field",
+            ),
+        ]
+        for class_marker, old, new in _stac_assets_fixes:
+            if class_marker in content:
+                idx = content.index(class_marker)
+                next_class = content.find("\nclass ", idx + 1)
+                block_end = next_class if next_class != -1 else len(content)
+                block = content[idx:block_end]
+                fixed_block = block.replace(old, new, 1)
+                if fixed_block == block:
+                    raise RuntimeError(
+                        f"generate.py: STAC asset-dict post-processor had no "
+                        f"effect on {class_marker} — gen-pydantic output no "
+                        f"longer contains `{old}`. Update generate.py "
+                        f"(Feature 223)."
+                    )
+                content = content[:idx] + fixed_block + content[block_end:]
+
+        # Mark the three open-record classes as `extra='allow'` so STAC
+        # extension keys (`debrief:*`, `file:*`, `processing:*`, `proj:*`)
+        # pass through validation without rejection. Article XV.2 exception
+        # documented in plan.md Complexity Tracking. The classes inherit
+        # from ConfiguredBaseModel which sets `extra='forbid'`; we override
+        # by inserting `model_config = ConfigDict(extra='allow')` after the
+        # full linkml_meta declaration (which may span multiple lines).
+        for stac_open_class in (
+            "StacItemProperties",
+            "StacAsset",
+            "StacItemAssetDefinition",
+            "StacSummaries",
+        ):
+            class_marker = f"class {stac_open_class}("
+            if class_marker not in content:
+                raise RuntimeError(
+                    f"generate.py: STAC extra='allow' post-processor could "
+                    f"not find `{class_marker}` — gen-pydantic output is "
+                    f"missing the expected class. Update generate.py "
+                    f"(Feature 223)."
+                )
+            idx = content.index(class_marker)
+            linkml_meta_idx = content.index("linkml_meta: ClassVar[LinkMLMeta]", idx)
+            # Walk forward from the start of LinkMLMeta(...) and balance
+            # parentheses to find the true end of the call expression.
+            paren_open = content.index("LinkMLMeta(", linkml_meta_idx)
+            cursor = paren_open + len("LinkMLMeta")
+            depth = 0
+            while cursor < len(content):
+                ch = content[cursor]
+                if ch == "(":
+                    depth += 1
+                elif ch == ")":
+                    depth -= 1
+                    if depth == 0:
+                        cursor += 1
+                        break
+                cursor += 1
+            # Advance past the trailing newline so insertion lands on its
+            # own line.
+            newline_idx = content.find("\n", cursor)
+            line_end = (newline_idx + 1) if newline_idx != -1 else cursor
+            insertion = (
+                "    model_config = ConfigDict(\n"
+                "        extra='allow',\n"
+                "        serialize_by_alias=True,\n"
+                "        validate_by_name=True,\n"
+                "        validate_assignment=True,\n"
+                "        validate_default=True,\n"
+                "        arbitrary_types_allowed=True,\n"
+                "        use_enum_values=True,\n"
+                "    )\n"
+            )
+            content = content[:line_end] + insertion + content[line_end:]
 
         # Prepend DO NOT EDIT header
         content = "# AUTO-GENERATED — DO NOT EDIT\n" + content
@@ -370,6 +552,81 @@ def generate_jsonschema() -> bool:
         return False
 
 
+# --- Feature 256: prefix-aware STAC extension typing ----------------------
+#
+# LinkML's gen-typescript strips the `debrief:` prefix and emits each slot
+# under its bare name (`platforms`, `debrief_platforms`, `tool_id`). The STAC
+# writers read/write those fields under their on-disk colon keys
+# (`props['debrief:platforms']`), so the bare slots type nothing at the real
+# call sites. These two helpers rewrite the generated slot keys to their
+# `slot_uri` verbatim, schema-driven (never hard-coded), across the three
+# extension-bearing classes.
+
+# Maps each prefix-bearing STAC class to the LinkML source that declares it.
+_STAC_PREFIX_SOURCES: dict[str, str] = {
+    "StacExtensionProperties": "stac-extension.yaml",
+    "StacSummaries": "stac.yaml",
+    "StacAsset": "stac.yaml",
+}
+
+
+def prefix_extension_slots(block_text: str, slot_uri_map: dict[str, str]) -> str:
+    """Rewrite bare slot keys in a generated TS interface block to their slot_uri.
+
+    For every ``slot_name -> slot_uri`` in ``slot_uri_map``, the generated
+    bare-key declaration line (e.g. ``    platforms?: PlatformRecord[],``) has
+    its key rewritten to the quoted ``slot_uri``
+    (``    'debrief:platforms'?: PlatformRecord[],``). Slots absent from the map
+    (e.g. ``StacAsset.href``) are left untouched. Value types and optionality
+    markers are preserved. Pure function — no I/O — so it is unit-testable in
+    isolation (Feature 256, FR-002/FR-013).
+    """
+    import re
+
+    result = block_text
+    for slot_name, slot_uri in slot_uri_map.items():
+        # Match the property-key portion of a declaration line: leading
+        # indentation, the exact slot name, an optional `?`, then `:`.
+        pattern = re.compile(
+            rf"^(?P<indent>\s*){re.escape(slot_name)}(?P<opt>\??):",
+            re.MULTILINE,
+        )
+        result = pattern.sub(rf"\g<indent>'{slot_uri}'\g<opt>:", result)
+    return result
+
+
+def _load_extension_slot_uri_map() -> dict[str, dict[str, str]]:
+    """Return ``{class_name: {slot_name: slot_uri}}`` for prefix-bearing classes.
+
+    Reads ``slot_uri`` verbatim from the LinkML sources and keeps only slots
+    whose ``slot_uri`` carries an extension prefix (a colon CURIE), so
+    non-extension slots (``StacAsset.href``, ``type``, ``roles``) are excluded.
+    Schema-driven: a new ``debrief:*`` slot flows through with no edit here
+    (Feature 256, FR-002/FR-013).
+    """
+    import yaml
+
+    out: dict[str, dict[str, str]] = {}
+    doc_cache: dict[str, dict] = {}
+    for cls_name, source in _STAC_PREFIX_SOURCES.items():
+        if source not in doc_cache:
+            doc_cache[source] = yaml.safe_load((LINKML_DIR / source).read_text())
+        attrs = (doc_cache[source].get("classes", {}).get(cls_name, {}) or {}).get(
+            "attributes", {}
+        ) or {}
+        slot_map: dict[str, str] = {}
+        for slot_name, slot_def in attrs.items():
+            if not isinstance(slot_def, dict):
+                continue
+            slot_uri = slot_def.get("slot_uri")
+            # Extension keys carry a prefixed CURIE (`debrief:platforms`); skip
+            # the LinkML meta prefix and any unprefixed/bare slot_uri.
+            if isinstance(slot_uri, str) and ":" in slot_uri and not slot_uri.startswith("linkml:"):
+                slot_map[slot_name] = slot_uri
+        out[cls_name] = slot_map
+    return out
+
+
 def generate_typescript() -> bool:
     """Generate TypeScript interfaces from LinkML schema."""
     if not MASTER_SCHEMA.exists():
@@ -517,6 +774,47 @@ def generate_typescript() -> bool:
             enum_end = content.index("};\n", enum_start)
             content = content[:enum_end] + _display_mode_decl + content[enum_end + len("};\n") :]
 
+        # Post-process (Feature 258 / FR-001, FR-006): narrow
+        # `SceneProperties.display_mode` and `SceneProperties._polygon_source`
+        # from `string` to the corresponding template-literal types. Same
+        # post-processing rationale as the TemporalSlice case above:
+        # gen-typescript collapses enum-ranged slots to bare `string`, and the
+        # spec only "means" what it says once these are narrowed.
+        _polygon_source_decl = (
+            "};\n"
+            "/**\n"
+            "* Template-literal derivation of the permissible polygon-source values\n"
+            "* from PolygonSourceEnum. Narrows the `_polygon_source` field on\n"
+            "* SceneProperties so TypeScript rejects an unknown provenance value at\n"
+            "* compile time (Feature 258).\n"
+            "*/\n"
+            "export type PolygonSource = `${PolygonSourceEnum}`;\n"
+        )
+        _polygon_source_sentinel = "export enum PolygonSourceEnum {"
+        if _polygon_source_sentinel in content and "export type PolygonSource" not in content:
+            enum_start = content.index(_polygon_source_sentinel)
+            enum_end = content.index("};\n", enum_start)
+            content = content[:enum_end] + _polygon_source_decl + content[enum_end + len("};\n") :]
+
+        _scene_props_start = content.find("export interface SceneProperties ")
+        if _scene_props_start == -1:
+            raise RuntimeError(
+                "generate.py: gen-typescript did not emit `export interface SceneProperties`."
+            )
+        _scene_props_end = content.index("}\n", _scene_props_start) + 2
+        _scene_props_block = content[_scene_props_start:_scene_props_end]
+        _new_scene_props_block = _scene_props_block.replace(
+            "    display_mode?: string,\n", "    display_mode?: DisplayMode,\n", 1
+        ).replace("    _polygon_source?: string,\n", "    _polygon_source?: PolygonSource,\n", 1)
+        if _new_scene_props_block == _scene_props_block:
+            raise RuntimeError(
+                "generate.py: SceneProperties enum-slot post-processor had no "
+                "effect — gen-typescript output no longer contains the expected "
+                "`display_mode?: string` / `_polygon_source?: string` tokens. Update "
+                "generate.py (Feature 258)."
+            )
+        content = content[:_scene_props_start] + _new_scene_props_block + content[_scene_props_end:]
+
         # Narrow the two TemporalSlice fields from string → template-literal type.
         _temporal_slice_start = content.find("export interface TemporalSlice {\n")
         if _temporal_slice_start == -1:
@@ -621,6 +919,171 @@ def generate_typescript() -> bool:
             '    type: "FeatureCollection",',
         )
 
+        # ----------------------------------------------------------------------
+        # STAC cluster post-processing (Feature #223)
+        # ----------------------------------------------------------------------
+        # 1) Narrow the discriminator `type` slot to a string literal on each
+        #    of StacItem / StacCatalog / StacCollection. gen-typescript loses
+        #    equals_string when the range is a permissible-value enum.
+        # 2) Replace the StacItem.geometry placeholder (`string`) with the
+        #    full any_of union (same pattern as RawGeoJSONFeature.geometry).
+        # 3) Rewrite the open-record asset map slot:
+        #       StacItem.assets       unknown          → Record<string, StacAsset>
+        #       StacCollection.item_assets unknown    → Record<string, StacAsset>
+        # 4) Rewrite StacSpatialExtent.bbox / StacTemporalExtent.interval to
+        #    nested arrays (Research R-011 precedent).
+        # 5) Add `[key: string]: unknown` to StacItemProperties, StacAsset, and
+        #    StacSummaries so extension keys (`debrief:*`, `file:*`,
+        #    `processing:*`, `proj:*`) are permitted at the type level — same
+        #    boundary-loose semantics as the Pydantic `extra='allow'` above.
+
+        # (1) Discriminator type literals
+        _stac_type_literal_fixes: list[tuple[str, str, str]] = [
+            ("export interface StacItem {", "type: string,", 'type: "Feature",'),
+            ("export interface StacCatalog {", "type: string,", 'type: "Catalog",'),
+            ("export interface StacCollection {", "type: string,", 'type: "Collection",'),
+        ]
+        for marker, old, new in _stac_type_literal_fixes:
+            if marker in content:
+                start = content.index(marker)
+                end = content.index("}\n", start) + 2
+                block = content[start:end]
+                fixed_block = block.replace(old, new, 1)
+                if fixed_block == block:
+                    raise RuntimeError(
+                        f"generate.py: STAC type-literal post-processor had no "
+                        f"effect on `{marker}` — `{old}` not found. Update "
+                        f"generate.py (Feature 223)."
+                    )
+                content = content[:start] + fixed_block + content[end:]
+
+        # (2) StacItem.geometry — any_of geometry union (same as RawGeoJSONFeature)
+        stac_item_start = content.find("export interface StacItem {\n")
+        if stac_item_start != -1:
+            stac_item_end = content.index("}\n", stac_item_start) + 2
+            stac_item_block = content[stac_item_start:stac_item_end]
+            new_block = stac_item_block.replace(
+                "    geometry: string,\n",
+                "    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | "
+                "GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | "
+                "GeoJSONMultiPolygon,\n",
+                1,
+            )
+            if new_block == stac_item_block:
+                raise RuntimeError(
+                    "generate.py: STAC geometry post-processor had no effect — "
+                    "gen-typescript output no longer contains the expected "
+                    "`geometry: string` token inside StacItem. Update generate.py."
+                )
+            content = content[:stac_item_start] + new_block + content[stac_item_end:]
+
+        # (3) Open-record asset map. gen-typescript emits `Any` for
+        # `range: Any` slots; this patch must run BEFORE the bulk
+        # `Any → unknown` substitution later in this function so we can
+        # match the typed `Any` token, not the post-substitution `unknown`.
+        _stac_record_fixes: list[tuple[str, str, str]] = [
+            ("export interface StacItem {", "assets: Any,", "assets: Record<string, StacAsset>,"),
+            (
+                "export interface StacCollection {",
+                "item_assets?: Any,",
+                "item_assets?: Record<string, StacItemAssetDefinition>,",
+            ),
+        ]
+        for marker, old, new in _stac_record_fixes:
+            if marker in content:
+                start = content.index(marker)
+                end = content.index("}\n", start) + 2
+                block = content[start:end]
+                fixed_block = block.replace(old, new, 1)
+                if fixed_block == block:
+                    raise RuntimeError(
+                        f"generate.py: STAC asset-record post-processor had no "
+                        f"effect on `{marker}` — `{old}` not found. Update "
+                        f"generate.py (Feature 223)."
+                    )
+                content = content[:start] + fixed_block + content[end:]
+
+        # (4) Nested-array slots (Research R-011)
+        _stac_nested_ts_fixes: list[tuple[str, str, str]] = [
+            (
+                "export interface StacSpatialExtent {",
+                "bbox: number[],",
+                "bbox: number[][],",
+            ),
+            (
+                "export interface StacTemporalExtent {",
+                "interval: string[],",
+                "interval: (string | null)[][],",
+            ),
+        ]
+        for marker, old, new in _stac_nested_ts_fixes:
+            if marker in content:
+                start = content.index(marker)
+                end = content.index("}\n", start) + 2
+                block = content[start:end]
+                fixed_block = block.replace(old, new, 1)
+                if fixed_block == block:
+                    raise RuntimeError(
+                        f"generate.py: STAC nested-array post-processor had no "
+                        f"effect on `{marker}` — `{old}` not found. Update "
+                        f"generate.py (Feature 223)."
+                    )
+                content = content[:start] + fixed_block + content[end:]
+
+        # (5) Extension-key open-record on the three boundary-loose classes
+        _stac_open_record_classes = (
+            "StacItemProperties",
+            "StacAsset",
+            "StacItemAssetDefinition",
+            "StacSummaries",
+        )
+        for cls_name in _stac_open_record_classes:
+            marker = f"export interface {cls_name}"
+            if marker not in content:
+                raise RuntimeError(
+                    f"generate.py: STAC open-record post-processor could not "
+                    f"find `{marker}`. Update generate.py (Feature 223)."
+                )
+            start = content.index(marker)
+            # Find the closing brace of this interface block.
+            end = content.index("}\n", start)
+            # Insert the index signature on a new line just before the close.
+            # Preserve the trailing comma convention used by gen-typescript.
+            insertion = "    [key: string]: unknown,\n"
+            content = content[:end] + insertion + content[end:]
+
+        # (5b) Prefix-aware extension keys (Feature 256). Rewrite the modelled
+        #      debrief:* slot keys to their on-disk slot_uri across
+        #      StacExtensionProperties / StacSummaries / StacAsset, so writer
+        #      call sites using props['debrief:foo'] / asset['debrief:toolId']
+        #      gain named-slot typing flowing from LinkML. Schema-driven: keys
+        #      come from each slot's slot_uri, so a new slot flows through with
+        #      no edit here.
+        _stac_prefix_slot_map = _load_extension_slot_uri_map()
+        for cls_name, slot_map in _stac_prefix_slot_map.items():
+            marker = f"export interface {cls_name}"
+            if marker not in content:
+                raise RuntimeError(
+                    f"generate.py: prefix post-processor could not find "
+                    f"`{marker}`. Update generate.py (Feature 256)."
+                )
+            if not slot_map:
+                raise RuntimeError(
+                    f"generate.py: no extension `slot_uri` found for `{cls_name}` "
+                    f"(Feature 256) — the LinkML source changed?"
+                )
+            start = content.index(marker)
+            end = content.index("}\n", start)
+            block = content[start:end]
+            fixed_block = prefix_extension_slots(block, slot_map)
+            if fixed_block == block:
+                raise RuntimeError(
+                    f"generate.py: prefix post-processor made no change to "
+                    f"`{cls_name}` (Feature 256) — gen-typescript output changed; "
+                    f"expected bare keys {sorted(slot_map)}."
+                )
+            content = content[:start] + fixed_block + content[end:]
+
         # Drop the empty `export interface Any {}` stub — it's the LinkML
         # wildcard class that the post-processor has already mapped to
         # `Record<string, unknown>` at the usage site. Leaving it in the
@@ -635,16 +1098,41 @@ def generate_typescript() -> bool:
             content,
         )
 
+        # Post-process: any remaining `Any`-typed slot fields (`: Any,`,
+        # `?: Any,`, `: Any[]`, etc.) come from LinkML `range: Any` slots
+        # that did not get a per-field post-processor (the RawGeoJSONFeature
+        # block above handles RawGeoJSON.properties specifically; this is
+        # the general fallback used by the MCP envelope cluster (#222) and
+        # any future schemas that use `range: Any`).
+        #
+        # Mapping rule: `Any` becomes `unknown` so consumers MUST narrow
+        # before reading (Article XV.2 spirit). `unknown` is preferred over
+        # `Record<string, unknown>` because not every `Any` slot is an
+        # object — some carry primitives or arrays (e.g. tool result
+        # payloads).
+        content = _re_any.sub(
+            r"(?<![A-Za-z_])Any(?![A-Za-z_])",
+            "unknown",
+            content,
+        )
+
         # Prepend DO NOT EDIT header
         content = "// AUTO-GENERATED — DO NOT EDIT\n" + content
 
         output_file.write_text(content, encoding="utf-8", newline="\n")
         print(f"  [OK] Generated: {output_file}")
 
-        # Create index.ts that re-exports everything
+        # Create index.ts that re-exports everything (generated types,
+        # union helpers, and the TS-only function aliases for the MCP
+        # cluster — spec 222 Research R-002).
         index_file = TYPESCRIPT_OUT / "index.ts"
         index_file.write_text(
-            'export * from "./types.js";\nexport * from "./unions.js";\n',
+            'export * from "./types.js";\n'
+            'export * from "./unions.js";\n'
+            "export type { ToolExecutor, ToolVersionResolver } "
+            'from "../../typescript/aliases/mcp-functions.js";\n'
+            "export type { StacCatalogOrCollection } "
+            'from "../../typescript/aliases/stac-unions.js";\n',
             encoding="utf-8",
             newline="\n",
         )

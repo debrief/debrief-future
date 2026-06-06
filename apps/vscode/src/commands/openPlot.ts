@@ -3,8 +3,12 @@
  */
 
 import * as vscode from 'vscode';
-import { access, readFile } from 'fs/promises';
-import { loadSession, createLogService, createSnapshotService, createTimeInstant, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
+import { readFile } from 'fs/promises';
+import { createLogService, createSnapshotService, createTimeInstant, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
+import { hydrateStoreFromFeatures, SystemStateLoadError, type PlayheadClampDiagnostic } from '../services/systemStateBridge';
+import { notifyPlayheadClamps } from '../services/playheadClampNotice';
+import type { StacWriter } from '@debrief/stac-writer';
+import { reconcileBeforeOpen } from './reconcileOnOpen';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
@@ -22,7 +26,7 @@ import { MapPanel } from '../webview/mapPanel';
 import { isTrackFeature, isReferenceLocation } from '@debrief/components';
 import type { DebriefFeature } from '@debrief/components';
 import { parseStacUri, buildStacUri } from '../types/stac';
-import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
+import type { IngressFeature, IngressFeatureCollection } from '@debrief/schemas';
 
 /** Extract a display name from a DebriefFeature. Uses type-specific property names. */
 function featureDisplayName(f: DebriefFeature): string {
@@ -37,24 +41,49 @@ function featureDisplayName(f: DebriefFeature): string {
   return props.label ?? props.name ?? props.text ?? String(f.id);
 }
 
-/** Adapt a SafeFeature to a loosely-typed record for session-state log service. */
-function safeFeatureToRecord(f: SafeFeature): Record<string, unknown> {
+/** Adapt an IngressFeature to a loosely-typed record for session-state log service. */
+function safeFeatureToRecord(f: IngressFeature): Record<string, unknown> {
   return { type: f.type, id: f.id, geometry: f.geometry, properties: f.properties };
 }
 
 /**
- * Adapt a GeoJsonFeatureCollection (session-state type) to SafeFeatureCollection
+ * Adapt a GeoJsonFeatureCollection (session-state type) to IngressFeatureCollection
  * (stacService type). The shapes are structurally equivalent; geometry:unknown
- * narrows to SafeGeometry via assertion on each feature.
+ * narrows to the schema-derived ingress geometry (which admits null for SYSTEM /
+ * storyboard features) via assertion on each feature.
  */
-function toSafeFC(fc: { type: string; features: Array<{ type: string; geometry: unknown; properties: Record<string, unknown> | null; id?: string | number }> }): SafeFeatureCollection {
+function toIngressFC(fc: { type: string; features: Array<{ type: string; geometry: unknown; properties: Record<string, unknown> | null; id?: string | number }> }): IngressFeatureCollection {
   return {
     type: 'FeatureCollection',
-    features: fc.features.map((f): SafeFeature => ({
+    features: fc.features.map((f): IngressFeature => ({
       type: 'Feature',
       id: f.id,
-      geometry: f.geometry as SafeGeometry | null,
+      geometry: f.geometry as IngressFeature['geometry'],
       properties: f.properties,
+    })),
+  };
+}
+
+/** Minimal session-state GeoJSON feature shape (matches `@debrief/session-state`
+ *  `GeoJsonFeature`): geometry erased to `unknown`, properties required-nullable. */
+type SessionGeoJsonFC = {
+  type: 'FeatureCollection';
+  features: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> | null; id?: string | number }>;
+};
+
+/** Adapt an IngressFeatureCollection (geometry may be null, properties optional)
+ *  back to the session-state GeoJsonFeatureCollection shape. The only structural
+ *  gap is `properties`, which the schema-derived type leaves optional
+ *  (`Record | null | undefined`) but session-state requires as `Record | null`. */
+function toGeoJsonFC(fc: IngressFeatureCollection | null): SessionGeoJsonFC | null {
+  if (!fc) { return null; }
+  return {
+    type: 'FeatureCollection',
+    features: fc.features.map((f) => ({
+      type: 'Feature' as const,
+      geometry: f.geometry,
+      properties: f.properties ?? null,
+      id: f.id,
     })),
   };
 }
@@ -62,29 +91,6 @@ function toSafeFC(fc: { type: string; features: Array<{ type: string; geometry: 
 
 interface OpenPlotArgs {
   uri?: string;
-}
-
-/**
- * Derive session file path from store path and item path.
- * Converts item.json to item.debrief-session.
- */
-function deriveSessionPath(storePath: string, itemPath: string): string {
-  const sessionItemPath = itemPath.replace(/\.json$/, '.debrief-session');
-  // Normalize path separators
-  const normalizedStorePath = storePath.replace(/\\/g, '/');
-  return `${normalizedStorePath}/${sessionItemPath}`;
-}
-
-/**
- * Check if a file exists.
- */
-async function fileExists(path: string): Promise<boolean> {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 interface PlotQuickPickItem extends vscode.QuickPickItem {
@@ -110,7 +116,13 @@ export function createOpenPlotCommand(
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void,
   resultIdRegistry?: ResultIdRegistry,
-  logPanelProvider?: LogPanelViewProvider
+  logPanelProvider?: LogPanelViewProvider,
+  // Spec #192 T017 — host call site for the read-only signal. After a plot
+  // is opened we ask the writer for its capability and dispatch
+  // `setReadOnly` on the session's plot slice. Optional so existing
+  // wirings (including tests) keep working; when omitted the read-only
+  // signal still escalates correctly from `saveSession` failures.
+  getStacWriter?: (storePath: string) => StacWriter,
 ): (args?: OpenPlotArgs) => Promise<void> {
   return async (args?: OpenPlotArgs) => {
     let storeId: string;
@@ -147,6 +159,12 @@ export function createOpenPlotCommand(
       void vscode.window.showErrorMessage('Store not found');
       return;
     }
+
+    // #268 — reconcile any interrupted save BEFORE reading the plot, so the
+    // loads below observe a single coherent on-disk state (FR-007/FR-008).
+    await reconcileBeforeOpen(getStacWriter, store.path, itemPath, (message) => {
+      void vscode.window.showWarningMessage(message);
+    });
 
     // Load plot
     const plot = await vscode.window.withProgress(
@@ -185,30 +203,59 @@ export function createOpenPlotCommand(
       featureCollectionUri: plotUri,
     });
 
-    // Check for existing session file and load it (Feature: 029 - T053-T055)
-    const sessionPath = deriveSessionPath(store.path, itemPath);
-    if (await fileExists(sessionPath)) {
-      const loadResult = await loadSession(session, sessionPath);
-      if (loadResult.success) {
-        // Session loaded successfully
-        void vscode.window.showInformationMessage(
-          `Restored session from ${sessionPath.split('/').pop()}`
+    // Feature 261 (FR-007): hydrate view-state (viewport, time window/playhead,
+    // selection) and per-feature visibility from the SystemState features inside
+    // the loaded features.geojson. The `.debrief-session` sidecar is gone — the
+    // plot is self-describing. Absence of a SystemState variant leaves the store
+    // at its defaults (FR-008). Malformed / duplicate / cross-field-invalid
+    // SystemState features fail loudly (strict-on-import, FR-011/FR-012).
+    let playheadClamps: PlayheadClampDiagnostic[] = [];
+    try {
+      playheadClamps = hydrateStoreFromFeatures(session.getState(), plotData.features);
+    } catch (err) {
+      if (err instanceof SystemStateLoadError) {
+        void vscode.window.showErrorMessage(
+          `Could not restore plot view-state: ${err.message}`,
         );
-      } else if (loadResult.error?.includes('newer than supported')) {
-        // Future version - warn user (T055)
-        void vscode.window.showWarningMessage(
-          `Session file was created with a newer version of Debrief. Some settings may not be restored. ${loadResult.error}`
-        );
-      } else if (loadResult.error) {
-        // Other error - warn but continue
-        void vscode.window.showWarningMessage(
-          `Could not restore session: ${loadResult.error}`
-        );
+      } else {
+        throw err;
       }
     }
+    // spec 267 (FR-003): an orphaned playhead (out-of-window current_time inside
+    // a coherent window) is clamped on load — never silent. Surface a
+    // non-blocking warning naming the edge it moved to. A fatal cross-field
+    // error (incoherent window) was already surfaced as an error above and
+    // leaves `playheadClamps` empty, so the two paths never collide.
+    notifyPlayheadClamps(playheadClamps);
 
     // Set as active document
     sessionManager.setActiveDocument(plotUri);
+
+    // Spec #192 T017 (producer rule 1) — ask the host-agnostic StacWriter
+    // whether storage is persistent, and dispatch the read-only signal on
+    // this session's plot slice. Most-restrictive precedence: any single
+    // producer setting true keeps the plot RO until an openPlot against a
+    // writable host resets it. We *always* dispatch — including resetting
+    // to false — because the same store handle may have been escalated by
+    // a prior `saveSession` failure on a different plot.
+    if (getStacWriter) {
+      try {
+        const writer = getStacWriter(store.path);
+        const capability = await writer.capability();
+        const persistent = capability.persistent === true;
+        session.getState().setReadOnly(
+          !persistent,
+          persistent ? null : 'Storage location is not writable',
+        );
+      } catch (err) {
+        // Capability probing must never block plot opening. Default to
+        // "writable" so the analyst is not surprised by a banner caused by
+        // a probing error; the save-time escalation path will catch real
+        // write failures.
+        console.warn('[debrief] openPlot: writer.capability() probe failed', err);
+        session.getState().setReadOnly(false, null);
+      }
+    }
 
     // Create or get map panel
     let panel = getMapPanel();
@@ -298,7 +345,7 @@ export function createOpenPlotCommand(
 
       // Phase 6: replay deps (Feature: 076-replay-tune)
       writeGeoJson: async (sp, ip, fc) => {
-        await stacService.writeGeoJson(sp, ip, toSafeFC(fc));
+        await stacService.writeGeoJson(sp, ip, toIngressFC(fc));
       },
 
       executeTool: async (toolId, featureIds, params, activityId, timestamp) => {
@@ -308,7 +355,7 @@ export function createOpenPlotCommand(
         const fc = await stacService.loadGeoJsonForItem(store.path, itemPath);
         if (!fc) { return { success: false, duration_ms: Date.now() - startMs }; }
 
-        // SafeFeature already has id?: string | number
+        // IngressFeature already has id?: string | number
         const allFeatures = fc.features;
         const features = allFeatures.filter(
           (f) => featureIds.includes(String(f.id ?? f.properties?.['id']))
@@ -326,7 +373,7 @@ export function createOpenPlotCommand(
         // Helper: stamp the original activityId and timestamp on Python-generated
         // provenance so the timeline shows one entry per original activity at
         // its original position, not duplicates sorted to the end.
-        const stampProvenance = (f: SafeFeature): void => {
+        const stampProvenance = (f: IngressFeature): void => {
           if (!activityId) { return; }
           const props = f.properties;
           if (!props || !Array.isArray(props.provenance)) { return; }
@@ -367,7 +414,7 @@ export function createOpenPlotCommand(
         } else {
           // Additive: append new features, stamping original activityId
           for (const f of result.features.features) {
-            const sf: SafeFeature = { type: 'Feature', id: f.id, geometry: f.geometry, properties: f.properties };
+            const sf: IngressFeature = { type: 'Feature', id: f.id, geometry: f.geometry, properties: f.properties };
             stampProvenance(sf);
             fc.features.push(sf);
           }
@@ -385,17 +432,7 @@ export function createOpenPlotCommand(
       },
 
       loadSnapshot: async (sp, ip, assetFilename) => {
-        const fc = await stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
-        if (!fc) { return null; }
-        return {
-          type: fc.type as 'FeatureCollection',
-          features: fc.features.map((f): { type: 'Feature'; geometry: unknown; properties: Record<string, unknown> | null; id?: string | number } => ({
-            type: f.type,
-            geometry: f.geometry,
-            properties: f.properties,
-            id: f.id,
-          })),
-        };
+        return toGeoJsonFC(await stacService.loadSnapshotGeoJson(sp, ip, assetFilename));
       },
 
       resolveToolVersion: (toolId) => {
@@ -435,15 +472,15 @@ export function createOpenPlotCommand(
       // Wire SnapshotService for action bar snapshot button (Feature: 074)
       const snapshotService = createSnapshotService({
         loadGeoJson: async (sp: string, ip: string) => {
-          return stacService.loadGeoJsonForItem(sp, ip);
+          return toGeoJsonFC(await stacService.loadGeoJsonForItem(sp, ip));
         },
         writeSnapshotAsset: (sp, ip, fn, data) =>
           stacService.writeSnapshotAsset(sp, ip, fn, data),
         loadSnapshotGeoJson: async (sp, ip, assetFilename) => {
-          return stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
+          return toGeoJsonFC(await stacService.loadSnapshotGeoJson(sp, ip, assetFilename));
         },
         writeGeoJson: async (sp, ip, fc) => {
-          await stacService.writeGeoJson(sp, ip, toSafeFC(fc));
+          await stacService.writeGeoJson(sp, ip, toIngressFC(fc));
         },
         markDirty: () => {
           const activeSession = sessionManager.getActiveSession();

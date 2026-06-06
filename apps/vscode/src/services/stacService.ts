@@ -13,8 +13,8 @@ import type {
   StacItemSummary,
   StacCatalog,
   StacItem,
+  StacItemProperties,
   StacAsset,
-  PlatformRecord,
 } from '../types/stac';
 
 // AssociatedFile is canonically defined by `@debrief/components`; re-export
@@ -31,8 +31,10 @@ import type {
   PositionStyleOverride,
 } from '@debrief/schemas';
 
-// Canonical Safe GeoJSON types from @debrief/utils (T02)
-import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
+// Permissive ingress/parse-boundary feature types (schema-derived, #212)
+import type { IngressFeature, IngressFeatureCollection } from '@debrief/schemas';
+// Shared bounds utility — reused for STAC item bbox computation (#212, R2)
+import { calculateBounds } from '@debrief/utils';
 
 // Properties Panel (#191/#193) — provenance constants + type. Imported via
 // subpath so the service does not drag in the full components barrel (and its
@@ -71,16 +73,12 @@ export class SchemaValidationError extends Error {
   }
 }
 
-/** Disk / filesystem refused the write (EACCES / EROFS / read-only mount). */
-export class ReadOnlyFilesystemError extends Error {
-  override readonly name = 'ReadOnlyFilesystemError' as const;
-  constructor(
-    readonly path: string,
-    message: string = 'Cannot write item.json — filesystem is read-only',
-  ) {
-    super(message);
-  }
-}
+// `ReadOnlyFilesystemError` was moved to `@debrief/stac-writer` (spec #192
+// T017) so `@debrief/session-state`'s `saveSession` catch block can detect
+// it cleanly via `instanceof` without depending on this VS Code package.
+// Re-exported here so existing call sites (and tests) keep working.
+export { ReadOnlyFilesystemError } from '@debrief/stac-writer';
+import { ReadOnlyFilesystemError } from '@debrief/stac-writer';
 
 export interface UpdateItemMetadataInput {
   storePath: string;
@@ -109,6 +107,19 @@ function isReadOnlyFsError(err: unknown): boolean {
   if (typeof err !== 'object' || err === null) {return false;}
   const code = (err as { code?: unknown }).code;
   return code === 'EACCES' || code === 'EROFS' || code === 'EPERM';
+}
+
+/**
+ * Narrow the LinkML-generated `StacItem.bbox: number[]` to the 4-tuple
+ * shape expected by UI summary projections. STAC permits 4- or
+ * 6-element bboxes; the catalog overview / plot UI only needs the 2D
+ * corners. Returns null when the bbox is shorter than 4 elements (the
+ * schema's lower-bound constraint rejects those at validation time,
+ * but the conditional keeps TypeScript happy here).
+ */
+function toBbox4(bbox: number[] | undefined): [number, number, number, number] | null {
+  if (!Array.isArray(bbox) || bbox.length < 4) {return null;}
+  return [bbox[0]!, bbox[1]!, bbox[2]!, bbox[3]!];
 }
 
 export class StacService {
@@ -280,8 +291,8 @@ export class StacService {
         const item = await this.loadItem(itemPath);
 
         if (item) {
-          const startDatetime = (item.properties.start_datetime as string | undefined) ?? null;
-          const endDatetime = (item.properties.end_datetime as string | undefined) ?? null;
+          const startDatetime = item.properties.start_datetime ?? null;
+          const endDatetime = item.properties.end_datetime ?? null;
           items.push({
             id: item.id,
             title: item.properties.title ?? item.id,
@@ -289,14 +300,16 @@ export class StacService {
             itemPath: relativePath,
             catalogId: catalog.id,
             storeId: store.id,
-            bbox: item.bbox ?? null,
+            bbox: toBbox4(item.bbox),
             startDatetime,
             endDatetime,
-            platforms: (item.properties['debrief:platforms'] as PlatformRecord[] | undefined) ?? [],
-            tags: (item.properties['debrief:tags'] as string[] | undefined) ?? [],
-            featureTags: (item.properties['debrief:feature_tags'] as string[] | undefined) ?? [],
+            platforms: item.properties['debrief:platforms'] ?? [],
+            tags: item.properties['debrief:tags'] ?? [],
+            featureTags: item.properties['debrief:feature_tags'] ?? [],
+            // spec 241: assets.thumbnail is the small (200x150) variant;
+            // assets.overview is the large (800x600) variant.
             thumbnailHref: item.assets['thumbnail']?.href ?? null,
-            thumbnailSmHref: item.assets['thumbnail-sm']?.href ?? null,
+            overviewHref: item.assets['overview']?.href ?? null,
           });
         }
       }
@@ -359,8 +372,8 @@ export class StacService {
       // falling back to datetime for both bounds
       const fallback = item.properties.datetime;
       const timeExtent: [string, string] = [
-        (item.properties.start_datetime as string | undefined) ?? fallback,
-        (item.properties.end_datetime as string | undefined) ?? fallback,
+        item.properties.start_datetime ?? fallback,
+        item.properties.end_datetime ?? fallback,
       ];
 
       if (geoJsonAsset) {
@@ -405,7 +418,10 @@ export class StacService {
         itemPath,
         catalogId: '', // Will be set by caller
         sourcePath: item.properties.sourcePath as string | undefined,
-        bbox: item.bbox,
+        // Plot.bbox is required as a 4-tuple; supply a zero-extent
+        // fallback for the (validation-rejected) case of a too-short
+        // schema bbox.
+        bbox: toBbox4(item.bbox) ?? [0, 0, 0, 0],
         timeExtent,
         trackCount,
         locationCount,
@@ -656,9 +672,8 @@ export class StacService {
       return true;
     }
 
-    // Fallback: Check for debrief:toolId metadata
-    const assetWithMetadata = asset as StacAsset & { 'debrief:toolId'?: string };
-    if (assetWithMetadata['debrief:toolId']) {
+    // Fallback: Check for debrief:toolId metadata (modelled StacAsset slot, #256)
+    if (asset['debrief:toolId']) {
       return true;
     }
 
@@ -811,14 +826,14 @@ export class StacService {
 
   private loadGeoJson(
     geoJsonPath: string
-  ): Promise<SafeFeatureCollection | null> {
+  ): Promise<IngressFeatureCollection | null> {
     try {
       if (!fs.existsSync(geoJsonPath)) {
         return Promise.resolve(null);
       }
 
       const content = fs.readFileSync(geoJsonPath, 'utf-8');
-      return Promise.resolve(JSON.parse(content) as SafeFeatureCollection);
+      return Promise.resolve(JSON.parse(content) as IngressFeatureCollection);
     } catch {
       return Promise.resolve(null);
     }
@@ -997,7 +1012,7 @@ export class StacService {
     storePath: string,
     itemPath: string,
     assetFilename: string
-  ): Promise<SafeFeatureCollection | null> {
+  ): Promise<IngressFeatureCollection | null> {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
     if (!item) {
@@ -1023,7 +1038,7 @@ export class StacService {
   async writeGeoJson(
     storePath: string,
     itemPath: string,
-    featureCollection: SafeFeatureCollection
+    featureCollection: IngressFeatureCollection
   ): Promise<void> {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
@@ -1296,18 +1311,19 @@ export class StacService {
     }
     const fingerprint = fs.statSync(fullItemPath).mtimeMs;
 
-    // Step 3: merge patch into properties.
-    // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
-    const props = item.properties as Record<string, unknown>;
+    // Step 3: merge patch into properties. #256: props is typed as the
+    // LinkML-derived StacItemProperties (open via its index signature), so
+    // modelled debrief:* writes are type-checked while arbitrary/core keys
+    // still flow through the `[key: string]: unknown` index signature.
+    const props: StacItemProperties = item.properties;
     for (const [k, v] of Object.entries(patch)) {
       props[k] = v;
     }
 
     // Step 4: merge overrideFields into debrief:overrides (dedupe + sort).
-    const existingOverrides = Array.isArray(props['debrief:overrides'])
-      ? (props['debrief:overrides'] as unknown[]).filter(
-          (x): x is string => typeof x === 'string',
-        )
+    const existingOverridesVal = props['debrief:overrides'];
+    const existingOverrides = Array.isArray(existingOverridesVal)
+      ? existingOverridesVal.filter((x): x is string => typeof x === 'string')
       : [];
     const overridesSet = new Set<string>(existingOverrides);
     for (const f of overrideFields) {
@@ -1328,8 +1344,13 @@ export class StacService {
     };
 
     // Step 6: append entry; rotate oldest entries when cap exceeded.
-    const existingLog = Array.isArray(props['debrief:provenance_log'])
-      ? (props['debrief:provenance_log'] as PropertiesProvenanceEntry[])
+    // #256/#240: the slot is typed as the generated (wide) provenance entry;
+    // the writer works in the narrowed component hybrid (literal tool/method/
+    // source). Bridge persistence-type → domain-type here — a typed narrowing
+    // between two known shapes, not an untyped-bag escape.
+    const existingLogVal = props['debrief:provenance_log'];
+    const existingLog: PropertiesProvenanceEntry[] = Array.isArray(existingLogVal)
+      ? (existingLogVal as PropertiesProvenanceEntry[])
       : [];
     const log: PropertiesProvenanceEntry[] = [...existingLog, entry];
     if (log.length > PROVENANCE_LOG_CAP) {
@@ -1509,7 +1530,7 @@ export class StacService {
   async addFeatures(
     storePath: string,
     itemPath: string,
-    features: SafeFeature[]
+    features: IngressFeature[]
   ): Promise<number> {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
@@ -1527,7 +1548,7 @@ export class StacService {
 
     const itemDir = path.dirname(fullItemPath);
     let geoJsonPath: string;
-    let featureCollection: SafeFeatureCollection;
+    let featureCollection: IngressFeatureCollection;
 
     if (geoJsonAsset) {
       geoJsonPath = path.resolve(itemDir, geoJsonAsset.href);
@@ -1551,8 +1572,12 @@ export class StacService {
     // Append new features
     featureCollection.features.push(...features);
 
-    // Update bbox if features have coordinates
-    const newBbox = this.calculateBboxFromFeatures(featureCollection.features);
+    // Update bbox if features have coordinates. Reuse the shared
+    // `calculateBounds` (#212, R2): it handles all seven geometry types
+    // (the removed local helper silently omitted Multi* geometries) and
+    // skips null-geometry features. `IngressFeature[]` is assignable to the
+    // utility's structural minimum without a cast.
+    const newBbox = calculateBounds(featureCollection.features);
     if (newBbox) {
       item.bbox = newBbox;
     }
@@ -1610,7 +1635,7 @@ export class StacService {
     }
 
     // Build a map of feature ID -> feature for quick lookup
-    const featureMap = new Map<string, SafeFeature>();
+    const featureMap = new Map<string, IngressFeature>();
     for (const feature of featureCollection.features) {
       const id = feature.id !== null && feature.id !== undefined
         ? String(feature.id)
@@ -1627,7 +1652,7 @@ export class StacService {
       const feature = featureMap.get(featureId);
       if (!feature) { continue; }
 
-      // Ensure properties exists — SafeFeature.properties is Record<string, unknown> | null
+      // Ensure properties exists — IngressFeature.properties is Record<string, unknown> | null | undefined
       if (!feature.properties) {
         feature.properties = {};
       }
@@ -1669,7 +1694,7 @@ export class StacService {
   async loadGeoJsonForItem(
     storePath: string,
     itemPath: string
-  ): Promise<SafeFeatureCollection | null> {
+  ): Promise<IngressFeatureCollection | null> {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
 
@@ -1710,68 +1735,5 @@ export class StacService {
     }
 
     return assetKey in item.assets;
-  }
-
-  /**
-   * Calculate bounding box from features
-   */
-  private calculateBboxFromFeatures(
-    features: SafeFeature[]
-  ): [number, number, number, number] | null {
-    let minLon = Infinity;
-    let minLat = Infinity;
-    let maxLon = -Infinity;
-    let maxLat = -Infinity;
-
-    for (const feature of features) {
-      if (!feature.geometry) {continue;} // Skip features with null geometry
-      const coords = this.extractCoordinates(feature.geometry);
-      for (const [lon, lat] of coords) {
-        if (typeof lon === 'number' && typeof lat === 'number') {
-          minLon = Math.min(minLon, lon);
-          minLat = Math.min(minLat, lat);
-          maxLon = Math.max(maxLon, lon);
-          maxLat = Math.max(maxLat, lat);
-        }
-      }
-    }
-
-    if (minLon === Infinity) {
-      return null;
-    }
-
-    return [minLon, minLat, maxLon, maxLat];
-  }
-
-  /**
-   * Extract all coordinates from a geometry
-   */
-  private extractCoordinates(geometry: SafeGeometry): number[][] {
-    const coords: number[][] = [];
-
-    if (geometry.type === 'Point') {
-      const point = geometry.coordinates as number[];
-      if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
-        coords.push([point[0], point[1]]);
-      }
-    } else if (geometry.type === 'LineString') {
-      const line = geometry.coordinates as number[][];
-      for (const point of line) {
-        if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
-          coords.push([point[0], point[1]]);
-        }
-      }
-    } else if (geometry.type === 'Polygon') {
-      const rings = geometry.coordinates as number[][][];
-      for (const ring of rings) {
-        for (const point of ring) {
-          if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
-            coords.push([point[0], point[1]]);
-          }
-        }
-      }
-    }
-
-    return coords;
   }
 }

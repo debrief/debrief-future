@@ -215,3 +215,14 @@ classes:
           rather than using inline choices.
         range: ParameterTypeEnum
         required: false
+      choices:
+        description: >-
+          Explicit choice list for enum-typed parameters when the client
+          cannot (or chooses not to) resolve a schema-defined `param_type`.
+          Used by both the ToolMatch picker (shared/components) and the
+          VS Code activity-panel adapter (apps/vscode/src/services/mcpToolAdapter.ts).
+          Added under spec 222 (P2) to collapse the drift cluster
+          attributed to ToolParameter (audit §3.2 rows 37 and 86).
+        range: string
+        required: false
+        multivalued: true

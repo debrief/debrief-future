@@ -147,6 +147,20 @@ function CatalogOverviewApp(): React.ReactElement {
     return catalogData.items.map(toStacBrowserItem);
   }, [catalogData]);
 
+  // #191 T082 — host wiring for the NL failure-banner recovery buttons.
+  // `retry` is handled inside FilterBar (re-submits the last phrase); here
+  // we route `open-settings`, `reload`, and `help` through VS Code commands
+  // by posting a message back to the extension host, which maps them to
+  // the matching `vscode.commands.executeCommand` (`help` resolves via
+  // `vscode.env.openExternal` — #198 Decision 4).
+  // Declared before the early return so hook order stays stable across renders.
+  const handleNlBannerAction = useCallback(
+    (action: 'open-settings' | 'retry' | 'reload' | 'help') => {
+      vscode.postMessage({ type: 'nlBannerAction', action });
+    },
+    [],
+  );
+
   if (!catalogData) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--vscode-editor-foreground, #ccc)' }}>
@@ -165,19 +179,6 @@ function CatalogOverviewApp(): React.ReactElement {
     shouldUseLlmClient && nlConfig
       ? `Live · Anthropic · ${nlConfig.model}`
       : undefined;
-
-  // #191 T082 — host wiring for the NL failure-banner recovery buttons.
-  // `retry` is handled inside FilterBar (re-submits the last phrase); here
-  // we route `open-settings`, `reload`, and `help` through VS Code commands
-  // by posting a message back to the extension host, which maps them to
-  // the matching `vscode.commands.executeCommand` (`help` resolves via
-  // `vscode.env.openExternal` — #198 Decision 4).
-  const handleNlBannerAction = useCallback(
-    (action: 'open-settings' | 'retry' | 'reload' | 'help') => {
-      vscode.postMessage({ type: 'nlBannerAction', action });
-    },
-    [],
-  );
 
   return (
     <StacBrowser

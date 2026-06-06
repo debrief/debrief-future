@@ -30,7 +30,7 @@ As a maintainer, when #142's research sprint lands a reliable fix for the openvs
 
 **Why this priority**: This is the entire reason the spec exists. The tests provide coverage that neither Storybook nor the web-shell harness can reproduce (they both bypass the VS Code extension host). Without reactivation, the coverage gap #210 tried to close reopens after #142 resolves.
 
-**Independent Test**: On a branch where #142 is landed and merged, remove `.fixme` from the `test.describe` in `tests/e2e/test-log-panel.spec.ts`, run `node apps/vscode/tests/e2e/run-playwright.mjs test-log-panel` (or the equivalent code-server runner), and confirm all five tests pass in CI across three consecutive runs.
+**Independent Test**: On a branch where #142 is landed and merged, remove `.fixme` from the `test.describe` in `tests/e2e/test-log-panel.spec.ts`, run `npx playwright test --config tests/e2e/playwright.config.ts test-log-panel` (the same invocation CI uses — see `.github/workflows/e2e.yml` line 193), and confirm all five tests pass in CI across three consecutive runs.
 
 **Acceptance Scenarios**:
 
@@ -67,11 +67,22 @@ As a future developer who encounters another test suite wedged on webview flakin
 
 ### Functional Requirements
 
-- **FR-001**: The five log-panel tests MUST be removed from `test.describe.fixme(...)` in `tests/e2e/test-log-panel.spec.ts` — converted back to `test.describe(...)`.
-- **FR-002**: The mute comment (`#233 — Re-suspended pending #142. ...`) MUST be removed from the test file in the same commit.
+- **FR-001**: The five log-panel tests MUST be removed from `test.describe.fixme(...)` in `tests/e2e/test-log-panel.spec.ts` — converted back to `test.describe(...)`. **Implementation note (post-#142 verification, 2026-04-29):** the cloud E2E framework (Hybrid A+D — see `docs/project_notes/webview-e2e-research.md` "Limitations") does not natively propagate extension → webview state messages. The four state-dependent tests (#2-#5) only pass once the page object's `executeCommand(...)` and `getWebviewFrame(...)` helpers synthesise the state messages the muted extension flow would have sent (`loadPlot` for the map iframe, `timeline:update` for the LogPanel). Helpers are explicitly in scope; test bodies stay untouched per §131. All five tests pass locally + in CI as required.
+- **FR-002**: The mute-explanation comments documenting the temporary `.fixme` state MUST be removed in the same commit. This covers BOTH:
+  - the `// #233 — Re-suspended pending #142 ...` block at the top of `tests/e2e/test-log-panel.spec.ts` (immediately above the `test.describe`); and
+  - the `# #210's log-panel skip-guard removed 2026-04-24 per spec 233 ...` block in `Taskfile.yml` (under the `lint:` task, in the slot where the guard line is being re-added).
+  Both comments document the *temporary* mute state and become stale the moment the suite is active again. The historical record lives in this spec and the merge commit body.
 - **FR-003**: Before un-suspending, #142 MUST be merged to main and the log-panel suite MUST pass three consecutive CI runs on a feature branch that rebases on top of that merge.
 - **FR-004**: The backlog entry for 233 MUST be struck-through and marked `complete` in `BACKLOG.md` in the same commit that removes `.fixme`.
 - **FR-005**: The skip-guard script that #210 introduced at `scripts/check-log-panel-skip-guard.sh` (invoked from `Taskfile.yml` → `lint`) MUST be restored when the suite is un-muted. The script asserts no `test.skip` / `test.fixme` / `test.describe.skip` / `test.describe.fixme` appears in `tests/e2e/test-log-panel.spec.ts`. It was removed by #534 (alongside this spec's creation) because it blocked the narrow mute; its purpose — preventing silent future skips — remains valid once the suite is stable again. Restoring means: re-create the bash script (see commit history for the original), re-add the `bash scripts/check-log-panel-skip-guard.sh` line to `Taskfile.yml`'s `lint` task, and confirm `task lint` passes with the `.fixme`-free test file.
+
+### Adjacent Cleanup (in-scope, pulled in from review)
+
+These three follow-ups were originally going to be deferred to BACKLOG.md as separate items. The reviewer's call to keep them in this spec is reflected below. None of them broaden the testing surface beyond `tests/e2e/`; together they take the un-mute work from "one suite returned to coverage" to "the post-#142 cleanup wavefront is fully consumed".
+
+- **FR-006** — *Dispose the now-superseded webview-injection POC*. `tests/e2e/test-webview-probe.spec.ts` was a proof-of-concept for webview content injection (POC-01 / POC-02), explicitly marked `.fixme` with the inline note `injector conflicts with Patch 3 — real extension now resolves webview natively. Injector-based POC is superseded by test-webview-resolve.spec.ts.` The replacement (`tests/e2e/test-webview-resolve.spec.ts`) exists and is active. The probe MUST be deleted in the same PR — including the `.spec.ts` file itself and any helper imports that become unreferenced (notably `tests/e2e/helpers/webview-injector.ts`). If `webview-injector.ts` has other importers, narrow the deletion to the spec file only and capture the orphaned-helper question as a one-line note in `evidence/`.
+- **FR-007** — *Triage the remaining muted E2E suites and produce a catalog*. As of 2026-04-27, sixteen `tests/e2e/*.spec.ts` files contain `test.describe.skip(...)` blocks blocked on **#143** (a separate webview-iframe blocker, NOT #142): `test-analysis-tool`, `test-capture-log-evidence`, `test-catalog-browse`, `test-drawing`, `test-event-log-propagation`, `test-load-display`, `test-log-edit-face`, `test-real-webview`, `test-selection-sync`, `test-storyboard-capture`, `test-storyboard-playback`, `test-styling-tools`, `test-time-controller`, `test-tune-prov`, `test-undo-redo-split`, `test-vscode-nl-search`. (The earlier review summary said "4"; the actual count is sixteen — recorded here for traceability.) These suites MUST NOT be un-muted in this PR — their blocker is #143, not #142, and #143 has not resolved. Instead, this PR MUST add a triage table at `specs/233-resuspend-log-panel-e2e/evidence/muted-suite-triage.md` listing each of the sixteen files with: (a) blocker issue (`#143` for all sixteen), (b) `.skip` vs `.fixme` flavour, (c) one-line scope of the test, (d) whether Patch 3 from #142 plausibly affects it (most likely "no" since the iframe-render path differs from the visibility-gate fix, but the operator should spot-check at least one suite — pick `test-real-webview` — to confirm). The triage exists so future work on #143 can plan the next un-mute wave from a single artefact rather than re-discovering the inventory.
+- **FR-008** — *Decide on a project-wide skip-guard pattern (decision only, no implementation in this PR)*. The current `scripts/check-log-panel-skip-guard.sh` is hard-coded to one file. With sixteen muted suites still on the board (FR-007), the question of whether to generalise to a parametrised guard (`scripts/check-suite-skip-guard.sh <file>`) or a glob-based ESLint rule recurs every time a suite un-mutes. This PR MUST record the decision (generalise vs. keep per-suite scripts vs. switch to ESLint) in `specs/233-resuspend-log-panel-e2e/research.md` under a new "Decision 6 — Skip-guard scaling" entry, with rationale. Implementation of the chosen pattern is explicitly OUT of scope for this PR — only the decision and the reasoning land here. The decision then governs the per-suite spec template that future un-mute specs (modelled on this one) will follow.
 
 ### Un-Suspend Recipe
 
@@ -91,8 +102,8 @@ git pull origin main
 #    Re-add `bash scripts/check-log-panel-skip-guard.sh` to Taskfile.yml
 #    under the `lint:` task, right after `check-adr-refs.sh`.
 
-# 4. Run locally first (cloud-friendly runner):
-node apps/vscode/tests/e2e/run-playwright.mjs test-log-panel
+# 4. Run locally first (matches CI invocation in .github/workflows/e2e.yml:193):
+npx playwright test --config tests/e2e/playwright.config.ts test-log-panel
 task lint  # confirm skip-guard passes against the fixme-free file
 
 # 5. Verify: expect 5 passed, 0 failed, 0 skipped. If any fails, STOP —
@@ -120,7 +131,7 @@ task lint  # confirm skip-guard passes against the fixme-free file
 
 - **SC-001**: After un-suspension, CI shows 5 passing log-panel tests in the `VS Code E2E` job on every run against main (three consecutive runs as the stability gate).
 - **SC-002**: Zero `test.describe.fixme` or `test.skip` markers remain on the `Log Panel` describe block.
-- **SC-003**: No new infrastructure warnings surface in the CI logs (i.e. webview-ready events fire, `resolveWebviewView` is called, iframe content renders within 15 s).
+- **SC-003**: No new infrastructure warnings surface in the CI logs (i.e. webview-ready events fire, `resolveWebviewView` is called, iframe content renders within 15 s). **Manual gate** — there is no automated CI assertion for this; the operator must spot-check the `VS Code E2E` job log of the merge-candidate run for the `Webview frame ... not found after 15000ms` substring (must be absent) and for any `resolveWebviewView` warning lines. Recorded as a manual step in `quickstart.md` Step 8 and in the Done-criteria checklist; if either string surfaces, treat the merge as blocked even when the five tests pass.
 - **SC-004**: The referenced `.fixme` comment in the test file is removed along with the mute.
 
 ---
@@ -131,6 +142,9 @@ task lint  # confirm skip-guard passes against the fixme-free file
 - Adding new log-panel test scenarios beyond the five that existed at the moment of un-suspension — additions belong to follow-up backlog items.
 - Changing the openvscode-server or Chromium image version (infrastructure change is out of scope for a test-reactivation PR).
 - Migrating the log-panel tests to the web-shell harness surface — they explicitly exist to exercise the VS Code extension-host integration, which is not reproducible in the harness.
+- **Un-muting any of the sixteen #143-blocked suites listed in FR-007.** Their blocker is a different webview-iframe failure mode (rendering path, not the visibility-gate fix Patch 3 delivered for #142). Cataloguing them is in scope (FR-007); un-muting is not.
+- **Implementing a generalised/parametrised skip-guard.** FR-008 records the decision; implementation is left to a follow-up PR governed by that decision.
+- **Refactoring `tests/e2e/helpers/webview-injector.ts`** beyond the deletion permitted in FR-006. If it has importers besides the disposed probe, leave it alone and note the orphan question in `evidence/`.
 
 ---
 
@@ -142,6 +156,6 @@ task lint  # confirm skip-guard passes against the fixme-free file
 
 ## Estimate
 
-- **Days**: 0.5 dev-day (once #142 lands).
-- **Complexity**: Low — revert one `.fixme`, re-run CI three times, merge.
-- **Risk**: Low-medium — depends on whether #142's fix is complete or leaves residual flakes. The edge-case section documents how to handle partial fixes.
+- **Days**: ~0.75 dev-day (once #142 lands). Revised upward from the original 0.5 estimate to absorb the three review-pulled-in adjacents — FR-006 (probe disposal: ~10 min), FR-007 (16-row triage table: ~30 min including the optional `test-real-webview` spot-check), FR-008 (record Decision 6 in research.md: ~15 min). The un-mute itself is unchanged at 0.5 dev-day.
+- **Complexity**: Low — revert one `.fixme`, delete one POC spec file, author one triage table + one decision entry, re-run CI three times, merge. Each adjacent is a paper-only addition with no new runtime code.
+- **Risk**: Low-medium — depends on whether #142's fix is complete or leaves residual flakes (the un-mute risk is unchanged). The adjacents add zero runtime risk: FR-006 deletes a `.fixme`'d spec (no behaviour change to CI); FR-007 only writes a markdown file; FR-008 only writes a markdown decision entry. The edge-case section documents how to handle partial #142 fixes.

@@ -1,0 +1,8 @@
+{
+  "type": "tools:update",
+  "payload": {
+    "tools": [],
+    "hasToolInventory": false,
+    "hasSelection": false
+  }
+}

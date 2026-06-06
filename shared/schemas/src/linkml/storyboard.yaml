@@ -12,9 +12,31 @@ description: >-
   - Viewport (sub-record, lives inside SceneProperties.viewport)
   - StoryboardFeature, SceneFeature (GeoJSON Feature wrappers)
 
-  Reserved slots in schema v1:
-  - SceneProperties.time_range MUST be null (reserved for v2 animated ranges)
-  - Viewport.bearing MUST be 0 (reserved for v2 rotated viewports)
+  Reserved slots in schema v2:
+  - Viewport.bearing MUST be 0 (reserved for rotated viewports)
+
+  v3 evolution (introduced by #263):
+  - SceneProperties.time_range is now a first-class TimeRange sub-record
+    (was reserved-null in v1/v2). When set, the Scene is the "time-range"
+    flavour and `viewport_end` MUST also be set.
+  - New SceneProperties.viewport_end slot: present iff time_range present.
+  - Cross-field rule scene-flavour-xor-rule enforces the XOR coupling.
+  - Cross-field rule scene-time-range-end-after-start-rule enforces
+    `time_range.end > time_range.start`.
+  - Schema evolution is additive (Article XIV); legacy instant Scenes with
+    `time_range = null`/absent and no `viewport_end` parse unchanged.
+
+  v2 (introduced by #259):
+  - SceneProperties.timestamp is NO LONGER required to be unique within a
+    Storyboard. Multiple Scenes may share a timestamp; ties are broken by
+    `creation_order` ascending.
+  - New required slot SceneProperties.creation_order (per-Storyboard
+    monotonic integer, unique within the Storyboard).
+  - StoryboardProperties.schema_version minimum bumped to 2.
+  - Module invariants: FC-I3 (no duplicate timestamps) is removed;
+    FC-I4 (no duplicate creation_order), FC-I5 (every Scene MUST carry
+    creation_order), and FC-V1 (schema_version >= 2) are added — enforced
+    by the storyboard module's `validatePlot` (see #259 data-model.md).
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -29,7 +51,54 @@ imports:
   - geojson
   - log-entry
 
+enums:
+  # NB: DisplayModeEnum is now canonical in common.yaml (feature 261, FR-002a —
+  # single source of truth for the time-controller's display mode). common.yaml
+  # is imported above, so SceneProperties.display_mode references it directly;
+  # the former mirror that lived here has been removed.
+  PolygonSourceEnum:
+    description: >-
+      Provenance of a Scene's stored polygon geometry. Render-side consumers
+      use this to decide whether to trust the on-disk polygon ('bounds') or
+      recompute it from (viewport, map dimensions) when the stored polygon
+      pre-dates Spec #258 ('placeholder') or was hand-drawn ('manual').
+    permissible_values:
+      bounds:
+        description: >-
+          Polygon was computed from real Leaflet map bounds at capture time
+          (post-#258 norm). Renderers trust the on-disk geometry.
+      placeholder:
+        description: >-
+          Pre-#258 ~100m placeholder square or otherwise non-bounds-derived.
+          Renderers recompute from (viewport, map dimensions); the on-disk
+          value is preserved (Article III.2 source preservation).
+      manual:
+        description: >-
+          Reserved for future user-drawn rectangles. Renderers recompute
+          (current behaviour) until manual editing of scene geometry ships.
+
 classes:
+  TimeRange:
+    description: >-
+      Time interval for a time-range Scene (#263). The interval is closed on
+      both ends. `end` MUST be strictly greater than `start`. Introduced by
+      Spec #263 to make `SceneProperties.time_range` a first-class slot.
+    attributes:
+      start:
+        description: >-
+          ISO-8601 instant; the slider position at the first capture action.
+          By convention CRUD writes the owning Scene's `timestamp` into this
+          slot, but the system does not depend on the two being equal —
+          ordering reads `time_range?.start ?? timestamp`.
+        range: datetime
+        required: true
+      end:
+        description: >-
+          ISO-8601 instant; the slider position at the second (confirm)
+          capture action. MUST be strictly greater than `start`.
+        range: datetime
+        required: true
+
   Viewport:
     description: >-
       Camera state sub-record inside a Scene. Captures the map viewport at
@@ -81,11 +150,16 @@ classes:
         required: false
       schema_version:
         description: >-
-          Schema version. Starts at 1. Monotonically non-decreasing across
-          edits; bumped only by migrations.
+          Schema version. Bumped to 2 by #259 (relax timestamp uniqueness +
+          add `SceneProperties.creation_order`). Pre-#259 plots carrying
+          `schema_version: 1` are rejected at load with
+          `UnsupportedSchemaVersionError` — no in-place migration is
+          provided (Article XIV pre-release freedom; FR-010 in #259 spec).
+          Monotonically non-decreasing across edits; bumped only by
+          migrations or breaking schema changes.
         range: integer
         required: true
-        minimum_value: 1
+        minimum_value: 2
 
   SceneProperties:
     is_a: BaseFeatureProperties
@@ -125,14 +199,38 @@ classes:
       timestamp:
         description: >-
           ISO-8601 instant when the Scene was captured. Drives Scene ordering
-          (ascending within a Storyboard). MUST be unique within a Storyboard.
+          (ascending within a Storyboard) as the primary sort key. Multiple
+          Scenes MAY share the same timestamp; ties are broken by
+          `creation_order` ascending (see #259).
         range: datetime
         required: true
+      creation_order:
+        description: >-
+          Per-Storyboard monotonic sequence value assigned by the platform at
+          capture time. Acts as the secondary sort key for Scenes — when two
+          Scenes share a `timestamp` the one with the lower `creation_order`
+          comes first. Unique within a Storyboard; gaps are permitted (left by
+          deletion). The platform — not the client — is the source of truth.
+          Introduced by #259; absent on pre-#259 plots which are rejected at
+          load (no migration shim — Article XIV pre-release freedom).
+        range: integer
+        required: true
+        minimum_value: 0
       time_range:
         description: >-
-          Reserved slot for v2 animated time-range Scenes. MUST be absent
-          (null) in schema v1.
-        range: string
+          For instant Scenes (#215 default): MUST be absent. For time-range
+          Scenes (#263): a TimeRange sub-record. When present, the Scene is
+          the time-range flavour and `viewport_end` MUST also be present.
+          See cross-field rule `scene-flavour-xor-rule`.
+        range: TimeRange
+        required: false
+      viewport_end:
+        description: >-
+          Map viewport camera state at the end of a time-range Scene (#263).
+          MUST be present if and only if `time_range` is present. Reuses
+          the Viewport sub-record (`bearing` MUST be 0). For instant Scenes
+          this slot MUST be absent.
+        range: Viewport
         required: false
       visible_feature_ids:
         description: >-
@@ -162,6 +260,53 @@ classes:
         range: integer
         required: true
         minimum_value: 0
+      display_mode:
+        description: >-
+          Time-controller display mode at capture time (full = entire track
+          history; trail = only the tail behind each platform). Reuses
+          DisplayModeEnum from session-state.yaml. Optional for legacy
+          compatibility (Spec #258): readers MUST leave the time controller
+          untouched when this slot is absent (FR-003). Writers populate it
+          from session.displayMode at the moment the scene is created.
+        range: DisplayModeEnum
+        required: false
+      _polygon_source:
+        description: >-
+          Provenance of the scene's stored polygon geometry (Spec #258).
+          'bounds' = computed from real Leaflet map bounds at capture time;
+          'placeholder' = pre-#258 ~100m square; 'manual' = reserved for
+          future user-drawn rectangles. Render-side consumers recompute the
+          polygon from (viewport, map dimensions) when this value is
+          anything other than 'bounds' (including absent, for legacy
+          scenes). The stored geometry is NEVER rewritten on read
+          (Article III.2 source preservation).
+        range: PolygonSourceEnum
+        required: false
+    rules:
+      - description: >-
+          Scene flavour XOR (#263): a Scene is either the instant flavour
+          (both `time_range` and `viewport_end` absent) or the time-range
+          flavour (both present). Any other combination is rejected with
+          `SceneFlavourXorViolation`.
+        preconditions:
+          slot_conditions:
+            time_range:
+              value_presence: PRESENT
+        postconditions:
+          slot_conditions:
+            viewport_end:
+              value_presence: PRESENT
+      - description: >-
+          Scene flavour XOR (#263, reverse): if `viewport_end` is present
+          then `time_range` MUST also be present.
+        preconditions:
+          slot_conditions:
+            viewport_end:
+              value_presence: PRESENT
+        postconditions:
+          slot_conditions:
+            time_range:
+              value_presence: PRESENT
 
   StoryboardFeature:
     description: GeoJSON Feature representing a Storyboard parent entity
@@ -207,3 +352,58 @@ classes:
         description: Scene properties
         range: SceneProperties
         required: true
+
+  SceneThumbnailAssetEntry:
+    description: |-
+      A single STAC Item asset entry produced by Storyboarding (#216) for one
+      variant of one Scene's thumbnail. Always appears as part of a
+      pair in an Item's `assets` map: a large entry under the key
+      `scene-thumbnail-{ULID}` and a small entry under the key
+      `scene-thumbnail-{ULID}-sm`, where `{ULID}` is the owning Scene's
+      identifier (matches SceneProperties.id).
+
+      Why ULID: the owning Scene's id; lets every per-Scene asset be
+      traced back to its Scene without an explicit foreign-key field
+      in the asset payload.
+
+      Why pairs: the Storyboarding capture pipeline produces both
+      sizes atomically (800x600 large for inspection; 200x150 small
+      for timeline strips). A single-variant entry is a defect — see
+      schema rule scene-thumbnail-pair-rule-001.
+
+      Lifecycle: created when a Scene is captured. Deleted when the
+      Scene is deleted (garbage-collection invariant — see schema
+      rule scene-thumbnail-orphan-rule-001). Both rules are enforced
+      by the debrief-stac audit module; the JSON Schema layer
+      enforces the value shape and key format only (see schema rule
+      scene-thumbnail-key-format-rule-001).
+
+      Supersedes the spec-241 placeholder `item_assets["scene-thumbnail"]`
+      and the `^scene-thumbnail(-.+)?$` patternProperties rule.
+    attributes:
+      href:
+        description: >-
+          URI-reference relative to the Item directory; conventionally
+          ./scene-thumbnails/scene-{ULID}.png (large) or
+          ./scene-thumbnails/scene-{ULID}-sm.png (small).
+        range: string
+        required: true
+      type:
+        description: Always image/png — Storyboarding capture writes PNGs only.
+        range: string
+        required: true
+        equals_string: "image/png"
+      roles:
+        description: >-
+          Exactly ["thumbnail"]. Storyboarding-derived thumbnails are
+          not declared as overview (which is reserved for plot-level
+          overviews of dimensions 600x800).
+        range: string
+        required: true
+        multivalued: true
+      title:
+        description: >-
+          Optional human label. Storyboarding writer emits
+          "Scene thumbnail" (large) or "Scene thumbnail (small)" (small).
+        range: string
+        required: false

@@ -1,0 +1,15 @@
+{
+  "_comment": "T016 — paired valid: one ULID, both large and small variants present.",
+  "scene-thumbnail-01HXYZ7K8M9N0P1Q2R3S4T5V6W": {
+    "href": "./scene-thumbnails/scene-01HXYZ7K8M9N0P1Q2R3S4T5V6W.png",
+    "type": "image/png",
+    "roles": ["thumbnail"],
+    "title": "Scene thumbnail"
+  },
+  "scene-thumbnail-01HXYZ7K8M9N0P1Q2R3S4T5V6W-sm": {
+    "href": "./scene-thumbnails/scene-01HXYZ7K8M9N0P1Q2R3S4T5V6W-sm.png",
+    "type": "image/png",
+    "roles": ["thumbnail"],
+    "title": "Scene thumbnail (small)"
+  }
+}
