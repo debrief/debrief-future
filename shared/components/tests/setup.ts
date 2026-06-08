@@ -1,4 +1,26 @@
 import '@testing-library/jest-dom';
+import { beforeEach, afterEach } from 'vitest';
+
+// Clear persisted UI state between every test so persistence-touching suites
+// (layout, thumbnail-size, exercise-list, etc.) don't bleed state into one
+// another. [Decision #11 — spec 281]
+//
+// Guarded: some suites replace `localStorage` with a partial mock that omits
+// `clear()`. Skip silently in that case rather than failing every test in the
+// suite — those suites manage their own storage lifecycle.
+function clearLocalStorageSafely(): void {
+  if (typeof localStorage !== 'undefined' && typeof localStorage.clear === 'function') {
+    localStorage.clear();
+  }
+}
+
+beforeEach(() => {
+  clearLocalStorageSafely();
+});
+
+afterEach(() => {
+  clearLocalStorageSafely();
+});
 
 // Mock ResizeObserver for components that use it
 global.ResizeObserver = class ResizeObserver {

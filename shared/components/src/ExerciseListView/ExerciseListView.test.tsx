@@ -1,8 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, act } from '@testing-library/react';
 import React from 'react';
 import { ExerciseListView } from './ExerciseListView';
 import type { ExerciseListItem, RecentlyOpenedEntry } from './types';
+
+// Exposed measure spy so Decision-#10/#12 tests can inspect it.
+export const measureSpy = vi.fn();
 
 // ── Mock Data ──────────────────────────────────────────────────────
 
@@ -48,7 +51,9 @@ function makeRecentItems(count: number): RecentlyOpenedEntry[] {
 
 // ── Vitest Mocking ─────────────────────────────────────────────────
 
-// Mock useVirtualizer to render all items in test
+// Mock useVirtualizer to render all items in test.
+// Includes a `measure` spy so Decision #10/#12 tests can verify it fires on
+// rowHeight changes (and only then — not on every render).
 vi.mock('@tanstack/react-virtual', () => ({
   useVirtualizer: ({ count, estimateSize }: { count: number; estimateSize: () => number }) => ({
     getVirtualItems: () =>
@@ -59,6 +64,7 @@ vi.mock('@tanstack/react-virtual', () => ({
         size: estimateSize(),
       })),
     getTotalSize: () => count * estimateSize(),
+    measure: measureSpy,
   }),
 }));
 
@@ -376,6 +382,71 @@ describe('ExerciseListView', () => {
       );
 
       expect(onRequestTrackData).toHaveBeenCalledWith('item-1', 'exercises/alpha/data.geojson');
+    });
+  });
+
+  // ── virtualizer.measure() gating (Decision #10, #12) ──────────────
+  //
+  // Decision #12: measure() MUST be called inside useEffect([rowHeight])
+  // and NEVER in the render path.
+  // Decision #10: measure() must fire when rowHeight changes (thumbnailSize
+  // toggle causes rowHeight to change).
+
+  describe('virtualizer.measure() — Decision #10 and #12', () => {
+    beforeEach(() => {
+      measureSpy.mockClear();
+    });
+
+    it('calls measure() once on initial mount (useEffect fires after first render)', () => {
+      const items = makeItems(3);
+      render(<ExerciseListView items={items} thumbnailSize="small" />);
+      // The [rowHeight] effect fires once on mount
+      expect(measureSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls measure() again when thumbnailSize prop changes (rowHeight changes)', () => {
+      const items = makeItems(3);
+      const { rerender } = render(<ExerciseListView items={items} thumbnailSize="small" />);
+      const callsAfterMount = measureSpy.mock.calls.length;
+
+      // Change thumbnailSize → rowHeight goes from 80 to 135
+      act(() => {
+        rerender(<ExerciseListView items={items} thumbnailSize="medium" />);
+      });
+
+      // measure() must have been called again (at least one additional call)
+      expect(measureSpy.mock.calls.length).toBeGreaterThan(callsAfterMount);
+    });
+
+    it('does NOT call measure() again when only items change (rowHeight unchanged)', () => {
+      const items = makeItems(3);
+      const { rerender } = render(<ExerciseListView items={items} thumbnailSize="small" />);
+      const callsAfterMount = measureSpy.mock.calls.length;
+
+      // Changing items only — rowHeight stays the same → no extra measure() call
+      act(() => {
+        rerender(<ExerciseListView items={makeItems(5)} thumbnailSize="small" />);
+      });
+
+      expect(measureSpy.mock.calls.length).toBe(callsAfterMount);
+    });
+
+    it('calls measure() for each distinct rowHeight value encountered', () => {
+      const items = makeItems(2);
+      measureSpy.mockClear();
+      const { rerender } = render(<ExerciseListView items={items} thumbnailSize="small" />);
+      // small → mount fires once
+      expect(measureSpy).toHaveBeenCalledTimes(1);
+
+      act(() => { rerender(<ExerciseListView items={items} thumbnailSize="medium" />); });
+      expect(measureSpy).toHaveBeenCalledTimes(2);
+
+      act(() => { rerender(<ExerciseListView items={items} thumbnailSize="large" />); });
+      expect(measureSpy).toHaveBeenCalledTimes(3);
+
+      // Switching back to small triggers another measure()
+      act(() => { rerender(<ExerciseListView items={items} thumbnailSize="small" />); });
+      expect(measureSpy).toHaveBeenCalledTimes(4);
     });
   });
 });

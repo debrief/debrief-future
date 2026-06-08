@@ -15,7 +15,7 @@ import {
   type ComponentContainer,
 } from 'golden-layout';
 import type { PanelRegistry } from './panelRegistry';
-import { DEFAULT_LAYOUT_CONFIG, PANEL_MAP } from './defaultLayout';
+import { getDefaultLayout, BASELINE_WIDTH, PANEL_MAP } from './defaultLayout';
 import { saveLayout, loadLayout, clearLayout } from './layoutPersistence';
 import { createBindHandler, createUnbindHandler, unmountAll, updateContextWrapper } from './goldenLayoutBridge';
 import './PanelWorkspace.css';
@@ -87,7 +87,11 @@ export function PanelWorkspace({
     const gl = new GoldenLayout(container, bindHandler, unbindHandler);
     glRef.current = gl;
 
-    // Try to load saved layout, fall back to default
+    // Read container width ONCE at GL init (Decision #3, #13 — key off
+    // clientWidth of the container, not window.innerWidth).
+    const containerWidth = container.clientWidth || BASELINE_WIDTH;
+
+    // Try to load saved layout, fall back to responsive default
     const registeredTypes = registry.getTypes();
     const savedConfig = loadLayout(registeredTypes as string[]);
 
@@ -97,10 +101,10 @@ export function PanelWorkspace({
         layoutConfig = LayoutConfig.fromResolved(savedConfig as ResolvedLayoutConfig);
       } catch {
         console.warn('Failed to parse saved layout, using default');
-        layoutConfig = DEFAULT_LAYOUT_CONFIG;
+        layoutConfig = getDefaultLayout(containerWidth);
       }
     } else {
-      layoutConfig = DEFAULT_LAYOUT_CONFIG;
+      layoutConfig = getDefaultLayout(containerWidth);
     }
 
     gl.loadLayout(layoutConfig);
@@ -155,7 +159,9 @@ export function PanelWorkspace({
     }
 
     clearLayout();
-    gl.loadLayout(DEFAULT_LAYOUT_CONFIG);
+    // Read container width ONCE at reset (Decision #3, #13).
+    const containerWidth = containerRef.current?.clientWidth ?? BASELINE_WIDTH;
+    gl.loadLayout(getDefaultLayout(containerWidth));
 
     // After loadLayout, GoldenLayout has created new DOM containers and
     // the bridge has bound fresh React roots. Force a re-render of all

@@ -16,11 +16,13 @@ import {
   LayoutConfig,
   ResolvedLayoutConfig,
   type ComponentContainer,
+  type RowOrColumnItemConfig,
 } from 'golden-layout';
 import { createRoot, type Root } from 'react-dom/client';
 import { MapContainer, Rectangle, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import type { LatLngBoundsExpression, LeafletMouseEvent } from 'leaflet';
 
+import { readThumbnailSize, writeThumbnailSize } from './thumbnailSizePreference';
 import type { StacBrowserProps } from './types';
 import type { StacBrowserItem } from '../filter-engine/types';
 import type { ViewportPolygon, TimeFilter } from '@debrief/schemas';
@@ -197,8 +199,7 @@ function buildLayoutForVisiblePanels(hidden: Set<string>): LayoutConfig {
   const showMap = !hidden.has(PANEL_MAP);
   const hasBottom = showTimeline || showMap;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const content: any[] = [
+  const content: RowOrColumnItemConfig.ChildItemConfig[] = [
     { type: 'stack', height: hasBottom ? 55 : 100, content: [exercises] },
   ];
 
@@ -656,9 +657,12 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   const [sort, setSort] = useState<SortConfiguration>(DEFAULT_SORT);
   const handleSortChange = useCallback((s: SortConfiguration) => setSort(s), []);
 
-  // ─── Thumbnail size ──────────────────────────────────────────────────────────
-  const [thumbnailSize, setThumbnailSize] = useState<ThumbnailSize>('small');
-  const handleThumbnailSizeChange = useCallback((s: ThumbnailSize) => setThumbnailSize(s), []);
+  // ─── Thumbnail size — hydrated from localStorage on mount (T033) ─────────────
+  const [thumbnailSize, setThumbnailSize] = useState<ThumbnailSize>(readThumbnailSize);
+  const handleThumbnailSizeChange = useCallback((s: ThumbnailSize) => {
+    writeThumbnailSize(s);
+    setThumbnailSize(s);
+  }, []);
 
   // ─── Hidden panels (removed from GL, restore via filter bar buttons) ──────
   const [hiddenPanels, setHiddenPanels] = useState<Set<string>>(new Set());
@@ -832,7 +836,9 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
             renderThumbnailSizeToggle();
           }
 
-          // Hide button — only for Timeline and Map panels
+          // Collapse button — only for Timeline and Map panels.
+          // Uses a chevron-down glyph + "Collapse" label so the affordance is
+          // discoverable (FR-014). The data-testid enables reliable E2E selection.
           if ((componentType === PANEL_TIMELINE || componentType === PANEL_MAP) && !hideBtnRoots.has(componentType)) {
             const btnLi = document.createElement('li');
             btnLi.className = 'stac-browser__hide-btn-li';
@@ -853,9 +859,21 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
             controlsEl.insertBefore(btnLi, controlsEl.firstChild);
             const btnRoot = createRoot(btnLi);
             hideBtnRoots.set(componentType, { root: btnRoot, container: btnLi });
+            const panelTitle = PANEL_TITLES[componentType] ?? componentType;
+            const testId = componentType === PANEL_TIMELINE
+              ? 'catalog-collapse-timeline'
+              : 'catalog-collapse-map';
             btnRoot.render(
-              <button type="button" className="stac-browser__hide-btn" title={`Hide ${PANEL_TITLES[componentType]} panel`}>
-                {'\u2212'}
+              <button
+                type="button"
+                className="stac-browser__hide-btn"
+                title={`Collapse ${panelTitle} preview row`}
+                aria-label={`Collapse ${panelTitle} preview row`}
+                data-testid={testId}
+              >
+                {/* chevron-down ▾ + label for discoverability (FR-014) */}
+                <span aria-hidden="true">&#x25BE;</span>
+                {' '}Collapse
               </button>,
             );
           }
@@ -956,10 +974,11 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
             type="button"
             className="stac-browser__restore-btn"
             onClick={() => restorePanel(PANEL_TIMELINE)}
-            title="Show Timeline panel"
+            title="Show Timeline preview row"
+            aria-label="Show Timeline preview row"
             data-testid="restore-timeline"
           >
-            + Timeline
+            &#x25B4; Show Timeline
           </button>
         )}
         {hiddenPanels.has(PANEL_MAP) && (
@@ -967,10 +986,11 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
             type="button"
             className="stac-browser__restore-btn"
             onClick={() => restorePanel(PANEL_MAP)}
-            title="Show Map panel"
+            title="Show Map preview row"
+            aria-label="Show Map preview row"
             data-testid="restore-map"
           >
-            + Map
+            &#x25B4; Show Map
           </button>
         )}
       </div>

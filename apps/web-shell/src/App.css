@@ -81,7 +81,7 @@ body {
 .web-shell__header-link {
   padding: 4px 8px;
   font-size: 12px;
-  color: var(--vscode-textLink-foreground, #3794ff);
+  color: var(--debrief-color-primary, #0066cc);
   text-decoration: none;
   border-radius: 2px;
   transition: background-color 0.1s;
@@ -89,7 +89,15 @@ body {
 
 .web-shell__header-link:hover {
   background: var(--vscode-button-secondaryBackground, #3a3d41);
-  color: var(--vscode-textLink-activeForeground, #3794ff);
+  color: var(--debrief-color-primary, #0066cc);
+  text-decoration: underline;
+}
+
+/* High-contrast modes: add non-colour affordance (underline + heavier weight)
+   to meet SC 1.4.1 (use of colour) and SC 1.4.11 (non-text contrast). */
+[data-theme^='high-contrast'] .web-shell__header-link {
+  text-decoration: underline;
+  font-weight: 600;
 }
 
 /* Back button */

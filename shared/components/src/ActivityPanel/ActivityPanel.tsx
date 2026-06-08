@@ -5,7 +5,7 @@
  * single collapsible panel with three sections.
  */
 
-import { useState, useCallback, useRef, useEffect, useMemo, Component } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo, Component, useLayoutEffect } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
 import { Icon } from 'vscrui';
 import type { IIconProps } from 'vscrui';
@@ -170,6 +170,19 @@ function ResizeHandle({ onDrag }: ResizeHandleProps) {
 }
 
 /**
+ * Height threshold below which the short-height adaptation fires (T021).
+ *
+ * Derived from a 720-px viewport: subtract ~100px for the GoldenLayout header
+ * chrome + the browser URL bar, leaving ~820 px for the panel itself.
+ * Panels taller than 899 px (e.g. 900px+ / 13" laptop at full height, or
+ * any desktop with the GL panel occupying the full viewport) are NOT adapted.
+ *
+ * Decision #2: adapt only when UNCONTROLLED AND height < threshold AND a
+ * feature is selected. Never call onCollapseStateChange (not persisted).
+ */
+const SHORT_HEIGHT_THRESHOLD = 820;
+
+/**
  * ActivityPanel component.
  *
  * @example
@@ -231,6 +244,50 @@ export function ActivityPanel({
 }: ActivityPanelProps) {
   const [internalCollapseState, setInternalCollapseState] = useState(DEFAULT_COLLAPSE_STATE);
   const collapseState = externalCollapseState ?? internalCollapseState;
+
+  // Ref for the panel root div — used by the short-height adaptation (T021).
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Short-height adaptation (T021 / US4 / Decision #2):
+  //
+  // When the panel is UNCONTROLLED (no collapseState prop) AND the container
+  // clientHeight is below SHORT_HEIGHT_THRESHOLD AND a feature is selected,
+  // set the INITIAL internalCollapseState to collapse Tools (and Layers if
+  // also needed) so Properties is immediately visible without scrolling.
+  //
+  // Rules:
+  //   - No-op when collapseState is controlled (externalCollapseState provided).
+  //   - No-op when clientHeight >= 900px.
+  //   - NEVER calls onCollapseStateChange — not persisted; manual toggles win.
+  //   - Read clientHeight ONCE (useLayoutEffect runs synchronously after DOM
+  //     paint on the initial mount, Decision #13 — read once at init/reset).
+  //   - A feature is "selected" when selectedFeatureIds is non-empty OR
+  //     selection.featureIds is non-empty.
+  const isUncontrolled = externalCollapseState === undefined;
+  const hasSelectedFeature =
+    (selectedFeatureIds?.length ?? 0) > 0 ||
+    (selection?.featureIds?.length ?? 0) > 0;
+
+  useLayoutEffect(() => {
+    if (!isUncontrolled) return; // No-op when controlled
+    const el = panelRef.current;
+    if (!el) return;
+    const height = el.clientHeight;
+    if (height === 0 || height >= 900) return; // No-op when tall or unmeasured
+    if (height >= SHORT_HEIGHT_THRESHOLD) return; // No-op above threshold
+    if (!hasSelectedFeature) return; // No-op when no feature selected
+
+    // Collapse Tools first; that is usually enough to reveal Properties.
+    // If the panel is extremely short, also collapse Layers.
+    setInternalCollapseState((prev) => ({
+      ...prev,
+      toolsCollapsed: true,
+      // Collapse Layers too when height is very constrained (< 600px)
+      layersCollapsed: height < 600 ? true : prev.layersCollapsed,
+    }));
+    // Intentionally NO call to onCollapseStateChange (Decision #2 — not persisted)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run ONCE at mount — clientHeight read once (Decision #13)
 
   // Tracks the pixel offset from the default 50/50 split between Tools and Layers
   const [splitOffset, setSplitOffset] = useState(0);
@@ -592,7 +649,7 @@ export function ActivityPanel({
     : undefined;
 
   return (
-    <div className={`debrief-activity-panel ${className ?? ''}`} role="region" aria-label="Activity Panel">
+    <div ref={panelRef} className={`debrief-activity-panel ${className ?? ''}`} role="region" aria-label="Activity Panel">
       {/* Time Controller — fixed height, no resize */}
       <PaneSection
         title="Time Controller"
