@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debrief Briefing</title>
+    <style>
+      html, body, #briefing-root { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; }
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1e1e1e; color: #f0f0f0; }
+    </style>
+    <script type="module" src="/debrief-future/pr-preview/pr-668/briefing-renderer/assets/index-KaFBBxnt.js"></script>
+    <link rel="stylesheet" href="/debrief-future/pr-preview/pr-668/briefing-renderer/assets/index-C6qkxmJl.css">
+  </head>
+  <body>
+    <div id="briefing-root"></div>
+
+    <!--
+      The three <script type="application/json"> blocks below are filled by
+      the VS Code export command (apps/vscode/src/services/briefingZipExport/
+      injectInlineData.ts) at zip-assembly time. In dev they remain empty;
+      the SPA falls back to its in-tree fixture (src/fixtures/dev-fixture.ts).
+    -->
+    <script type="application/json" id="briefing-features-data"></script>
+    <script type="application/json" id="briefing-item-data"></script>
+    <script type="application/json" id="briefing-config"></script>
+
+  </body>
+</html>
