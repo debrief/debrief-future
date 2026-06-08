@@ -14,13 +14,20 @@
 
 import { test, expect } from '@playwright/test';
 import path from 'node:path';
+import { mkdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { CatalogPage } from '../pages/CatalogPage';
 
 // ─── Evidence output path ────────────────────────────────────────────────────
+// ESM-safe __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const EVIDENCE_DIR = path.resolve(
   __dirname,
   '../../../../specs/281-ui-review-p1-p2-fixes/evidence/screenshots',
 );
+mkdirSync(EVIDENCE_DIR, { recursive: true });
 
 // ─── SC-006: discoverable collapse / restore, state persists ─────────────────
 
@@ -51,7 +58,7 @@ test.describe('SC-006: Bottom preview row collapse / restore', () => {
     expect(ariaLabel).toContain('Collapse');
   });
 
-  test('collapse timeline → exercise list grows, restore returns it', async ({ page }) => {
+  test('collapse the preview row → exercise list grows, restore returns it', async ({ page }) => {
     const catalog = new CatalogPage(page);
     await catalog.goto();
 
@@ -59,31 +66,34 @@ test.describe('SC-006: Bottom preview row collapse / restore', () => {
     const heightBefore = await catalog.getExerciseListHeight();
     expect(heightBefore).toBeGreaterThan(0);
 
-    // Collapse the timeline panel
+    // The preview row holds two sibling panels (Timeline + Map). Collapsing one
+    // lets the sibling fill the row; the list only reclaims the space once the
+    // whole row is collapsed. Collapse both via the discoverable controls.
     await catalog.collapseTimelinePanel();
-
-    // Restore button should appear in filter bar
     await expect(catalog.restoreTimeline).toBeVisible();
     const titleAttr = await catalog.restoreTimeline.getAttribute('title');
     expect(titleAttr).toBeTruthy();
     expect(titleAttr).toContain('Show');
 
-    // Exercise list should be taller (more space available)
+    await catalog.collapseMapPanel();
+    await expect(catalog.restoreMap).toBeVisible();
+
+    // With the whole preview row collapsed, the exercise list reclaims the space.
     await page.waitForTimeout(300); // allow GL animation to settle
     const heightAfterCollapse = await catalog.getExerciseListHeight();
     expect(heightAfterCollapse).toBeGreaterThan(heightBefore);
 
-    // Screenshot: collapsed state
+    // Screenshot: collapsed state (list expanded into the reclaimed space)
     await page.screenshot({
       path: path.join(EVIDENCE_DIR, 'catalog-collapse.png'),
       fullPage: false,
     });
 
-    // Restore the panel
+    // Restore both panels
     await catalog.restoreTimelinePanel();
-
-    // Restore button should disappear
     await expect(catalog.restoreTimeline).not.toBeVisible();
+    await catalog.restoreMapPanel();
+    await expect(catalog.restoreMap).not.toBeVisible();
 
     // Exercise list height should return to approximately original
     await page.waitForTimeout(300);

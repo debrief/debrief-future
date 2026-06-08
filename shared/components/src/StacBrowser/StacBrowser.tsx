@@ -223,6 +223,26 @@ function buildLayoutForVisiblePanels(hidden: Set<string>): LayoutConfig {
   };
 }
 
+/**
+ * Recursively collect every `componentType` present in a (resolved or
+ * unresolved) GoldenLayout config tree. Used on mount to reconcile the
+ * `hiddenPanels` React state with the panels actually present in the
+ * restored layout (FR-016 — so the restore affordance survives a reload).
+ */
+function collectComponentTypes(node: unknown, acc: Set<string> = new Set()): Set<string> {
+  if (node === null || node === undefined || typeof node !== 'object') return acc;
+  if ('componentType' in node) {
+    const ct = (node as { componentType: unknown }).componentType;
+    if (typeof ct === 'string') acc.add(ct);
+  }
+  if (Array.isArray(node)) {
+    for (const child of node) collectComponentTypes(child, acc);
+  } else {
+    for (const value of Object.values(node)) collectComponentTypes(value, acc);
+  }
+  return acc;
+}
+
 /** Clean up injected header controls before rebuilding the layout. */
 function cleanupInjectedControls(): void {
   if (sortHeaderRoot) { sortHeaderRoot.unmount(); sortHeaderRoot = null; }
@@ -676,6 +696,8 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
       // Rebuild the entire layout so the panel appears in its correct position
       cleanupInjectedControls();
       gl.loadLayout(buildLayoutForVisiblePanels(next));
+      // Persist immediately so the restored state survives a quick reload.
+      try { saveBrowserLayout(gl.saveLayout()); } catch { /* ignore */ }
       return next;
     });
   }, []);
@@ -852,6 +874,9 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
                 if (glInst) {
                   cleanupInjectedControls();
                   glInst.loadLayout(buildLayoutForVisiblePanels(next));
+                  // Persist immediately (not just via the debounced autosave) so
+                  // the collapsed state survives a reload that races the debounce.
+                  try { saveBrowserLayout(glInst.saveLayout()); } catch { /* ignore */ }
                 }
                 return next;
               });
@@ -909,6 +934,16 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     }
 
     gl.loadLayout(layoutConfig);
+
+    // Reconcile hiddenPanels with the panels actually present in the restored
+    // layout, so the restore affordance reflects the persisted state after a
+    // reload (FR-016). Without this, hiddenPanels resets to empty and the
+    // "Show Timeline/Map" controls vanish even though the panels are absent.
+    const presentTypes = collectComponentTypes(layoutConfig.root);
+    const initialHidden = new Set<string>();
+    if (!presentTypes.has(PANEL_TIMELINE)) initialHidden.add(PANEL_TIMELINE);
+    if (!presentTypes.has(PANEL_MAP)) initialHidden.add(PANEL_MAP);
+    if (initialHidden.size > 0) setHiddenPanels(initialHidden);
 
     gl.on('stateChanged', () => {
       debouncedSave();

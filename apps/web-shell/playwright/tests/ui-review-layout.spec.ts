@@ -20,77 +20,29 @@
 
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
+import { mkdirSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { AnalysisPage } from '../pages/AnalysisPage';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ESM-safe __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 /** Repo-relative path to the evidence screenshots directory. */
-const EVIDENCE_DIR = path.join(
+const EVIDENCE_DIR = path.resolve(
   __dirname,
   '../../../../specs/281-ui-review-p1-p2-fixes/evidence/screenshots',
 );
+mkdirSync(EVIDENCE_DIR, { recursive: true });
 
 /** Open the first available plot in the catalog. */
 async function openFirstPlot(analysis: AnalysisPage): Promise<void> {
   await analysis.page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
   await analysis.waitForLoad();
-}
-
-/**
- * Seed localStorage with a custom v3 layout at the well-known storage key.
- * The config content is structurally valid (all essential panels present)
- * but uses custom column widths to verify the layout is used verbatim.
- */
-async function seedCustomV3Layout(page: import('@playwright/test').Page): Promise<void> {
-  await page.evaluate(() => {
-    const customLayout = {
-      version: 3,
-      config: {
-        root: {
-          type: 'row',
-          content: [
-            {
-              type: 'column',
-              width: 30, // custom 30% sidebar
-              content: [
-                {
-                  type: 'stack',
-                  height: 30,
-                  content: [{ type: 'component', componentType: 'navigation', title: 'Navigation' }],
-                },
-                {
-                  type: 'stack',
-                  height: 70,
-                  activeItemIndex: 0,
-                  content: [
-                    { type: 'component', componentType: 'activity', title: 'Activity' },
-                    { type: 'component', componentType: 'log', title: 'Log' },
-                  ],
-                },
-              ],
-            },
-            {
-              type: 'column',
-              width: 70, // 70% for the map
-              content: [
-                {
-                  type: 'stack',
-                  content: [{ type: 'component', componentType: 'map', title: 'Map' }],
-                },
-              ],
-            },
-          ],
-        },
-        openPopouts: [],
-        dimensions: {},
-        header: {},
-        resolved: true,
-      },
-    };
-    localStorage.setItem('debrief-panel-layout', JSON.stringify(customLayout));
-  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -170,17 +122,41 @@ test.describe('US3 — responsive sidebar width (spec 281)', () => {
     expect(railWidth).toBeLessThan(1440 * 0.5);
   });
 
-  test('FR-011: saved v3 custom layout is respected verbatim', async ({ page }) => {
+  test('FR-011: a saved custom layout is respected verbatim', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
-    // Seed a custom 30/70 split layout at v3
-    await seedCustomV3Layout(page);
+    await page.evaluate(() => localStorage.removeItem('debrief-panel-layout'));
 
     const analysis = new AnalysisPage(page);
     await openFirstPlot(analysis);
 
-    // The custom layout specifies 30% sidebar. At 1440px that is ~432px.
-    // Accept a generous range (380-520px) tolerating GL chrome.
+    // The app persists GoldenLayout's *resolved* config on stateChanged.
+    // Wait for that autosave, then widen the sidebar to a custom 30% and write
+    // it back — this is a real, app-produced layout (not a hand-built one), so
+    // it round-trips through LayoutConfig.fromResolved() exactly as a user's
+    // saved layout would.
+    await page.waitForFunction(() => localStorage.getItem('debrief-panel-layout') !== null);
+    const mutated = await page.evaluate(() => {
+      const raw = localStorage.getItem('debrief-panel-layout');
+      if (raw === null) return false;
+      const parsed = JSON.parse(raw) as {
+        config: { root?: { type: string; content: { size: number }[] } };
+      };
+      const root = parsed.config.root;
+      if (!root || root.type !== 'row' || root.content.length < 2) return false;
+      // content[0] = sidebar column, content[1] = map column
+      root.content[0].size = 30;
+      root.content[1].size = 70;
+      localStorage.setItem('debrief-panel-layout', JSON.stringify(parsed));
+      return true;
+    });
+    expect(mutated).toBe(true);
+
+    // Reload and reopen — the saved custom layout must be applied verbatim.
+    await page.reload();
+    await openFirstPlot(analysis);
+
+    // 30% sidebar at 1440px ≈ 432px. Accept a generous range tolerating GL chrome.
     const railWidth = await analysis.getActivityRailWidthPx();
     expect(railWidth).toBeGreaterThan(380);
     expect(railWidth).toBeLessThan(520);
