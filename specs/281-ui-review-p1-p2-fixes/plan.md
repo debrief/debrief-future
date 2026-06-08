@@ -73,6 +73,26 @@ added/modified. No data-model or API surface.
 
 **No violations. No Complexity Tracking entries required.**
 
+## Review Decisions (`/speckit.review`, 2026-06-08)
+
+Binding decisions from the pre-tasks review. `/speckit.tasks` MUST encode these.
+
+| # | Area | Decision | Rationale (principle) |
+|---|------|----------|----------------------|
+| 1 | P2.1 default wiring | `DEFAULT_LAYOUT_CONFIG = getDefaultLayout(BASELINE_WIDTH)` — single panel-tree source. Switch **all three** `PanelWorkspace` call sites (parse-fail fallback, no-saved-layout, Reset Layout) to `getDefaultLayout(containerWidth)`. | DRY + minimal diff; Article XV. Prevents Reset Layout silently emitting the old fixed split (Article I). |
+| 2 | P2.2 collapse adaptation | Apply auto-collapse only as the **initial internal collapseState** when the panel is *uncontrolled* AND height < threshold. Never call `onCollapseStateChange` for it; manual toggles win and nothing is persisted. No-op when `collapseState` is controlled. | Article IV boundaries + Article I (no surprise / no silent persist). |
+| 3 | P2.1 width signal | Breakpoint keys off `containerRef.current.clientWidth` (the workspace container), **not** `window.innerWidth` — correct in the VS Code host where the workspace is narrower than the window. | Correctness across both hosts. |
+| 4 | P1.3 link colour | `.web-shell__header-link` consumes `var(--debrief-color-primary)` (already theme-aware, HC-light = `#0F4A85`) + underline/weight affordance in `[data-theme^='high-contrast']`. Add a dedicated darker token **only if** the 7:1 audit fails. | DRY + minimal diff. |
+| 5 | P2.4 thumbnail persistence | Small **typed read/write helper**, versioned like the sibling keys. On read, narrow to the `ThumbnailSize` union and fall back to `'small'` on any unexpected value. | Article XV.5 (validate untyped boundary) + Article I. |
+| 6 | Catalog `any` | Replace `const content: any[]` + `eslint-disable` in `buildLayoutForVisiblePanels` (`StacBrowser.tsx:200-201`) with the proper GoldenLayout item type while P2.3 is in this function. | Article XV (boy-scout at the edit site). |
+| 7 | P2.1 band logic | **Discrete bands**: ≤1366 → ~280 px rail; ≥1600 → ~360–400 px rail; in-between → one middle band. No continuous interpolation. | Explicit over clever; engineered-enough. |
+| 8 | P1.4 flake proof | Validate via the **10× no-retry loop**, AND configure CI to run the `properties-screenshots` suite at `retries: 0` so future flake fails loudly instead of being retried away. | Article VI (CI must catch regressions) + Article I. |
+| 9 | P2.2 invariant test | jsdom unit test: stub height < threshold → assert adaptation collapses Tools/Layers internally, **never** calls `onCollapseStateChange`, and is a no-op when `collapseState` is controlled. | Locks decision #2 against future silent-persist regression. |
+| 10 | P2.4 test layers | Unit-assert `virtualizer.measure()` fires on `rowHeight` change (spy) and that the persistence helper narrows bad input; E2E confirms visible S/M/L resize + reload. | Localise failures; don't rely on screenshot diff alone. |
+| 11 | Persistence test hygiene | Add `localStorage.clear()` to the setup/teardown of all persistence-touching unit suites (new thumbnail/layout specs + existing `ExerciseListView`/`ThumbnailSizeToggle`). | Prevent cross-test state bleed / flake. |
+| 12 | P2.4 measure gating | Call `virtualizer.measure()` only inside `useEffect(..., [rowHeight])` — never in the render path. | Avoid per-render re-measure thrash on a growing list. |
+| 13 | P2.1/P2.2 sampling | Read container `clientWidth`/`clientHeight` **once** at GL init and on Reset Layout. No continuous `ResizeObserver` re-flow (live re-flow on drag is out of scope). | Avoid forced-reflow cost for a non-requirement; matches spec 'correct on open'. |
+
 ## Project Structure
 
 ### Documentation (this feature)
@@ -138,11 +158,13 @@ involved.
   none`. In HC-light, `tokens.css` sets `--debrief-color-primary:
   var(--vscode-textLink-foreground, #0F4A85)` but the header link uses the raw
   VS Code var, not the Debrief token, and has no underline.
-- **Change**: introduce a theme-aware link token (e.g. `--debrief-link-fg` with
-  an HC override) consumed by `.web-shell__header-link`, and add an
-  underline + weight in HC modes (`[data-theme^='high-contrast'] .web-shell__header-link`).
-  Applied at the shared class/token level so all three links (and future ones)
-  inherit it (FR-003). Verify ≥7:1 against the HC-light header background.
+- **Change** (Decision #4): point `.web-shell__header-link` at the **existing**
+  theme-aware `var(--debrief-color-primary)` (HC-light = `#0F4A85`) rather than
+  inventing a new token, and add an underline + weight in HC modes
+  (`[data-theme^='high-contrast'] .web-shell__header-link`). Applied at the shared
+  class/token level so all three links (and future ones) inherit it (FR-003).
+  Verify ≥7:1 against the HC-light header background; **only if the audit fails**,
+  add a dedicated darker HC link token.
 - **Verify**: axe-core contrast audit in HC-light (SC-001) + visual evidence in
   all four themes (no regression, FR-004).
 
@@ -159,8 +181,11 @@ involved.
   actionability-aware `firstRow.click()` which already auto-waits. Keep the
   existing 15 s form-wait so genuine breakage still fails loudly (FR-007). Apply
   the same gate to the interaction-video test (lines 131-138).
-- **Verify**: 10 consecutive runs, retries disabled, 100% first-attempt pass
-  (SC-002). Note: this is a test-only change; no product behaviour changes.
+- **Verify** (Decision #8): 10 consecutive runs, retries disabled, 100%
+  first-attempt pass (SC-002). Additionally configure CI to run the
+  `properties-screenshots` suite at `retries: 0` so a future re-flake fails
+  loudly rather than being retried away. Note: this is a test-only change; no
+  product behaviour changes.
 
 ### P2.1 — Analysis layout scales to wide screens (US3)
 
@@ -168,16 +193,20 @@ involved.
   `DEFAULT_LAYOUT_CONFIG` with sidebar `width: 25` / content `width: 75`. A flat
   percentage gives an unpredictable px rail and doesn't honour the review's
   target px bands.
-- **Change**: replace the static export with a `getDefaultLayout(viewportWidth:
+- **Change**: replace the static export with a `getDefaultLayout(containerWidth:
   number): LayoutConfig` that computes the sidebar width *percentage* from a
-  target px width per band — ~280 px at ≤1366, growing to ~360–400 px at
-  ≥1600 (interpolated between) — clamped so the map always keeps the majority
-  (FR-010). Keep `DEFAULT_LAYOUT_CONFIG` as a back-compat default
-  (`getDefaultLayout(window.innerWidth)` equivalent) for existing importers.
-  `PanelWorkspace` calls the function when building the *fresh* default (only
-  when `loadLayout()` returns nothing or a stale version — FR-011). Bump
+  target px width using **discrete bands** (Decision #7): ≤1366 → ~280 px;
+  ≥1600 → ~360–400 px; in-between → one middle band — clamped so the map always
+  keeps the majority (FR-010). Derive `DEFAULT_LAYOUT_CONFIG =
+  getDefaultLayout(BASELINE_WIDTH)` so the panel tree has a single source
+  (Decision #1). Switch **all three** `PanelWorkspace` call sites — parse-fail
+  fallback, no-saved-layout, and **Reset Layout** — to call
+  `getDefaultLayout(containerWidth)`, where `containerWidth` is read **once**
+  from `containerRef.current.clientWidth` at GL init / reset (Decisions #3, #13),
+  not `window.innerWidth` (correct in the narrower VS Code host). Bump
   `LAYOUT_VERSION` so pre-existing fixed-25% saved layouts fall back to the
-  responsive default rather than persisting the old split.
+  responsive default rather than persisting the old split (FR-011 — saved custom
+  layouts still respected).
 - **Verify**: at ≥1600 the longest tool name renders without ellipsis (SC-003);
   at ≤1366 the rail is ~280 px and the map keeps the majority (SC-004); a saved
   custom layout is respected (FR-011).
@@ -188,13 +217,16 @@ involved.
   Properties stack vertically inside the Activity tab. At ~720 px tall the
   Properties section sits below the fold with no signal it exists; reaching it
   needs the user to know the column scrolls.
-- **Change**: add a height-conditional adaptation. Preferred approach
-  (confirmed in research): when the available activity-panel height is below a
-  threshold (~ derived from a 720 px viewport) **and** a feature is selected,
-  auto-collapse the upper flexible sections (Tools, and Layers if still needed)
-  so the Properties section is visible; the existing per-section collapse
-  primitive (`PaneSection`) is reused, so it remains manually overridable.
-  Adaptation is gated on available height (no effect ≥900 px — FR-013).
+- **Change** (Decision #2): add a height-conditional adaptation applied **only as
+  the initial internal `collapseState`** when the panel is *uncontrolled* AND the
+  available height (read once, `containerRef.clientHeight`, Decision #13) is below
+  a threshold (~derived from a 720 px viewport) AND a feature is selected — collapse
+  the upper flexible sections (Tools, and Layers if still needed) so Properties is
+  visible. It **must not** call `onCollapseStateChange` (nothing persisted, manual
+  toggles win) and **must be a no-op when `collapseState` is controlled**. The
+  existing per-section collapse primitive (`PaneSection`) is reused, so it remains
+  manually overridable. Adaptation is gated on available height (no effect ≥900 px
+  — FR-013).
 - **Verify**: at 1280×720 with a feature selected, Properties is visible/reachable
   without prior scroll knowledge (SC-005); at ≥900 px no adaptation forced.
 
@@ -212,7 +244,9 @@ involved.
   the hidden-panel state survives reload (it should via layout save — add a test
   to lock it in, FR-016). (c) Apply the agreed first-run default (bottom row
   **shown** once a dataset context exists; see Assumptions) when no saved layout
-  exists (FR-017). Reset Layout reapplies this default.
+  exists (FR-017). Reset Layout reapplies this default. (d) While editing this
+  function, replace its `const content: any[]` + `eslint-disable` with the proper
+  GoldenLayout item type (Decision #6, Article XV).
 - **Verify**: collapse expands the list and restore brings the row back, state
   survives reload (SC-006).
 
@@ -225,14 +259,18 @@ involved.
   caches item measurements and does **not** re-measure when `estimateSize`
   changes — so rows keep their old heights. Separately, `thumbnailSize` defaults
   to `'small'` and is **never persisted** (`StacBrowser.tsx:660`).
-- **Change**: (a) in `ExerciseListView`, call `virtualizer.measure()` in a
-  `useEffect` keyed on `rowHeight` so a size change re-flows the list (also
-  ensure the thumbnail imagery itself scales with the size config, not only row
-  height — FR-018). (b) persist `thumbnailSize` to `localStorage` (new key,
-  versioned alongside the others) and hydrate it on mount (FR-020). The toggle's
+- **Change**: (a) in `ExerciseListView`, call `virtualizer.measure()` **only**
+  inside `useEffect(..., [rowHeight])` (Decision #12 — never in the render path)
+  so a size change re-flows the list (also ensure the thumbnail imagery itself
+  scales with the size config, not only row height — FR-018). (b) persist
+  `thumbnailSize` via a **typed, versioned read/write helper** (Decision #5) that
+  narrows the stored value to the `ThumbnailSize` union on read and falls back to
+  `'small'` on anything unexpected; hydrate on mount (FR-020). The toggle's
   active-state indication already exists and is correct (FR-019).
-- **Verify**: S/M/L each produce a visibly distinct item size and the choice
-  survives reload (SC-007).
+- **Verify** (Decision #10): unit-assert `virtualizer.measure()` fires on
+  `rowHeight` change and that the persistence helper rejects bad input; E2E
+  confirms S/M/L each produce a visibly distinct item size and the choice survives
+  reload (SC-007).
 
 ## Media Components
 
@@ -273,7 +311,12 @@ behaviour, if a constrained-height story is added.
 **Testing Strategy**:
 - [x] Component renders correctly in theme variants
 - [x] Properties section visible/reachable under constrained height
+- [x] **Invariant unit test (Decision #9)**: height < threshold → adaptation
+  collapses Tools/Layers internally, never calls `onCollapseStateChange`, and is
+  a no-op when `collapseState` is controlled
 - [x] Accessibility attributes present (existing `data-testid`s reused)
+- [x] **`localStorage.clear()` in setup/teardown** for all persistence-touching
+  unit suites, incl. existing `ExerciseListView`/`ThumbnailSizeToggle` (Decision #11)
 - [x] Screenshots captured for evidence
 
 **Test File Location**: `shared/components/e2e/ActivityPanel.spec.ts` (only if a
