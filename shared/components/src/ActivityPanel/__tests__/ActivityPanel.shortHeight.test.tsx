@@ -3,8 +3,10 @@
  *
  * US4 (P2.2): When the panel is UNCONTROLLED AND container clientHeight is
  * below the threshold AND a feature is selected, the INITIAL internal
- * collapseState collapses Tools (and optionally Layers) so Properties is
- * reachable. It MUST NOT call onCollapseStateChange.
+ * collapseState collapses ONLY the Time Controller so Properties moves toward
+ * the fold — WITHOUT hiding Tools or Layers (collapsing those would set them
+ * display:none, hiding the feature list the user selects from and the tools
+ * they run). It MUST NOT call onCollapseStateChange.
  *
  * Decisions:
  *   #2  — only fires for uncontrolled instances; never calls onCollapseStateChange
@@ -92,19 +94,20 @@ afterEach(() => {
 });
 
 describe('ActivityPanel — short-height adaptation (uncontrolled, feature selected)', () => {
-  it('collapses Tools internally when clientHeight < threshold', () => {
+  it('collapses ONLY the Time Controller when clientHeight < threshold', () => {
     const { container, restore } = renderUncontrolledWithFeature(700);
     try {
-      expect(isSectionCollapsed(container, 'Tools')).toBe(true);
+      expect(isSectionCollapsed(container, 'Time Controller')).toBe(true);
     } finally {
       restore();
     }
   });
 
-  it('leaves Time Controller and Properties expanded', () => {
+  it('leaves Tools, Layers and Properties expanded (never hidden)', () => {
     const { container, restore } = renderUncontrolledWithFeature(700);
     try {
-      expect(isSectionCollapsed(container, 'Time Controller')).toBe(false);
+      expect(isSectionCollapsed(container, 'Tools')).toBe(false);
+      expect(isSectionCollapsed(container, 'Layers')).toBe(false);
       expect(isSectionCollapsed(container, 'Properties')).toBe(false);
     } finally {
       restore();
@@ -134,8 +137,8 @@ describe('ActivityPanel — short-height adaptation no-op conditions', () => {
   it('is a no-op when clientHeight = 900 (at threshold boundary)', () => {
     const { container, restore } = renderUncontrolledWithFeature(900);
     try {
-      // Tools should remain expanded (default)
-      expect(isSectionCollapsed(container, 'Tools')).toBe(false);
+      // Time Controller should remain expanded (default)
+      expect(isSectionCollapsed(container, 'Time Controller')).toBe(false);
     } finally {
       restore();
     }
@@ -144,7 +147,7 @@ describe('ActivityPanel — short-height adaptation no-op conditions', () => {
   it('is a no-op when clientHeight > 900', () => {
     const { container, restore } = renderUncontrolledWithFeature(1080);
     try {
-      expect(isSectionCollapsed(container, 'Tools')).toBe(false);
+      expect(isSectionCollapsed(container, 'Time Controller')).toBe(false);
     } finally {
       restore();
     }
@@ -154,7 +157,7 @@ describe('ActivityPanel — short-height adaptation no-op conditions', () => {
     const restore = stubClientHeight(700);
     const { container } = render(<ActivityPanel timeUiState="empty" selectedFeatureIds={[]} />);
     restore();
-    expect(isSectionCollapsed(container, 'Tools')).toBe(false);
+    expect(isSectionCollapsed(container, 'Time Controller')).toBe(false);
   });
 
   it('is a no-op when controlled (collapseState prop provided)', () => {
@@ -175,8 +178,9 @@ describe('ActivityPanel — short-height adaptation no-op conditions', () => {
       />,
     );
     restore();
-    // The controlled collapseState passes toolsCollapsed=false → Tools is expanded
-    expect(isSectionCollapsed(container, 'Tools')).toBe(false);
+    // The controlled collapseState passes timeControllerCollapsed=false →
+    // the adaptation must NOT override it.
+    expect(isSectionCollapsed(container, 'Time Controller')).toBe(false);
     // The spy must not have been called by the adaptation
     expect(spy).not.toHaveBeenCalled();
   });
@@ -189,8 +193,8 @@ describe('ActivityPanel — short-height adaptation no-op conditions', () => {
 describe('ActivityPanel — controlled mode isolation', () => {
   it('respects controlled collapse state and does not override it', () => {
     const controlledState: ActivityPanelCollapseState = {
-      timeControllerCollapsed: true,
-      toolsCollapsed: false, // explicitly expanded
+      timeControllerCollapsed: false, // explicitly expanded
+      toolsCollapsed: true,
       layersCollapsed: true,
       propertiesCollapsed: false,
     };
@@ -203,10 +207,11 @@ describe('ActivityPanel — controlled mode isolation', () => {
       />,
     );
     restore();
-    // Controlled state has toolsCollapsed=false — adaptation must NOT override
-    expect(isSectionCollapsed(container, 'Tools')).toBe(false);
-    // Controlled state has timeControllerCollapsed=true — must be honoured
-    expect(isSectionCollapsed(container, 'Time Controller')).toBe(true);
+    // Controlled state has timeControllerCollapsed=false — adaptation must NOT
+    // override it even though the panel is short and a feature is selected.
+    expect(isSectionCollapsed(container, 'Time Controller')).toBe(false);
+    // Controlled state has toolsCollapsed=true — must be honoured verbatim.
+    expect(isSectionCollapsed(container, 'Tools')).toBe(true);
   });
 });
 
@@ -258,7 +263,7 @@ describe('ActivityPanel — Properties reachable after adaptation', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('ActivityPanel — adaptation via selection prop', () => {
-  it('collapses Tools when selection.featureIds is non-empty (short height)', () => {
+  it('collapses the Time Controller when selection.featureIds is non-empty (short height)', () => {
     const restore = stubClientHeight(700);
     const { container } = render(
       <ActivityPanel
@@ -268,7 +273,10 @@ describe('ActivityPanel — adaptation via selection prop', () => {
       />,
     );
     restore();
-    expect(isSectionCollapsed(container, 'Tools')).toBe(true);
+    expect(isSectionCollapsed(container, 'Time Controller')).toBe(true);
+    // Tools and Layers stay visible
+    expect(isSectionCollapsed(container, 'Tools')).toBe(false);
+    expect(isSectionCollapsed(container, 'Layers')).toBe(false);
   });
 
   it('is a no-op when selection.featureIds is empty (short height)', () => {
@@ -281,7 +289,6 @@ describe('ActivityPanel — adaptation via selection prop', () => {
       />,
     );
     restore();
-    expect(isSectionCollapsed(container, 'Tools')).toBe(false);
+    expect(isSectionCollapsed(container, 'Time Controller')).toBe(false);
   });
 });
-

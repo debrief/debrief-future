@@ -252,8 +252,8 @@ export function ActivityPanel({
   //
   // When the panel is UNCONTROLLED (no collapseState prop) AND the container
   // clientHeight is below SHORT_HEIGHT_THRESHOLD AND a feature is selected,
-  // set the INITIAL internalCollapseState to collapse Tools (and Layers if
-  // also needed) so Properties is immediately visible without scrolling.
+  // set the INITIAL internalCollapseState to collapse the Time Controller so
+  // Properties moves up toward the fold — without hiding Tools or Layers.
   //
   // Rules:
   //   - No-op when collapseState is controlled (externalCollapseState provided).
@@ -277,13 +277,17 @@ export function ActivityPanel({
     if (height >= SHORT_HEIGHT_THRESHOLD) return; // No-op above threshold
     if (!hasSelectedFeature) return; // No-op when no feature selected
 
-    // Collapse Tools first; that is usually enough to reveal Properties.
-    // If the panel is extremely short, also collapse Layers.
+    // Collapse ONLY the Time Controller (the topmost fixed-height section) to
+    // free vertical space so Properties moves up toward the fold. We must NOT
+    // collapse Tools or Layers: collapsing a section sets it display:none, which
+    // hides the feature list (Layers) the user selects from and the Tools they
+    // run — breaking the very selection/run flows this view exists for and
+    // leaving those rows unreachable (they can't be scrolled into view). With
+    // Tools/Layers kept expanded, Properties is reached via the column's natural
+    // scroll (Decision #2 — never persisted; manual toggles win).
     setInternalCollapseState((prev) => ({
       ...prev,
-      toolsCollapsed: true,
-      // Collapse Layers too when height is very constrained (< 600px)
-      layersCollapsed: height < 600 ? true : prev.layersCollapsed,
+      timeControllerCollapsed: true,
     }));
     // Intentionally NO call to onCollapseStateChange (Decision #2 — not persisted)
   // eslint-disable-next-line react-hooks/exhaustive-deps
