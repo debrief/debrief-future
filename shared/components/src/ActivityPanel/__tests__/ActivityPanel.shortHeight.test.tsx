@@ -2,11 +2,17 @@
  * Unit tests for the short-height adaptation in ActivityPanel — spec 281 T019.
  *
  * US4 (P2.2): When the panel is UNCONTROLLED AND container clientHeight is
- * below the threshold AND a feature is selected, the INITIAL internal
- * collapseState collapses ONLY the Time Controller so Properties moves toward
- * the fold — WITHOUT hiding Tools or Layers (collapsing those would set them
- * display:none, hiding the feature list the user selects from and the tools
- * they run). It MUST NOT call onCollapseStateChange.
+ * below the threshold, the INITIAL internal collapseState collapses ONLY the
+ * Time Controller so the flexible Tools/Layers sections (and Properties) get
+ * usable height — WITHOUT hiding Tools or Layers (collapsing those would set
+ * them display:none, hiding the feature list the user selects from and the
+ * tools they run). It MUST NOT call onCollapseStateChange.
+ *
+ * The adaptation fires regardless of whether a feature is already selected: a
+ * time-loaded Time Controller claims ~173px of the ~487px sidebar, squeezing
+ * the Layers feature-list below one row, so the user couldn't click a row to
+ * make a first selection. An earlier `hasSelectedFeature` gate created that
+ * deadlock (space freed only *after* an impossible selection) and is removed.
  *
  * Decisions:
  *   #2  — only fires for uncontrolled instances; never calls onCollapseStateChange
@@ -93,7 +99,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('ActivityPanel — short-height adaptation (uncontrolled, feature selected)', () => {
+describe('ActivityPanel — short-height adaptation (uncontrolled)', () => {
   it('collapses ONLY the Time Controller when clientHeight < threshold', () => {
     const { container, restore } = renderUncontrolledWithFeature(700);
     try {
@@ -153,11 +159,17 @@ describe('ActivityPanel — short-height adaptation no-op conditions', () => {
     }
   });
 
-  it('is a no-op when no features are selected (short height)', () => {
+  it('collapses the Time Controller even when no features are selected (short height)', () => {
+    // Regression guard for the removed `hasSelectedFeature` gate: the feature
+    // list must be reachable BEFORE the first selection, so the adaptation
+    // fires on a short panel regardless of selection state.
     const restore = stubClientHeight(700);
     const { container } = render(<ActivityPanel timeUiState="empty" selectedFeatureIds={[]} />);
     restore();
-    expect(isSectionCollapsed(container, 'Time Controller')).toBe(false);
+    expect(isSectionCollapsed(container, 'Time Controller')).toBe(true);
+    // Tools and Layers stay visible so the user can select / run.
+    expect(isSectionCollapsed(container, 'Tools')).toBe(false);
+    expect(isSectionCollapsed(container, 'Layers')).toBe(false);
   });
 
   it('is a no-op when controlled (collapseState prop provided)', () => {
@@ -279,7 +291,9 @@ describe('ActivityPanel — adaptation via selection prop', () => {
     expect(isSectionCollapsed(container, 'Layers')).toBe(false);
   });
 
-  it('is a no-op when selection.featureIds is empty (short height)', () => {
+  it('collapses the Time Controller even when selection.featureIds is empty (short height)', () => {
+    // Same regression guard as above, via the `selection` prop path: the
+    // adaptation no longer depends on a non-empty selection.
     const restore = stubClientHeight(700);
     const { container } = render(
       <ActivityPanel
@@ -289,6 +303,6 @@ describe('ActivityPanel — adaptation via selection prop', () => {
       />,
     );
     restore();
-    expect(isSectionCollapsed(container, 'Time Controller')).toBe(false);
+    expect(isSectionCollapsed(container, 'Time Controller')).toBe(true);
   });
 });

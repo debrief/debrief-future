@@ -251,9 +251,15 @@ export function ActivityPanel({
   // Short-height adaptation (T021 / US4 / Decision #2):
   //
   // When the panel is UNCONTROLLED (no collapseState prop) AND the container
-  // clientHeight is below SHORT_HEIGHT_THRESHOLD AND a feature is selected,
-  // set the INITIAL internalCollapseState to collapse the Time Controller so
-  // Properties moves up toward the fold — without hiding Tools or Layers.
+  // clientHeight is below SHORT_HEIGHT_THRESHOLD, collapse the Time Controller
+  // on mount so the flexible Tools/Layers sections (and Properties) get usable
+  // height. At 1280×720 the GoldenLayout sidebar is only ~487px tall; with a
+  // time-loaded plot the Time Controller alone claims ~173px, which squeezes
+  // the Layers feature-list below a single row — leaving the user unable to
+  // click a row to make their first selection. This adaptation MUST therefore
+  // run regardless of whether a feature is already selected (an earlier
+  // `hasSelectedFeature` gate created a deadlock: the space that makes the
+  // list clickable was only freed *after* a selection the user couldn't make).
   //
   // Rules:
   //   - No-op when collapseState is controlled (externalCollapseState provided).
@@ -261,12 +267,7 @@ export function ActivityPanel({
   //   - NEVER calls onCollapseStateChange — not persisted; manual toggles win.
   //   - Read clientHeight ONCE (useLayoutEffect runs synchronously after DOM
   //     paint on the initial mount, Decision #13 — read once at init/reset).
-  //   - A feature is "selected" when selectedFeatureIds is non-empty OR
-  //     selection.featureIds is non-empty.
   const isUncontrolled = externalCollapseState === undefined;
-  const hasSelectedFeature =
-    (selectedFeatureIds?.length ?? 0) > 0 ||
-    (selection?.featureIds?.length ?? 0) > 0;
 
   useLayoutEffect(() => {
     if (!isUncontrolled) return; // No-op when controlled
@@ -275,15 +276,14 @@ export function ActivityPanel({
     const height = el.clientHeight;
     if (height === 0 || height >= 900) return; // No-op when tall or unmeasured
     if (height >= SHORT_HEIGHT_THRESHOLD) return; // No-op above threshold
-    if (!hasSelectedFeature) return; // No-op when no feature selected
 
     // Collapse ONLY the Time Controller (the topmost fixed-height section) to
-    // free vertical space so Properties moves up toward the fold. We must NOT
-    // collapse Tools or Layers: collapsing a section sets it display:none, which
-    // hides the feature list (Layers) the user selects from and the Tools they
-    // run — breaking the very selection/run flows this view exists for and
-    // leaving those rows unreachable (they can't be scrolled into view). With
-    // Tools/Layers kept expanded, Properties is reached via the column's natural
+    // free vertical space for the flexible Tools/Layers sections and Properties.
+    // We must NOT collapse Tools or Layers: collapsing a section sets it
+    // display:none, which hides the feature list (Layers) the user selects from
+    // and the Tools they run — breaking the very selection/run flows this view
+    // exists for. With Tools/Layers kept expanded, the freed height makes the
+    // feature rows clickable and Properties reachable via the column's natural
     // scroll (Decision #2 — never persisted; manual toggles win).
     setInternalCollapseState((prev) => ({
       ...prev,
