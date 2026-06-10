@@ -34,8 +34,14 @@ export interface FeatureListProps {
     hiddenIds?: Set<string>;
     /** Optional filter function */
     filter?: (feature: DebriefFeature) => boolean;
-    /** Height of the list container in pixels */
-    height?: number;
+    /**
+     * Height of the list container. A `number` is treated as a pixel value
+     * (default 300 — suits standalone/Storybook usage). Pass `'100%'` (or any
+     * CSS length) to fill a flex/sized parent — required when embedded in the
+     * height-constrained ActivityPanel, where a fixed pixel height overflows
+     * the section and pushes virtualised rows past the clipped edge.
+     */
+    height?: number | string;
     /** Height of each row in pixels */
     rowHeight?: number;
     /** Additional CSS class name */

@@ -5,7 +5,17 @@
  * with version checking and component type validation.
  */
 export declare const LAYOUT_STORAGE_KEY = "debrief-panel-layout";
-export declare const LAYOUT_VERSION = 2;
+/**
+ * Layout format version.
+ *
+ * Bump history:
+ *   1 → initial
+ *   2 → added essential-panel validation
+ *   3 → responsive sidebar width (spec 281 US3 T016): legacy v2 layouts
+ *       persist a fixed 25% sidebar; bumping to 3 causes the version-mismatch
+ *       path in loadLayout to return null so the responsive default is applied.
+ */
+export declare const LAYOUT_VERSION = 3;
 /**
  * Recursively validates that all componentType values in the config tree
  * exist in the registeredTypes array.
