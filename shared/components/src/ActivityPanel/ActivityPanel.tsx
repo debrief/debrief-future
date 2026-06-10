@@ -5,7 +5,7 @@
  * single collapsible panel with three sections.
  */
 
-import { useState, useCallback, useRef, useEffect, useMemo, Component, useLayoutEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo, Component } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
 import { Icon } from 'vscrui';
 import type { IIconProps } from 'vscrui';
@@ -86,15 +86,18 @@ interface PaneSectionProps {
   collapsed: boolean;
   onToggle: () => void;
   layout?: 'fixed' | 'flexible';
+  /** Pin the section to the top of the scrolling column (Time Controller). */
+  sticky?: boolean;
   style?: React.CSSProperties;
   children: React.ReactNode;
 }
 
-function PaneSection({ title, icon, collapsed, onToggle, layout = 'fixed', style, children }: PaneSectionProps) {
+function PaneSection({ title, icon, collapsed, onToggle, layout = 'fixed', sticky = false, style, children }: PaneSectionProps) {
   const sectionClass = [
     'debrief-activity-panel__section',
     collapsed && 'debrief-activity-panel__section--collapsed',
     layout === 'flexible' && !collapsed && 'debrief-activity-panel__section--flexible',
+    sticky && 'debrief-activity-panel__section--sticky',
   ]
     .filter(Boolean)
     .join(' ');
@@ -170,19 +173,6 @@ function ResizeHandle({ onDrag }: ResizeHandleProps) {
 }
 
 /**
- * Height threshold below which the short-height adaptation fires (T021).
- *
- * Derived from a 720-px viewport: subtract ~100px for the GoldenLayout header
- * chrome + the browser URL bar, leaving ~820 px for the panel itself.
- * Panels taller than 899 px (e.g. 900px+ / 13" laptop at full height, or
- * any desktop with the GL panel occupying the full viewport) are NOT adapted.
- *
- * Decision #2: adapt only when UNCONTROLLED AND height < threshold AND a
- * feature is selected. Never call onCollapseStateChange (not persisted).
- */
-const SHORT_HEIGHT_THRESHOLD = 820;
-
-/**
  * ActivityPanel component.
  *
  * @example
@@ -248,50 +238,22 @@ export function ActivityPanel({
   // Ref for the panel root div — used by the short-height adaptation (T021).
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Short-height adaptation (T021 / US4 / Decision #2):
+  // Short-height handling (T021 / US4 / FR-012):
   //
-  // When the panel is UNCONTROLLED (no collapseState prop) AND the container
-  // clientHeight is below SHORT_HEIGHT_THRESHOLD, collapse the Time Controller
-  // on mount so the flexible Tools/Layers sections (and Properties) get usable
-  // height. At 1280×720 the GoldenLayout sidebar is only ~487px tall; with a
-  // time-loaded plot the Time Controller alone claims ~173px, which squeezes
-  // the Layers feature-list below a single row — leaving the user unable to
-  // click a row to make their first selection. This adaptation MUST therefore
-  // run regardless of whether a feature is already selected (an earlier
-  // `hasSelectedFeature` gate created a deadlock: the space that makes the
-  // list clickable was only freed *after* a selection the user couldn't make).
-  //
-  // Rules:
-  //   - No-op when collapseState is controlled (externalCollapseState provided).
-  //   - No-op when clientHeight >= 900px.
-  //   - NEVER calls onCollapseStateChange — not persisted; manual toggles win.
-  //   - Read clientHeight ONCE (useLayoutEffect runs synchronously after DOM
-  //     paint on the initial mount, Decision #13 — read once at init/reset).
-  const isUncontrolled = externalCollapseState === undefined;
-
-  useLayoutEffect(() => {
-    if (!isUncontrolled) return; // No-op when controlled
-    const el = panelRef.current;
-    if (!el) return;
-    const height = el.clientHeight;
-    if (height === 0 || height >= 900) return; // No-op when tall or unmeasured
-    if (height >= SHORT_HEIGHT_THRESHOLD) return; // No-op above threshold
-
-    // Collapse ONLY the Time Controller (the topmost fixed-height section) to
-    // free vertical space for the flexible Tools/Layers sections and Properties.
-    // We must NOT collapse Tools or Layers: collapsing a section sets it
-    // display:none, which hides the feature list (Layers) the user selects from
-    // and the Tools they run — breaking the very selection/run flows this view
-    // exists for. With Tools/Layers kept expanded, the freed height makes the
-    // feature rows clickable and Properties reachable via the column's natural
-    // scroll (Decision #2 — never persisted; manual toggles win).
-    setInternalCollapseState((prev) => ({
-      ...prev,
-      timeControllerCollapsed: true,
-    }));
-    // Intentionally NO call to onCollapseStateChange (Decision #2 — not persisted)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run ONCE at mount — clientHeight read once (Decision #13)
+  // At a 1280×720 viewport the GoldenLayout sidebar is only ~487px tall and a
+  // time-loaded Time Controller alone claims ~173px, so the five sections
+  // cannot all fit. Rather than force a section closed (an earlier attempt
+  // auto-collapsed the Time Controller, but that hides the viewport/playback
+  // controls the storyboard-capture flow requires to stay visible — spec
+  // #264/#273), the column simply SCROLLS: every section keeps a usable height
+  // (the flexible Tools/Layers lists have a CSS min-height and scroll
+  // internally), the Time Controller is pinned `sticky` at the top so its
+  // controls remain reachable at any scroll offset (otherwise it scrolls up
+  // under the app header and the storyboard-capture invariant fails), and
+  // Properties + the feature list are reached by scrolling. See
+  // ActivityPanel.css. This satisfies FR-012 (Properties reachable on short
+  // laptops) without the deadlock the auto-collapse created (the feature list
+  // was too short to click before any selection could be made).
 
   // Tracks the pixel offset from the default 50/50 split between Tools and Layers
   const [splitOffset, setSplitOffset] = useState(0);
@@ -654,13 +616,16 @@ export function ActivityPanel({
 
   return (
     <div ref={panelRef} className={`debrief-activity-panel ${className ?? ''}`} role="region" aria-label="Activity Panel">
-      {/* Time Controller — fixed height, no resize */}
+      {/* Time Controller — fixed height, pinned sticky so its viewport/playback
+          controls stay visible + reachable while the column scrolls (otherwise
+          it scrolls up under the app header — storyboard-capture invariant). */}
       <PaneSection
         title="Time Controller"
         icon="watch"
         collapsed={collapseState.timeControllerCollapsed}
         onToggle={() => toggleSection('timeControllerCollapsed')}
         layout="fixed"
+        sticky
       >
         <SectionErrorBoundary sectionName="Time Controller">
           <TimeController
