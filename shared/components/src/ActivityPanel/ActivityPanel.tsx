@@ -718,6 +718,13 @@ export function ActivityPanel({
             onFileAction={(file, action) => onMessage?.({ type: 'file:action', payload: { file, action } })}
           />
           <FeatureList
+            // Fill the remaining Layers-section height rather than the default
+            // fixed 300px: inside the height-constrained ActivityPanel a fixed
+            // pixel height overflows the section and pushes virtualised rows
+            // past the clipped bottom edge, making them unclickable at short
+            // viewports (regression exposed when spec 281 added the Time
+            // Controller section). The internal scroll area handles overflow.
+            height="100%"
             features={features}
             selectedIds={new Set(selectedFeatureIds)}
             hiddenIds={hiddenIds}
