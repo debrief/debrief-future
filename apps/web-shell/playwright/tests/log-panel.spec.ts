@@ -13,6 +13,7 @@
 import { test, expect } from '@playwright/test';
 import { CatalogPage, AnalysisPage } from '../pages';
 import { collapsePropertiesSection } from '../fixtures/properties-collapse';
+import { clickVirtualisedRow } from '../helpers/clickVirtualisedRow';
 
 /**
  * Helper: select a track feature via the feature list sidebar.
@@ -24,8 +25,8 @@ async function selectTrackViaFeatureList(page: import('@playwright/test').Page) 
   const target = (await featureRow.count()) > 0
     ? featureRow
     : page.locator('.debrief-feature-row').first();
-  // Click the content area to avoid the expand button (stopPropagation)
-  await target.locator('.debrief-feature-row__content').click();
+  // Virtualised list in a scrollable column — DOM-dispatch click (see helper).
+  await clickVirtualisedRow(page, target.locator('.debrief-feature-row__content'));
   await page.waitForTimeout(200);
 }
 

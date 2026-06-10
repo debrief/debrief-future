@@ -13,6 +13,7 @@
 import { test, expect } from '@playwright/test';
 import { CatalogPage, AnalysisPage } from '../pages';
 import { collapsePropertiesSection } from '../fixtures/properties-collapse';
+import { clickVirtualisedRow } from '../helpers/clickVirtualisedRow';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -43,8 +44,8 @@ async function selectTrack(page: import('@playwright/test').Page) {
   const row = page.locator('.debrief-feature-row:has-text("HMS Defender")');
   const target =
     (await row.count()) > 0 ? row : page.locator('.debrief-feature-row').first();
-  // Click the content area to avoid the expand button (stopPropagation)
-  await target.locator('.debrief-feature-row__content').click();
+  // Virtualised list in a scrollable column — DOM-dispatch click (see helper).
+  await clickVirtualisedRow(page, target.locator('.debrief-feature-row__content'));
   await page.waitForTimeout(200);
 }
 

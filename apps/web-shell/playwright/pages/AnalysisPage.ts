@@ -8,6 +8,7 @@
 
 import type { Page, Locator } from '@playwright/test';
 import { TimeController } from '../components/TimeController';
+import { clickVirtualisedRow } from '../helpers/clickVirtualisedRow';
 
 /**
  * Page object for the Analysis view.
@@ -197,13 +198,13 @@ export class AnalysisPage {
    * Click on a layer to select it.
    */
   async selectLayer(layer: Locator): Promise<void> {
-    // Click the content area to avoid the expand button (which has stopPropagation)
+    // Click the content area to avoid the expand button (which has stopPropagation).
+    // The FeatureList is virtualised and lives in a scrollable ActivityPanel
+    // column, so scroll the row into view first — otherwise a plain click()
+    // can time out at short viewports (see selectFeature for the same pattern).
     const content = layer.locator('.debrief-feature-row__content');
-    if (await content.count() > 0) {
-      await content.click();
-    } else {
-      await layer.click();
-    }
+    const target = (await content.count()) > 0 ? content : layer;
+    await clickVirtualisedRow(this.page, target);
   }
 
   /**
@@ -334,15 +335,14 @@ export class AnalysisPage {
     }
 
     // Layers-panel row. The FeatureList is virtualised via @tanstack/
-    // react-virtual; after the first selection expands the Properties
-    // form below, the Layers section can shrink and the target row
-    // gets virtualised out of view, so a plain `click()` times out at
-    // 30 s. `scrollIntoViewIfNeeded()` walks up the scroll parents
-    // until the row is in view (Playwright handles virtualised lists
-    // by triggering scroll which the virtualiser observes).
+    // react-virtual inside the scrollable, sticky-headed ActivityPanel
+    // column, where Playwright's own click() fails (see clickVirtualisedRow).
     const row = this.page.getByTestId(`feature-row-${id}`);
-    await row.scrollIntoViewIfNeeded();
-    await row.locator('.debrief-feature-row__content').click(clickOpts);
+    await clickVirtualisedRow(
+      this.page,
+      row.locator('.debrief-feature-row__content'),
+      modifiers,
+    );
   }
 
   /**

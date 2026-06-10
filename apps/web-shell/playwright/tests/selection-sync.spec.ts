@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { collapsePropertiesSection } from '../fixtures/properties-collapse';
+import { clickVirtualisedRow } from '../helpers/clickVirtualisedRow';
 
 // Selection sync tests — verifies map/panel selection synchronization.
 test.describe('Selection Sync', () => {
@@ -40,7 +41,7 @@ test.describe('Selection Sync', () => {
   test('clicking feature in list selects it on map', async ({ page }) => {
     // Find a feature row and click its content area (avoid expand button)
     const featureRow = page.locator('.debrief-feature-row').first();
-    await featureRow.locator('.debrief-feature-row__content').click();
+    await clickVirtualisedRow(page, featureRow.locator('.debrief-feature-row__content'));
 
     // Feature should be selected (row gets selected state)
     await expect(featureRow).toHaveClass(/selected/);
