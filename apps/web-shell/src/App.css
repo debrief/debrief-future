@@ -78,10 +78,13 @@ body {
   margin-left: auto;
 }
 
+/* The header sits on the fixed dark title bar (--vscode-titleBar-activeBackground,
+   #3c3c3c) in every theme, so header links use the host's (light) text-link
+   colour rather than the dark content-area primary. */
 .web-shell__header-link {
   padding: 4px 8px;
   font-size: 12px;
-  color: var(--vscode-textLink-foreground, #3794ff);
+  color: var(--vscode-textLink-foreground, #4daafc);
   text-decoration: none;
   border-radius: 2px;
   transition: background-color 0.1s;
@@ -89,7 +92,22 @@ body {
 
 .web-shell__header-link:hover {
   background: var(--vscode-button-secondaryBackground, #3a3d41);
-  color: var(--vscode-textLink-activeForeground, #3794ff);
+  color: var(--vscode-textLink-activeForeground, #6cb6ff);
+  text-decoration: underline;
+}
+
+/* High-contrast modes: a dedicated bright link token clears WCAG AAA (≥7:1)
+   on the dark title bar, plus a non-colour affordance (underline + heavier
+   weight) to meet SC 1.4.1 (use of colour). [spec 281 P1.3 — audit-driven;
+   supersedes plan Decision #4, which assumed a light header background.] */
+[data-theme^='high-contrast'] .web-shell__header-link {
+  color: var(--debrief-header-link-hc, #9CDCFE);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+[data-theme^='high-contrast'] .web-shell__header-link:hover {
+  color: var(--debrief-header-link-hc, #9CDCFE);
 }
 
 /* Back button */

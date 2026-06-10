@@ -5,6 +5,12 @@
  * Captures three theme variants of the Properties demo aside, plus a video
  * recording of the edit flow (blur-commit). Outputs land under
  * specs/193-properties-panel/evidence/screenshots/.
+ *
+ * FR-006 / FR-007 — row-click is gated on actionability (visible +
+ * scrollIntoViewIfNeeded) before clicking to avoid racing the virtualised
+ * list re-render. The 15 s properties-form wait is unchanged so genuine
+ * breakage still fails loudly (FR-007). retries: 0 is set at the describe
+ * level (T010) so flakiness masks no real regression.
  */
 
 import { test, expect, Page } from '@playwright/test';
@@ -80,6 +86,10 @@ async function applyTheme(page: Page, theme: 'light' | 'dark' | 'vscode'): Promi
 }
 
 test.describe('Properties Panel — visual evidence', () => {
+  // T010 — retries: 0 so flakiness does not mask real regressions (Decision #8).
+  // Per-describe override is the minimal approach — avoids touching playwright.config.ts.
+  test.describe.configure({ retries: 0 });
+
   test.setTimeout(120_000);
 
   for (const theme of ['light', 'dark', 'vscode'] as const) {
@@ -96,10 +106,16 @@ test.describe('Properties Panel — visual evidence', () => {
       await page.waitForSelector('[data-testid="exercise-list-item-row"]', {
         timeout: 15_000,
       });
+      // FR-006: gate on actionability before clicking to avoid racing the
+      // virtualised list re-render. scrollIntoViewIfNeeded ensures the row
+      // is in the viewport before the click lands.
       const firstRow = page
         .locator('[data-testid="exercise-list-item-row"]')
         .first();
+      await expect(firstRow).toBeVisible();
+      await firstRow.scrollIntoViewIfNeeded();
       await firstRow.click();
+      // FR-007: 15 s wait kept intact so genuine breakage still fails loudly.
       await page.waitForSelector('[data-testid="properties-form"]', {
         timeout: 15_000,
       });
@@ -134,7 +150,13 @@ test.describe('Properties Panel — visual evidence', () => {
     const firstRow = page
       .locator('[data-testid="exercise-list-item-row"]')
       .first();
+    // FR-006: gate on actionability before clicking to avoid racing the
+    // virtualised list re-render. scrollIntoViewIfNeeded ensures the row
+    // is in the viewport before the click lands.
+    await expect(firstRow).toBeVisible();
+    await firstRow.scrollIntoViewIfNeeded();
     await firstRow.click();
+    // FR-007: 15 s wait kept intact so genuine breakage still fails loudly.
     await page.waitForSelector('[data-testid="properties-form"]', {
       timeout: 15_000,
     });

@@ -3,10 +3,17 @@
  *
  * This page displays the STAC catalog overview where users can browse
  * and select plots to analyze.
+ *
+ * Extended in spec 281 with:
+ *  - Thumbnail size toggle accessors (S/M/L)
+ *  - Bottom-row collapse / restore control accessors
+ *  - Exercise-list height / row-height helper
  */
 
 import type { Page, Locator } from '@playwright/test';
 import { AnalysisPage } from './AnalysisPage';
+
+export type ThumbnailSizeLabel = 'small' | 'medium' | 'large';
 
 /**
  * Page object for the Catalog (welcome) view.
@@ -91,6 +98,52 @@ export class CatalogPage {
    */
   get exerciseItems(): Locator {
     return this.page.locator('[data-testid="exercise-list-item-row"]');
+  }
+
+  // ─── Thumbnail size toggle (spec 281 / US6) ──────────────────────────────────
+
+  /**
+   * The thumbnail size toggle group (radiogroup).
+   */
+  get thumbnailSizeToggle(): Locator {
+    return this.page.locator('[data-testid="thumbnail-size-toggle"]');
+  }
+
+  /**
+   * Individual thumbnail size button by size label.
+   */
+  thumbnailSizeButton(size: ThumbnailSizeLabel): Locator {
+    return this.page.locator(`[data-testid="thumbnail-size-${size}"]`);
+  }
+
+  // ─── Bottom-row collapse / restore (spec 281 / US5) ─────────────────────────
+
+  /**
+   * Collapse button for the Timeline panel (injected into its GL header).
+   */
+  get collapseTimeline(): Locator {
+    return this.page.locator('[data-testid="catalog-collapse-timeline"]');
+  }
+
+  /**
+   * Collapse button for the Map panel (injected into its GL header).
+   */
+  get collapseMap(): Locator {
+    return this.page.locator('[data-testid="catalog-collapse-map"]');
+  }
+
+  /**
+   * Restore button for the Timeline panel (shown in filter bar when hidden).
+   */
+  get restoreTimeline(): Locator {
+    return this.page.locator('[data-testid="restore-timeline"]');
+  }
+
+  /**
+   * Restore button for the Map panel (shown in filter bar when hidden).
+   */
+  get restoreMap(): Locator {
+    return this.page.locator('[data-testid="restore-map"]');
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -189,5 +242,64 @@ export class CatalogPage {
    */
   async hasItems(): Promise<boolean> {
     return (await this.getItemCount()) > 0;
+  }
+
+  // ─── Height helpers (spec 281) ────────────────────────────────────────────────
+
+  /**
+   * Read the bounding-box height of the exercise list scroll container.
+   * Useful for asserting that it grows when the preview row is collapsed.
+   */
+  async getExerciseListHeight(): Promise<number> {
+    const el = this.page.locator('[data-testid="exercise-list-scroll"]');
+    const box = await el.boundingBox();
+    return box?.height ?? 0;
+  }
+
+  /**
+   * Read the height in pixels of the first visible exercise-list row.
+   * Useful for asserting that S/M/L thumbnail size produces distinct heights.
+   */
+  async getFirstRowHeight(): Promise<number> {
+    const first = this.exerciseItems.first();
+    const box = await first.boundingBox();
+    return box?.height ?? 0;
+  }
+
+  // ─── Actions (spec 281) ───────────────────────────────────────────────────────
+
+  /**
+   * Click the collapse-timeline button in the GoldenLayout header.
+   */
+  async collapseTimelinePanel(): Promise<void> {
+    await this.collapseTimeline.click();
+  }
+
+  /**
+   * Click the collapse-map button in the GoldenLayout header.
+   */
+  async collapseMapPanel(): Promise<void> {
+    await this.collapseMap.click();
+  }
+
+  /**
+   * Click the restore-timeline button in the filter bar.
+   */
+  async restoreTimelinePanel(): Promise<void> {
+    await this.restoreTimeline.click();
+  }
+
+  /**
+   * Click the restore-map button in the filter bar.
+   */
+  async restoreMapPanel(): Promise<void> {
+    await this.restoreMap.click();
+  }
+
+  /**
+   * Select a thumbnail size via the S/M/L toggle.
+   */
+  async selectThumbnailSize(size: ThumbnailSizeLabel): Promise<void> {
+    await this.thumbnailSizeButton(size).click();
   }
 }

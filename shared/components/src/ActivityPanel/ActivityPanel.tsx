@@ -86,15 +86,18 @@ interface PaneSectionProps {
   collapsed: boolean;
   onToggle: () => void;
   layout?: 'fixed' | 'flexible';
+  /** Pin the section to the top of the scrolling column (Time Controller). */
+  sticky?: boolean;
   style?: React.CSSProperties;
   children: React.ReactNode;
 }
 
-function PaneSection({ title, icon, collapsed, onToggle, layout = 'fixed', style, children }: PaneSectionProps) {
+function PaneSection({ title, icon, collapsed, onToggle, layout = 'fixed', sticky = false, style, children }: PaneSectionProps) {
   const sectionClass = [
     'debrief-activity-panel__section',
     collapsed && 'debrief-activity-panel__section--collapsed',
     layout === 'flexible' && !collapsed && 'debrief-activity-panel__section--flexible',
+    sticky && 'debrief-activity-panel__section--sticky',
   ]
     .filter(Boolean)
     .join(' ');
@@ -231,6 +234,26 @@ export function ActivityPanel({
 }: ActivityPanelProps) {
   const [internalCollapseState, setInternalCollapseState] = useState(DEFAULT_COLLAPSE_STATE);
   const collapseState = externalCollapseState ?? internalCollapseState;
+
+  // Ref for the panel root div — used by the short-height adaptation (T021).
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Short-height handling (T021 / US4 / FR-012):
+  //
+  // At a 1280×720 viewport the GoldenLayout sidebar is only ~487px tall and a
+  // time-loaded Time Controller alone claims ~173px, so the five sections
+  // cannot all fit. Rather than force a section closed (an earlier attempt
+  // auto-collapsed the Time Controller, but that hides the viewport/playback
+  // controls the storyboard-capture flow requires to stay visible — spec
+  // #264/#273), the column simply SCROLLS: every section keeps a usable height
+  // (the flexible Tools/Layers lists have a CSS min-height and scroll
+  // internally), the Time Controller is pinned `sticky` at the top so its
+  // controls remain reachable at any scroll offset (otherwise it scrolls up
+  // under the app header and the storyboard-capture invariant fails), and
+  // Properties + the feature list are reached by scrolling. See
+  // ActivityPanel.css. This satisfies FR-012 (Properties reachable on short
+  // laptops) without the deadlock the auto-collapse created (the feature list
+  // was too short to click before any selection could be made).
 
   // Tracks the pixel offset from the default 50/50 split between Tools and Layers
   const [splitOffset, setSplitOffset] = useState(0);
@@ -592,14 +615,17 @@ export function ActivityPanel({
     : undefined;
 
   return (
-    <div className={`debrief-activity-panel ${className ?? ''}`} role="region" aria-label="Activity Panel">
-      {/* Time Controller — fixed height, no resize */}
+    <div ref={panelRef} className={`debrief-activity-panel ${className ?? ''}`} role="region" aria-label="Activity Panel">
+      {/* Time Controller — fixed height, pinned sticky so its viewport/playback
+          controls stay visible + reachable while the column scrolls (otherwise
+          it scrolls up under the app header — storyboard-capture invariant). */}
       <PaneSection
         title="Time Controller"
         icon="watch"
         collapsed={collapseState.timeControllerCollapsed}
         onToggle={() => toggleSection('timeControllerCollapsed')}
         layout="fixed"
+        sticky
       >
         <SectionErrorBoundary sectionName="Time Controller">
           <TimeController
@@ -657,6 +683,13 @@ export function ActivityPanel({
             onFileAction={(file, action) => onMessage?.({ type: 'file:action', payload: { file, action } })}
           />
           <FeatureList
+            // Fill the remaining Layers-section height rather than the default
+            // fixed 300px: inside the height-constrained ActivityPanel a fixed
+            // pixel height overflows the section and pushes virtualised rows
+            // past the clipped bottom edge, making them unclickable at short
+            // viewports (regression exposed when spec 281 added the Time
+            // Controller section). The internal scroll area handles overflow.
+            height="100%"
             features={features}
             selectedIds={new Set(selectedFeatureIds)}
             hiddenIds={hiddenIds}

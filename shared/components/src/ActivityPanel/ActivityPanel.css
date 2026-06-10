@@ -2,16 +2,24 @@
  * ActivityPanel styles - unified panel with collapsible sections.
  *
  * Layout model:
- *  - Time Controller: fixed height (content-sized), collapse only
- *  - Tools & Layers: flexible, share remaining vertical space, internal scroll
- *  - No top-level scrollbar — panel fills available height exactly
+ *  - The column scrolls vertically when its sections don't all fit (e.g. the
+ *    ~487px GoldenLayout sidebar at a 1280x720 viewport). This is the US4 /
+ *    FR-012 "column scrolls" resolution — Properties and the feature list stay
+ *    reachable on short laptops without forcing any section closed.
+ *  - Time Controller: sticky at the top so its viewport/playback controls stay
+ *    visible and pointer-reachable at any scroll offset. Without this the
+ *    control scrolls up under the app header during the storyboard-capture
+ *    flow and the #264/#273 occlusion invariant fails.
+ *  - Tools & Layers: flexible, share spare space when the column is tall, but
+ *    keep a min-height so their lists never collapse below a clickable row.
  */
 
 .debrief-activity-panel {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden; /* no top-level scrollbar */
+  overflow-x: hidden;
+  overflow-y: auto; /* column scrolls when sections don't all fit (US4/FR-012) */
   background: var(--debrief-bg-primary, #1e1e1e);
   color: var(--debrief-text-primary, #cccccc);
   /* Contain dropdowns within panel bounds */
@@ -30,12 +38,24 @@
   border-bottom: none;
 }
 
-/* Flexible section — stretches to fill remaining space */
+/* Time Controller stays pinned at the top while the column scrolls, so its
+ * viewport/playback controls remain visible + reachable (storyboard invariant). */
+.debrief-activity-panel__section--sticky {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--debrief-bg-primary, #1e1e1e);
+}
+
+/* Flexible section — grows to fill spare space, but never shrinks its list
+ * below a usable, clickable height; the list then scrolls internally and the
+ * column scrolls to reach sections below. */
 .debrief-activity-panel__section--flexible {
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 160px;
 }
 
 .debrief-activity-panel__section--flexible .debrief-activity-panel__section-content {
@@ -53,9 +73,10 @@
   min-height: 0;
 }
 
-/* Collapsed — header only, no flex growth */
+/* Collapsed — header only, no flex growth (overrides the flexible min-height) */
 .debrief-activity-panel__section--collapsed {
   flex: 0 0 auto !important;
+  min-height: 0 !important;
 }
 
 /* ── Section header ────────────────────────────────────── */

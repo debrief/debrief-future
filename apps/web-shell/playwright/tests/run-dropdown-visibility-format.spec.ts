@@ -11,6 +11,7 @@
 
 import { test, expect } from '@playwright/test';
 import { collapsePropertiesSection } from '../fixtures/properties-collapse';
+import { clickVirtualisedRow } from '../helpers/clickVirtualisedRow';
 
 /**
  * Helper: select a track feature via the feature list.
@@ -20,7 +21,7 @@ async function selectTrackViaFeatureList(page: import('@playwright/test').Page) 
   const target = (await featureRow.count()) > 0
     ? featureRow
     : page.locator('.debrief-feature-row').first();
-  await target.locator('.debrief-feature-row__content').click();
+  await clickVirtualisedRow(page, target.locator('.debrief-feature-row__content'));
   await page.waitForTimeout(200);
 }
 
@@ -132,7 +133,7 @@ test.describe('Visibility Toggle', () => {
     const target = (await featureRow.count()) > 0
       ? featureRow
       : page.locator('.debrief-feature-row').first();
-    await target.locator('.debrief-feature-row__content').click();
+    await clickVirtualisedRow(page, target.locator('.debrief-feature-row__content'));
     await page.waitForTimeout(200);
 
     // Hide it
@@ -173,7 +174,7 @@ test.describe('Info Dialog', () => {
     // If info icon is not visible, expand the row first
     if (!(await infoIcon.isVisible())) {
       // Click to select the feature first (info icon may only appear on hover/selection)
-      await featureRow.locator('.debrief-feature-row__content').click();
+      await clickVirtualisedRow(page, featureRow.locator('.debrief-feature-row__content'));
       await page.waitForTimeout(200);
     }
 
@@ -251,7 +252,7 @@ test.describe('Info Dialog', () => {
   test('info dialog is dismissed by Escape', async ({ page }) => {
     // Open info dialog
     const featureRow = page.locator('.debrief-feature-row').first();
-    await featureRow.locator('.debrief-feature-row__content').click();
+    await clickVirtualisedRow(page, featureRow.locator('.debrief-feature-row__content'));
     await page.waitForTimeout(200);
 
     const infoIcon = featureRow.locator('.debrief-feature-row__info-icon');

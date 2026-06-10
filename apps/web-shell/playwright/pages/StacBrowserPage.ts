@@ -67,4 +67,66 @@ export class StacBrowserPage {
     const img = this.page.locator('img').first();
     await img.waitFor({ state: 'visible', timeout: 15000 });
   }
+
+  /**
+   * Return a locator for a named header link (`.web-shell__header-link`).
+   * Pass no `name` to get all header links as a locator.
+   */
+  headerLink(name?: string | RegExp): ReturnType<typeof this.page.locator> {
+    const base = this.page.locator('.web-shell__header-link');
+    return name !== undefined ? base.filter({ hasText: name }) : base;
+  }
+
+  /**
+   * Switch the active theme by mutating the VS Code body class that the
+   * ThemeProvider's `vsCodeBodyClassSource` watches. The provider sets
+   * `document.documentElement[data-theme]` within ~1s of the class change.
+   *
+   * Valid values:
+   *   'light'                → vscode-light
+   *   'dark'                 → vscode-dark
+   *   'high-contrast-dark'   → vscode-high-contrast
+   *   'high-contrast-light'  → vscode-high-contrast-light
+   */
+  async setTheme(
+    theme: 'light' | 'dark' | 'high-contrast-dark' | 'high-contrast-light',
+  ): Promise<void> {
+    const BODY_CLASS_MAP = {
+      light: 'vscode-light',
+      dark: 'vscode-dark',
+      'high-contrast-dark': 'vscode-high-contrast',
+      'high-contrast-light': 'vscode-high-contrast-light',
+    } as const;
+
+    const wanted = [
+      'vscode-light',
+      'vscode-dark',
+      'vscode-high-contrast',
+      'vscode-high-contrast-light',
+    ];
+
+    const bodyClass = BODY_CLASS_MAP[theme];
+    await this.page.evaluate(
+      ({ wanted: w, bodyClass: cls }) => {
+        for (const c of w) document.body.classList.remove(c);
+        document.body.classList.add(cls);
+      },
+      { wanted, bodyClass },
+    );
+
+    // Wait for the ThemeProvider MutationObserver to flush `data-theme`.
+    const DATA_THEME_MAP = {
+      light: 'light',
+      dark: 'dark',
+      'high-contrast-dark': 'high-contrast-dark',
+      'high-contrast-light': 'high-contrast-light',
+    } as const;
+
+    const expectedDataTheme = DATA_THEME_MAP[theme];
+    await this.page.waitForFunction(
+      (dt: string) => document.documentElement.getAttribute('data-theme') === dt,
+      expectedDataTheme,
+      { timeout: 2_000 },
+    );
+  }
 }

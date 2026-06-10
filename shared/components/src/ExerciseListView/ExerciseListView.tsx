@@ -81,6 +81,12 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
     overscan: 5,
   });
 
+  // Re-flow the virtualised list when rowHeight changes (Decision #10, #12).
+  // Called ONLY in this effect — never in the render path.
+  useEffect(() => {
+    virtualizer.measure();
+  }, [rowHeight]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Lazy GeoJSON loading: request data for visible items
   const visibleItems = virtualizer.getVirtualItems();
   useEffect(() => {

@@ -8,6 +8,7 @@
 
 import { test, expect } from '@playwright/test';
 import { collapsePropertiesSection } from '../fixtures/properties-collapse';
+import { clickVirtualisedRow } from '../helpers/clickVirtualisedRow';
 
 const STYLING_TOOL_NAMES = [
   'Set Track Color',
@@ -27,8 +28,11 @@ async function selectTrackViaFeatureList(page: import('@playwright/test').Page) 
   const target = (await featureRow.count()) > 0
     ? featureRow
     : page.locator('.debrief-feature-row').first();
-  // Click the content area to avoid the expand button (stopPropagation)
-  await target.locator('.debrief-feature-row__content').click();
+  // Click the content area to avoid the expand button (stopPropagation).
+  // Scroll into view first — the virtualised list sits in a scrollable
+  // ActivityPanel column, so the row may be out of view at short viewports.
+  // Virtualised list in a scrollable column — centre + force-click (see helper).
+  await clickVirtualisedRow(page, target.locator('.debrief-feature-row__content'));
   await page.waitForTimeout(200);
 }
 

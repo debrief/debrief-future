@@ -21,6 +21,7 @@
 import { test, expect } from '@playwright/test';
 import { AnalysisPage } from '../pages/AnalysisPage';
 import { clearReadOnly } from '../fixtures/read-only';
+import { clickVirtualisedRow } from '../helpers/clickVirtualisedRow';
 
 test.describe('Multi-select emitter (#192 Phase 5)', () => {
   test.beforeEach(async ({ page }) => {
@@ -275,9 +276,11 @@ test.describe('Multi-select emitter (#192 Phase 5)', () => {
     // Hold Ctrl (the WRONG modifier on macOS) and click `b` — should
     // behave like a plain click (replaces selection).
     const row = page.getByTestId(`feature-row-${b}`);
-    await row.locator('.debrief-feature-row__content').click({
-      modifiers: ['Control'],
-    });
+    await clickVirtualisedRow(
+      page,
+      row.locator('.debrief-feature-row__content'),
+      ['Control'],
+    );
     expect(await ap.getSelectedFeatureIds()).toEqual([b]);
 
     // Now hold Cmd (the CORRECT modifier on macOS) and click `a` — should

@@ -579,3 +579,58 @@ export const VSCodeTheme: Story = {
     },
   },
 };
+
+// =============================================================================
+// Short-height adaptation (US4 — spec 281 T022)
+// =============================================================================
+
+/**
+ * Short-height panel with a feature selected — demonstrates that Properties
+ * is immediately reachable without manual scrolling on ~720px-tall viewports.
+ *
+ * The wrapper is constrained to 720px height (matching a 1280×720 laptop).
+ * When the panel is UNCONTROLLED and a feature is selected, the adaptation
+ * automatically collapses the Tools section on mount so Properties is visible.
+ *
+ * Users can still expand Tools by clicking the section header.
+ */
+export const ShortHeightPropertiesReachable: Story = {
+  render: () => (
+    <ThemeProvider theme={{ variant: 'dark' }}>
+      {/* Constrain to 720px tall — simulates a short-laptop viewport */}
+      <div style={{ width: 320, height: 720, background: '#1e1e1e', overflow: 'hidden' }}>
+        {/* UNCONTROLLED — no collapseState prop, so the adaptation fires */}
+        <ActivityPanel
+          timeExtent={TIME_EXTENT}
+          timeUiState="ready"
+          tools={MOCK_TOOLS}
+          features={MOCK_FEATURES}
+          selectedFeatureIds={['track-1']}
+          hiddenIds={new Set()}
+          toolMatches={[]}
+          onMessage={console.log}
+          /* No collapseState prop → uncontrolled → short-height adaptation fires */
+        />
+      </div>
+    </ThemeProvider>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `
+**Short-height adaptation (US4 — spec 281)**
+
+When the panel is UNCONTROLLED (no \`collapseState\` prop) **and** the container
+height is below ~820 px **and** a feature is selected, the panel automatically
+collapses the Tools section on first render so the Properties section is
+immediately visible without scrolling.
+
+- This wrapper is 720 px tall — typical for a 1280×720 laptop.
+- The Tools section starts collapsed; click the "Tools" header to expand it.
+- \`onCollapseStateChange\` is NEVER called by the adaptation (not persisted).
+- On the next open the panel renders fresh (no stored state).
+        `,
+      },
+    },
+  },
+};

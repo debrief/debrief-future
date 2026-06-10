@@ -1,0 +1,51 @@
+# P1.4 flake proof — properties-screenshots (SC-002)
+
+Spec configured `test.describe.configure({ retries: 0 })`; run with
+`node run-playwright.mjs properties-screenshots --repeat-each=10`.
+4 tests × 10 repeats = 40 executions, retries disabled, 100% first-attempt pass.
+
+Captured: 2026-06-08T21:53:11Z
+
+```
+  ✓   1 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — light (3.0s)
+  ✓   2 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — dark (1.9s)
+  ✓   3 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — vscode (1.7s)
+  ✓   4 playwright/tests/properties-screenshots.spec.ts:134:3 › Properties Panel — visual evidence › interaction video — edit a tag and commit (5.2s)
+  ✓   5 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — light (1.8s)
+  ✓   6 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — dark (1.7s)
+  ✓   7 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — vscode (1.7s)
+  ✓   8 playwright/tests/properties-screenshots.spec.ts:134:3 › Properties Panel — visual evidence › interaction video — edit a tag and commit (5.1s)
+  ✓   9 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — light (1.8s)
+  ✓  10 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — dark (1.7s)
+  ✓  11 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — vscode (1.7s)
+  ✓  12 playwright/tests/properties-screenshots.spec.ts:134:3 › Properties Panel — visual evidence › interaction video — edit a tag and commit (5.1s)
+  ✓  13 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — light (1.8s)
+  ✓  14 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — dark (1.7s)
+  ✓  15 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — vscode (1.8s)
+  ✓  16 playwright/tests/properties-screenshots.spec.ts:134:3 › Properties Panel — visual evidence › interaction video — edit a tag and commit (5.2s)
+  ✓  17 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — light (1.7s)
+  ✓  18 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — dark (1.8s)
+  ✓  19 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — vscode (1.8s)
+  ✓  20 playwright/tests/properties-screenshots.spec.ts:134:3 › Properties Panel — visual evidence › interaction video — edit a tag and commit (5.1s)
+  ✓  21 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — light (1.9s)
+  ✓  22 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — dark (1.8s)
+  ✓  23 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — vscode (1.8s)
+  ✓  24 playwright/tests/properties-screenshots.spec.ts:134:3 › Properties Panel — visual evidence › interaction video — edit a tag and commit (5.2s)
+  ✓  25 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — light (2.0s)
+  ✓  26 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — dark (1.8s)
+  ✓  27 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — vscode (1.7s)
+  ✓  28 playwright/tests/properties-screenshots.spec.ts:134:3 › Properties Panel — visual evidence › interaction video — edit a tag and commit (5.3s)
+  ✓  29 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — light (2.0s)
+  ✓  30 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — dark (1.9s)
+  ✓  31 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — vscode (1.9s)
+  ✓  32 playwright/tests/properties-screenshots.spec.ts:134:3 › Properties Panel — visual evidence › interaction video — edit a tag and commit (5.3s)
+  ✓  33 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — light (2.0s)
+  ✓  34 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — dark (2.1s)
+  ✓  35 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — vscode (2.0s)
+  ✓  36 playwright/tests/properties-screenshots.spec.ts:134:3 › Properties Panel — visual evidence › interaction video — edit a tag and commit (5.4s)
+  ✓  37 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — light (1.9s)
+  ✓  38 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — dark (1.9s)
+  ✓  39 playwright/tests/properties-screenshots.spec.ts:96:5 › Properties Panel — visual evidence › properties-form screenshot — vscode (1.9s)
+  ✓  40 playwright/tests/properties-screenshots.spec.ts:134:3 › Properties Panel — visual evidence › interaction video — edit a tag and commit (5.5s)
+  40 passed (2.1m)
+```

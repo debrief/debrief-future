@@ -50,8 +50,14 @@ export interface FeatureListProps {
   /** Optional filter function */
   filter?: (feature: DebriefFeature) => boolean;
 
-  /** Height of the list container in pixels */
-  height?: number;
+  /**
+   * Height of the list container. A `number` is treated as a pixel value
+   * (default 300 — suits standalone/Storybook usage). Pass `'100%'` (or any
+   * CSS length) to fill a flex/sized parent — required when embedded in the
+   * height-constrained ActivityPanel, where a fixed pixel height overflows
+   * the section and pushes virtualised rows past the clipped edge.
+   */
+  height?: number | string;
 
   /** Height of each row in pixels */
   rowHeight?: number;
@@ -237,7 +243,10 @@ export function FeatureList({
     .join(' ');
 
   const containerStyle: CSSProperties = {
-    height: `${height}px`,
+    height: typeof height === 'number' ? `${height}px` : height,
+    // Allow the virtualised scroll area to shrink inside a flex parent rather
+    // than forcing the column to its content height (which would clip rows).
+    minHeight: 0,
     ...style,
   };
 

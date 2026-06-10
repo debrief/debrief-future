@@ -167,6 +167,13 @@
   --debrief-border-color-focus: var(--vscode-focusBorder, #006BBE);
   --debrief-color-primary: var(--vscode-textLink-foreground, #0F4A85);
 
+  /* Header links sit on the fixed dark title bar (#3c3c3c) even in the
+     light high-contrast theme, so they need a *bright* link colour here,
+     not the dark content-area primary. #9CDCFE clears WCAG AAA (≈8.6:1)
+     on #3c3c3c. [spec 281 P1.3 — audit-driven; supersedes plan Decision #4
+     which assumed a light header background.] */
+  --debrief-header-link-hc: #9CDCFE;
+
   --debrief-selection-bg: var(--vscode-list-activeSelectionBackground, #0F4A85);
   --debrief-selection-border: var(--vscode-contrastActiveBorder, #0F4A85);
 }
@@ -186,6 +193,10 @@
   --debrief-border-color: var(--vscode-contrastBorder, #6FC3DF);
   --debrief-border-color-focus: var(--vscode-focusBorder, #F38518);
   --debrief-color-primary: var(--vscode-textLink-foreground, #3AA0F3);
+
+  /* Bright header-link colour for the dark title bar — same rationale as the
+     light HC variant (≈8.6:1 on #3c3c3c). [spec 281 P1.3] */
+  --debrief-header-link-hc: #9CDCFE;
 
   --debrief-selection-bg: var(--vscode-list-activeSelectionBackground, #f3a823);
   --debrief-selection-border: var(--vscode-contrastActiveBorder, #F38518);
