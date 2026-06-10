@@ -260,3 +260,41 @@ pnpm --filter @debrief/components test:e2e
 **Developer guide:** `docs/e2e-testing-guide.md`
 **Research notes:** `docs/project_notes/webview-e2e-research.md`
 **Architecture decision:** ADR-007 in `docs/project_notes/decisions.md`
+
+### Reproducing web-shell Playwright failures locally (the `CI=1` catalog gap)
+
+**The trap:** `apps/web-shell` E2E can pass locally but fail in CI because the
+two environments load **different STAC catalogs**. `vite.config.ts` picks the
+store via:
+
+```
+STAC_STORE_ROOT = process.env.STAC_STORE_PATH
+  ? <that path>
+  : (!process.env.CI && exists(preview/workspace/samples/local-store)) ? <preview dev catalog>
+  : <apps/vscode/test-data/local-store>   // ← what CI uses (Exercise Alpha)
+```
+
+So a bare `node run-playwright.mjs <spec>` locally serves the **preview dev
+catalog** (short property forms, no time data), while CI serves **test-data**
+(Exercise Alpha — time-loaded plots, taller `ActivityPanel` sections). Layout
+bugs that depend on content height (e.g. the #281 Layers-list squeeze, where a
+173px time-loaded Time Controller starved the feature list below one row) only
+reproduce under the CI catalog.
+
+**To mirror CI locally, set `CI=1`** (or `STAC_STORE_PATH=apps/vscode/test-data/local-store`):
+
+```bash
+cd apps/web-shell && CI=1 node run-playwright.mjs <spec>
+```
+
+**`CI=1` is necessary but NOT sufficient.** CI runs the **entire** web-shell
+suite serially in one worker (~1h). Some specs persist browser state
+(`localStorage` `debrief-panel-layout`, IndexedDB) that leaks into later specs
+and changes behaviour — e.g. a saved layout can make `ActivityPanel`'s
+short-height adaptation no-op (it only fires when *uncontrolled*). Verifying a
+fix on **isolated specs** can therefore pass while the **full suite** still
+fails. Before pushing an E2E fix, run the whole suite the way CI does:
+
+```bash
+cd apps/web-shell && CI=1 node run-playwright.mjs   # no spec arg → all specs
+```
