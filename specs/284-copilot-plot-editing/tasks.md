@@ -15,7 +15,7 @@ description: "Task list for Copilot Chat drives Debrief (spike)"
 
 ## Evidence Requirements
 
-> **Purpose**: The spike's product is a findings report + evidenced demo, not shipped code. Copilot Chat **cannot** be driven by Playwright, so end-to-end evidence is manually captured chat transcripts; automated coverage stops at the mocked tool layer (spec FR-021, plan "Web-Shell E2E Testing").
+> **Purpose**: The spike's product is a findings report + evidenced demo, not shipped code. **Correctness is verified automatically** — a 4-layer stack (unit + real-Python integration + `vscode-test` extension-host + scripted-transcript replay) covers the whole Debrief side of the boundary with no human and no LLM (Phase 6.5, FR-029–FR-031, SC-009). Copilot Chat itself can't be Playwright-driven, so the *live* chat transcripts are **supplementary** evidence (screenshots for the findings/blog), not the gate; a gated Anthropic probe (FR-032) automates the model-routing-quality read.
 
 **Evidence Directory**: `specs/284-copilot-plot-editing/evidence/`
 **Media Directory**: `specs/284-copilot-plot-editing/media/`
@@ -24,9 +24,10 @@ description: "Task list for Copilot Chat drives Debrief (spike)"
 
 | Artifact | Description | Captured When |
 |----------|-------------|---------------|
-| `test-summary.md` | vitest results for the tool adapters (mocked LM invocations) | After tests pass |
+| `test-summary.md` | Results of the 4-layer automated stack — unit + real-Python integration + extension-host + scripted replay (the human-free verdict, SC-009) | After tests pass |
 | `usage-example.md` | Annotated walkthrough of a chat turn → confirmed edit | After US2 works |
-| `screenshots/scenario-*.png` (+ optional `.gif`) | Manual Copilot Chat transcripts for the 5 happy-path + 3 fail-safe scenarios (quickstart.md) | Manual live-demo run |
+| `routing-probe.md` | Automated model-routing probe results (first-attempt tool-selection accuracy per scenario) | After probe run (gated) |
+| `screenshots/scenario-*.png` (+ optional `.gif`) | **Supplementary** live Copilot transcripts for the 8 scenarios — the automated replay (T036) is the gate | Optional live-demo run |
 | `telemetry.jsonl` | Per-invocation log from the demo runs; validated against `contracts/telemetry-record.schema.json` | After demo run |
 | `token-budget.md` | Measured summary token sizes vs. ≥2 local-model context windows (FR-025) | After demo run |
 | `findings-report.md` | The primary deliverable — what worked/blocked, tool-call quality per model, priming A/B, transferability to the offline NL panel (FR-020, SC-008) | After demo runs |
@@ -154,39 +155,58 @@ description: "Task list for Copilot Chat drives Debrief (spike)"
 
 **Checkpoint**: All four user stories independently functional.
 
+---
+
+## Phase 6.5: Automated Verification (no human, no Copilot)
+
+**Purpose**: Make the whole Debrief side of the boundary a deterministic CI gate so a developer verifies the feature with one command and no live chat session (FR-029–FR-032, SC-009). Only the model's tool *selection* stays non-deterministic — and even that gets a gated probe.
+
+> Depends on the tools existing (Phases 3–6). The unit tests in those phases already cover mocked delegation; this phase adds real-Python, real-host, and gated-model layers.
+
+- [ ] T033 [P] Add a small committed fixture STAC catalog (a few plots with tracks/platforms/times/extents spanning the four search criteria) in `apps/vscode/test-fixtures/copilot-catalog/` (or document reuse of `apps/vscode/test-data/local-store/`)
+- [ ] T034 [test] Integration suite: invoke `searchCatalog` + `debrief_runTool` directly against the **real** debrief-calc Python path and the fixture catalog — assert real 4-criteria search results and a real mutation/analytical round-trip (no mocks, no LLM) in `apps/vscode/src/__tests__/copilot/integration/toolRoundtrip.integration.test.ts` (FR-029)
+- [ ] T035 [test] Extension-host suite (`vscode-test`): register the tools, invoke via `vscode.lm.invokeTool('debrief_runTool'|'debrief_searchPlots', …)` with **no model**, and assert editor invariants — mutation changes features + marks session dirty + **snapshots the fixture store before/after to prove no on-disk write** (FR-011/FR-030); decline applies nothing (FR-016); `searchPlots` opens via `debrief.openPlot` — in `apps/vscode/src/test/copilot/lmTools.host.test.ts`
+- [ ] T036 [test] Scripted-transcript replay: encode the 8 quickstart scenarios (5 happy + 3 fail-safe) as canned tool-call sequences driven through the harnesses, asserting each expected outcome; this is the SC-002 gate in place of the manual demo, in `apps/vscode/src/__tests__/copilot/transcript/scenarios.transcript.test.ts` (FR-031)
+- [ ] T037 [P] Model-routing probe: a **network-gated** script that feeds the four tool schemas + the 8 scenario prompts to a model via the #191 `llmProxy` Anthropic transport and asserts the expected tool call + schema-valid params; **skips cleanly with a clear message when `ANTHROPIC_API_KEY` is absent** (never fails offline) — in `apps/vscode/scripts/model-routing-probe.ts` (FR-032)
+- [ ] T038 Wire CI: unit + integration + extension-host into the PR gate (extend the existing `test:integration` invocation / `.github/workflows/ci.yml`); add a **separate** nightly/opt-in workflow `.github/workflows/copilot-routing-probe.yml` that runs T037 and no-ops without the key (SC-009)
+
+**Checkpoint**: `pnpm --filter @debrief/vscode test:unit && pnpm --filter @debrief/vscode test:integration` is green and gives a one-command, human-free verdict; the routing probe runs separately.
+
 ## Phase 7: Polish & Cross-Cutting Concerns
 
 **Purpose**: Domain priming, run the demo, capture evidence + findings, write the post, open the PR.
 
 ### Cross-cutting
 
-- [ ] T033 [P] Author the domain-priming instructions file (Debrief vocabulary: plot, track, platform, selection; tool-usage conventions) in `apps/vscode/.github/copilot-instructions.md` (FR-027)
-- [ ] T034 Run the full CI gate locally (`task verify` — ruff/pyright/eslint/tsc/vitest); ensure the new strict TS passes with no `any`
-- [ ] T035 Run `quickstart.md` verification (tool discovery + all 8 scenarios) in a live VS Code 1.99+ Copilot session
+- [ ] T039 [P] Author the domain-priming instructions file (Debrief vocabulary: plot, track, platform, selection; tool-usage conventions) in `apps/vscode/.github/copilot-instructions.md` (FR-027)
+- [ ] T040 Run the full CI gate locally (`task verify` plus `pnpm --filter @debrief/vscode test:integration` — the automated verdict from Phase 6.5); ensure the new strict TS passes with no `any`
+- [ ] T041 [P] Run the gated model-routing probe locally with a key (`ANTHROPIC_API_KEY=… tsx apps/vscode/scripts/model-routing-probe.ts`) to capture routing quality for the findings (FR-032 → FR-026); confirm it skips cleanly without a key
 
-### Demo runs (manual — Copilot Chat is not Playwright-drivable)
+### Supplementary live-demo capture (optional — the automated replay in Phase 6.5 is the gate)
 
-- [ ] T036 Execute the 5 happy-path scenarios (open / summarise / style edit / selection filter / selection summary) under model A; capture transcript screenshots (+ optional GIF) to `specs/284-copilot-plot-editing/evidence/screenshots/`
-- [ ] T037 Execute the 3 fail-safe scenarios (no plot open, ambiguous track, invented tool id) — verify each fails safely with the plot untouched; capture to `evidence/screenshots/` (FR-028)
-- [ ] T038 Re-run the happy-path scenarios under model B and with the priming file toggled off, annotating `activeModel`/`primingEnabled` (FR-026/FR-027)
+> These produce blog/findings screenshots and the human-observed model-quality read. They are **not** the correctness gate (that's T036) — skip-able if a live Copilot session isn't available.
+
+- [ ] T042 [P] Capture the 5 happy-path scenarios from a live Copilot session (open / summarise / style edit / selection filter / selection summary) as transcript screenshots (+ optional GIF) to `specs/284-copilot-plot-editing/evidence/screenshots/`
+- [ ] T043 [P] Capture the 3 fail-safe scenarios (no plot open, ambiguous track, invented tool id) from the live session to `evidence/screenshots/` (FR-028) — the automated fail-safe assertions already live in T036
+- [ ] T044 [P] Capture a second-model run and a priming-off run, annotating `activeModel`/`primingEnabled`, to complement the automated probe (FR-026/FR-027)
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T039 Capture test summary using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/284-copilot-plot-editing/evidence/test-summary.md`
-- [ ] T040 [P] Record usage demonstration (chat turn → confirmed edit, with the dirty/undo/no-disk-write note) in `specs/284-copilot-plot-editing/evidence/usage-example.md`
-- [ ] T041 [P] Collect + validate the invocation telemetry against `contracts/telemetry-record.schema.json` in `specs/284-copilot-plot-editing/evidence/telemetry.jsonl`
-- [ ] T042 [P] Tabulate measured summary token sizes vs. ≥2 local-model context windows in `specs/284-copilot-plot-editing/evidence/token-budget.md` (FR-025 / SC-007)
-- [ ] T043 Write the findings report — what worked/blocked, tool-call quality per model from telemetry, priming A/B difference, confirmation-UX, undo-granularity finding (research R5), transferability to the offline NL panel — answering SC-008's six questions, in `specs/284-copilot-plot-editing/evidence/findings-report.md` (FR-020)
+- [ ] T045 Capture test summary using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/284-copilot-plot-editing/evidence/test-summary.md`
+- [ ] T046 [P] Record usage demonstration (chat turn → confirmed edit, with the dirty/undo/no-disk-write note) in `specs/284-copilot-plot-editing/evidence/usage-example.md`
+- [ ] T047 [P] Collect + validate the invocation telemetry against `contracts/telemetry-record.schema.json` in `specs/284-copilot-plot-editing/evidence/telemetry.jsonl` (sourced from the scripted replay T036 and/or a live run), and save the model-routing probe output (per-scenario expected-vs-actual tool call, first-attempt accuracy) in `specs/284-copilot-plot-editing/evidence/routing-probe.md` (from T041/T037)
+- [ ] T048 [P] Tabulate measured summary token sizes vs. ≥2 local-model context windows in `specs/284-copilot-plot-editing/evidence/token-budget.md` (FR-025 / SC-007)
+- [ ] T049 Write the findings report — what worked/blocked, tool-call quality per model from telemetry, priming A/B difference, confirmation-UX, undo-granularity finding (research R5), transferability to the offline NL panel — answering SC-008's six questions, in `specs/284-copilot-plot-editing/evidence/findings-report.md` (FR-020)
 
 ### Media Content
 
-- [ ] T044 Create feature blog post in `specs/284-copilot-plot-editing/media/shipped-post.md` (Content Specialist; first three sections copied verbatim from `evidence/opening-context.md`; remaining sections from evidence — the mermaid Hook opens it)
+- [ ] T050 Create feature blog post in `specs/284-copilot-plot-editing/media/shipped-post.md` (Content Specialist; first three sections copied verbatim from `evidence/opening-context.md`; remaining sections from evidence — the mermaid Hook opens it)
 
 ### PR Creation
 
-- [ ] T045 Create PR and publish blog: run `/speckit.pr`
+- [ ] T051 Create PR and publish blog: run `/speckit.pr`
 
-**Task T045 must run last — it depends on all evidence, findings, and media tasks being complete.**
+**Task T051 must run last — it depends on all evidence, findings, and media tasks being complete.**
 
 ## Dependencies
 
@@ -195,7 +215,8 @@ description: "Task list for Copilot Chat drives Debrief (spike)"
 - **Setup (P1)** → no deps.
 - **Foundational (P2)** → after Setup; **blocks all user stories**.
 - **User stories (P3–P6)** → after Foundational. US1, US3 are largely independent; US2 depends on the foundation's plot/selection resolution; US4 wires `scope` into US2/US3 tools (so US4 follows US2 and US3 in practice, though its selection *read* is already in T006).
-- **Polish (P7)** → after the user stories that will be demoed are complete.
+- **Automated Verification (P6.5)** → after the tools exist (Phases 3–6). Its layers are the correctness gate for SC-002/SC-009; the Polish demo capture depends on nothing but is supplementary.
+- **Polish (P7)** → after the user stories and the automated verification are complete (the findings report and test-summary consume the automated results).
 
 ### Story completion order (recommended)
 
@@ -212,7 +233,7 @@ Tests (write first, fail) → implementation → checkpoint. Provenance/telemetr
 - Foundation: T004, T005, T009 are `[P]` (distinct files); T006/T007 depend on T004.
 - All `[test]` tasks within a story are `[P]` (distinct test files) and precede that story's implementation.
 - Across stories after Foundation: US1 and US3 can proceed in parallel; US2 shares `runToolTool.ts` so its tasks are largely sequential.
-- Polish evidence tasks T040/T041/T042 are `[P]`; the findings report (T043) consumes them.
+- Polish evidence tasks T046/T047/T048 are `[P]`; the findings report (T049) consumes them.
 
 ## Implementation Strategy
 
@@ -230,7 +251,7 @@ Each story adds value without breaking the previous. A useful MVP checkpoint is 
 ### Spike discipline
 
 - All new code stays inside `apps/vscode/src/copilot/` (+ `package.json` contribution, one activation call, one `.github/copilot-instructions.md`) so the experiment is trivially removable. The four reused services are **not** modified. Python services are **not** touched.
-- The findings report (T043) is the primary deliverable — treat the code as the means, the learning as the product.
+- The findings report (T049) is the primary deliverable — treat the code as the means, the learning as the product.
 - If the session model does not give a clean single-step revert of a chat edit (research R5), that is a **reported finding**, not new undo infrastructure to build here.
 
 ### Notes
