@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://debrief.dev/schemas/284/telemetry-record.json",
+  "title": "TelemetryRecord",
+  "description": "One JSONL line per LM tool invocation during the Copilot spike. Throwaway experiment instrumentation, not a shipped audit trail.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ts", "tool", "input", "validation", "retries", "confirmation", "latencyMs", "activeModel", "primingEnabled", "outcome"],
+  "properties": {
+    "ts": { "type": "string", "format": "date-time", "description": "Host-stamped invocation time." },
+    "tool": { "type": "string", "enum": ["searchPlots", "summarizeCurrentPlot", "listTools", "runTool"] },
+    "input": { "type": "object", "description": "The validated tool input." },
+    "validation": {
+      "oneOf": [
+        { "type": "string", "enum": ["accepted"] },
+        { "type": "object", "required": ["rejected"], "additionalProperties": false, "properties": { "rejected": { "type": "string" } } }
+      ]
+    },
+    "retries": { "type": "integer", "minimum": 0 },
+    "confirmation": { "type": "string", "enum": ["approved", "declined", "not_required"] },
+    "latencyMs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total"],
+      "properties": {
+        "registry": { "type": "number" },
+        "python": { "type": "number" },
+        "apply": { "type": "number" },
+        "total": { "type": "number" }
+      }
+    },
+    "activeModel": { "type": "string", "description": "Operator-annotated — the LM Tools API does not expose model identity to the tool (research R2)." },
+    "primingEnabled": { "type": "boolean", "description": "Whether .github/copilot-instructions.md was present for this run (FR-027)." },
+    "outcome": {
+      "oneOf": [
+        { "type": "string", "enum": ["ok"] },
+        { "type": "object", "required": ["error"], "additionalProperties": false, "properties": { "error": { "type": "string" } } }
+      ]
+    }
+  }
+}
