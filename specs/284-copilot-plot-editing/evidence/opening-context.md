@@ -1,6 +1,18 @@
 ## Hook
 
-![GitHub Copilot Chat in agent mode driving Debrief: the analyst asks in plain English to trim a track, Copilot calls a Debrief tool, and after a one-line confirmation the edit lands live on the open plot's map](screenshots/copilot-confirmed-edit.png)
+```mermaid
+flowchart LR
+  A["Analyst<br/>'trim the first 10 min<br/>off this track'"] --> B["Copilot Chat<br/>(agent mode)"]
+  B --> C["Debrief LM tools<br/>searchPlots · summarize<br/>listTools · runTool"]
+  C --> D["debrief-calc<br/>(Python, stdio)"]
+  D --> E{"mutates<br/>the plot?"}
+  E -- "yes" --> F["plain-language<br/>confirmation"]
+  E -- "no" --> G["Results panel<br/>+ chat reply"]
+  F -- "approved" --> H["live edit on the<br/>open map — dirty,<br/>never written to disk"]
+  C -. "reads open plot<br/>+ selection" .-> I["Debrief editor"]
+  H --> I
+```
+
 
 ## What We're Building
 
