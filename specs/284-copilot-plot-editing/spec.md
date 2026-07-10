@@ -126,10 +126,22 @@ The analyst selects features in the plot editor, then says "summarise the select
 - **FR-017**: The run-tool surface MUST validate the requested tool id and parameters against the live registry schema before dispatch, returning structured, correctable error messages for invalid requests.
 - **FR-018**: Tool failures (Python errors, timeouts, no-plot-open, empty selection) MUST surface as structured results in the chat reply with the plot state unchanged.
 
+**Provenance**
+
+- **FR-023**: Chat-invoked tool runs MUST record provenance identically to Tools-panel runs (inherited via the shared execution path, FR-013) and MUST additionally record that the run was chat-initiated together with the analyst's originating natural-language utterance, so a later reader of the plot's lineage can answer "why did this change happen" from the analyst's own words.
+
+**Learning instrumentation** *(the spike's product is knowledge — these make the findings quantitative rather than anecdotal)*
+
+- **FR-024**: Every language-model tool invocation MUST be recorded to a structured, evidence-committable telemetry log capturing: tool id, parameters as received, validation outcome (accepted / rejected with reason), retry count, confirmation outcome (approved / declined / not required), and per-stage latency (registry fetch, Python execution, edit application). Reuse of #191's structured-logging pattern is expected; the exact format is a plan-phase decision.
+- **FR-025**: The current-plot summary tool MUST report the approximate token size of each summary it returns, and the findings report MUST tabulate measured summary sizes for the sample plots against at least two representative local-model context windows — restoring #235's "token-budget probe: numbers, not vibes" deliverable.
+- **FR-026**: The scripted demo scenarios MUST be executed under at least two different Copilot Chat model selections, with per-model tool-call quality captured in the telemetry log and compared in the findings report — the best available proxy for small/local-model feasibility.
+- **FR-027**: The spike MUST ship a repository-level Copilot instructions file teaching Debrief domain vocabulary (plot, track, platform, selection) and the intended tool-usage conventions, and the demo scenarios MUST be run both with and without it, with the observed difference reported in the findings — measuring how much prompt scaffolding the future in-Debrief NL panel will need.
+
 **Spike deliverables**
 
-- **FR-019**: The feature MUST ship with 3–5 scripted demo scenarios captured as chat transcripts with screenshots/GIF in the feature evidence directory (candidates: "open the day-1 plot", "what's in this plot?", "colour the submarine track red", "run speed-filter below 5 kts on the selection", "summarise the selection").
-- **FR-020**: The feature MUST ship with a written findings report covering: what worked unaided, what blocked or needed workarounds, observed tool-call quality (correct tool choice, parameter accuracy, hallucination rate), confirmation-UX observations, and implications for the future offline in-Debrief NL panel (feeding #235 / E13).
+- **FR-019**: The feature MUST ship with 3–5 scripted happy-path demo scenarios captured as chat transcripts with screenshots/GIF in the feature evidence directory (candidates: "open the day-1 plot", "what's in this plot?", "colour the submarine track red", "run speed-filter below 5 kts on the selection", "summarise the selection").
+- **FR-028**: The demo script MUST additionally include 2–3 failure-mode scenarios that MUST fail safely and be evidenced like the happy-path ones: an edit requested with no plot open, an ambiguous feature reference among several candidates (e.g. "colour the track" when several tracks are present), and an invented tool id — demonstrating the strict posture rather than merely specifying it.
+- **FR-020**: The feature MUST ship with a written findings report covering: what worked unaided, what blocked or needed workarounds, tool-call quality measured from the telemetry log (correct tool choice, parameter accuracy, hallucination/rejection rate — per model per FR-026), the token-budget numbers (FR-025), the with/without-priming difference (FR-027), confirmation-UX observations, and implications for the future offline in-Debrief NL panel (feeding #235 / E13).
 - **FR-021**: The tool adapters MUST have automated tests, including mocked language-model tool invocations. End-to-end automation stops at the tool layer — Copilot Chat itself cannot be driven by Playwright — and the spec accepts that boundary.
 - **FR-022**: A new backlog row MUST be added for this spike, linked to the E13 NL-copilot epic and referencing #235 as related work.
 
@@ -138,8 +150,9 @@ The analyst selects features in the plot editor, then says "summarise the select
 - **Plot (STAC Item)**: an analysis document in the local STAC catalog — title, description, time span, spatial extent, platform properties, GeoJSON feature payload. The search target and the edit target.
 - **Tool registry entry**: a Python tool's id, description, parameter schema, applicability constraints, and mutating/analytical nature — served live by the tool-server, surfaced through list-tools.
 - **Tool invocation**: one chat-initiated run — tool id, parameters, target plot, target features (all/selection), confirmation outcome, result (edited features or analytical payload), and failure detail if any.
-- **Plot summary**: the thinned representation of an open plot handed to the model — metadata plus bounded feature inventory with truncation flag.
+- **Plot summary**: the thinned representation of an open plot handed to the model — metadata plus bounded feature inventory with truncation flag and reported token size.
 - **Selection**: the set of feature identifiers currently selected in the plot editor.
+- **Telemetry record**: one entry in the spike's evidence log per LM tool invocation — tool id, parameters, validation outcome, retry count, confirmation outcome, per-stage latency, active model, and priming-file on/off state.
 
 ## User Interface Flow
 
@@ -173,15 +186,18 @@ The analyst selects features in the plot editor, then says "summarise the select
 ### Measurable Outcomes
 
 - **SC-001**: An analyst can go from "no plot open" to "requested plot open in the editor" using a single natural-language request (plus at most one disambiguation choice) for each of the four search criteria types — free text, time range, platform, and spatial extent.
-- **SC-002**: All 3–5 scripted demo scenarios complete end-to-end in a live Copilot Chat session and are captured as evidence (transcript + screenshots/GIF).
+- **SC-002**: All scripted demo scenarios — happy-path and failure-mode — complete end-to-end in a live Copilot Chat session and are captured as evidence (transcript + screenshots/GIF); every failure-mode scenario fails safely with the plot untouched.
 - **SC-003**: 100% of mutating tool invocations across the demo scenarios present a human-readable confirmation before executing; zero chat-driven writes reach disk without an explicit save.
 - **SC-004**: Every chat-driven edit in the demo scenarios is revertible with a single undo, and a mid-flight decline or failure leaves the plot byte-identical to its pre-invocation state.
-- **SC-005**: In the scripted scenarios, Copilot selects the correct Debrief tool and valid parameters on the first attempt in at least 4 of 5 scenarios; every miss is documented in the findings report with its failure mode.
-- **SC-006**: The findings report answers, with evidence, the spike's four learning questions: tool-granularity fit (meta-pair vs. static), context sufficiency (was the thinned summary enough to target edits?), confirmation-UX friction, and transferability of the tool surface to an offline in-Debrief NL panel.
+- **SC-005**: Across the scripted scenario runs, Copilot selects the correct Debrief tool and valid parameters on the first attempt in at least 80% of runs, measured from the telemetry log (per model); every miss is documented in the findings report with its failure mode.
+- **SC-006**: The telemetry log contains a record for 100% of tool invocations made during the evidenced demo runs — no invocation is unaccounted for.
+- **SC-007**: The findings report states measured summary token sizes for every sample plot exercised, with an explicit fits/doesn't-fit verdict against at least two representative local-model context windows.
+- **SC-008**: The findings report answers, with evidence, the spike's six learning questions: tool-granularity fit (meta-pair vs. static), context sufficiency (was the thinned summary enough to target edits?), confirmation-UX friction, model sensitivity (did tool-call quality vary across the models tested?), priming value (what difference did the instructions file make?), and transferability of the tool surface to an offline in-Debrief NL panel.
 
 ## Assumptions
 
 - The analyst has a GitHub Copilot licence and Copilot Chat agent mode available; this dependency is acceptable **because the feature is a spike** (see Positioning) — it does not weaken the offline-by-default constitution for shipped capability.
+- Copilot Chat's model picker offers at least two distinct models to the licence in use (needed by FR-026); if only one is available, the comparison degrades gracefully to a single-model result, noted as a limitation in the findings.
 - The workspace sample STAC catalog (as used by the existing STAC tree/preview workflows) is the search corpus; multi-catalog and remote STAC are out of scope.
 - The existing Python tool-server execution path (as used by the Tools panel) is reusable for chat-invoked runs without protocol changes; only new invocation context (live features, selection, plot id) is added.
 - "Current plot" resolution can build on the extension's existing open-plots tracking.
@@ -194,7 +210,7 @@ The analyst selects features in the plot editor, then says "summarise the select
 - Offline / local-model operation (that is the E13 follow-on this spike informs).
 - Multi-catalog or remote STAC search; multi-plot orchestration beyond "search, open one".
 - Optimising conversational multi-turn refinement.
-- An audit trail beyond existing logging.
+- A production audit trail. (The spike's telemetry log, FR-024, is throwaway experiment instrumentation for the findings report — it is not a shipped audit capability; the chat-initiated provenance tagging of FR-023 rides the existing provenance system.)
 - Non-Copilot chat clients (Claude Desktop, Cursor, etc. — already rejected as production framings in #235).
 
 ## Related Work
