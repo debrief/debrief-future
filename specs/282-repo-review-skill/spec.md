@@ -26,6 +26,17 @@ This spec was produced from a structured interview (2026-07-10). The decisions b
 | Token budget | "Whatever it takes" — log spend per phase, never silently trim coverage |
 | Prior art | #172 (March 2026 tech-debt review) is the baseline for the tech-debt dimension; existing audit docs (`stac-data-quality-audit.md`, `viewport-mutation-audit.md`) set the report register |
 
+A second interview round (2026-07-10) settled **value capture** — how the review's output converts
+into realised value rather than shelf-ware:
+
+| Decision | Choice |
+|----------|--------|
+| Fix handoff | A companion `/repo-review.fix RR-NNN` fast-path (modelled on `/bugfix`) consumes a ledger entry directly into fix → test → PR; the review's true success metric is **resolution rate by the next run**, not findings count |
+| Prevention over cure | Synthesis must cluster findings into systemic themes and propose, per theme, a permanent guard: lint rule, CI gate, CLAUDE.md instruction, constitution amendment candidate, or playbook update (the ADR-033 / PR #623 pattern) |
+| Memory integration | Confirmed Critical/High correctness bugs are logged to `docs/project_notes/bugs.md`; themes spanning ≥ 3 findings mint a failure-pattern doc (like `failure-pattern-type-erasure-at-boundaries.md`) |
+| Self-calibration | Per-heuristic confirmed-vs-refuted attribution feeds a playbook-tuning appendix each run; playbooks are pruned/strengthened by small PR between runs |
+| Operating rhythm | Prescribed as a runbook section in this spec: run before a cleanup window, 30-minute triage ritual, quick-wins batch within a week, playbook-tuning PR after each run |
+
 ### Why this adds value (interview rationale)
 
 The repo has ~200 delivered specs, ~230 Python files and ~1,300 TypeScript files, built
@@ -110,6 +121,80 @@ least one suspicious test was validated by a mutation spot check.
 
 ---
 
+### User Story 4 - Hand a Finding to a Fix Session with One Command (Priority: P2)
+
+As the project maintainer, I pick a finding from the quick-wins table and run
+`/repo-review.fix RR-014` in a fresh session; the session reads the ledger entry, implements
+the fix, tests it, and opens a PR referencing the finding ID — with no re-investigation of
+the defect and no speckit ceremony, the same way `/bugfix` fast-tracks bug-type backlog items.
+
+**Why this priority**: The report has a half-life — the repo merges ~15 features a month, so
+findings and their line references go stale within weeks. Value is realised only when findings
+become merged fixes, and the handoff must be one command, not a fresh investigation. The
+review's honest success metric is resolution rate by the next run, not findings count.
+
+**Independent Test**: Take one confirmed finding from a real run, invoke `/repo-review.fix`
+with its ID in a fresh session, and verify the resulting PR fixes the described defect
+without the session needing information beyond the ledger entry and the code.
+
+**Acceptance Scenarios**:
+
+1. **Given** an open ledger entry, **When** `/repo-review.fix RR-NNN` is invoked, **Then** the session loads the entry (defect statement, locations, failure scenario, verification note) and proceeds directly to fix → test → PR, following the `/bugfix` workflow shape.
+2. **Given** the fix PR is opened, **When** the ledger is updated, **Then** the entry records the PR URL (status remains `open` — only the next run's reconciliation, seeing the defect gone from the code, marks it `fixed`).
+3. **Given** an ID that doesn't exist or whose status is not `open`, **When** the skill is invoked, **Then** it halts with a clear message rather than guessing.
+4. **Given** several quick-wins findings, **When** the maintainer passes multiple IDs (e.g. `/repo-review.fix RR-014 RR-019 RR-023`), **Then** the session batches them into a single cleanup PR where the fixes are independent.
+
+---
+
+### User Story 5 - Convert Finding Classes into Permanent Guards (Priority: P2)
+
+As the project maintainer, I want the report to go beyond point findings: the synthesis phase
+must cluster findings into systemic themes and, for each theme, propose a permanent guard —
+a lint rule, CI gate, CLAUDE.md instruction, constitution amendment candidate, or PR-review
+playbook update — so each defect *class* dies once instead of being re-found every run.
+
+**Why this priority**: A review that adds three automated gates is worth more than one that
+files thirty findings, because gates keep paying. This is the established ADR-033 pattern:
+one PR #623 incident became a standing CLAUDE.md rule every future session obeys.
+
+**Independent Test**: On a run with ≥ 2 multi-finding themes, verify the report contains a
+prevention section where every theme has a typed, concretely-worded guard proposal (e.g. the
+actual ESLint rule name and config, or the draft CLAUDE.md paragraph).
+
+**Acceptance Scenarios**:
+
+1. **Given** synthesis has deduplicated findings, **When** ≥ 2 findings share a root pattern, **Then** they are grouped into a named theme with a one-paragraph pattern description and member finding IDs.
+2. **Given** a theme, **When** the prevention section is written, **Then** it proposes exactly one primary guard typed as {lint rule | CI gate | CLAUDE.md instruction | constitution amendment | playbook update}, worded concretely enough to implement without re-analysis (rule identifiers, draft text).
+3. **Given** a proposed guard, **When** the report is written, **Then** the guard proposal is advisory — the review does not itself modify lint configs, CI, CLAUDE.md, or the constitution (FR-011 boundary; adopting a guard is a deliberate follow-up PR).
+4. **Given** a re-run, **When** a previously-proposed guard was adopted, **Then** the delta section notes whether that theme produced any new findings (evidence the guard works).
+
+---
+
+### User Story 6 - Feed Institutional Memory and Sharpen the Playbooks (Priority: P3)
+
+As the project maintainer, I want confirmed high-impact bugs recorded in the project's
+memory system (`bugs.md`, failure-pattern docs) so day-to-day sessions — which never read
+the reviews directory — benefit from the review's insights; and I want each run to report
+which playbook heuristics earned their keep, so the playbooks are pruned and strengthened
+between runs and the review compounds instead of repeating itself.
+
+**Why this priority**: Multiplies the value of runs over time, but depends on US1–US2
+existing and producing history first.
+
+**Independent Test**: After a run, verify Critical/High correctness findings appear in
+`bugs.md` per the memory protocol; verify the methodology appendix attributes confirmed and
+refuted candidates to the playbook heuristics that generated them, with tuning
+recommendations.
+
+**Acceptance Scenarios**:
+
+1. **Given** a confirmed Critical or High correctness-bug finding, **When** the run completes, **Then** a corresponding entry is appended to `docs/project_notes/bugs.md` (date, defect, location, finding ID) following the existing bugs.md format.
+2. **Given** a theme spanning ≥ 3 findings, **When** the run completes, **Then** a failure-pattern document is drafted in `docs/project_notes/` (in the register of `failure-pattern-type-erasure-at-boundaries.md`) describing the pattern, how to recognise it, and how to avoid it.
+3. **Given** each candidate finding is tagged with the playbook heuristic that produced it, **When** the methodology appendix is written, **Then** it shows per-heuristic confirmed/refuted counts and recommends heuristics to prune (all-noise), strengthen (high-yield), or add (defect classes found by no heuristic).
+4. **Given** the tuning recommendations, **When** the maintainer applies them, **Then** it is a small reviewed PR editing the checked-in playbooks — the skill never edits its own playbooks during a run.
+
+---
+
 ### Edge Cases
 
 - **Dirty working tree at invocation**: the skill refuses to start and tells the user to commit or stash — the report's `git_sha` must identify exactly what was reviewed.
@@ -136,15 +221,20 @@ least one suspicious test was validated by a mutation spot check.
 - **FR-004**: The skill MUST orchestrate execution as a multi-agent workflow: recon phase (build subsystem inventory + work-list), parallel review phase (agents scoped to subsystem × dimension), verification phase (independent adversarial agent per candidate finding, prompted to refute), evidence phase (US3 tooling), synthesis phase (dedup, severity/effort assignment, report + ledger writing). Review and verification SHOULD be pipelined (a candidate verifies while other reviewers still run) rather than barriered.
 - **FR-005**: A finding MUST appear in the report only after an adversarial verification agent, given the candidate and access to the code, fails to refute it and positively confirms the defect. Verifier and originating reviewer MUST be separate agent invocations.
 - **FR-006**: Every reported finding MUST carry: stable ID (`RR-NNN`, monotonically assigned, never reused), dimension, severity ∈ {Critical, High, Medium, Low}, effort ∈ {S, M, L}, one or more repo-relative file:line locations, defect statement, failure scenario or violated constitution article, and verification note. Severity definitions MUST be written in terms of user impact and data-loss risk and included in the playbook so runs are consistent.
-- **FR-007**: The report MUST be written to `docs/project_notes/reviews/YYYY-MM-DD-repo-review.md` with YAML front matter (`git_sha`, `captured_at`, run metrics), and MUST contain in order: delta summary (re-runs only), quick-wins table (High/Critical × S effort), per-dimension chapters, coverage manifest, methodology (spend, agent counts, candidate/confirmed/refuted counts, tool failures), accepted-risks appendix.
+- **FR-007**: The report MUST be written to `docs/project_notes/reviews/YYYY-MM-DD-repo-review.md` with YAML front matter (`git_sha`, `captured_at`, run metrics), and MUST contain in order: delta summary with resolution rate (re-runs only; FR-020), quick-wins table (High/Critical × S effort), themes + prevention section (FR-017), per-dimension chapters, coverage manifest, methodology (spend, agent counts, candidate/confirmed/refuted counts, per-heuristic attribution, tool failures), playbook-tuning appendix (FR-019), accepted-risks appendix.
 - **FR-008**: The system MUST maintain a machine-readable findings ledger (single YAML or JSON file under `docs/project_notes/reviews/`) where each entry has: ID, status ∈ {open, fixed, accepted-risk}, status reason (for accepted-risk), first-seen run, last-seen run, and the finding fields from FR-006. The ledger MUST be hand-editable and MUST be validated on load (halt on corruption, per edge cases).
 - **FR-009**: On each run the system MUST reconcile confirmed findings against the ledger: match existing entries by defect identity (tolerant of line drift), mark disappeared defects `fixed`, suppress `accepted-risk` re-detections from the findings chapters, and add new entries with fresh IDs.
 - **FR-010**: The evidence phase MUST run knip, a cross-file dependency-version audit, and stricter-than-CI lint configurations; MUST measure Python and TypeScript test coverage; and MUST support mutation spot-checks in disposable worktrees for reviewer-flagged suspicious tests. Tool failures degrade claims to qualitative with explicit notice (never blocking the run, never silent).
-- **FR-011**: The review MUST NOT modify any file outside `docs/project_notes/reviews/` (and its own scratch/evidence areas). It produces no fixes, no backlog entries, no GitHub issues. Report-only is a deliberate interview decision.
+- **FR-011**: The review MUST NOT modify any file outside `docs/project_notes/reviews/` (and its own scratch/evidence areas), with exactly two whitelisted exceptions from the memory-integration decision: appending to `docs/project_notes/bugs.md` (FR-018) and creating failure-pattern docs under `docs/project_notes/` (FR-018). It produces no code fixes, no backlog entries, no GitHub issues, and never edits lint configs, CI, CLAUDE.md, the constitution, or its own playbooks during a run — guard proposals (FR-017) and playbook tuning (FR-019) are advisory outputs adopted via separate PRs.
 - **FR-012**: The system MUST log token spend per phase and MUST NOT trim planned coverage to save tokens; if a hard limit (agent cap, context) forces partial coverage, the shortfall MUST be visible in the coverage manifest.
 - **FR-013**: The skill MUST refuse to run on a dirty working tree.
 - **FR-014**: Findings in generated artefacts MUST be attributed to their source (LinkML schema, generator script, template), with the generated location listed as evidence only.
 - **FR-015**: The skill MUST be operable end-to-end in a Claude Code cloud session (no `gh` CLI assumptions; Playwright/coverage via the existing `run-playwright.mjs` / `uv` / `pnpm` conventions documented in CLAUDE.md).
+- **FR-016**: The feature MUST deliver a companion `/repo-review.fix` skill (`.claude/commands/repo-review.fix.md`) that accepts one or more finding IDs, loads their ledger entries, and fast-tracks fix → test → PR in the `/bugfix` workflow shape. It MUST record the fix PR URL on the ledger entry, MUST leave status transitions to run-time reconciliation (FR-009), and MUST halt on unknown or non-`open` IDs.
+- **FR-017**: The synthesis phase MUST cluster confirmed findings sharing a root pattern (≥ 2 members) into named themes, and the report MUST contain a prevention section proposing per theme one primary guard typed as {lint rule | CI gate | CLAUDE.md instruction | constitution amendment candidate | PR-review playbook update}, worded concretely enough to implement without re-analysis. Guard proposals are advisory (see FR-011).
+- **FR-018**: On run completion the system MUST append confirmed Critical/High correctness-bug findings to `docs/project_notes/bugs.md` (existing format, citing the finding ID), and MUST draft a failure-pattern document in `docs/project_notes/` for any theme spanning ≥ 3 findings.
+- **FR-019**: Every candidate finding MUST be attributed to the playbook heuristic that generated it, and the methodology appendix MUST report per-heuristic confirmed/refuted counts with tuning recommendations (prune / strengthen / add). Applying recommendations is a separate PR editing the checked-in playbooks.
+- **FR-020**: Each re-run's delta section MUST report the resolution rate: the percentage of the prior run's Critical/High findings now `fixed` or `accepted-risk`. This is the review's primary value metric and MUST be shown alongside finding counts, never instead of them.
 
 ### Key Entities
 
@@ -155,6 +245,9 @@ least one suspicious test was validated by a mutation spot check.
 - **Dimension Playbook**: checked-in instructions per dimension (checklists, heuristics, severity rubric) that reviewer agents are prompted with; versioned with the repo so review criteria evolve by PR.
 - **Tier Map**: the checked-in mapping of repo areas to review depth (Tier 1/2/3); editable as the repo grows.
 - **Coverage Manifest**: per-run record of what was reviewed at what depth and what was skipped and why.
+- **Theme**: a named cluster of ≥ 2 findings sharing a root pattern; owns a pattern description, member finding IDs, and one Guard Proposal.
+- **Guard Proposal**: an advisory, typed prevention recommendation attached to a Theme (lint rule / CI gate / CLAUDE.md instruction / constitution amendment candidate / playbook update); adopted, if at all, by a separate PR whose effectiveness the next run's delta reports on.
+- **Heuristic Attribution**: the link from each candidate to the playbook heuristic that generated it; aggregated per run into the playbook-tuning appendix.
 
 ## Success Criteria *(mandatory)*
 
@@ -167,11 +260,39 @@ least one suspicious test was validated by a mutation spot check.
 - **SC-005**: The report is actionable standalone: the maintainer can select any quick-win finding and hand it to a fix session using only the report text (no re-investigation needed to understand the defect).
 - **SC-006**: The four dimension playbooks, report template, ledger schema, and tier map exist as reviewed, checked-in artefacts — the skill's behaviour is reproducible from the repo alone, not from any one session's memory.
 - **SC-007**: Methodology section of every report includes per-phase token spend and candidate→confirmed→refuted counts, enabling cost/precision tracking across runs.
+- **SC-008**: ≥ 50% of the inaugural run's Critical/High findings are `fixed` or explicitly `accepted-risk` by the second run (resolution rate, FR-020) — the review's primary value metric.
+- **SC-009**: At least one finding is taken to a merged fix PR via `/repo-review.fix` using only the ledger entry and the code — no re-investigation of the defect (validates the handoff end-to-end).
+- **SC-010**: Every theme in the inaugural report carries a typed guard proposal implementable without re-analysis; at least one proposed guard is adopted, and the following run confirms zero new findings in that theme.
+- **SC-011**: The playbook-tuning appendix of each run identifies at least the heuristics with zero confirmed findings; playbook edits between runs are traceable to it (small PRs referencing the run).
+
+## Operating the Review (Runbook)
+
+The skill's value depends on how it is operated, not just how it is built. This runbook is
+part of the spec and should be reproduced in the skill's documentation:
+
+1. **Run when you can act.** Schedule a run immediately before a planned cleanup window, not
+   opportunistically. The report has a half-life: at ~15 features merged per month, line
+   references and even whole findings decay within weeks.
+2. **Triage ritual (≈ 30 minutes, same day).** Read the delta summary and quick-wins table;
+   set every new ledger entry's disposition: fix now (quick-wins batch), fix later (leave
+   `open`), or `accepted-risk` with a written reason. An untriaged ledger silently converts
+   the review back into shelf-ware.
+3. **Quick-wins batch within a week.** Run `/repo-review.fix` with the batch of High/Critical
+   × S-effort IDs while references are fresh. One cleanup PR is the target, not one PR per
+   finding.
+4. **Adopt at least one guard per run.** Pick the highest-leverage guard proposal from the
+   prevention section and land it as its own PR (lint rule, CI gate, CLAUDE.md paragraph).
+   Gates keep paying; findings only pay once.
+5. **Playbook-tuning PR after each run.** Apply the tuning appendix's prune/strengthen/add
+   recommendations to the checked-in playbooks so the next run is sharper and cheaper.
+6. **Judge the review by resolution rate** (FR-020), not by findings count. If run N+1 shows
+   the same open Criticals as run N, fix the operating rhythm before running again.
 
 ## Out of Scope
 
-- Automatic fixing of findings (a future session may consume the report; see FR-011).
+- Automatic fixing of findings by the review run itself (fixes flow through the separate, manually-invoked `/repo-review.fix` skill; see FR-011/FR-016).
 - Backlog/GitHub issue creation from findings.
+- Automatic adoption of guard proposals (lint/CI/CLAUDE.md/constitution changes are separate deliberate PRs).
 - Per-PR review gating (the existing `/code-review` skill and CI cover incoming changes; this skill audits the existing codebase).
 - Scheduled/cron execution (the skill is manually invoked; scheduling can be layered on later without spec changes).
 - Reviewing external/contrib repositories.
