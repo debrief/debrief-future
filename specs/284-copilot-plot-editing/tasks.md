@@ -204,7 +204,7 @@ description: "Task list for Copilot Chat drives Debrief (spike)"
 
 ### PR Creation
 
-- [ ] T051 Create PR and publish blog: run `/speckit.pr`
+- [x] T051 Create PR and publish blog: run `/speckit.pr`
 
 **Task T051 must run last — it depends on all evidence, findings, and media tasks being complete.**
 
