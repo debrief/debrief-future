@@ -150,3 +150,44 @@ export const ConfigurationTarget = {
   Workspace: 2,
   WorkspaceFolder: 3,
 };
+
+// ─── Language Model Tools API (#284 Copilot spike) ──────────────────────────
+// Minimal runtime stand-ins so the copilot tools and their unit tests run
+// under vitest. Only additive — existing tests are untouched.
+
+export class MarkdownString {
+  value: string;
+  constructor(value = '') {
+    this.value = value;
+  }
+  appendMarkdown(value: string): this {
+    this.value += value;
+    return this;
+  }
+}
+
+export class LanguageModelTextPart {
+  constructor(public value: string) {}
+}
+
+export class LanguageModelToolResult {
+  constructor(public content: unknown[]) {}
+}
+
+export const lm = {
+  registerTool: vi.fn(() => ({ dispose: (): void => {} })),
+  invokeTool: vi.fn(),
+};
+
+export class CancellationTokenSource {
+  token = {
+    isCancellationRequested: false,
+    onCancellationRequested: (): { dispose: () => void } => ({
+      dispose: (): void => {},
+    }),
+  };
+  cancel(): void {
+    this.token.isCancellationRequested = true;
+  }
+  dispose(): void {}
+}

@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "publisher": "debrief",
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.99.0"
   },
   "categories": [
     "Visualization",
@@ -687,6 +687,16 @@
     "configuration": {
       "title": "Debrief",
       "properties": {
+        "debrief.copilot.activeModel": {
+          "type": "string",
+          "default": "unknown",
+          "description": "Spike #284: operator-annotated model name recorded in Copilot tool telemetry (the LM Tools API does not expose the active model to the tool). Set this to the model you have selected in Copilot before a scenario run."
+        },
+        "debrief.copilot.primingEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Spike #284: records in Copilot tool telemetry whether .github/copilot-instructions.md is active for the current run (FR-027 with/without-priming comparison). Set to false when running with the priming file renamed away."
+        },
         "debrief.selection.glowEffect": {
           "type": "boolean",
           "default": true,
@@ -779,7 +789,140 @@
           "description": "Defensive cap on the provider's response size in bytes. Responses exceeding this budget are treated as a malformed response."
         }
       }
-    }
+    },
+    "languageModelTools": [
+      {
+        "name": "debrief_searchPlots",
+        "displayName": "Search Debrief plots",
+        "modelDescription": "Search the local STAC catalog for plots by free text (title/description), time range, platform name/type, and/or spatial bounding box. Returns matching plots with id, title, time span, platforms, and extent. Optionally opens a single match in the Debrief plot editor.",
+        "toolReferenceName": "debrief_searchPlots",
+        "canBeReferencedInPrompt": true,
+        "tags": [
+          "debrief"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "Free-text matched against plot title and description."
+            },
+            "startTime": {
+              "type": "string",
+              "description": "ISO-8601 start of the time range to overlap."
+            },
+            "endTime": {
+              "type": "string",
+              "description": "ISO-8601 end of the time range to overlap."
+            },
+            "platforms": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Platform names or types to match (membership)."
+            },
+            "bbox": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4,
+              "description": "Spatial extent [west, south, east, north] to intersect."
+            },
+            "open": {
+              "type": "boolean",
+              "description": "When true and exactly one plot matches, open it in the editor."
+            }
+          }
+        }
+      },
+      {
+        "name": "debrief_summarizeCurrentPlot",
+        "displayName": "Summarise current Debrief plot",
+        "modelDescription": "Summarise the currently open Debrief plot: metadata plus a thinned inventory of its features (names, types, platforms, time spans, counts — no geometry). Use before targeting an edit. Accepts an optional plotId to summarise a specific open plot; also lists all open plots. Set selectionOnly to summarise only the currently selected features.",
+        "toolReferenceName": "debrief_summarizeCurrentPlot",
+        "canBeReferencedInPrompt": true,
+        "tags": [
+          "debrief"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "plotId": {
+              "type": "string",
+              "description": "Optional stac:// id of an open plot to summarise; defaults to the active plot."
+            },
+            "selectionOnly": {
+              "type": "boolean",
+              "description": "When true, summarise only the currently selected features."
+            }
+          }
+        }
+      },
+      {
+        "name": "debrief_listTools",
+        "displayName": "List Debrief tools",
+        "modelDescription": "List the Debrief analysis/editing tools available for the current plot and selection, with their parameters and whether each modifies the plot. Call before debrief_runTool to choose a tool and build valid parameters.",
+        "toolReferenceName": "debrief_listTools",
+        "canBeReferencedInPrompt": true,
+        "tags": [
+          "debrief"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "plotId": {
+              "type": "string",
+              "description": "Optional stac:// id of an open plot; defaults to the active plot."
+            }
+          }
+        }
+      },
+      {
+        "name": "debrief_runTool",
+        "displayName": "Run a Debrief tool",
+        "modelDescription": "Run a Debrief tool by id against the current plot. Tools that modify the plot require user confirmation; analytical tools return a summary and populate the Results panel. Pass the analyst's original request as `utterance` for provenance. Validate the tool id and parameters with debrief_listTools first.",
+        "toolReferenceName": "debrief_runTool",
+        "canBeReferencedInPrompt": true,
+        "tags": [
+          "debrief"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "required": [
+            "toolId"
+          ],
+          "properties": {
+            "toolId": {
+              "type": "string",
+              "description": "The registry id of the tool to run (from debrief_listTools)."
+            },
+            "params": {
+              "type": "object",
+              "description": "Parameter values for the tool, validated against its schema."
+            },
+            "plotId": {
+              "type": "string",
+              "description": "Optional stac:// id of an open plot to target; defaults to the active plot."
+            },
+            "scope": {
+              "type": "string",
+              "enum": [
+                "all",
+                "selection"
+              ],
+              "description": "Operate on all features or the current selection. Defaults to selection when features are selected, else all."
+            },
+            "utterance": {
+              "type": "string",
+              "description": "The analyst's original natural-language request, recorded in provenance."
+            }
+          }
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

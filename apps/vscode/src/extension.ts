@@ -37,6 +37,7 @@ import { IoService } from './services/ioService';
 import { SessionManager } from './services/sessionManager';
 import { ToolMatchAdapter } from './services/toolMatchAdapter';
 import { registerCommands } from './commands';
+import { registerLmTools } from './copilot';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 import { registerStoryboardTransportCommands } from './commands/storyboardTransport';
 import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
@@ -989,6 +990,20 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     resultsPanelService
   );
   context.subscriptions.push(...commands);
+
+  // Spike #284 — expose Debrief to GitHub Copilot Chat agent mode via the
+  // Language Model Tools API. All four tools orchestrate through existing
+  // service singletons; no new services. Self-contained in src/copilot/.
+  registerLmTools(context, {
+    calcService,
+    stacService,
+    configService,
+    resultsPanelService,
+    openPlotsService,
+    toolMatchAdapter,
+    sessionManager,
+    getMapPanel: () => mapPanel,
+  });
 
   // Feature 217 — register storyboard transport commands (forward,
   // backward, clickScene, jumpPast). Must run AFTER the service is
