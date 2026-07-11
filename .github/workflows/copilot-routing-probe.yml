@@ -1,0 +1,54 @@
+# Copilot spike (#284) — model-routing probe (FR-032 / T038).
+#
+# Runs the network-gated model-routing probe (apps/vscode/scripts/model-routing-probe.ts)
+# on a nightly schedule and on demand. It feeds the four Debrief tool schemas +
+# the eight scenario prompts to a model and asserts the expected tool call.
+#
+# This is deliberately SEPARATE from the PR gate: the probe no-ops (exit 0) when
+# ANTHROPIC_API_KEY is absent, so it never blocks the offline-by-default core CI.
+name: Copilot routing probe
+
+on:
+  schedule:
+    # 03:17 UTC nightly (off the hour to avoid the scheduler stampede).
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Model id to probe (overrides the default)'
+        required: false
+        type: string
+
+concurrency:
+  group: copilot-routing-probe
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run model-routing probe (skips cleanly without a key)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          COPILOT_PROBE_MODEL: ${{ inputs.model }}
+        run: npx tsx apps/vscode/scripts/model-routing-probe.ts
+
+      - name: Upload routing-probe report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: routing-probe-report
+          path: specs/284-copilot-plot-editing/evidence/routing-probe.md
+          if-no-files-found: ignore
