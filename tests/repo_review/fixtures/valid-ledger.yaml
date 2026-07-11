@@ -1,0 +1,68 @@
+version: 1
+next_id: 4
+findings:
+  - id: RR-001
+    status: open
+    dimension: correctness
+    severity: high
+    effort: S
+    title: Save path drops features when the source type grows
+    failure_scenario: >-
+      A plot with a new optional feature field is saved; the re-listed DTO omits
+      the field and the data is silently dropped on reload.
+    locations:
+      - file: shared/stac-writer/src/core.ts
+        line: 142
+    module_path: shared/stac-writer
+    defect_slug: relisted-boundary-type
+    heuristic: CB-03
+    verification: Verifier reproduced by adding a field to the source type and observing loss.
+    theme: relisted-boundary-types
+    first_seen:
+      date: "2026-07-10"
+      git_sha: "0123456789abcdef0123456789abcdef01234567"
+    last_seen:
+      date: "2026-07-10"
+      git_sha: "0123456789abcdef0123456789abcdef01234567"
+  - id: RR-002
+    status: accepted-risk
+    status_reason: Legacy dialect is out of support scope until v4.1; tracked separately.
+    dimension: correctness
+    severity: medium
+    effort: M
+    title: Legacy REP dialect mangles trailing sensor cuts
+    failure_scenario: A boat.rep with dialect-B sensor lines parses one cut short.
+    locations:
+      - file: services/io/src/rep.py
+        line: 88
+    module_path: services/io
+    defect_slug: dialect-b-trailing-cut
+    heuristic: CB-07
+    verification: Verifier confirmed against the dialect-B golden fixture.
+    first_seen:
+      date: "2026-07-10"
+      git_sha: "0123456789abcdef0123456789abcdef01234567"
+    last_seen:
+      date: "2026-07-10"
+      git_sha: "0123456789abcdef0123456789abcdef01234567"
+  - id: RR-003
+    status: fixed
+    dimension: tech-debt
+    severity: low
+    effort: S
+    title: Dead helper left after the #172 consolidation
+    failure_scenario: Unreferenced converter retained; knip flags it.
+    locations:
+      - file: shared/utils/src/legacy.ts
+        line: 12
+    module_path: shared/utils
+    defect_slug: dead-legacy-converter
+    heuristic: TD-11
+    verification: knip reports zero references; verifier confirmed no dynamic import.
+    fix_pr: https://github.com/debrief/debrief-future/pull/700
+    first_seen:
+      date: "2026-06-01"
+      git_sha: "1111111111111111111111111111111111111111"
+    last_seen:
+      date: "2026-07-10"
+      git_sha: "0123456789abcdef0123456789abcdef01234567"
