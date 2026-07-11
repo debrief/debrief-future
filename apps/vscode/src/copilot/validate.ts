@@ -123,11 +123,15 @@ export function validateRunToolInput(raw: unknown): RunToolInput {
   if (scope !== undefined && scope !== 'all' && scope !== 'selection') {
     throw new InputValidationError('"scope" must be "all" or "selection"');
   }
+  const featureIds = optionalStringArray(input.featureIds, 'featureIds');
+  const featureNames = optionalStringArray(input.featureNames, 'featureNames');
   return {
     toolId,
     ...(params ? { params } : {}),
     plotId: optionalString(input.plotId, 'plotId'),
     ...(scope ? { scope } : {}),
+    ...(featureIds ? { featureIds } : {}),
+    ...(featureNames ? { featureNames } : {}),
     utterance: optionalString(input.utterance, 'utterance'),
   };
 }

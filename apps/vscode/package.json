@@ -883,7 +883,7 @@
       {
         "name": "debrief_runTool",
         "displayName": "Run a Debrief tool",
-        "modelDescription": "Run a Debrief tool by id against the current plot. Tools that modify the plot require user confirmation; analytical tools return a summary and populate the Results panel. Pass the analyst's original request as `utterance` for provenance. Validate the tool id and parameters with debrief_listTools first.",
+        "modelDescription": "Run a Debrief tool by id against the current plot. Tools that modify the plot require user confirmation; analytical tools return a summary and populate the Results panel. To operate on specific features (e.g. \"the Contact track\"), pass featureNames or featureIds — get exact names/ids from debrief_summarizeCurrentPlot first; otherwise the tool uses the current map selection. Pass the analyst's original request as `utterance` for provenance. Validate the tool id and parameters with debrief_listTools first.",
         "toolReferenceName": "debrief_runTool",
         "canBeReferencedInPrompt": true,
         "tags": [
@@ -913,7 +913,21 @@
                 "all",
                 "selection"
               ],
-              "description": "Operate on all features or the current selection. Defaults to selection when features are selected, else all."
+              "description": "Operate on all features or the current selection. Defaults to selection when features are selected, else all. Ignored when featureNames or featureIds are given."
+            },
+            "featureNames": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Names of the features to operate on (e.g. [\"Contact\"]). Resolved against each feature's display name; an unknown or ambiguous name is reported, not guessed. Overrides scope."
+            },
+            "featureIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Exact feature ids to operate on (e.g. from debrief_summarizeCurrentPlot). Overrides scope."
             },
             "utterance": {
               "type": "string",

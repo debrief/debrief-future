@@ -57,6 +57,18 @@ export interface RunToolInput {
   plotId?: string;
   /** `'selection'` (default when a selection exists) or `'all'`. */
   scope?: 'all' | 'selection';
+  /**
+   * Explicit feature ids to operate on — e.g. ids taken from
+   * `debrief_summarizeCurrentPlot`. Overrides `scope` when present.
+   */
+  featureIds?: string[];
+  /**
+   * Feature names to operate on (resolved against each feature's display
+   * name). Lets the analyst target "the Contact track" without a manual map
+   * selection. Overrides `scope` when present; an unknown or ambiguous name is
+   * reported, never guessed.
+   */
+  featureNames?: string[];
   /** The analyst's originating request → provenance (FR-023). */
   utterance?: string;
 }

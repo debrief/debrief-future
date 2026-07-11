@@ -28,7 +28,17 @@ All optional, AND-combined. Empty input ⇒ list-all (bounded).
 | `params` | `Record<string, unknown>` | validated against the tool's schema |
 | `plotId` | `string \| undefined` | target plot override |
 | `scope` | `'all' \| 'selection'` | default `'selection'` when a selection exists, else `'all'` |
+| `featureIds` | `string[] \| undefined` | explicit target feature ids; overrides `scope` (named-feature targeting, post-#672 live-testing) |
+| `featureNames` | `string[] \| undefined` | target feature names, resolved against display names (exact then unique substring); overrides `scope`; unknown/ambiguous names are reported, not guessed |
 | `utterance` | `string` | the analyst's originating request (→ provenance, FR-023) |
+
+> **Named-feature targeting** (added after live testing surfaced the friction): an
+> analyst can say "buffer the Contact track" without a manual map selection —
+> `debrief_runTool` resolves `featureNames`/`featureIds` to the operating set,
+> falling back to the selection/all scope when neither is given. Resolution reuses
+> the same display-name logic as the summary, so the name the model saw is the name
+> it can target. Mutating runs still gate on the plain-language confirmation (which
+> now names the resolved features).
 
 ## Entities
 

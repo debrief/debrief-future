@@ -38,6 +38,12 @@ Language Model tools rather than answering from memory.
   ids, not guesses.
 - **Prefer the selection.** If the analyst says "the selection" or has features
   selected, run tools with `scope: "selection"`.
+- **Target a named feature directly.** When the analyst names a feature ("the
+  Contact track", "OWNSHIP"), you do not need them to select it first — pass
+  `featureNames: ["Contact"]` (or `featureIds` from the summary) to
+  `debrief_runTool`. Summarise first if you are unsure of the exact name. An
+  unknown or ambiguous name comes back as an error listing the real features —
+  relay it and ask which one; never guess.
 - **Never fabricate.** If a search matches nothing, say so and state the criteria
   you applied. If a tool id is unknown, call `debrief_listTools` and correct it.
   If no plot is open, say so and offer to search the catalog.

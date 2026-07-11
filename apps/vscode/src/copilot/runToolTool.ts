@@ -13,6 +13,7 @@
  */
 
 import * as vscode from 'vscode';
+import type { DebriefFeature } from '@debrief/schemas';
 import type { ToolExecutionResult } from '../types/tool';
 import type { CopilotToolDeps } from './deps';
 import { textResult } from './resultHelpers';
@@ -45,22 +46,102 @@ function resolutionMessage(
   }
 }
 
-/** Resolve the operating feature ids for a scope (T031 / FR-010). */
-function resolveScope(
+/** The resolved operating set, or a structured reason it could not be resolved. */
+type TargetResolution =
+  | { kind: 'ok'; scope: 'features' | 'selection' | 'all'; featureIds: string[] }
+  | { kind: 'error'; message: string };
+
+/** Match features whose display name equals (then contains) `name`, case-insensitively. */
+function matchByName(
+  features: DebriefFeature[],
+  name: string,
+): DebriefFeature[] {
+  const n = name.trim().toLowerCase();
+  if (n === '') {
+    return [];
+  }
+  const exact = features.filter(
+    (f) => featureDisplayName(f).toLowerCase() === n,
+  );
+  if (exact.length > 0) {
+    return exact;
+  }
+  return features.filter((f) => featureDisplayName(f).toLowerCase().includes(n));
+}
+
+/**
+ * Resolve the operating feature set (FR-010 + named-feature targeting).
+ *
+ * Precedence: explicit `featureIds`/`featureNames` (target by identity/name)
+ * win over `scope`. Names resolve against each feature's display name; an
+ * unknown or ambiguous name is reported, never guessed. Falls back to the
+ * selection (default when one exists) or all features.
+ */
+function resolveTargets(
   input: RunToolInput,
+  allFeatures: DebriefFeature[],
   selection: SelectionContext,
-  allFeatureIds: string[],
-): { scope: 'all' | 'selection'; featureIds: string[]; empty: boolean } {
-  const scope =
-    input.scope ?? (selection.ids.length > 0 ? 'selection' : 'all');
+): TargetResolution {
+  const explicitIds = input.featureIds ?? [];
+  const names = input.featureNames ?? [];
+
+  if (explicitIds.length > 0 || names.length > 0) {
+    const knownIds = new Set(allFeatures.map((f) => String(f.id)));
+    const resolved = new Set<string>();
+    const problems: string[] = [];
+
+    for (const id of explicitIds) {
+      if (knownIds.has(id)) {
+        resolved.add(id);
+      } else {
+        problems.push(`no feature with id "${id}"`);
+      }
+    }
+    for (const name of names) {
+      const matches = matchByName(allFeatures, name);
+      if (matches.length === 0) {
+        problems.push(`no feature named "${name}"`);
+      } else if (matches.length > 1) {
+        const listed = matches
+          .map((m) => `${featureDisplayName(m)} (${String(m.id)})`)
+          .join(', ');
+        problems.push(`"${name}" is ambiguous — matches ${matches.length}: ${listed}`);
+      } else {
+        resolved.add(String(matches[0]?.id));
+      }
+    }
+
+    if (problems.length > 0) {
+      const available = allFeatures
+        .map((f) => featureDisplayName(f))
+        .join(', ');
+      return {
+        kind: 'error',
+        message: `Could not resolve the target features: ${problems.join('; ')}. Features in this plot: ${available || '(none)'}. Select them, or pass exact names/ids from debrief_summarizeCurrentPlot.`,
+      };
+    }
+    return { kind: 'ok', scope: 'features', featureIds: [...resolved] };
+  }
+
+  const scope = input.scope ?? (selection.ids.length > 0 ? 'selection' : 'all');
   if (scope === 'selection') {
+    if (selection.ids.length === 0) {
+      return {
+        kind: 'error',
+        message:
+          'Nothing is selected. Select one or more features in the plot, name them explicitly (featureNames), or run on all features (scope:"all"). I will not guess.',
+      };
+    }
+    return { kind: 'ok', scope, featureIds: selection.ids };
+  }
+  const allIds = allFeatures.map((f) => String(f.id));
+  if (allIds.length === 0) {
     return {
-      scope,
-      featureIds: selection.ids,
-      empty: selection.ids.length === 0,
+      kind: 'error',
+      message: 'The plot has no features to run the tool on.',
     };
   }
-  return { scope, featureIds: allFeatureIds, empty: allFeatureIds.length === 0 };
+  return { kind: 'ok', scope: 'all', featureIds: allIds };
 }
 
 export class RunToolTool implements vscode.LanguageModelTool<unknown> {
@@ -127,16 +208,20 @@ export class RunToolTool implements vscode.LanguageModelTool<unknown> {
     input: RunToolInput,
     resolution: ResolvedPlot,
   ): string {
+    const allFeatures = resolution.panel.getFeatures();
     const selection = resolveSelection(this.deps, resolution.panel);
-    const scope =
-      input.scope ?? (selection.ids.length > 0 ? 'selection' : 'all');
-    if (scope === 'selection') {
-      if (selection.features.length === 0) {
-        return 'the current selection (empty)';
-      }
-      return selection.features.map(featureDisplayName).join(', ');
+    const targets = resolveTargets(input, allFeatures, selection);
+    if (targets.kind === 'error') {
+      // Unresolved here — invoke re-checks and returns the corrective message.
+      return 'the target features (to be confirmed on run)';
     }
-    return `all features in ${resolution.title}`;
+    if (targets.scope === 'all') {
+      return `all ${targets.featureIds.length} features in ${resolution.title}`;
+    }
+    const idToName = new Map(
+      allFeatures.map((f) => [String(f.id), featureDisplayName(f)]),
+    );
+    return targets.featureIds.map((id) => idToName.get(id) ?? id).join(', ');
   }
 
   // ── Execution (FR-011..018) ────────────────────────────────────────────────
@@ -189,15 +274,15 @@ export class RunToolTool implements vscode.LanguageModelTool<unknown> {
     }
 
     const selection = resolveSelection(this.deps, resolution.panel);
-    const allFeatureIds = resolution.panel
-      .getFeatures()
-      .map((f) => String(f.id));
-    const scoped = resolveScope(input, selection, allFeatureIds);
-    if (scoped.scope === 'selection' && scoped.empty) {
-      const reason =
-        'Nothing is selected. Select one or more features in the plot, then ask again (I will not guess).';
-      return this.reject('runTool', input, reason, start, ctx, confirmation);
+    const targets = resolveTargets(
+      input,
+      resolution.panel.getFeatures(),
+      selection,
+    );
+    if (targets.kind === 'error') {
+      return this.reject('runTool', input, targets.message, start, ctx, confirmation);
     }
+    const operatingFeatureIds = targets.featureIds;
 
     // 4. Execute via the shared Python path, cancellation-aware.
     const pyStart = Date.now();
@@ -206,12 +291,12 @@ export class RunToolTool implements vscode.LanguageModelTool<unknown> {
     try {
       result = await this.deps.calcService.executeTool({
         toolId: input.toolId,
-        featureIds: scoped.featureIds,
+        featureIds: operatingFeatureIds,
         ...(input.params ? { params: input.params } : {}),
       });
     } catch (err) {
       const reason = err instanceof Error ? err.message : String(err);
-      this.routeError(resolution, input, scoped.featureIds, reason);
+      this.routeError(resolution, input, operatingFeatureIds, reason);
       return this.reject('runTool', input, reason, start, ctx, confirmation);
     }
     const pythonMs = Date.now() - pyStart;
@@ -219,7 +304,7 @@ export class RunToolTool implements vscode.LanguageModelTool<unknown> {
     // 5. Failure → structured error, plot unchanged (FR-018).
     if (!result.success) {
       const reason = result.error ?? 'Unknown tool error';
-      this.routeError(resolution, input, scoped.featureIds, reason);
+      this.routeError(resolution, input, operatingFeatureIds, reason);
       return this.reject(
         'runTool',
         input,
@@ -253,19 +338,19 @@ export class RunToolTool implements vscode.LanguageModelTool<unknown> {
         resolution.panel,
         input.toolId,
         result,
-        scoped.featureIds,
+        operatingFeatureIds,
       );
       summary = outcome.applied
         ? `Applied ${tool.name} to ${outcome.modifiedFeatureIds.length} feature(s) in "${resolution.title}". The plot is now dirty (unsaved) — undo/revert to discard, or Save to persist.`
         : `${tool.name} ran but produced no editable change.`;
     } else {
-      this.routeAnalytical(resolution, input, result, scoped.featureIds);
+      this.routeAnalytical(resolution, input, result, operatingFeatureIds);
       summary = `Ran ${tool.name}. A summary is in this reply and the full result is in the Results panel.`;
     }
     const applyMs = Date.now() - applyStart;
 
     // 7. Provenance (FR-023) + 8. telemetry (FR-024).
-    this.recordProvenance(resolution, input, result, scoped.featureIds);
+    this.recordProvenance(resolution, input, result, operatingFeatureIds);
     this.telemetry.record({
       tool: 'runTool',
       input,
