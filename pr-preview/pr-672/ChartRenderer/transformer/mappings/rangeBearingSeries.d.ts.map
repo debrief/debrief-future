@@ -1,1 +1,0 @@
-{"version":3,"file":"rangeBearingSeries.d.ts","sourceRoot":"","sources":["../../../../src/ChartRenderer/transformer/mappings/rangeBearingSeries.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,YAAY,EAAE,MAAM,WAAW,CAAC;AAC9C,OAAO,KAAK,EAAE,eAAe,EAAE,MAAM,aAAa,CAAC;AAEnD;;;;;GAKG;AACH,wBAAgB,kBAAkB,CAAC,OAAO,EAAE,eAAe,GAAG,YAAY,CAuCzE"}
