@@ -60,6 +60,37 @@ class MockThemeColor {
   }
 }
 
+// ─── Language Model Tools API (#284 Copilot spike) ──────────────────────────
+class MockMarkdownString {
+  value: string;
+  constructor(value = '') {
+    this.value = value;
+  }
+  appendMarkdown(value: string) {
+    this.value += value;
+    return this;
+  }
+}
+
+class MockLanguageModelTextPart {
+  constructor(public value: string) {}
+}
+
+class MockLanguageModelToolResult {
+  constructor(public content: unknown[]) {}
+}
+
+class MockCancellationTokenSource {
+  token = {
+    isCancellationRequested: false,
+    onCancellationRequested: () => ({ dispose: () => {} }),
+  };
+  cancel() {
+    this.token.isCancellationRequested = true;
+  }
+  dispose() {}
+}
+
 // Mock VS Code API globally
 vi.mock('vscode', () => ({
   window: {
@@ -134,5 +165,13 @@ vi.mock('vscode', () => ({
   },
   env: {
     openExternal: vi.fn(),
+  },
+  MarkdownString: MockMarkdownString,
+  LanguageModelTextPart: MockLanguageModelTextPart,
+  LanguageModelToolResult: MockLanguageModelToolResult,
+  CancellationTokenSource: MockCancellationTokenSource,
+  lm: {
+    registerTool: vi.fn(() => ({ dispose: () => {} })),
+    invokeTool: vi.fn(),
   },
 }));
