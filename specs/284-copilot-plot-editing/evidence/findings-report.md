@@ -9,10 +9,11 @@ should inherit or avoid.
 (48 unit tests + the 8-scenario transcript replay, all green; `test-summary.md`).
 The model's own routing quality (Q4) and the priming A/B (Q5) were **measured for
 real** via the automated routing probe run across two models × priming
-(`routing-probe.md`, captured 2026-07-11) — not left to a live session. A live
-Copilot session would add in-situ screenshots but is not required for these
-findings. Everything below the tool boundary is deterministic and is reported
-from the automated layers.
+(`routing-probe.md`, captured 2026-07-11) — not left to a live session. A **live
+Copilot session in the browser-based preview** was also captured (contrary to an
+earlier assumption that the preview couldn't run Copilot) — see "Live testing"
+below and `evidence/screenshots/live-*.png`. Everything below the tool boundary is
+deterministic and is reported from the automated layers.
 
 ---
 
@@ -180,6 +181,39 @@ applied-but-unsaved `updatePlotFeatures` change is the one invariant that the
 deferred extension-host layer is designed to exercise. Per spike discipline this
 is a **reported finding** (a gap the offline panel must close), not new undo
 infrastructure built here.
+
+## Live testing (browser preview) — what it confirmed, and the fix it surfaced
+
+The tools were exercised live in a real Copilot Chat session inside the
+browser-based Code Server preview (`evidence/screenshots/live-*.png`):
+
+- **`debrief_listTools`** returned the live registry with each tool's category
+  and `mutating` flag correct (`live-list-tools.png`) — Q1's projection, live.
+- **A mutating edit worked end-to-end:** *"change track symbols to squares"* ran
+  Apply Symbol Style, updated 5 features, and marked the plot **dirty / unsaved**
+  with nothing written to disk (`live-symbol-edit.png`) — FR-011, live.
+- **The empty-selection fail-safe fired:** *"add a buffer to the Contact track"*
+  with nothing selected was refused and relayed ("select the Contact track, then
+  say run it") — US4 AC-2 / F2, live.
+
+Two findings came out of that session:
+
+1. **Missing named-feature targeting (fixed).** The operating set was originally
+   only `all` or the live map selection, so a *named* feature ("the Contact
+   track") couldn't be acted on without a manual selection — even though the
+   model knew its id from the summary. This was consistent with the Tools panel's
+   selection-driven model, but wrong for a natural-language flow. **Fixed**:
+   `debrief_runTool` now accepts `featureNames`/`featureIds` (resolved against the
+   same display-name logic the summary uses), with unknown/ambiguous names
+   reported not guessed, and mutating runs still gated. For E13 this is the
+   general lesson: an NL surface needs a *by-name/by-id* operating scope, not just
+   "what's selected in the UI".
+2. **The model can narrate an action it didn't take.** In the empty-selection
+   case the model said "Executed Buffer Zone Generator" before reporting it
+   couldn't (no selection). The tool did the right thing regardless — nothing ran,
+   nothing changed — which is exactly why the safety lives in the extension, not
+   the prose. A reminder for E13: trust the tool's structured result, never the
+   model's summary of what it did.
 
 ## Recommendation for E13
 

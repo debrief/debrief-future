@@ -63,5 +63,5 @@ pnpm --filter debrief-vscode test:unit
 ## Known gaps (reported, not hidden)
 
 1. **Two verification layers deferred** to a runner with a Python env + Electron (see above). The stated correctness gate (transcript replay) is green.
-2. **Live Copilot screenshots not captured** — Copilot Chat cannot be Playwright-driven (spec FR-021); the automated replay is the gate, and the live session is supplementary. Screenshot capture is a manual follow-up in a licensed Copilot session.
+2. **Live Copilot screenshots** — captured after all (in the browser-based preview): `evidence/screenshots/live-list-tools.png` (registry projection) and `live-symbol-edit.png` (mutating edit → 5 features, dirty, no disk write), plus the empty-selection fail-safe. Copilot Chat still can't be Playwright-driven in CI, so the automated replay remains the gate; the live shots are supplementary evidence.
 3. **Undo granularity** (research R5) is a design question the extension-host layer would exercise; recorded in the findings as a spike observation, not new infrastructure.

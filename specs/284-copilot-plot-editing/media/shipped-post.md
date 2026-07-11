@@ -76,6 +76,14 @@ On approval, the tool re-validates the id and params against the live registry (
 
 The contrast cases are just as important. An analytical tool — *"run speed-filter below 5 kts"* — auto-runs with no confirmation and routes its result to the Results panel. And the fail-safes refuse rather than guess: *"colour the track red"* with nothing selected returns "Nothing is selected… (I will not guess)"; an invented tool id returns a corrective message and never spawns Python; no plot open returns "Search the catalog and open a plot first."
 
+And it isn't hypothetical — here it is running live in the browser-based preview. Asking *"change track symbols to squares"* runs the styling tool and reports back honestly: **five features updated, plot dirty (unsaved), save to keep the change** — the dirty-only, nothing-written-to-disk path, in a real Copilot session:
+
+![Copilot Chat in the Debrief VS Code preview: the analyst typed "change track symbols to squares"; Copilot ran Apply Symbol Style and replied "Track symbols are now set to squares on the active plot — Updated features: 5, Plot status: unsaved (dirty), so save to keep the change". The status bar reads "Unsaved Session".](../evidence/screenshots/live-symbol-edit.png)
+
+And asking *"list what debrief tools you have available"* returns the live registry — each tool tagged with its category and whether it mutates the plot, exactly as `debrief_listTools` projects it:
+
+![Copilot Chat listing the Debrief tools from the live registry: Apply Symbol Style (style, mutating), Area Summary (calc, non-mutating), Buffer Zone Generator, Set Track Color (style, mutating), Track Stats (calc, non-mutating) and more, each annotated with category and mutating flag.](../evidence/screenshots/live-list-tools.png)
+
 ## What We Learned
 
 The findings report answers six questions. The short version:
@@ -135,7 +143,7 @@ Three things blocked or bent, and I'd rather record them than bury them.
 
 **Two verification layers are deferred.** Real-Python integration needs a provisioned debrief-calc interpreter, and the extension-host `vscode.lm.invokeTool` layer needs an Electron download that returned HTTP 403 in the cloud build session. Both are honestly deferred with written acceptance criteria for a follow-up on a properly-provisioned runner. The stated correctness gate — the transcript replay — is green, and the key invariants are proven at the unit layer against the production path.
 
-**No live Copilot screenshots.** Copilot Chat can't be Playwright-driven, so there is no captured chat session here — the automated replay is the gate, and a licensed live session is supplementary follow-up. The one figure in this post is a chart of the real routing measurements, not a screenshot: I'd rather show you numbers I can reproduce than fabricate a picture of a session I couldn't automate.
+**Live Copilot screenshots came late, and corrected me.** I'd written this section claiming Copilot Chat couldn't run in the browser preview at all — and then it did, driving the tools exactly as designed (the two shots above are from that session, unretouched). The lesson landed on me as much as the tooling: the automated replay is still the *gate* because Copilot Chat can't be Playwright-driven in CI, but "can't demo it" was too strong. What I won't do is fabricate a screenshot — every picture here is either a real session or a chart of reproducible numbers.
 
 One more, filed as a finding rather than a fix: the Debrief editor is a webview custom editor with app-managed session state, not VS Code's native undo stack, so "single undo" maps to the session revert mechanism. A declined or failed chat edit leaves the plot byte-identical because nothing is applied — that much is guaranteed and unit-proven. Whether an *applied-but-unsaved* chat edit reverts in a clean single step is the invariant the deferred extension-host layer is designed to exercise, and a gap the offline panel will need to close.
 
@@ -143,6 +151,8 @@ One more, filed as a finding rather than a fix: the Debrief editor is a webview 
 
 The recommendation to E13 is to adopt this tool surface as the contract for the offline NL panel. The static-plus-meta split, summarise-before-edit grounding, the plain-language confirmation gate, and the dirty-only apply all transfer. Three items to close first: a per-feature spatial digest in the summary, the single-step-revert verification, and — the one the routing numbers demand — a **sequence-aware probe** that runs each tool call and scores the whole trajectory, so the model and priming comparisons are measured on the multi-step intents that actually matter, not just the first token. The single-shot probe is a good smoke test; it's the wrong ruler for the questions we care about most.
 
-The throwaway code did its job. The findings, the token numbers, and the tool boundary are what carry forward.
+Driving it live already paid off. Asking to *"add a buffer to the Contact track"* with nothing selected got refused — correctly, the fail-safe working — but it exposed a real gap: the tool could only operate on *all* features or the live map *selection*, so a plainly-named track couldn't be targeted without a manual click, even though the model knew exactly which feature it was. So the tool now takes `featureNames`/`featureIds`: "buffer the Contact track" resolves the name to its id and runs, with unknown or ambiguous names reported rather than guessed. That's the spike doing its actual job — a live session turning a plausible design into a concrete improvement the offline panel will inherit.
+
+The throwaway code did its job. The findings, the token numbers, the live session, and the tool boundary are what carry forward.
 
 → [See the code](https://github.com/debrief/debrief-future/pull/672)
