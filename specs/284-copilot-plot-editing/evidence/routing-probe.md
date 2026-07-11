@@ -9,6 +9,8 @@ domain-priming on/off (the FR-026 model-sensitivity + FR-027 priming A/B).
 > The probe scores strictly: the **terminal** tool must be the **first** call.
 > See "The multi-step caveat" below — this understates real agent behaviour.
 
+![Tool-routing accuracy by model and priming — strict vs sequence-aware](screenshots/routing-accuracy.png)
+
 ## Strict results (terminal tool on the first call)
 
 | Model | Priming | Accuracy | SC-005 (≥80%) |

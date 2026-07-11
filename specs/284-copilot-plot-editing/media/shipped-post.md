@@ -5,7 +5,7 @@ date: 2026-07-11
 spec: 284-copilot-plot-editing
 track: [momentum, ambition]
 author: Ian
-reading_time: 9
+reading_time: 11
 tags: [tracer-bullet, copilot, natural-language, spike, vscode-extension, offline-nl-panel]
 excerpt: "A spike wiring Copilot Chat into Debrief through four LM tools — reconnaissance for the offline NL panel. The findings report is the deliverable."
 ---
@@ -88,6 +88,20 @@ The findings report answers six questions. The short version:
 
 **Transferability — high, and it's the deliverable that outlives the spike.** Search, execution, and the safety divergence are all Copilot-agnostic TypeScript. The offline panel reuses `searchCatalog`, `summarize`, `plotContext`, `applyChatEdit`, the registry, and the telemetry seams unchanged — only the *transport* (Copilot LM tools versus a local-model loop) gets replaced.
 
+## What the Models Actually Did
+
+The two questions I most wanted real numbers for — *does the model pick the right tool, and does the model matter?* — are the ones that decide whether an offline panel is feasible at all. So I ran the routing probe for real: the four tool schemas plus the eight scenario prompts, fed to two models (Claude Haiku 4.5 and Sonnet 5) with the domain-priming file toggled on and off. It records which tool the model reaches for. The results were more interesting than a pass/fail number, and they changed how I think about the problem.
+
+![Grouped bar chart of tool-routing accuracy for Haiku 4.5 and Sonnet 5, with domain priming off and on, comparing a strict first-call score against a sequence-aware score. Sonnet 5 reaches 75% strict and 100% sequence-aware in both priming conditions; Haiku 4.5 is 50%/50% unprimed and 38%/62% primed. A dashed line marks the 80% target.](../evidence/screenshots/routing-accuracy.png)
+
+**The model tier mattered more than anything I could write in a prompt.** Sonnet 5 called a tool for every discovery, summary and search request; Haiku 4.5 did not. Three of Haiku's misses were *no tool call at all* — asked "what's in this plot?" or "list the tools", it answered in prose instead of invoking the tool. That's the finding that reframed the whole exercise for me: **in a tool-driving context, the dangerous failure isn't picking the wrong tool — it's a helpful-sounding paragraph where an action should have been.** A weaker model doesn't misfire so much as decline to fire. For the offline/local-model target, capability-to-actually-invoke is the dominant variable, ahead of any prompt scaffolding.
+
+**"Did it route correctly?" turned out to be the wrong question.** Two of the eight scenarios — "colour the submarine track red", "run speed-filter on the selection" — aren't single calls at all. The right behaviour is a *sequence*: summarise to find the track, list the tools, then run. Sonnet's only two "misses" were it correctly calling `summarizeCurrentPlot` or `listTools` **first** — grounding before acting, exactly what a careful agent should do. My probe scored the first call against the *terminal* tool, so it marked that discipline as wrong. Re-scored to credit a valid next step, Sonnet never actually mis-routed. The lesson: an agent that decomposes a request into steps has to be evaluated at the level of the *trajectory*, not the first token. A single-shot accuracy number quietly punishes the behaviour you most want.
+
+**Priming shaped strategy, not just vocabulary — and my cheap probe lied about it in an instructive way.** On the naive score, adding the instructions file *lowered* Haiku's accuracy (50% → 38%), which looked like an argument against shipping it. But when I looked at *what changed*, priming was pushing the model toward grounding-first — summarising before editing, listing before running — precisely the convention the file teaches. The single-shot probe penalised the improvement. Re-scored for the sequence, priming *helped* (50% → 62%). So the honest reading is: the domain-priming file demonstrably steers which tool the model reaches for first, toward the instructed pattern — a real, observed effect — but proving it improves end-to-end success needs a multi-turn harness that runs each tool call and scores the whole path. Instrument first; then interrogate the instrument, because the cheap version will mislead you in the direction of your own metric.
+
+None of this needed a human sitting in Copilot Chat — it's an automated, repeatable measurement, and it's wired to run nightly once a key is present. That matters for a spike whose whole point is to hand E13 numbers instead of impressions.
+
 ## Numbers, Not Vibes
 
 Because the summary is what a local model has to swallow before it can act, its token cost is the number that decides whether an offline panel is even viable. The token-budget probe measured the shipped summariser over representative plot sizes:
@@ -117,18 +131,18 @@ The whole Debrief side of the boundary is verified with no human and no LLM in t
 
 Three things blocked or bent, and I'd rather record them than bury them.
 
-**Model identity is invisible to the tool.** The LM Tools API doesn't tell the extension which model is answering, so the multi-model comparison is operator-annotated. The spike closes the gap with an automated routing probe that owns the model choice and measures first-attempt tool-selection accuracy — but in this build session it skipped cleanly (no API key). A keyed nightly run produces the per-model table; until then, Q4 (model sensitivity) and Q5 (priming value) stay marked *live-pending*.
+**Model identity is invisible to the tool.** The LM Tools API doesn't tell the extension which model is answering, so *inside Copilot* the multi-model comparison would have to be operator-annotated. The spike sidesteps that by giving the routing probe its own model choice, which is how it produced the numbers above without ever needing to read Copilot's picker. Worth recording as a limitation of the in-Copilot path, not of the measurement.
 
 **Two verification layers are deferred.** Real-Python integration needs a provisioned debrief-calc interpreter, and the extension-host `vscode.lm.invokeTool` layer needs an Electron download that returned HTTP 403 in the cloud build session. Both are honestly deferred with written acceptance criteria for a follow-up on a properly-provisioned runner. The stated correctness gate — the transcript replay — is green, and the key invariants are proven at the unit layer against the production path.
 
-**No live Copilot screenshots.** Copilot Chat can't be Playwright-driven, so there is no captured session here — the automated replay is the gate, and a licensed live session is supplementary follow-up. If this post feels light on pictures, that's why: I won't fabricate a screenshot of a session I couldn't automate.
+**No live Copilot screenshots.** Copilot Chat can't be Playwright-driven, so there is no captured chat session here — the automated replay is the gate, and a licensed live session is supplementary follow-up. The one figure in this post is a chart of the real routing measurements, not a screenshot: I'd rather show you numbers I can reproduce than fabricate a picture of a session I couldn't automate.
 
 One more, filed as a finding rather than a fix: the Debrief editor is a webview custom editor with app-managed session state, not VS Code's native undo stack, so "single undo" maps to the session revert mechanism. A declined or failed chat edit leaves the plot byte-identical because nothing is applied — that much is guaranteed and unit-proven. Whether an *applied-but-unsaved* chat edit reverts in a clean single step is the invariant the deferred extension-host layer is designed to exercise, and a gap the offline panel will need to close.
 
 ## What's Next
 
-The recommendation to E13 is to adopt this tool surface as the contract for the offline NL panel. The static-plus-meta split, summarise-before-edit grounding, the plain-language confirmation gate, and the dirty-only apply all transfer. Two items to close first: a per-feature spatial digest in the summary, and the single-step-revert verification. And wiring the routing probe into nightly CI with a key turns the two *live-pending* findings into standing measurements.
+The recommendation to E13 is to adopt this tool surface as the contract for the offline NL panel. The static-plus-meta split, summarise-before-edit grounding, the plain-language confirmation gate, and the dirty-only apply all transfer. Three items to close first: a per-feature spatial digest in the summary, the single-step-revert verification, and — the one the routing numbers demand — a **sequence-aware probe** that runs each tool call and scores the whole trajectory, so the model and priming comparisons are measured on the multi-step intents that actually matter, not just the first token. The single-shot probe is a good smoke test; it's the wrong ruler for the questions we care about most.
 
 The throwaway code did its job. The findings, the token numbers, and the tool boundary are what carry forward.
 
-→ [See the code](https://github.com/debrief/debrief-future/pull/284)
+→ [See the code](https://github.com/debrief/debrief-future/pull/672)
