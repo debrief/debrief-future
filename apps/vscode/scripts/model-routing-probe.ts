@@ -21,10 +21,25 @@ import * as path from 'path';
 
 const MODEL = process.env.COPILOT_PROBE_MODEL ?? 'claude-haiku-4-5-20251001';
 const API_KEY = process.env.ANTHROPIC_API_KEY;
+/** When truthy, send `.github/copilot-instructions.md` as the system prompt (FR-027 A/B). */
+const PRIMING = /^(1|on|true|yes)$/i.test(process.env.COPILOT_PROBE_PRIMING ?? '');
 const EVIDENCE = path.resolve(
   __dirname,
   '../../../specs/284-copilot-plot-editing/evidence/routing-probe.md',
 );
+const PRIMING_FILE = path.resolve(__dirname, '../.github/copilot-instructions.md');
+
+/** The domain-priming system prompt, or undefined when priming is off. */
+function primingSystem(): string | undefined {
+  if (!PRIMING) {
+    return undefined;
+  }
+  try {
+    return fs.readFileSync(PRIMING_FILE, 'utf8');
+  } catch {
+    return undefined;
+  }
+}
 
 /** The four tool schemas the model chooses between (mirrors package.json). */
 const TOOLS = [
@@ -97,6 +112,7 @@ interface ScenarioResult {
 }
 
 async function callModel(prompt: string): Promise<string | null> {
+  const system = primingSystem();
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -108,6 +124,7 @@ async function callModel(prompt: string): Promise<string | null> {
       model: MODEL,
       max_tokens: 1024,
       tools: TOOLS,
+      ...(system ? { system } : {}),
       messages: [{ role: 'user', content: prompt }],
     }),
   });
@@ -147,11 +164,13 @@ async function main(): Promise<void> {
 
   const passed = results.filter((r) => r.ok).length;
   const pct = Math.round((passed / results.length) * 100);
+  const priming = PRIMING ? 'on' : 'off';
 
   const md = [
     '# Model-routing probe results',
     '',
     `- **Model**: \`${MODEL}\``,
+    `- **Domain priming (FR-027)**: ${priming}`,
     `- **First-attempt tool-selection accuracy**: ${passed}/${results.length} (${pct}%)`,
     `- **Gate (SC-005)**: ≥80% → ${pct >= 80 ? 'PASS' : 'FAIL'}`,
     '',
@@ -165,7 +184,9 @@ async function main(): Promise<void> {
 
   fs.mkdirSync(path.dirname(EVIDENCE), { recursive: true });
   fs.writeFileSync(EVIDENCE, md);
-  console.log(`[routing-probe] ${passed}/${results.length} correct (${pct}%). Wrote ${EVIDENCE}`);
+  // Machine-readable line for multi-condition assembly (model | priming | passed | total).
+  console.log(`RESULT\t${MODEL}\t${priming}\t${passed}\t${results.length}\t${JSON.stringify(results)}`);
+  console.log(`[routing-probe] ${MODEL} priming=${priming}: ${passed}/${results.length} correct (${pct}%). Wrote ${EVIDENCE}`);
   if (pct < 80) {
     process.exitCode = 1;
   }

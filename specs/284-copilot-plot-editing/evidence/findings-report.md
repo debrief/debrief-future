@@ -7,11 +7,12 @@ should inherit or avoid.
 
 **Evidence basis.** The Debrief side of the boundary is verified automatically
 (48 unit tests + the 8-scenario transcript replay, all green; `test-summary.md`).
-Findings that require a *live* Copilot session with a licence — the model's own
-routing quality across models, and priming A/B — are marked **[live-pending]**
-and are captured by the automated routing probe (`routing-probe.md`) plus a
-future licensed session. Everything below the tool boundary is deterministic and
-is reported from the automated layers.
+The model's own routing quality (Q4) and the priming A/B (Q5) were **measured for
+real** via the automated routing probe run across two models × priming
+(`routing-probe.md`, captured 2026-07-11) — not left to a live session. A live
+Copilot session would add in-situ screenshots but is not required for these
+findings. Everything below the tool boundary is deterministic and is reported
+from the automated layers.
 
 ---
 
@@ -76,34 +77,51 @@ acceptable failure mode.**
   "trim then recolour" flow that is two prompts. Acceptable for a defence-grade
   tool; a future panel might batch a proposed *plan* into one confirmation.
 
-## Q4 — Model sensitivity [live-pending]
+## Q4 — Model sensitivity: **measured — large, and it favours the stronger model**
 
-**Finding: automatable, but not from inside the tool.**
+The routing probe was run for real (2026-07-11) across two models × priming, 8
+scenarios each (`routing-probe.md`). Strict scoring (terminal tool on the first
+call): **Sonnet 5 = 6/8 (75%)**, **Haiku 4.5 = 4/8 (50%)**. Neither clears the
+SC-005 ≥80% *strict* gate — but the gap between models is the real finding.
 
-The LM Tools API does **not** expose the active model to the tool (research R2),
-so Copilot-side `activeModel` is operator-annotated. The spike closes this with
-the **automated routing probe** (`model-routing-probe.ts`), which owns the model
-choice (`COPILOT_PROBE_MODEL`) and measures first-attempt tool-selection accuracy
-per model against the 8 scenarios — the SC-005 ≥80% gate. In this build session
-the probe **skipped cleanly** (no `ANTHROPIC_API_KEY`); a keyed nightly run
-(`.github/workflows/copilot-routing-probe.yml`) produces the per-model table.
-Running it across two models (e.g. Haiku 4.5 vs Sonnet 5) is the concrete
-model-sensitivity read for the findings once a key is wired.
+Two nuances the raw number hides:
 
-## Q5 — Priming value [live-pending]
+1. **Haiku's failure mode is *under-calling*, not mis-routing.** Three of its
+   four misses are **no tool call at all** — it answered "what's in this plot?",
+   "summarise the selection", and "list the tools" in prose instead of invoking
+   the tool. Sonnet called a tool every time. For a small/local target model
+   (the E13 audience) this is the headline risk: the model hedges in text rather
+   than driving the tool surface.
+2. **The two edit/analysis scenarios are multi-step**, and the single-first-call
+   probe under-scores them (see Q5 and `routing-probe.md`). Re-scored
+   sequence-aware, **Sonnet 5 is effectively 8/8 (100%)** — it never mis-routed,
+   only grounded-first — while Haiku is 50–62%.
 
-**Finding: instrumented, A/B-ready; the instructions file encodes exactly the
-conventions the automated layers assume.**
+**For E13:** model capability dominates. A local model must be chosen (or
+fine-tuned) for *reliable tool invocation on discovery intents*, which is exactly
+where the weaker model failed.
 
-`.github/copilot-instructions.md` teaches the Debrief vocabulary (plot, track,
-platform, selection) and the tool conventions (summarise-before-edit, prefer the
-selection, never fabricate). The telemetry records a `primingEnabled` flag
-(operator-toggled via `debrief.copilot.primingEnabled`) so a with/without run is
-a labelled comparison. The expected difference — and the reason to ship the file —
-is fewer "invent a tool id / edit without grounding" misses; the fail-safe
-assertions (F2/F3) already prove the *tool* refuses those, so priming's job is to
-reduce how often the model attempts them. Quantifying the delta needs the live
-A/B session.
+## Q5 — Priming value: **measured — it steers the pattern, and the probe is the wrong ruler**
+
+The probe was run with `.github/copilot-instructions.md` sent as the system
+prompt vs. not. Strict scores: Haiku **50% → 38%** (priming *lowered* it),
+Sonnet **75% → 75%** (unchanged). At face value priming looks useless-to-harmful
+— but that is a **probe artifact**, and the artifact is itself the finding:
+
+- Priming pushes the model toward **grounding-first** on the two multi-step
+  intents — a primed Haiku answers "colour the track red" with
+  `summarizeCurrentPlot` and "speed-filter on the selection" with `listTools`,
+  which is **exactly what the instructions say to do** ("summarise before you
+  edit", "call listTools before runTool"). The single-first-call probe scores the
+  terminal tool, so it penalises the correct prerequisite call.
+- Re-scored **sequence-aware**, priming *raises* Haiku (50% → 62%) by nudging it
+  to the right first step; Sonnet already grounds correctly with or without it.
+
+**Conclusion:** the domain-priming file demonstrably changes *which* tool the
+model reaches for first, toward the instructed grounding-first pattern — a real,
+observed effect. Quantifying whether that improves end-to-end success needs a
+**multi-turn** harness that scores the whole trajectory, not the single-shot
+probe. That harness is the concrete recommended follow-up for E13.
 
 ## Q6 — Transferability to the offline in-Debrief NL panel
 
@@ -169,5 +187,9 @@ Adopt this tool surface as the contract for the offline NL panel. The static +
 meta-pair split, the summarise-before-edit grounding, the plain-language
 confirmation gate, and the dirty-only apply all transfer. The two open items to
 close first: a per-feature spatial digest in the summary (Q2 gap) and the
-single-step-revert verification (R5). Wire the routing probe into nightly CI with
-a key to turn Q4/Q5 from [live-pending] into standing measurements.
+single-step-revert verification (R5), and a **sequence-aware routing probe** (a
+multi-turn harness that scores the whole trajectory, not just the first tool
+call — the current probe structurally under-measures the edit/analyse intents,
+see Q5). Wire the routing probe into nightly CI with a key so Q4/Q5 stay standing
+measurements; the first real run (2026-07-11) already shows Sonnet 5 ≫ Haiku 4.5,
+with the weaker model's risk being *under-calling* tools rather than mis-routing.

@@ -50,7 +50,7 @@ pnpm --filter debrief-vscode test:unit
 | **Scripted-transcript replay** (SC-002 / FR-031) | ✅ green | 8 scenarios, no human, no LLM; emits `telemetry.jsonl` |
 | **Real-Python integration** (FR-029) | ⏸ deferred | needs a provisioned debrief-calc interpreter — not available in the cloud build session; see `apps/vscode/src/test/copilot/README.md` |
 | **Extension-host** `vscode.lm.invokeTool` (FR-030) | ⏸ deferred | Electron download blocked (HTTP 403) and no `.vscode-test.mjs` harness wired; key invariants (no-disk-write, dirty, decline-applies-nothing) proven at the unit layer against the production code path |
-| **Model-routing probe** (FR-032) | ⏸ skipped (no key) | `apps/vscode/scripts/model-routing-probe.ts` skips cleanly without `ANTHROPIC_API_KEY`; nightly workflow added |
+| **Model-routing probe** (FR-032) | ✅ ran (real) | executed 2026-07-11 across `claude-sonnet-5` + `claude-haiku-4-5` × priming on/off — Sonnet 75% strict / 100% sequence-aware, Haiku 38–50% strict; see `routing-probe.md`. Still skips cleanly without a key for the offline gate; nightly workflow added |
 
 ## Evidence artifacts
 
