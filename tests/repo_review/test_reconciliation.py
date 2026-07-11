@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from types import ModuleType
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 VALID_LEDGER = FIXTURES / "valid-ledger.yaml"
@@ -14,11 +16,11 @@ VALID_LEDGER = FIXTURES / "valid-ledger.yaml"
 RUN = {"date": "2026-08-01", "git_sha": "a" * 40}
 
 
-def _run_ref(rl: ModuleType) -> Any:
+def _run_ref(rl: ModuleType) -> Any:  # noqa: ANN401 — rl is a dynamically-loaded module
     return rl.RunRef(date=RUN["date"], git_sha=RUN["git_sha"])
 
 
-def _candidate(rl: ModuleType, **overrides: Any) -> Any:
+def _candidate(rl: ModuleType, **overrides: Any) -> Any:  # noqa: ANN401 — dynamic module types
     base: dict[str, Any] = {
         "dimension": "correctness",
         "module_path": "shared/stac-writer",

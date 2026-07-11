@@ -291,11 +291,20 @@ def reconcile(
     ids. Entries and candidates still unmatched with no pairing are reported for
     a (further) stage-2 pass rather than force-matched.
     """
-    pairings = pairings or {}
+    # ``pairings is None`` means a dry run: report the unmatched sets for the
+    # agent's stage-2 decision and mutate nothing terminal. An empty dict means
+    # "finalise with no fuzzy pairings" — genuinely new candidates get ids and
+    # disappeared open defects become fixed.
+    is_dry_run = pairings is None
+    active_pairings = pairings or {}
     result = ReconcileResult()
 
+    # Snapshot pre-existing entries so newly-assigned ids are not mistaken for
+    # disappeared defects in the loop below.
+    original_entries = list(ledger.findings)
+
     entries_by_identity: dict[tuple[str, str, str], LedgerEntry] = {}
-    for entry in ledger.findings:
+    for entry in original_entries:
         entries_by_identity.setdefault(entry.identity(), entry)
 
     matched_entry_ids: set[str] = set()
@@ -314,7 +323,7 @@ def reconcile(
     # Stage 2: apply agent-supplied pairings for the residue.
     still_unmatched: list[int] = []
     for index in unmatched_indices:
-        paired_id = pairings.get(index)
+        paired_id = active_pairings.get(index)
         if paired_id is not None:
             entry = ledger.by_id(paired_id)
             if entry is None:
@@ -329,30 +338,25 @@ def reconcile(
         else:
             still_unmatched.append(index)
 
-    # Remaining candidates with an explicit new-id request are assigned; with no
-    # pairing at all they are reported for a further stage-2 decision.
+    # Remaining unmatched candidates: reported on a dry run, assigned fresh ids
+    # when finalising.
     for index in still_unmatched:
-        if index in pairings and pairings[index] == "":  # explicit "this is new"
-            new_id = _assign_new(ledger, candidates[index], run)
-            result.assigned[index] = new_id
-        elif not pairings:
+        if is_dry_run:
             result.unmatched_candidates.append(index)
         else:
-            # pairings were supplied but omitted this index → treat as new.
-            new_id = _assign_new(ledger, candidates[index], run)
-            result.assigned[index] = new_id
+            result.assigned[index] = _assign_new(ledger, candidates[index], run)
 
-    # Open entries whose defect disappeared → fixed. accepted-risk left as-is.
-    for entry in ledger.findings:
-        if entry.id in matched_entry_ids:
+    # Open entries whose defect disappeared → fixed. accepted-risk left as-is
+    # (honours hand edits — T027).
+    for entry in original_entries:
+        if entry.id in matched_entry_ids or entry.status != "open":
             continue
-        if entry.status == "open":
-            if not pairings:
-                result.unmatched_open_entries.append(entry.id)
-            else:
-                entry.status = "fixed"
-                entry.last_seen = run
-                result.newly_fixed.append(entry.id)
+        if is_dry_run:
+            result.unmatched_open_entries.append(entry.id)
+        else:
+            entry.status = "fixed"
+            entry.last_seen = run
+            result.newly_fixed.append(entry.id)
 
     return result
 
@@ -430,7 +434,7 @@ def _cmd_validate(args: argparse.Namespace) -> int:
     return 0
 
 
-def _read_json(path: Path) -> Any:
+def _read_json(path: Path) -> object:
     try:
         with path.open(encoding="utf-8") as handle:
             return json.load(handle)
@@ -441,11 +445,15 @@ def _read_json(path: Path) -> Any:
 def _cmd_reconcile(args: argparse.Namespace) -> int:
     ledger = load(args.ledger)
     raw_findings = _read_json(args.run_findings)
+    if not isinstance(raw_findings, list):
+        raise SystemExit("--run-findings JSON must be an array of findings")
     candidates = [candidate_from_dict(item) for item in raw_findings]
     run = RunRef(date=args.date, git_sha=args.sha)
     pairings: dict[int, str] | None = None
     if args.pairings is not None:
         raw_pairings = _read_json(args.pairings)
+        if not isinstance(raw_pairings, dict):
+            raise SystemExit("--pairings JSON must be an object of index->id")
         pairings = {int(k): str(v) for k, v in raw_pairings.items()}
 
     result = reconcile(ledger, candidates, run, pairings)

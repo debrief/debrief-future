@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import copy
 from pathlib import Path
-from types import ModuleType
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 import yaml
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 VALID_LEDGER = FIXTURES / "valid-ledger.yaml"
