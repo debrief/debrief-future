@@ -1,0 +1,86 @@
+version: 1
+next_id: 5
+findings:
+- id: RR-001
+  status: open
+  dimension: correctness
+  severity: high
+  effort: S
+  title: Save path drops features when the source type grows
+  failure_scenario: field added to source is dropped on reload
+  locations:
+  - file: shared/stac-writer/src/core.ts
+    line: 158
+  module_path: shared/stac-writer
+  defect_slug: relisted-boundary-type
+  heuristic: CB-03
+  verification: reproduced by adding a field to the source type
+  first_seen:
+    date: '2026-07-10'
+    git_sha: 0123456789abcdef0123456789abcdef01234567
+  last_seen:
+    date: '2026-08-01'
+    git_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+- id: RR-002
+  status: accepted-risk
+  dimension: correctness
+  severity: medium
+  effort: M
+  title: Legacy REP dialect mangles trailing sensor cuts
+  failure_scenario: A boat.rep with dialect-B sensor lines parses one cut short.
+  locations:
+  - file: services/io/src/rep.py
+    line: 88
+  module_path: services/io
+  defect_slug: dialect-b-trailing-cut
+  heuristic: CB-07
+  verification: Verifier confirmed against the dialect-B golden fixture.
+  first_seen:
+    date: '2026-07-10'
+    git_sha: 0123456789abcdef0123456789abcdef01234567
+  last_seen:
+    date: '2026-07-10'
+    git_sha: 0123456789abcdef0123456789abcdef01234567
+  status_reason: Legacy dialect is out of support scope until v4.1; tracked separately.
+- id: RR-003
+  status: fixed
+  dimension: tech-debt
+  severity: low
+  effort: S
+  title: Dead helper left after the
+  failure_scenario: Unreferenced converter retained; knip flags it.
+  locations:
+  - file: shared/utils/src/legacy.ts
+    line: 12
+  module_path: shared/utils
+  defect_slug: dead-legacy-converter
+  heuristic: TD-11
+  verification: knip reports zero references; verifier confirmed no dynamic import.
+  first_seen:
+    date: '2026-06-01'
+    git_sha: '1111111111111111111111111111111111111111'
+  last_seen:
+    date: '2026-07-10'
+    git_sha: 0123456789abcdef0123456789abcdef01234567
+  fix_pr: https://github.com/debrief/debrief-future/pull/700
+- id: RR-004
+  status: open
+  dimension: tech-debt
+  severity: medium
+  effort: S
+  title: eslint version range diverges from root
+  failure_scenario: web-shell pins eslint ^8.50 vs root ^8.57
+  locations:
+  - file: apps/web-shell/package.json
+    line: 42
+  module_path: apps/web-shell
+  defect_slug: skewed-eslint-range
+  heuristic: TD-01
+  verification: dependency audit shows two ranges
+  first_seen:
+    date: '2026-08-01'
+    git_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  last_seen:
+    date: '2026-08-01'
+    git_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  fix_pr: https://github.com/debrief/debrief-future/pull/999

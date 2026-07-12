@@ -1,0 +1,9 @@
+# Valid ledger passes:
+$ python scripts/review-ledger.py validate --ledger good.yaml
+OK: /tmp/claude-0/-home-user-debrief-future/f26dbfad-1315-5ea6-8656-d8accb87e169/scratchpad/good.yaml is valid
+(exit 0)
+
+# Corrupt ledger (accepted-risk entry missing status_reason) is REFUSED, not regenerated:
+$ python scripts/review-ledger.py validate --ledger bad.yaml
+INVALID: findings/1: 'status_reason' is a required property
+(exit 1)

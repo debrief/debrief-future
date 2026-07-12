@@ -1,0 +1,35 @@
+$ python scripts/review-ledger.py validate --ledger ledger.yaml
+OK: /tmp/claude-0/-home-user-debrief-future/f26dbfad-1315-5ea6-8656-d8accb87e169/scratchpad/ledger.yaml is valid
+
+$ python scripts/review-ledger.py reconcile --ledger ledger.yaml --run-findings run.json --date 2026-08-01 --sha <sha>   # dry run
+{
+  "matched": [
+    "RR-001"
+  ],
+  "newly_fixed": [],
+  "assigned": {},
+  "unmatched_candidates": [
+    1
+  ],
+  "unmatched_open_entries": []
+}
+
+# RR-001 re-detected (line refreshed 142->158); RR-002 accepted-risk not in run (left as-is);
+# RR-003 already fixed; skewed-eslint-range is new -> reported as unmatched candidate [1].
+
+$ echo '{}' > pairings.json   # no fuzzy moves; finalise
+$ python scripts/review-ledger.py reconcile ... --pairings pairings.json --write
+{
+  "matched": [
+    "RR-001"
+  ],
+  "newly_fixed": [],
+  "assigned": {
+    "1": "RR-004"
+  },
+  "unmatched_candidates": [],
+  "unmatched_open_entries": []
+}
+
+$ python scripts/review-ledger.py record-fix-pr RR-004 https://github.com/debrief/debrief-future/pull/999 --ledger ledger.yaml
+OK: recorded https://github.com/debrief/debrief-future/pull/999 on RR-004
