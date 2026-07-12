@@ -59,12 +59,12 @@ def test_heuristic_ids_globally_unique() -> None:
 @pytest.mark.parametrize(
     ("heuristic", "confirmed", "refuted", "expected"),
     [
-        ("CB-03", 0, 4, "prune"),      # produced candidates, confirmed none
-        ("CB-01", 5, 1, "strengthen"), # high yield, majority confirmed
-        ("CB-05", 1, 0, "keep"),       # low volume, not enough to strengthen
-        ("CB-05", 2, 3, "keep"),       # minority confirmed but not zero
-        ("CC-12", 0, 0, "keep"),       # never fired
-        ("(unprompted)", 3, 0, "add"), # recurring unprompted → add a heuristic
+        ("CB-03", 0, 4, "prune"),  # produced candidates, confirmed none
+        ("CB-01", 5, 1, "strengthen"),  # high yield, majority confirmed
+        ("CB-05", 1, 0, "keep"),  # low volume, not enough to strengthen
+        ("CB-05", 2, 3, "keep"),  # minority confirmed but not zero
+        ("CC-12", 0, 0, "keep"),  # never fired
+        ("(unprompted)", 3, 0, "add"),  # recurring unprompted → add a heuristic
         ("(unprompted)", 1, 0, "keep"),
     ],
 )

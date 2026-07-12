@@ -58,8 +58,6 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LEDGER = REPO_ROOT / "docs/project_notes/reviews/ledger.yaml"
 SCHEMA_PATH = REPO_ROOT / ".claude/review/ledger.schema.json"
 
-RESOLVED_STATUSES = frozenset({"fixed", "accepted-risk"})
-
 
 class LedgerError(Exception):
     """Base class for ledger operations that must halt the caller."""
@@ -255,10 +253,10 @@ def candidate_from_dict(data: dict[str, Any]) -> Candidate:
 
 @dataclass
 class ReconcileResult:
-    matched: list[str] = field(default_factory=list)          # ledger ids re-confirmed
-    newly_fixed: list[str] = field(default_factory=list)      # ledger ids transitioned to fixed
-    assigned: dict[int, str] = field(default_factory=dict)    # candidate index -> new id
-    unmatched_candidates: list[int] = field(default_factory=list)   # indices needing stage-2
+    matched: list[str] = field(default_factory=list)  # ledger ids re-confirmed
+    newly_fixed: list[str] = field(default_factory=list)  # ledger ids transitioned to fixed
+    assigned: dict[int, str] = field(default_factory=dict)  # candidate index -> new id
+    unmatched_candidates: list[int] = field(default_factory=list)  # indices needing stage-2
     unmatched_open_entries: list[str] = field(default_factory=list)  # ids needing stage-2
 
 
