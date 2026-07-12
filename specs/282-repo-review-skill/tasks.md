@@ -46,10 +46,10 @@ validation output, and a real inaugural-run report excerpt.
 **Goal**: Directory scaffolding and the two machine-readable config assets that everything
 else references (tier map, severity rubric). No behaviour yet.
 
-- [ ] T001 Create skill-asset and artefact directory tree with `.gitkeep` files `.claude/review/playbooks/.gitkeep`, `docs/project_notes/reviews/.gitkeep`, `tests/repo_review/fixtures/.gitkeep`
-- [ ] T002 [P] Author the machine-readable tier map — map every top-level source directory (`shared/`, `services/`, `apps/`, `scripts/`, `preview/`, `tools/`, `contrib/`) to tier 1/2/3 per plan.md Structure Decision `.claude/review/tier-map.yaml`
-- [ ] T003 [P] Author the severity × effort rubric — Critical/High/Medium/Low defined in terms of user impact and data-loss risk, S/M/L effort definitions (FR-006) `.claude/review/severity-rubric.md`
-- [ ] T004 [P] Add pytest package marker for the helper test suite `tests/repo_review/__init__.py`
+- [x] T001 Create skill-asset and artefact directory tree with `.gitkeep` files `.claude/review/playbooks/.gitkeep`, `docs/project_notes/reviews/.gitkeep`, `tests/repo_review/fixtures/.gitkeep`
+- [x] T002 [P] Author the machine-readable tier map — map every top-level source directory (`shared/`, `services/`, `apps/`, `scripts/`, `preview/`, `tools/`, `contrib/`) to tier 1/2/3 per plan.md Structure Decision `.claude/review/tier-map.yaml`
+- [x] T003 [P] Author the severity × effort rubric — Critical/High/Medium/Low defined in terms of user impact and data-loss risk, S/M/L effort definitions (FR-006) `.claude/review/severity-rubric.md`
+- [x] T004 [P] Add pytest package marker for the helper test suite `tests/repo_review/__init__.py`
 
 ## Phase 2: Foundation (Ledger schema + validating helper — blocks all stories)
 
@@ -62,21 +62,21 @@ validate-on-write behaviour lands here.
 
 ### Contract & schema
 
-- [ ] T005 Copy the ledger JSON Schema from the contract into the runtime asset location (single source the helper loads) `.claude/review/ledger.schema.json`
+- [x] T005 Copy the ledger JSON Schema from the contract into the runtime asset location (single source the helper loads) `.claude/review/ledger.schema.json`
 
 ### Typed helper — models & validation (FR-008)
 
-- [ ] T006 Define strict-typed ledger dataclasses (Ledger, LedgerEntry, Location, RunRef) narrowing `yaml.safe_load` output at the boundary per Article XV.5 and data-model.md `scripts/review-ledger.py`
-- [ ] T007 Implement `load()` — read YAML, jsonschema-validate against `ledger.schema.json`, narrow to dataclasses; raise a typed `LedgerCorruptError` with the jsonschema error path on failure (FR-008 halt-not-regenerate) `scripts/review-ledger.py`
-- [ ] T008 Implement `save()` — validate the full document, sort findings by ID, atomic write (temp file + rename) per R-008 `scripts/review-ledger.py`
-- [ ] T009 Implement `validate` subcommand (CLI entry) — exit 0 on valid, exit 1 printing the jsonschema error path (fix-handoff.md CLI contract) `scripts/review-ledger.py`
+- [x] T006 Define strict-typed ledger dataclasses (Ledger, LedgerEntry, Location, RunRef) narrowing `yaml.safe_load` output at the boundary per Article XV.5 and data-model.md `scripts/review-ledger.py`
+- [x] T007 Implement `load()` — read YAML, jsonschema-validate against `ledger.schema.json`, narrow to dataclasses; raise a typed `LedgerCorruptError` with the jsonschema error path on failure (FR-008 halt-not-regenerate) `scripts/review-ledger.py`
+- [x] T008 Implement `save()` — validate the full document, sort findings by ID, atomic write (temp file + rename) per R-008 `scripts/review-ledger.py`
+- [x] T009 Implement `validate` subcommand (CLI entry) — exit 0 on valid, exit 1 printing the jsonschema error path (fix-handoff.md CLI contract) `scripts/review-ledger.py`
 
 ### Tests (foundation)
 
-- [ ] T010 [P][test] Golden valid-ledger fixtures + assert `load()` accepts them and round-trips through `save()` unchanged (ordering normalised) `tests/repo_review/test_ledger_validation.py`
-- [ ] T011 [P][test] Invalid-ledger fixtures (bad ID pattern, unknown enum, accepted-risk without reason, duplicate IDs, id ≥ next_id) each raise `LedgerCorruptError` `tests/repo_review/test_ledger_validation.py`
-- [ ] T012 [P][test] Structural check: every playbook heuristic ID unique across playbooks and matches `^(CC|CB|TD|TQ)-\d+$` (guards R-004; will pass vacuously until Phase 3 adds playbooks, then enforces) `tests/repo_review/test_playbook_structure.py`
-- [ ] T013 [P][test] Structural check: `tier-map.yaml` covers every top-level source directory and assigns no unknown paths (FR-003) `tests/repo_review/test_tier_map.py`
+- [x] T010 [P][test] Golden valid-ledger fixtures + assert `load()` accepts them and round-trips through `save()` unchanged (ordering normalised) `tests/repo_review/test_ledger_validation.py`
+- [x] T011 [P][test] Invalid-ledger fixtures (bad ID pattern, unknown enum, accepted-risk without reason, duplicate IDs, id ≥ next_id) each raise `LedgerCorruptError` `tests/repo_review/test_ledger_validation.py`
+- [x] T012 [P][test] Structural check: every playbook heuristic ID unique across playbooks and matches `^(CC|CB|TD|TQ)-\d+$` (guards R-004; will pass vacuously until Phase 3 adds playbooks, then enforces) `tests/repo_review/test_playbook_structure.py`
+- [x] T013 [P][test] Structural check: `tier-map.yaml` covers every top-level source directory and assigns no unknown paths (FR-003) `tests/repo_review/test_tier_map.py`
 
 **Checkpoint**: `uv run pytest tests/repo_review/` green; `python scripts/review-ledger.py validate` works against a fixture ledger.
 
@@ -92,24 +92,24 @@ for 100% of Tier 1 files (SC-002).
 
 ### Dimension playbooks (the review criteria — evolve by PR)
 
-- [ ] T014 [P] Constitution-conformance playbook — turn each CONSTITUTION.md article (read at authoring time) into falsifiable checks with `CC-NN` heuristic IDs; include Article IV.5 boundary-type derivation, services-never-touch-UI, provenance, schema-tests-mandatory, offline-by-default `.claude/review/playbooks/constitution.md`
-- [ ] T015 [P] Correctness-bug playbook — per-subsystem hunt heuristics with `CB-NN` IDs: async/race in host orchestration, data loss at serialisation boundaries, error-path handling in import pipelines, write-path atomicity `.claude/review/playbooks/correctness.md`
-- [ ] T016 [P] Tech-debt playbook — #172 regression categories (dependency skew, type duplication, config drift, logging hygiene, workspace membership) + dead code, `TD-NN` IDs, framed as a regression check against the #172 end state `.claude/review/playbooks/tech-debt.md`
-- [ ] T017 [P] Test-quality playbook — behaviour-vs-mock rubric, schema round-trip mandate compliance, untested-critical-path heuristics, `TQ-NN` IDs `.claude/review/playbooks/test-quality.md`
+- [x] T014 [P] Constitution-conformance playbook — turn each CONSTITUTION.md article (read at authoring time) into falsifiable checks with `CC-NN` heuristic IDs; include Article IV.5 boundary-type derivation, services-never-touch-UI, provenance, schema-tests-mandatory, offline-by-default `.claude/review/playbooks/constitution.md`
+- [x] T015 [P] Correctness-bug playbook — per-subsystem hunt heuristics with `CB-NN` IDs: async/race in host orchestration, data loss at serialisation boundaries, error-path handling in import pipelines, write-path atomicity `.claude/review/playbooks/correctness.md`
+- [x] T016 [P] Tech-debt playbook — #172 regression categories (dependency skew, type duplication, config drift, logging hygiene, workspace membership) + dead code, `TD-NN` IDs, framed as a regression check against the #172 end state `.claude/review/playbooks/tech-debt.md`
+- [x] T017 [P] Test-quality playbook — behaviour-vs-mock rubric, schema round-trip mandate compliance, untested-critical-path heuristics, `TQ-NN` IDs `.claude/review/playbooks/test-quality.md`
 
 ### Report template
 
-- [ ] T018 Author the report template mirroring the eleven required sections + front-matter contract in `contracts/report-structure.md` `.claude/review/report-template.md`
+- [x] T018 Author the report template mirroring the eleven required sections + front-matter contract in `contracts/report-structure.md` `.claude/review/report-template.md`
 
 ### Workflow orchestration (recon → review→verify pipeline → synthesis)
 
-- [ ] T019 Author the Workflow orchestration script — Phase A recon (work-list = subsystem × tier × dimension + playbook excerpts), Phase B `pipeline(cells, reviewStage, verifyStage)` with StructuredOutput candidate + adversarial-verifier schemas, Phase D synthesis stub; log per-phase spend + shortfalls into the coverage manifest, never trim (FR-004, FR-012, R-007) `.claude/review/workflow.js`
-- [ ] T020 Define the candidate and verdict StructuredOutput JSON schemas the reviewer/verifier agents are forced to emit (dimension, title, failure_scenario, locations, heuristic, proposed severity / refuted+reason) — inline in the workflow script `.claude/review/workflow.js`
+- [x] T019 Author the Workflow orchestration script — Phase A recon (work-list = subsystem × tier × dimension + playbook excerpts), Phase B `pipeline(cells, reviewStage, verifyStage)` with StructuredOutput candidate + adversarial-verifier schemas, Phase D synthesis stub; log per-phase spend + shortfalls into the coverage manifest, never trim (FR-004, FR-012, R-007) `.claude/review/workflow.js`
+- [x] T020 Define the candidate and verdict StructuredOutput JSON schemas the reviewer/verifier agents are forced to emit (dimension, title, failure_scenario, locations, heuristic, proposed severity / refuted+reason) — inline in the workflow script `.claude/review/workflow.js`
 
 ### Main skill command
 
-- [ ] T021 Author `/repo-review` command — clean-tree gate (FR-013, R-009), capture git_sha + timestamp, invoke the workflow, enforce write boundary (only `docs/project_notes/reviews/` this phase), generated-file attribution rule (FR-014), synthesis writes report from template + assigns first-run ledger entries via the helper `.claude/commands/repo-review.md`
-- [ ] T022 Synthesis: severity/effort assignment from the rubric, dedup, and coverage-manifest emission accounting for every tier-1 file (SC-002); dimension chapters appear even when empty (US1-S7) — encoded in the command's synthesis instructions `.claude/commands/repo-review.md`
+- [x] T021 Author `/repo-review` command — clean-tree gate (FR-013, R-009), capture git_sha + timestamp, invoke the workflow, enforce write boundary (only `docs/project_notes/reviews/` this phase), generated-file attribution rule (FR-014), synthesis writes report from template + assigns first-run ledger entries via the helper `.claude/commands/repo-review.md`
+- [x] T022 Synthesis: severity/effort assignment from the rubric, dedup, and coverage-manifest emission accounting for every tier-1 file (SC-002); dimension chapters appear even when empty (US1-S7) — encoded in the command's synthesis instructions `.claude/commands/repo-review.md`
 
 **Checkpoint**: inaugural `/repo-review` run produces a valid report + first ledger; 10-finding spot-check passes (SC-001); coverage manifest complete (SC-002).
 
@@ -124,18 +124,18 @@ new defect, re-run; verify all three are classified correctly (SC-003).
 
 ### Reconciliation logic (helper)
 
-- [ ] T023 Implement `reconcile` subcommand — stage-1 mechanical match on `(dimension, module_path, defect_slug)`, refresh line numbers on matches, mark ledger entries whose defect is absent from the run's findings as `fixed` with the run ref, emit unmatched-candidates + unmatched-open-entries JSON for stage-2 agent pairing (R-003, fix-handoff.md CLI) `scripts/review-ledger.py`
-- [ ] T024 Implement pairing application — accept the synthesis agent's explicit stage-2 pairings, link them, and assign fresh `RR-NNN` (bump `next_id`) to genuinely new candidates (R-003) `scripts/review-ledger.py`
+- [x] T023 Implement `reconcile` subcommand — stage-1 mechanical match on `(dimension, module_path, defect_slug)`, refresh line numbers on matches, mark ledger entries whose defect is absent from the run's findings as `fixed` with the run ref, emit unmatched-candidates + unmatched-open-entries JSON for stage-2 agent pairing (R-003, fix-handoff.md CLI) `scripts/review-ledger.py`
+- [x] T024 Implement pairing application — accept the synthesis agent's explicit stage-2 pairings, link them, and assign fresh `RR-NNN` (bump `next_id`) to genuinely new candidates (R-003) `scripts/review-ledger.py`
 
 ### Tests
 
-- [ ] T025 [P][test] Reconciliation cases: exact-match refreshes lines; disappeared defect → `fixed`; line-drifted same defect still matches; new defect → new ID; `accepted-risk` re-detection stays suppressed (US2 scenarios + SC-003) `tests/repo_review/test_reconciliation.py`
-- [ ] T026 [P][test] First-run behaviour: reconcile with no prior ledger creates the ledger and assigns IDs from `RR-001` (US2-S4) `tests/repo_review/test_reconciliation.py`
-- [ ] T027 [P][test] Hand-edit honoured: an entry hand-set to `accepted-risk` survives reconciliation and is not re-opened (US2-S5) `tests/repo_review/test_reconciliation.py`
+- [x] T025 [P][test] Reconciliation cases: exact-match refreshes lines; disappeared defect → `fixed`; line-drifted same defect still matches; new defect → new ID; `accepted-risk` re-detection stays suppressed (US2 scenarios + SC-003) `tests/repo_review/test_reconciliation.py`
+- [x] T026 [P][test] First-run behaviour: reconcile with no prior ledger creates the ledger and assigns IDs from `RR-001` (US2-S4) `tests/repo_review/test_reconciliation.py`
+- [x] T027 [P][test] Hand-edit honoured: an entry hand-set to `accepted-risk` survives reconciliation and is not re-opened (US2-S5) `tests/repo_review/test_reconciliation.py`
 
 ### Wire into the run
 
-- [ ] T028 Synthesis calls `reconcile` + applies stage-2 pairings before writing; report gains the Delta Summary section (new/resolved/still-open by severity) and the "resolved since last review" + "accepted risks re-confirmed" lists (US2-S2/S3) `.claude/commands/repo-review.md`
+- [x] T028 Synthesis calls `reconcile` + applies stage-2 pairings before writing; report gains the Delta Summary section (new/resolved/still-open by severity) and the "resolved since last review" + "accepted risks re-confirmed" lists (US2-S2/S3) `.claude/commands/repo-review.md`
 
 **Checkpoint**: controlled re-run test classifies fix / accept-risk / new-defect correctly (SC-003).
 
@@ -148,9 +148,9 @@ the `/bugfix` shape, recording the PR URL, with no re-investigation of the defec
 session, and verify the PR fixes the described defect using only the ledger entry + code
 (SC-009).
 
-- [ ] T029 Implement `record-fix-pr` subcommand — set `fix_pr`, refuse unknown or non-`open` IDs, validate whole file before atomic write (R-008, fix-handoff.md CLI) `scripts/review-ledger.py`
-- [ ] T030 [P][test] `record-fix-pr` sets the URL on an open entry, leaves status `open`, and rejects unknown/non-open IDs and non-GitHub URLs `tests/repo_review/test_reconciliation.py`
-- [ ] T031 Author `/repo-review.fix` command mirroring `bugfix.md` front-matter + flow: normalise IDs, hard-halt preconditions (missing/corrupt ledger, unknown ID, non-open status, already-has-fix_pr), already-resolved short-circuit, batch handling, fix → test → `task verify` → PR → `record-fix-pr` (FR-016, fix-handoff.md) `.claude/commands/repo-review.fix.md`
+- [x] T029 Implement `record-fix-pr` subcommand — set `fix_pr`, refuse unknown or non-`open` IDs, validate whole file before atomic write (R-008, fix-handoff.md CLI) `scripts/review-ledger.py`
+- [x] T030 [P][test] `record-fix-pr` sets the URL on an open entry, leaves status `open`, and rejects unknown/non-open IDs and non-GitHub URLs `tests/repo_review/test_reconciliation.py`
+- [x] T031 Author `/repo-review.fix` command mirroring `bugfix.md` front-matter + flow: normalise IDs, hard-halt preconditions (missing/corrupt ledger, unknown ID, non-open status, already-has-fix_pr), already-resolved short-circuit, batch handling, fix → test → `task verify` → PR → `record-fix-pr` (FR-016, fix-handoff.md) `.claude/commands/repo-review.fix.md`
 
 **Checkpoint**: one real ledger finding taken to a merged-quality PR from the entry alone (SC-009); ledger records the PR URL, status stays `open`.
 
@@ -163,9 +163,9 @@ constitution amendment / playbook update) worded to be implementable without re-
 **Independent test**: On a run with ≥ 2 multi-finding themes, verify the report's prevention
 section gives each theme a typed, concrete guard proposal (SC-010).
 
-- [ ] T032 Extend synthesis instructions — cluster confirmed findings (≥ 2 members) into themes with a slug, pattern paragraph, and member IDs; write `theme` onto each ledger entry (FR-017, data-model.md Theme) `.claude/commands/repo-review.md`
-- [ ] T033 Add the `## Themes & Prevention` report section — one typed GuardProposal per theme with concrete detail (rule identifiers / draft text), marked advisory (guard adoption is a separate PR — FR-011/FR-017) `.claude/review/report-template.md`
-- [ ] T034 Record adopted-guard effectiveness — GuardProposal `adopted_in` back-reference so a later run's delta can report whether the theme produced new findings (US5-S4); document the field in the report template `.claude/review/report-template.md`
+- [x] T032 Extend synthesis instructions — cluster confirmed findings (≥ 2 members) into themes with a slug, pattern paragraph, and member IDs; write `theme` onto each ledger entry (FR-017, data-model.md Theme) `.claude/commands/repo-review.md`
+- [x] T033 Add the `## Themes & Prevention` report section — one typed GuardProposal per theme with concrete detail (rule identifiers / draft text), marked advisory (guard adoption is a separate PR — FR-011/FR-017) `.claude/review/report-template.md`
+- [x] T034 Record adopted-guard effectiveness — GuardProposal `adopted_in` back-reference so a later run's delta can report whether the theme produced new findings (US5-S4); document the field in the report template `.claude/review/report-template.md`
 
 **Checkpoint**: a run with clusters emits typed, concrete guard proposals; adopting one and re-running shows the guard-effectiveness note (SC-010).
 
@@ -181,15 +181,15 @@ mutation-validated.
 
 ### Report-only evidence configs (hermetic — never touch repo configs, FR-011)
 
-- [ ] T035 [P] Strict ruff config extending the repo select-set (`B`, `S`, `PERF`, `RUF`, `SIM`) for the report-only lint pass (R-005) `.claude/review/ruff-strict.toml`
-- [ ] T036 [P] Strict ESLint flat config layering `@typescript-eslint/strict-type-checked` + `no-floating-promises` family over the repo config (R-005) `.claude/review/eslint-strict.config.mjs`
+- [x] T035 [P] Strict ruff config extending the repo select-set (`B`, `S`, `PERF`, `RUF`, `SIM`) for the report-only lint pass (R-005) `.claude/review/ruff-strict.toml`
+- [x] T036 [P] Strict ESLint flat config layering `@typescript-eslint/strict-type-checked` + `no-floating-promises` family over the repo config (R-005) `.claude/review/eslint-strict.config.mjs`
 
 ### Evidence phase in the workflow
 
-- [ ] T037 Add the Phase C evidence stage — run knip (existing `knip.json`), a cross-file dependency-version audit (reuse #172 skew categories), and the two strict-lint passes; capture raw outputs to `docs/project_notes/reviews/evidence/<date>/`; treat all hits as *leads* requiring verification, not findings (R-005, FR-010) `.claude/review/workflow.js`
-- [ ] T038 Add coverage measurement — `uv run pytest --cov --cov-report=json` and per-package `vitest --coverage` (JSON summary), excluding Playwright E2E; synthesis names least-covered Tier 1 modules with numbers (US3-S2, R-010) `.claude/review/workflow.js`
-- [ ] T039 Add mutation spot-checks — for each reviewer-flagged suspicious test, spawn a `isolation: 'worktree'` agent that breaks the code under test, re-runs only that test file, and confirms the finding only if the test still passes; worktree auto-discarded (US3-S3, R-006) `.claude/review/workflow.js`
-- [ ] T040 Graceful degradation — any evidence tool failure downgrades the affected claims to qualitative and is recorded in the Methodology section; never blocks the run (US3-S4, FR-010) `.claude/commands/repo-review.md`
+- [x] T037 Add the Phase C evidence stage — run knip (existing `knip.json`), a cross-file dependency-version audit (reuse #172 skew categories), and the two strict-lint passes; capture raw outputs to `docs/project_notes/reviews/evidence/<date>/`; treat all hits as *leads* requiring verification, not findings (R-005, FR-010) `.claude/review/workflow.js`
+- [x] T038 Add coverage measurement — `uv run pytest --cov --cov-report=json` and per-package `vitest --coverage` (JSON summary), excluding Playwright E2E; synthesis names least-covered Tier 1 modules with numbers (US3-S2, R-010) `.claude/review/workflow.js`
+- [x] T039 Add mutation spot-checks — for each reviewer-flagged suspicious test, spawn a `isolation: 'worktree'` agent that breaks the code under test, re-runs only that test file, and confirms the finding only if the test still passes; worktree auto-discarded (US3-S3, R-006) `.claude/review/workflow.js`
+- [x] T040 Graceful degradation — any evidence tool failure downgrades the affected claims to qualitative and is recorded in the Methodology section; never blocks the run (US3-S4, FR-010) `.claude/commands/repo-review.md`
 
 **Checkpoint**: report's tech-debt + test-quality chapters cite real tool numbers; ≥ 1 mutation spot-check ran; a simulated tool failure appears as an explicit qualitative downgrade.
 
@@ -203,9 +203,9 @@ prune/strengthen/add recommendations so the playbooks sharpen between runs.
 `bugs.md`; verify the methodology appendix attributes candidates to heuristics with tuning
 recommendations.
 
-- [ ] T041 Memory write-out — synthesis appends confirmed Critical/High correctness findings to `docs/project_notes/bugs.md` in the existing bullet format (date, defect, location, finding ID), and drafts a failure-pattern doc for any ≥ 3-finding theme (FR-018; extends the write boundary exactly per FR-011) `.claude/commands/repo-review.md`
-- [ ] T042 Heuristic attribution — every candidate carries its generating heuristic ID (or `(unprompted)`); synthesis emits the Methodology per-heuristic confirmed/refuted table and the `## Playbook Tuning` section with prune/strengthen/add recommendations, `(unprompted)` clusters → add (FR-019, R-004) `.claude/commands/repo-review.md`
-- [ ] T043 [P][test] Structural check: the Playbook Tuning recommendation logic is deterministic given attribution counts (zero-confirmed → prune; high-yield → strengthen; recurring unprompted → add) — unit-test the pure helper that computes recommendations `tests/repo_review/test_playbook_structure.py`
+- [x] T041 Memory write-out — synthesis appends confirmed Critical/High correctness findings to `docs/project_notes/bugs.md` in the existing bullet format (date, defect, location, finding ID), and drafts a failure-pattern doc for any ≥ 3-finding theme (FR-018; extends the write boundary exactly per FR-011) `.claude/commands/repo-review.md`
+- [x] T042 Heuristic attribution — every candidate carries its generating heuristic ID (or `(unprompted)`); synthesis emits the Methodology per-heuristic confirmed/refuted table and the `## Playbook Tuning` section with prune/strengthen/add recommendations, `(unprompted)` clusters → add (FR-019, R-004) `.claude/commands/repo-review.md`
+- [x] T043 [P][test] Structural check: the Playbook Tuning recommendation logic is deterministic given attribution counts (zero-confirmed → prune; high-yield → strengthen; recurring unprompted → add) — unit-test the pure helper that computes recommendations `tests/repo_review/test_playbook_structure.py`
 
 **Checkpoint**: a run appends to `bugs.md`, drafts a failure-pattern doc for a large theme, and its methodology names prune/strengthen/add heuristics (SC-011).
 
@@ -216,25 +216,25 @@ CI green, write the feature post, and open/refresh the PR.
 
 ### Full verification
 
-- [ ] T044 Run `task verify` (ruff + pyright + ESLint + pytest + vitest + Playwright) and confirm the helper + structural tests pass with the rest of the suite green (CLAUDE.md "Before Pushing")
+- [x] T044 Run `task verify` (ruff + pyright + ESLint + pytest + vitest + Playwright) and confirm the helper + structural tests pass with the rest of the suite green (CLAUDE.md "Before Pushing")
 - [ ] T045 Execute the inaugural `/repo-review` run on a clean tree; confirm report + ledger + evidence dir are produced and the coverage manifest is complete (SC-002); this run is both dogfood and the source of the evidence artifacts below
 
 ### Evidence Collection
 
-- [ ] T046 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed/failed/skipped`, `coverage_pct` `specs/282-repo-review-skill/evidence/test-summary.md`
-- [ ] T047 Create usage demonstration — invoke `/repo-review`, triage a finding, run `/repo-review.fix` on it `specs/282-repo-review-skill/evidence/usage-example.md`
-- [ ] T048 [P] Capture ledger helper CLI transcript (`validate` / `reconcile` / `record-fix-pr`) `specs/282-repo-review-skill/evidence/cli-demo.txt`
-- [ ] T049 [P] Capture `validate` output for a valid and a deliberately-corrupt ledger `specs/282-repo-review-skill/evidence/validation-output.txt`
-- [ ] T050 [P] Capture a representative post-run ledger sample (2–3 findings, mixed statuses) `specs/282-repo-review-skill/evidence/ledger-sample.yaml`
-- [ ] T051 [P] Capture a report excerpt (quick-wins + one themed finding + methodology block) from the real inaugural report `specs/282-repo-review-skill/evidence/report-excerpt.md`
+- [x] T046 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed/failed/skipped`, `coverage_pct` `specs/282-repo-review-skill/evidence/test-summary.md`
+- [x] T047 Create usage demonstration — invoke `/repo-review`, triage a finding, run `/repo-review.fix` on it `specs/282-repo-review-skill/evidence/usage-example.md`
+- [x] T048 [P] Capture ledger helper CLI transcript (`validate` / `reconcile` / `record-fix-pr`) `specs/282-repo-review-skill/evidence/cli-demo.txt`
+- [x] T049 [P] Capture `validate` output for a valid and a deliberately-corrupt ledger `specs/282-repo-review-skill/evidence/validation-output.txt`
+- [x] T050 [P] Capture a representative post-run ledger sample (2–3 findings, mixed statuses) `specs/282-repo-review-skill/evidence/ledger-sample.yaml`
+- [x] T051 [P] Capture a report excerpt (quick-wins + one themed finding + methodology block) from the real inaugural report `specs/282-repo-review-skill/evidence/report-excerpt.md`
 
 ### Documentation
 
-- [ ] T052 Add an ADR recording the review-ledger design (YAML+JSON-Schema over LinkML rationale, defect-identity reconciliation, verified-only bar) `docs/project_notes/decisions.md`
+- [x] T052 Add an ADR recording the review-ledger design (YAML+JSON-Schema over LinkML rationale, defect-identity reconciliation, verified-only bar) `docs/project_notes/decisions.md`
 
 ### Media Content
 
-- [ ] T053 Create feature blog post via the Content Specialist — first three sections copied verbatim from `evidence/opening-context.md`, remaining sections (By the Numbers, Lessons Learned, What's Next) from evidence `specs/282-repo-review-skill/media/shipped-post.md`
+- [x] T053 Create feature blog post via the Content Specialist — first three sections copied verbatim from `evidence/opening-context.md`, remaining sections (By the Numbers, Lessons Learned, What's Next) from evidence `specs/282-repo-review-skill/media/shipped-post.md`
 
 ### PR Creation
 
