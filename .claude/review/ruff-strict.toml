@@ -1,0 +1,33 @@
+# Report-only strict ruff config for /repo-review (spec 282, R-005).
+#
+# Extends the repo config and adds defect-focused rule families beyond CI's
+# select-set. Run by the review's evidence phase to surface *leads*, NOT
+# findings — every hit still needs adversarial verification before it can enter
+# the report. This file never touches the repo's real ruff.toml (FR-011); it is
+# invoked explicitly:
+#
+#   uv run ruff check --config .claude/review/ruff-strict.toml .
+#
+# Rule families added over the base (which already has E/F/I/W/UP/B/SIM/ANN/TC):
+#   S     bandit-style security checks
+#   PERF  perflint (avoidable overhead)
+#   RUF   ruff-specific correctness lints
+#   TRY   tryceratops (exception-handling smells — feeds CB-08/CB-09 leads)
+#   PLW   pylint warnings
+#   FBT   boolean-trap args (readability/defect surface)
+
+extend = "../../ruff.toml"
+
+[lint]
+extend-select = ["S", "PERF", "RUF", "TRY", "PLW", "FBT"]
+
+# Security rules that fire constantly on test/assert code are noise as *leads*.
+extend-ignore = [
+    "S101",  # assert used — pervasive and fine in tests
+    "TRY003", # long messages outside exception class — style, not a defect
+]
+
+[lint.per-file-ignores]
+# Test files: security + boolean-trap noise is not a lead worth chasing.
+"**/tests/**" = ["S", "FBT", "PLW"]
+"**/test_*.py" = ["S", "FBT", "PLW"]
