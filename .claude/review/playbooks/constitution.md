@@ -1,13 +1,18 @@
 # Playbook: Constitution Conformance (`CC-*`)
 
-Audits the codebase against `CONSTITUTION.md` (v1.3.0). Each heuristic is a **falsifiable
-check** — a reviewer can look at a file and say "this holds" or "this is violated here".
-Every candidate a reviewer emits under this dimension MUST cite the `CC-NN` id below.
+<!-- constitution-version: 1.5 -->
 
-> **Authoring note**: this playbook was written against constitution v1.3.0. When the
-> constitution is amended, regenerate these checks from the article text (spec 282 US1
-> generated-at-implementation-time rule). A finding against a since-deleted article
-> auto-resolves as `fixed (article removed)` at reconciliation.
+Audits the codebase against the root `CONSTITUTION.md` (document version 1.5, May 2026 —
+the authority per CLAUDE.md; the `.specify/memory` copy is derived). Each heuristic is a
+**falsifiable check** — a reviewer can look at a file and say "this holds" or "this is
+violated here". Every candidate a reviewer emits under this dimension MUST cite the `CC-NN`
+id below.
+
+> **Authoring note**: this playbook was written against constitution document version 1.5.
+> When the constitution is amended, regenerate these checks from the article text and bump
+> the `constitution-version` anchor above — `tests/repo_review/test_playbook_structure.py`
+> fails on drift. A finding against a since-deleted article auto-resolves as
+> `fixed (article removed)` at reconciliation.
 
 Severity guidance: violations of Articles I–IV, VI, and XV are load-bearing → **High** or
 above (see `severity-rubric.md`). Advisory-clause drift may be **Medium**.
@@ -84,6 +89,20 @@ above (see `severity-rubric.md`). Advisory-clause drift may be **Medium**.
   project's most-cited article and has its own CI gate.
 - **CC-19** — *Strict mode on.* Check: a TS project without `strict: true`, or a Python package
   outside pyright's strict/standard include set that ships production code.
+
+## Deliberately unchecked articles (do not "discover" these as gaps)
+
+- **Article V (Extensibility)** — fail-safe extension loading has no meaningful audit surface
+  yet: `/contrib/` is empty and the extension-discovery mechanism is explicitly deferred.
+  Revisit when the first extension lands.
+- **Article X (Security)** — secrets scanning is already machine-enforced in CI via gitleaks
+  (`gitleaks.toml`); duplicating it as review heuristics adds noise, not coverage. The
+  classification-awareness clause is covered by CC-01 (offline) in practice.
+- **Article XI (Internationalisation)** — i18n enforcement is premature pre-v4.0.0 while
+  user-facing strings churn; adding it now would flood the report with Low findings. Revisit
+  as v4.0.0 approaches.
+- **Articles XII–XIII (Community, Contribution standards)** — process articles enforced by
+  repo settings and workflow (PR review, CI gates), not auditable from source.
 
 ## What NOT to flag
 

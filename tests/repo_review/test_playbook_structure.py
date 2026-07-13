@@ -34,6 +34,29 @@ def test_every_playbook_exists() -> None:
         assert (PLAYBOOK_DIR / name).exists(), f"missing playbook {name}"
 
 
+def test_constitution_playbook_version_matches_constitution() -> None:
+    """Drift guard: the CC playbook's version anchor must match CONSTITUTION.md.
+
+    The playbook's checks are derived from the constitution's article text; if the
+    constitution is amended without regenerating the playbook, the review audits
+    against stale criteria. This test fails until the playbook is refreshed and
+    its ``constitution-version`` anchor bumped.
+    """
+    constitution = (PLAYBOOK_DIR.parents[2] / "CONSTITUTION.md").read_text(encoding="utf-8")
+    doc_match = re.search(r"\*Document version:\s*([0-9.]+)", constitution)
+    assert doc_match, "CONSTITUTION.md has no 'Document version:' line"
+
+    playbook = (PLAYBOOK_DIR / "constitution.md").read_text(encoding="utf-8")
+    anchor_match = re.search(r"<!--\s*constitution-version:\s*([0-9.]+)\s*-->", playbook)
+    assert anchor_match, "constitution.md playbook has no constitution-version anchor"
+
+    assert anchor_match.group(1) == doc_match.group(1), (
+        f"constitution playbook was authored against v{anchor_match.group(1)} but "
+        f"CONSTITUTION.md is now v{doc_match.group(1)} — regenerate the playbook's "
+        "checks from the amended article text and bump the anchor"
+    )
+
+
 def test_playbook_uses_only_its_own_prefix() -> None:
     for name, prefix in PREFIX_BY_FILE.items():
         path = PLAYBOOK_DIR / name

@@ -159,3 +159,36 @@ it adds noise, and CLAUDE.md already separates it from unit tests).
 
 **Rationale**: Reuses the exact test invocations CI runs (CLAUDE.md "Before Pushing"),
 adding only coverage flags — no new tooling, numbers comparable across runs.
+
+## R-011: Churn-scoped re-runs (added 2026-07-12, post-implementation review)
+
+**Decision**: Re-runs pass the prior run's `git_sha` (read from the most recent report's
+front matter) into recon, which weights cells by `git diff --stat <priorSha>..HEAD`: changed
+areas and ALL Tier-1 areas keep full depth; unchanged Tier-2 areas downgrade to sweep;
+unchanged Tier-3 areas are skipped — every downgrade/skip recorded in the coverage manifest.
+`--full` forces a complete sweep (recommended roughly annually).
+
+**Rationale**: The plan asserted re-runs would be "materially cheaper" but nothing
+implemented it; at ~15 features/month, sustained full multi-million-token sweeps would kill
+the cadence. Scoping by churn is visible scoping (FR-012's letter and spirit: recorded, not
+silent), and Tier-1's unconditional full depth protects the data-integrity spine from
+drift-by-omission.
+
+**Alternatives considered**: Ledger-driven scoping (re-check only areas with open findings)
+— rejected: blind to new defects in changed-but-clean areas. No scoping — rejected: cadence
+dies of cost.
+
+## R-012: Retrospective recall benchmark (added 2026-07-12, post-implementation review)
+
+**Decision**: Each run, synthesis judges whether the current playbooks would have flagged
+the 3–5 most recent real bugs from `docs/project_notes/bugs.md` (pre-fix). Hit/miss per bug
+is reported in the Methodology section; misses become Playbook Tuning "add" recommendations.
+
+**Rationale**: Verified-only optimises precision; false negatives are structurally invisible
+and the tuning loop can only prune noise, not detect blind spots. `bugs.md` is curated ground
+truth the project already maintains — using it as a rolling recall test set costs one
+synthesis step and turns the memory file into a calibration instrument.
+
+**Alternatives considered**: Seeding synthetic defects per run — rejected: expensive to
+author well, and synthetic defects test the seeder's imagination, not the repo's real failure
+modes. No recall measurement — rejected: the criteria can't improve on what they never see.

@@ -47,7 +47,9 @@ independent adversarial refutation pass. <confirmed> confirmed from <emitted> ca
 - **Resolution rate** (prior run's Critical/High now fixed or accepted-risk): **<pct>%**
 - New: <n> · Resolved since last review: <n> · Still open: <n>
 - Headline metrics vs prior run: dead-code <n→n> · skewed deps <n→n> · Tier-1 coverage <pct→pct>
+- **Guards**: <n> proposed to date · <n> adopted — the compounding metric alongside resolution rate
 - Guard effectiveness: <theme> guard adopted in <PR> → <n> new findings this run
+- Scope: <full sweep | churn-scoped vs <priorSha> — downgrades/skips listed in the Coverage Manifest>
 
 **Resolved since last review**: RR-0xx, RR-0yy …
 **Still open (carried)**: RR-0aa (Critical), …
@@ -116,6 +118,14 @@ _Adopted in_: <PR url, filled by a later run> · _Effectiveness_: <later run not
 | CB-03 | <n> | <n> | <n> |
 | (unprompted) | <n> | <n> | — |
 
+### Recall benchmark (vs bugs.md ground truth)
+
+<!-- The review's only recall signal. 3-5 most recent real bugs; would the playbooks have caught each pre-fix? -->
+
+| Bug (bugs.md date) | Defect class | Would-have-caught? | Heuristic (or miss -> Tuning "add") |
+|--------------------|--------------|--------------------|-------------------------------------|
+| <YYYY-MM-DD — title> | <class> | hit / miss | CB-nn / propose new |
+
 ## Playbook Tuning
 <!-- Derived from the attribution table (FR-019). -->
 
@@ -127,3 +137,13 @@ _Adopted in_: <PR url, filled by a later run> · _Effectiveness_: <later run not
 <!-- One line per re-detected accepted-risk ledger entry. Omit section if none. -->
 
 - RR-0zz — <title> — accepted because <status_reason>
+
+## Next Actions (Runbook)
+
+<!-- Always present — the report carries its own follow-through. Full runbook: specs/282-repo-review-skill/spec.md -->
+
+1. **Triage today (~30 min)**: set every new ledger entry to fix-now / open / accepted-risk (with reason); `python scripts/review-ledger.py validate` after hand edits.
+2. **Quick-wins batch this week**: `/repo-review.fix <ids from the Quick Wins table>` — one cleanup PR.
+3. **Adopt one guard**: pick the highest-leverage proposal from Themes & Prevention; land it as its own PR.
+4. **Playbook-tuning PR**: apply the prune/strengthen/add list above (including recall-benchmark misses).
+5. **Sample-audit the refuted pile**: skim ~5 refuted candidates in the run's working notes — the only check on verifier false-refutations.

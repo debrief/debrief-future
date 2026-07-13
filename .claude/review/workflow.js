@@ -14,7 +14,11 @@
 // shortfalls are recorded, never silently trimmed.
 //
 // `args` is passed by the skill: { gitSha, runDate, tierMapPath, playbookDir,
-// ledgerPath, evidenceDir, priorLedgerExists }.
+// ledgerPath, evidenceDir, priorLedgerExists, priorSha }.
+//
+// priorSha (re-runs only, else null): the previous run's git_sha, read from the
+// most recent report's front matter. Recon uses it to weight cells by churn —
+// re-runs sweep what changed, not everything, keeping the cadence affordable.
 
 export const meta = {
   name: 'repo-review',
@@ -79,10 +83,19 @@ const VERDICT_SCHEMA = {
 
 // --- Phase A: recon --------------------------------------------------------
 phase('Recon')
+const churnClause = args.priorSha
+  ? `This is a RE-RUN; the prior run reviewed ${args.priorSha}. Weight cells by churn:
+     run \`git diff --stat ${args.priorSha}..HEAD\` and (a) keep FULL depth for any area
+     with changes since the prior run and for ALL Tier-1 areas regardless of churn;
+     (b) DOWNGRADE untouched Tier-2 areas to sweep depth and SKIP untouched Tier-3 areas —
+     each downgrade/skip MUST appear in \`skipped\` with reason "unchanged since ${args.priorSha}"
+     so the coverage manifest records it (FR-012: scoped, never silently trimmed).`
+  : `This is the inaugural run (or a full sweep): every area gets its tier's full depth.`
 const recon = await agent(
   `Read ${args.tierMapPath}. Build the review work-list: one CELL per (reviewable area,
    dimension) pair. Tier-1 areas get all four dimensions at per-file depth; Tier-2 at
-   subsystem depth; Tier-3 as a sweep. For each cell output {area, tier, dimension, depth,
+   subsystem depth; Tier-3 as a sweep. ${churnClause}
+   For each cell output {area, tier, dimension, depth,
    files: [...]}. Also list any area you are deliberately NOT covering and why. Return JSON
    {cells: [...], skipped: [{area, reason}]}.`,
   {
@@ -207,7 +220,12 @@ const synthesis = await agent(
       Methodology with the per-heuristic confirmed/refuted table, and Playbook Tuning.
    5. Memory (FR-018): append confirmed Critical/High correctness findings to
       docs/project_notes/bugs.md; draft a failure-pattern doc for any theme with >= 3 members.
-   6. Do NOT modify any file outside docs/project_notes/reviews/, bugs.md, and new
+   6. Retrospective recall benchmark: take the 3-5 most recent REAL bugs from
+      docs/project_notes/bugs.md (fixed since the prior run, or the latest 3 on an inaugural
+      run). For each, judge honestly: would the current playbook heuristics have flagged the
+      pre-fix defect? Record hit/miss per bug in the Methodology section; misses feed the
+      Playbook Tuning "add" list. This is the review's only recall signal — do not skip it.
+   7. Do NOT modify any file outside docs/project_notes/reviews/, bugs.md, and new
       failure-pattern docs (FR-011). Guard proposals and playbook tuning are advisory only.`,
   { phase: 'Synthesis', effort: 'high', schema: { type: 'object' } },
 )

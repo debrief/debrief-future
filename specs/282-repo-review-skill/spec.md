@@ -14,8 +14,8 @@ This spec was produced from a structured interview (2026-07-10). The decisions b
 |----------|--------|
 | Review dimensions | All four: constitution conformance, correctness bugs, tech-debt refresh, test quality & coverage |
 | Scope | Whole repo, tiered by risk |
-| Tier 1 (deepest) | `shared/schemas` + generators (`shared/schemas/scripts/generate.py`, adherence tests); `services/*` Python (debrief-stac, debrief-io, debrief-calc, debrief-config, debrief-data, debrief-tools, debrief-session) |
-| Tier 2 | STAC write/save paths (`@debrief/stac-writer`, saveSession, session-state), VS Code extension + web-shell hosts, shared React components |
+| Tier 1 (deepest) | `shared/schemas` + generators (`shared/schemas/scripts/generate.py`, adherence tests); `services/*` Python (debrief-stac, debrief-io, debrief-calc, debrief-config, debrief-data, debrief-tools, debrief-session); `@debrief/stac-writer` (amended 2026-07-12: promoted from Tier 2 during implementation review — the unified writer abstraction is the persistence boundary (Article IV.4) and exactly where the ADR-033 silent-data-loss class lives; the tier map had it at Tier 1 and the spec now matches) |
+| Tier 2 | Remaining STAC write/save paths (saveSession, session-state), VS Code extension + web-shell hosts, shared React components |
 | Tier 3 (lightest) | scripts/, tooling, preview/, docs apps (spec-navigator, backlog-navigator) |
 | Output | Written report in `docs/project_notes/reviews/` + machine-readable findings ledger. **No** backlog items, GitHub issues, or fix PRs are produced by the review itself |
 | Signal bar | Verified-only: every reported finding survives an adversarial refutation pass |
@@ -270,9 +270,17 @@ recommendations.
 The skill's value depends on how it is operated, not just how it is built. This runbook is
 part of the spec and should be reproduced in the skill's documentation:
 
+0. **Pilot before the inaugural full run.** The orchestration layer (workflow script,
+   playbook prompts, synthesis instructions) is validated behaviourally, not by unit tests —
+   the first-ever execution WILL find its own bugs. Shake it down cheaply first:
+   `/repo-review --dimension correctness --tier 1` (a few hundred k tokens), fix what breaks,
+   then commit to the full run.
 1. **Run when you can act.** Schedule a run immediately before a planned cleanup window, not
    opportunistically. The report has a half-life: at ~15 features merged per month, line
-   references and even whole findings decay within weeks.
+   references and even whole findings decay within weeks. Re-runs are churn-scoped against
+   the prior run's sha (unchanged Tier-2/3 areas downgraded/skipped, recorded in the coverage
+   manifest); schedule an occasional `--full` sweep — roughly annually — to catch drift in
+   unchanged code.
 2. **Triage ritual (≈ 30 minutes, same day).** Read the delta summary and quick-wins table;
    set every new ledger entry's disposition: fix now (quick-wins batch), fix later (leave
    `open`), or `accepted-risk` with a written reason. An untriaged ledger silently converts
@@ -284,9 +292,18 @@ part of the spec and should be reproduced in the skill's documentation:
    prevention section and land it as its own PR (lint rule, CI gate, CLAUDE.md paragraph).
    Gates keep paying; findings only pay once.
 5. **Playbook-tuning PR after each run.** Apply the tuning appendix's prune/strengthen/add
-   recommendations to the checked-in playbooks so the next run is sharper and cheaper.
-6. **Judge the review by resolution rate** (FR-020), not by findings count. If run N+1 shows
-   the same open Criticals as run N, fix the operating rhythm before running again.
+   recommendations to the checked-in playbooks so the next run is sharper and cheaper. The
+   tuning input includes the **recall benchmark**: each run, synthesis judges whether the
+   current playbooks would have caught the 3–5 most recent real bugs from `bugs.md` pre-fix
+   — the review's only recall signal (verification measures precision; this measures what
+   the playbooks miss). Benchmark misses become "add" recommendations.
+6. **Sample-audit the refuted pile.** Skim ~5 refuted candidates per run from the working
+   notes. Verifier false-refutations are otherwise unmeasured — this is the only check that
+   the adversarial bar isn't killing real defects.
+7. **Judge the review by resolution rate** (FR-020) **and guard adoption**, not by findings
+   count. Resolution rate is the per-run value metric; guards proposed-vs-adopted is the
+   compounding one. If run N+1 shows the same open Criticals as run N, fix the operating
+   rhythm before running again.
 
 ## Out of Scope
 

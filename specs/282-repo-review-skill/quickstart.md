@@ -1,10 +1,22 @@
 # Quickstart: `/repo-review`
 
+## First time: run a pilot
+
+The orchestration layer is validated behaviourally — its first-ever execution will find its
+own bugs. Shake it down cheaply before committing to the full multi-million-token run:
+
+```text
+/repo-review --dimension correctness --tier 1
+```
+
+Fix what breaks, then run the full review.
+
 ## Run a review
 
 ```text
 # clean working tree required — commit or stash first
-/repo-review
+/repo-review          # re-runs are churn-scoped vs the prior run's sha
+/repo-review --full   # force a full sweep (do this roughly annually)
 ```
 
 What happens: recon builds the work-list from `.claude/review/tier-map.yaml`; reviewer
@@ -43,10 +55,14 @@ with a delta.
 3. **Adopt one guard**: pick the highest-leverage proposal from Themes & Prevention and
    land it as its own PR.
 4. **Playbook-tuning PR**: apply the Playbook Tuning section's prune/strengthen/add
-   recommendations to `.claude/review/playbooks/`.
-5. **Judge by resolution rate**: the next run's Delta Summary reports what fraction of this
-   run's Critical/High findings you actually resolved. That number — not the finding count —
-   is whether the review is working.
+   recommendations to `.claude/review/playbooks/` — including any recall-benchmark misses
+   (each report scores the playbooks against the last few real bugs from `bugs.md`).
+5. **Sample-audit ~5 refuted candidates** from the run's working notes — the only check on
+   verifier false-refutations.
+6. **Judge by resolution rate and guard adoption**: the next run's Delta Summary reports what
+   fraction of this run's Critical/High findings you actually resolved, and how many proposed
+   guards were adopted. Those numbers — not the finding count — are whether the review is
+   working.
 
 ## Fix a single finding
 

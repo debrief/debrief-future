@@ -29,7 +29,7 @@ resolution_rate: <float|null>              # FR-020; null on inaugural run
 
 | # | Section | Content contract |
 |---|---------|------------------|
-| 1 | `## Delta Summary` | Re-runs only (omit on inaugural run). New / resolved / still-open counts by severity; **resolution rate** of prior run's Critical/High (FR-020) shown alongside counts; headline evidence metrics side-by-side with prior run (US3-S5); guard-effectiveness notes for adopted guards (US5-S4) |
+| 1 | `## Delta Summary` | Re-runs only (omit on inaugural run). New / resolved / still-open counts by severity; **resolution rate** of prior run's Critical/High (FR-020) shown alongside counts; **guards proposed-to-date vs adopted** (the compounding metric); headline evidence metrics side-by-side with prior run (US3-S5); guard-effectiveness notes for adopted guards (US5-S4); scope statement (full sweep vs churn-scoped against the prior run's sha) |
 | 2 | `## Quick Wins` | Table of findings with severity ∈ {Critical, High} AND effort = S: ID, title, location, ready to feed `/repo-review.fix` |
 | 3 | `## Themes & Prevention` | One subsection per theme (FR-017): pattern paragraph, member IDs, exactly one typed guard proposal worded to be implementable without re-analysis |
 | 4 | `## Findings: Constitution Conformance` | Per-finding blocks (see below). Chapter MUST appear even with zero findings, stating what was examined (US1-S7) |
@@ -37,9 +37,10 @@ resolution_rate: <float|null>              # FR-020; null on inaugural run
 | 6 | `## Findings: Tech Debt` | 〃 — includes regression verdict vs the #172 end state |
 | 7 | `## Findings: Test Quality & Coverage` | 〃 — includes per-package coverage numbers (US3-S2) or the explicit qualitative downgrade (US3-S4) |
 | 8 | `## Coverage Manifest` | Every area × tier × depth; skipped/shortfall rows carry reasons (FR-003, FR-012) |
-| 9 | `## Methodology` | Spend/agents/candidates from front matter in prose; tool failures; per-heuristic confirmed/refuted table (FR-019) |
-| 10 | `## Playbook Tuning` | Prune / strengthen / add recommendations derived from §9 (FR-019) |
+| 9 | `## Methodology` | Spend/agents/candidates from front matter in prose; tool failures; per-heuristic confirmed/refuted table (FR-019); **recall benchmark** table — 3–5 most recent real bugs from `bugs.md`, hit/miss per bug on whether the playbooks would have caught the pre-fix defect (the review's only recall signal; misses feed §10's "add" list) |
+| 10 | `## Playbook Tuning` | Prune / strengthen / add recommendations derived from §9 (FR-019), including recall-benchmark misses |
 | 11 | `## Accepted Risks Re-confirmed` | One line per re-detected `accepted-risk` entry (US2-S3); omit if none |
+| 12 | `## Next Actions (Runbook)` | Always present — the condensed runbook (triage today, quick-wins batch, adopt one guard, tuning PR, sample-audit ~5 refuted candidates) so the report carries its own follow-through |
 
 ## Per-finding block (sections 4–7)
 

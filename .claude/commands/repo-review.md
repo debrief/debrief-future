@@ -9,7 +9,13 @@ $ARGUMENTS
 ```
 
 Arguments are optional. `--dimension <name>` limits the run to one dimension; `--tier <n>`
-limits to one tier. With no arguments, the full four-dimension, three-tier review runs.
+limits to one tier; `--full` forces a full sweep on a re-run (ignores churn scoping). With no
+arguments, the full four-dimension, three-tier review runs (churn-scoped on re-runs).
+
+> **First time? Run a pilot.** Before the first full run, shake down the orchestration with
+> `/repo-review --dimension correctness --tier 1` — a few hundred k tokens instead of
+> millions. The machinery (workflow script, playbook prompts, StructuredOutput schemas,
+> synthesis) is validated behaviourally, not by unit tests; find its failures cheaply first.
 
 ## Purpose
 
@@ -34,6 +40,12 @@ playbook tuning) is in `spec.md`.
 3. **Validate the ledger if present**: `python scripts/review-ledger.py validate`. If it
    reports INVALID, STOP and surface the error — do not regenerate the ledger (FR-008). A
    missing ledger is fine (first run).
+4. **Determine the prior run** (re-runs): read `git_sha` from the front matter of the most
+   recent `docs/project_notes/reviews/*-repo-review.md` → `priorSha` (null if none, or if
+   `--full` was passed). Recon uses it to scope re-runs by churn — unchanged Tier-2/3 areas
+   are downgraded/skipped *with coverage-manifest entries saying so*, keeping regular re-runs
+   affordable. Tier-1 always gets full depth. Schedule an occasional `--full` sweep
+   (e.g. annually) to catch drift in unchanged code.
 
 ### Step 2 — Run the orchestration workflow
 
@@ -47,6 +59,7 @@ args = {
   ledgerPath: 'docs/project_notes/reviews/ledger.yaml',
   evidenceDir: `docs/project_notes/reviews/evidence/${runDate}`,
   priorLedgerExists: <bool>,
+  priorSha: <sha | null>,   // from Step 1.4 — enables churn-scoped re-runs
 }
 ```
 
@@ -86,6 +99,10 @@ methodology section, not listed. "Verified" means confirmed, not merely unrefute
   constitution — FR-011); adoption is a separate PR.
 - **Calibration** (FR-019): the Methodology per-heuristic table and the Playbook Tuning
   section (prune / strengthen / add). Do not edit the playbooks during the run.
+- **Recall benchmark** (the review's only recall signal — precision is measured by
+  verification, recall by this): synthesis judges, for the 3–5 most recent real bugs in
+  `docs/project_notes/bugs.md`, whether the current playbooks would have flagged the pre-fix
+  defect. Hits/misses go in the Methodology section; misses feed the Tuning "add" list.
 
 ### Step 5 — Degradation, not silence (FR-010)
 
