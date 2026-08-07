@@ -1,0 +1,144 @@
+name: Code Graph PR Preview
+
+# Deploys a PR's committed graph pages to
+#   https://debrief.github.io/debrief-future/pr-preview/pr-<n>/code-graph/
+# and posts a sticky comment linking them, so the interactive graph is
+# reviewable from the PR itself rather than only after merge.
+#
+# Uses the existing pr-preview/pr-<n>/ convention already on gh-pages, and
+# keep_files: true so it cannot clobber production, a sibling PR preview, or a
+# branch preview from graphify-preview.yml.
+#
+# Deploys committed bytes — no build step runs from the PR. Even so, publishing
+# to our own Pages domain is gated to same-repository PRs: a fork could
+# otherwise commit arbitrary HTML and have us serve it from
+# debrief.github.io. Fork PRs get the comment explaining the manual route
+# instead of a deploy.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'graphify-out/pages/**'
+      # Included so a change to this workflow re-runs it on the open PR;
+      # otherwise editing the previewer never re-deploys or refreshes its own
+      # comment, and you cannot tell whether the edit worked until merge.
+      - '.github/workflows/graphify-pr-preview.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: graphify-pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine whether this PR may deploy
+        id: gate
+        run: |
+          if [ "${{ github.event.pull_request.head.repo.full_name }}" = "${{ github.repository }}" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "Fork PR — skipping deploy, posting manual instructions instead."
+          fi
+
+      - name: Checkout PR head
+        if: steps.gate.outputs.deploy == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Verify pages are present
+        if: steps.gate.outputs.deploy == 'true'
+        run: |
+          set -euo pipefail
+          for required in index.html tree.html adr/index.html GRAPH_REPORT.md; do
+            test -f "graphify-out/pages/${required}" \
+              || { echo "::error::graphify-out/pages/${required} missing — run 'task graph:build && task graph:pages' and commit."; exit 1; }
+          done
+
+      - name: Deploy PR preview
+        if: steps.gate.outputs.deploy == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./graphify-out/pages
+          destination_dir: pr-preview/pr-${{ github.event.pull_request.number }}/code-graph
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'chore(preview): deploy code-graph for PR #${{ github.event.pull_request.number }}'
+
+      - name: Post or update preview comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const headSha = context.payload.pull_request.head.sha;
+            const deployed = '${{ steps.gate.outputs.deploy }}' === 'true';
+
+            const marker = '<!-- code-graph-preview-comment -->';
+            const base =
+              `https://debrief.github.io/debrief-future/pr-preview/pr-${prNumber}/code-graph`;
+
+            const body = deployed
+              ? [
+                  marker,
+                  '## 🕸️ Code Graph Preview',
+                  '',
+                  'The interactive knowledge graph built from this PR:',
+                  '',
+                  `👉 **[Open the code graph](${base}/)**`,
+                  '',
+                  '| Page | Scope |',
+                  '|---|---|',
+                  `| [Whole repository](${base}/tree.html) | Collapsible tree, all nodes |`,
+                  `| [ADR citation graph](${base}/adr/) | Which code and docs cite which decision |`,
+                  `| [Graph report](${base}/GRAPH_REPORT.md) | Hubs and communities |`,
+                  '',
+                  `<sub>Updated for ${headSha.substring(0, 7)} — deployed from the pages committed on this branch, not rebuilt. `,
+                  `GitHub Pages can take a minute to serve a fresh deploy. `,
+                  `The graph needs internet access (D3 and vis-network load from CDNs).</sub>`,
+                ].join('\n')
+              : [
+                  marker,
+                  '## 🕸️ Code Graph Preview',
+                  '',
+                  'This PR is from a fork, so the preview is not deployed automatically —',
+                  'publishing fork content to our Pages domain would let any contributor',
+                  'serve arbitrary HTML from `debrief.github.io`.',
+                  '',
+                  'To review the graph, either check the branch out and open',
+                  '`graphify-out/pages/index.html` directly (no server needed), or push the',
+                  'branch to a `preview/`-prefixed name to trigger a branch preview.',
+                ].join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+              core.info(`Updated comment ${existing.id}`);
+            } else {
+              const { data: created } = await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+              core.info(`Created comment ${created.id}`);
+            }
