@@ -151,17 +151,32 @@ every page comfortably under it (`services/` as a whole is already at 4,744).
 The production publisher only fires on `main`, so a PR that changes the graph has
 nothing to click through by default. Two ways to look at it:
 
-**Deploy a branch preview.** Actions → *Preview Code Graph (branch)* → **Run
-workflow** → pick the branch. It deploys the branch's committed pages to:
+**Deploy a branch preview.** Two routes, and which one works depends on whether
+the workflow has reached `main` yet:
+
+- *Normal case* — Actions → *Preview Code Graph (branch)* → **Run workflow** →
+  pick the branch.
+- *When the workflow itself is not yet on `main`* — push the branch to a
+  `preview/`-prefixed name and the push trigger fires it:
+  `git push origin <branch>:refs/heads/preview/<name>`. GitHub only exposes the
+  **Run workflow** button for `workflow_dispatch` workflows that already exist on
+  the default branch, so dispatch returns a 404 until the workflow merges. The
+  push route works from any branch.
+
+Either way it deploys to:
 
 ```
 https://debrief.github.io/debrief-future/code-graph-preview/<slug>/
 ```
 
-`<slug>` is the branch name with non-`[A-Za-z0-9-]` characters replaced by `-`.
+`<slug>` is the *deployed* branch name with non-`[A-Za-z0-9-]` characters replaced
+by `-`, so a push to `preview/code-graph` publishes under `preview-code-graph`.
 Previews share `gh-pages` with production under `keep_files: true`, so this never
 overwrites `/code-graph/` or a sibling preview. Delete one by removing its folder
-from `gh-pages`.
+from `gh-pages` and deleting the `preview/` branch.
+
+GitHub Pages takes a minute or two to serve a fresh deploy — a 404 immediately
+after the workflow goes green is propagation, not a broken deploy.
 
 **Or open the files directly.** The pages are committed, so a checkout is enough —
 no server, no build:
