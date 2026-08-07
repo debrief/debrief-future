@@ -1,0 +1,93 @@
+name: Preview Code Graph (branch)
+
+# Deploys a branch's committed graph pages to
+#   https://debrief.github.io/debrief-future/code-graph-preview/<slug>/
+# where <slug> is the branch name with any non-[A-Za-z0-9-] characters replaced
+# by `-`. Mirrors spec-navigator-preview.yml: previews live next to production
+# on the same gh-pages branch, and keep_files: true stops this job clobbering
+# /code-graph/ (the production deploy) or any sibling preview.
+#
+# Exists because the production publisher only fires on main, so there is
+# otherwise no way to click through the interactive graph while reviewing a PR.
+# Like the publisher, this deploys committed bytes rather than rebuilding — the
+# pages come from `task graph:build && task graph:pages`.
+#
+# Dispatch from the Actions tab and pick the branch (or pass one explicitly).
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to preview (default: the branch this workflow was dispatched from)'
+        required: false
+        type: string
+  push:
+    branches:
+      - 'preview/**'
+    paths:
+      - 'graphify-out/pages/**'
+      - '.github/workflows/graphify-preview.yml'
+
+jobs:
+  build-and-publish-preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Resolve branch + slug
+        id: branch
+        run: |
+          BRANCH="${{ inputs.branch || github.ref_name }}"
+          SLUG=$(printf '%s' "$BRANCH" | tr -c 'A-Za-z0-9-' '-' | sed -E 's/-+/-/g;s/^-|-$//g')
+          if [ -z "$SLUG" ]; then
+            echo "::error::Could not derive slug from branch '$BRANCH'"
+            exit 1
+          fi
+          if [ "$SLUG" = "main" ]; then
+            echo "::error::Refusing to publish 'main' as a preview — use the production workflow."
+            exit 1
+          fi
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "Resolved: branch=$BRANCH slug=$SLUG"
+
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.branch.outputs.branch }}
+
+      - name: Verify pages are present
+        run: |
+          set -euo pipefail
+          for required in index.html tree.html adr/index.html GRAPH_REPORT.md; do
+            test -f "graphify-out/pages/${required}" \
+              || { echo "::error::graphify-out/pages/${required} missing on this branch — run 'task graph:build && task graph:pages' and commit."; exit 1; }
+          done
+
+      - name: Deploy preview to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./graphify-out/pages
+          destination_dir: code-graph-preview/${{ steps.branch.outputs.slug }}
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'chore(preview): deploy code-graph from ${{ steps.branch.outputs.branch }}'
+
+      - name: Summarise
+        run: |
+          BASE="https://debrief.github.io/debrief-future/code-graph-preview/${{ steps.branch.outputs.slug }}"
+          {
+            echo "### Code graph preview deployed :rocket:"
+            echo ""
+            echo "Branch: \`${{ steps.branch.outputs.branch }}\`"
+            echo ""
+            echo "| Page | URL |"
+            echo "|---|---|"
+            echo "| Landing index | ${BASE}/ |"
+            echo "| Whole-repo tree | ${BASE}/tree.html |"
+            echo "| ADR citation graph | ${BASE}/adr/ |"
+            echo ""
+            echo "Delete the preview by removing \`code-graph-preview/${{ steps.branch.outputs.slug }}\` from the \`gh-pages\` branch."
+          } >> "$GITHUB_STEP_SUMMARY"

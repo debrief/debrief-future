@@ -146,6 +146,39 @@ it grows past roughly 800 nodes, and note the 5,000-node ceiling is per page —
 splitting by workspace package rather than by top-level directory is what keeps
 every page comfortably under it (`services/` as a whole is already at 4,744).
 
+## Previewing from a pull request
+
+The production publisher only fires on `main`, so a PR that changes the graph has
+nothing to click through by default. Two ways to look at it:
+
+**Deploy a branch preview.** Actions → *Preview Code Graph (branch)* → **Run
+workflow** → pick the branch. It deploys the branch's committed pages to:
+
+```
+https://debrief.github.io/debrief-future/code-graph-preview/<slug>/
+```
+
+`<slug>` is the branch name with non-`[A-Za-z0-9-]` characters replaced by `-`.
+Previews share `gh-pages` with production under `keep_files: true`, so this never
+overwrites `/code-graph/` or a sibling preview. Delete one by removing its folder
+from `gh-pages`.
+
+**Or open the files directly.** The pages are committed, so a checkout is enough —
+no server, no build:
+
+```sh
+git checkout <branch>
+open graphify-out/pages/index.html      # macOS; xdg-open on Linux
+```
+
+Note the pages are **not self-contained**: the tree loads D3 from `d3js.org` and
+the force-directed views load vis-network from `unpkg.com`. They therefore need
+network access to render, whether opened locally or from `gh-pages`. That is fine
+for developer tooling on a public site, but it does mean these pages are not
+usable in an air-gapped environment — unlike the product, which is offline by
+default (Article III.4). Vendoring both libraries would remove the dependency if
+that ever matters.
+
 ## The ADR citation graph
 
 `scripts/extract-adr-graph.py` links every `ADR-NNN` token to its `### ADR-NNN:`
