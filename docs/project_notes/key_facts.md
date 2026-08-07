@@ -298,3 +298,53 @@ fails. Before pushing an E2E fix, run the whole suite the way CI does:
 ```bash
 cd apps/web-shell && CI=1 node run-playwright.mjs   # no spec arg → all specs
 ```
+
+## Graphify (code knowledge graph — developer tooling)
+
+Developer-only tooling. Not shipped, not analyst-facing. See ADR-041 and
+`docs/graphify-developer-guide.md`.
+
+**⚠️ Install the right package.** The PyPI name is **`graphifyy`** (double *y*).
+`pip install graphify` fetches an unrelated package, and near-name forks of the
+GitHub repo exist. The correct coordinates are:
+
+| | |
+|---|---|
+| PyPI package | `graphifyy` |
+| Pinned version | `0.9.35` |
+| Upstream repo | `Graphify-Labs/graphify` |
+| Licence | Apache-2.0 |
+
+No standing install is required — everything is invoked through
+`uvx --from graphifyy==0.9.35`, which is how `Taskfile.yml` and `.mcp.json` call
+it. Deliberately **not** in `pyproject.toml`, so it can never reach a shipped
+artefact.
+
+**Commands**
+
+```sh
+task graph:build      # full deterministic build (~45s) + ADR citation merge
+task graph:refresh    # incremental re-extract after code changes
+task graph:report     # regenerate GRAPH_REPORT.md (hubs, communities)
+task graph:pages      # build the browsable D3 tree + ADR graph pages
+```
+
+**Offline and deterministic.** Code extraction is tree-sitter AST with zero LLM
+calls — no API key, no network. Two consecutive builds produce a byte-identical
+`graph.json`, and `GRAPH_REPORT.md` reports `Token cost: 0 input · 0 output`.
+
+**Staleness.** `GRAPH_REPORT.md` records `Built from commit: <sha>`. Compare
+against `git rev-parse HEAD`; re-run `task graph:refresh` if they differ.
+
+**Published pages** (rebuilt by `.github/workflows/graphify-publish.yml` on
+pushes to `main` that touch source or `decisions.md`):
+
+- `https://debrief.github.io/debrief-future/code-graph/` — repo-wide D3 tree
+- `https://debrief.github.io/debrief-future/code-graph/adr/` — ADR citation graph
+
+`graphify-out/` **is committed** (~16MB; `graph.json` is 15MB of it) so a fresh
+clone can query the graph without building. Only `graphify-out/cache/` and the
+incremental `manifest.json` are gitignored — pure machine state.
+
+**Order matters:** `cluster-only` collapses same-endpoint edges and re-inflates the
+file, so the ADR merge always runs last. The `task graph:*` targets handle this.

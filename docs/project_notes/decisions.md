@@ -1992,3 +1992,119 @@ keys; deterministic regen; existing `src/generated` drift gate (no new gate).
 
 Related: ADR-011 (cast governance), ADR-033 (Article IV.5 — derived boundary
 types), #240 (LinkML-derived writer types + drift gate — deferral now closed).
+
+---
+
+### ADR-041: Graphify adopted as developer-only code + ADR graph; ADR reference check widened repo-wide (2026-08-07)
+
+**Status:** Accepted.
+
+**Context.**
+
+Two bodies of knowledge had outgrown grep. The source tree is 1,581 TypeScript/Python
+files across ~20 workspace packages under two package managers, so "what actually
+consumes this?" was grep plus judgement. Separately, ~173k words of *living*
+documentation (`docs/` 97k, `docs/project_notes/` 38k, root governance 33k,
+`docs/architecture/` 6k) constrain current work — as distinct from `specs/`, whose
+2.6M words describe features already shipped and whose value was banked on delivery.
+
+The densest structure in that documentation is the ADR citation network: 38 decisions
+living as `### ADR-NNN:` headings inside a single ~19k-word `decisions.md`, cited 588
+times across markdown, TypeScript, Python and LinkML YAML. Only the LinkML subset was
+validated by `scripts/check-adr-refs.sh` — roughly 90% of citations were unchecked, and
+the network was navigable only by grepping one very large file.
+
+**Decision.**
+
+Adopt [graphify](https://github.com/Graphify-Labs/graphify) (PyPI `graphifyy`, pinned
+`0.9.35`, Apache-2.0) as **developer tooling only**. Not analyst-facing, not product
+code, nothing shipped changes.
+
+1. **Code-only extraction.** Tree-sitter AST across 36+ languages; zero LLM calls, no
+   API key, no network, no embeddings, no vector store. Verified: two consecutive
+   builds produce a byte-identical `graph.json`, and `GRAPH_REPORT.md` records
+   `Token cost: 0 input · 0 output`. This is what makes the tool defensible under
+   Articles III.4 and X.2. The semantic (prose) pass is deliberately *not* adopted —
+   see Consequences.
+
+2. **Isolated, pinned install.** Invoked via `uvx --from graphifyy==0.9.35`, never added
+   to `pyproject.toml` dependency groups, so it cannot leak into a shipped artefact
+   (Article IX.1, IX.2). The install target is a live typosquat vector: `pip install
+   graphify` fetches an unrelated package and near-name forks exist, so the exact
+   coordinates are recorded in `key_facts.md`.
+
+3. **The ADR citation graph is extracted by us, not by graphify.**
+   `scripts/extract-adr-graph.py` links each `ADR-NNN` token to its heading. This is a
+   regex, not a concept, so it needs no LLM. Two upstream behaviours forced the
+   decision: graphify's generic `docref` extractor normalises IDs to a fixed four-digit
+   width — zero-padding our three-digit convention — so its nodes never join our real
+   identifiers; and `--code-only` skips markdown entirely, where most citations live. Edges anchor to
+   graphify's own `source_file` values rather than to re-derived node IDs, so they
+   survive changes to its ID slugging. Graphify's `merge-graphs` is unusable here — it
+   is built for cross-repository merges and namespaces every node (`repo::…`), severing
+   those anchors — so the merge is done in-place by our script and is idempotent.
+
+4. **`scripts/check-adr-refs.sh` widened from LinkML YAML to the whole repo**, and it
+   now rejects malformed (non-three-digit) IDs as well as dangling ones. It runs in
+   ~1.5s and stays in `task lint`.
+
+5. **Output is committed.** `graphify-out/` is version-controlled: the graph is what the
+   MCP server reads, so committing it means a fresh clone can query immediately rather
+   than waiting on a 45s build, and the published HTML is deployed rather than
+   regenerated on every push. Cost is ~16MB, of which `graph.json` is 15MB. Two
+   exceptions stay ignored as pure machine state with no enduring value:
+   `graphify-out/cache/` (7.4MB SHA256 index) and the incremental `manifest.json`.
+   The merge step writes with compact separators and `sort_keys`, which keeps the file
+   ~3MB smaller than pretty-printed and byte-reproducible across runs.
+
+6. **Published, not gated.** `.github/workflows/graphify-publish.yml` deploys the
+   *committed* pages to `gh-pages` under `code-graph/` beside spec-navigator and
+   backlog-navigator (`keep_files: true`) — a copy, not a rebuild, so the deployed bytes
+   are the reviewed bytes. It never runs on pull requests and cannot block a merge. A
+   second advisory job compares `GRAPH_REPORT.md`'s recorded build commit against `HEAD`
+   and reports drift to the Actions summary without failing anything.
+
+7. **Task ordering is load-bearing.** `graphify cluster-only` rewrites `graph.json` with
+   its own serialiser, re-inflating it and collapsing same-endpoint edges (501 citation
+   edges down to 266 — per-line multiplicity lost). The ADR merge therefore runs *last*
+   in every task that touches the graph.
+
+**Consequences.**
+
+- **The LinkML chain stays invisible.** `shared/schemas` LinkML → generated Pydantic/TS
+  → consumers crosses a code-generation boundary no AST parser sees. The graph shows
+  consumers of the *generated* types but cannot link them back to the schema that
+  produced them — precisely the chain Article II and ADR-033 care most about. Do not
+  read coverage into the graph here.
+- **The graph is an index, never a record.** Even code-only extraction is 97%
+  `EXTRACTED` / 3% `INFERRED` (1,035 inferred edges from fuzzy call resolution). It is
+  an exploration aid; it is not evidence and must never be cited as provenance.
+- **The repo-wide interactive HTML does not exist.** Graphify refuses force-directed
+  rendering above 5,000 nodes and the graph is ~14,300. The published pages are the D3
+  collapsible tree for the full graph, and the force-directed view for the much smaller
+  ADR citation graph.
+- **Community labels are placeholders.** Naming clusters requires an LLM backend, which
+  we do not configure, so `GRAPH_REPORT.md` shows `Community N`. Hub detection
+  (`god-nodes`) is unaffected and does produce meaningful output.
+- **`ADR-031` and `ADR-032` are allowlisted** in the widened check as reserved-but-
+  unwritten. They are cited from the #248/#249 extraction-kit runbooks; the numbering
+  note in this file records the reservation. Remove the allowlist entries once the
+  headings exist.
+- **This complements rather than replaces the existing gates.** `knip`, the custom rules
+  in `shared/eslint-rules/`, `pyright` and `tsc` answer closed questions and fail the
+  build. The graph answers open ones — and its clearest payoff is surfacing couplings
+  that should *become* new entries in `shared/eslint-rules/`.
+
+**Alternatives considered.** Gitignoring `graphify-out/` (rejected: the graph is the
+artefact with enduring value, it is what the MCP server reads on a fresh clone, and
+regenerating the published HTML on every deploy is waste; the ~16MB and the PR-diff churn
+are accepted costs). A CI freshness *gate* (rejected: `ci.yml` deliberately skips heavy
+steps on doc-only PRs, and gating exploration output inverts the tool's purpose — the
+advisory freshness job reports drift instead). Rebuilding the graph in the publish
+workflow (rejected: deploying committed bytes means what ships is what was reviewed).
+Graphing `specs/` (deferred: 15x the volume, value already banked). Graphify's own
+`merge-graphs` (rejected: namespaces node IDs, severing the anchors). The third-party
+`yasinyaman/graphify-mcp` server (rejected: the first-party `graphify-mcp` ships in the
+same pinned package).
+
+Related: ADR-011 (cast governance), ADR-033 (derived boundary types).

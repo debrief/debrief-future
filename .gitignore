@@ -254,3 +254,18 @@ tmp/
 # Speckit per-worktree active-feature override (used when branch name doesn't
 # follow the NNN-name convention, e.g. inside Claude Code cloud sessions)
 .specify/.active-feature
+
+# Graphify knowledge-graph output (developer tooling — see ADR-041 and
+# docs/graphify-developer-guide.md).
+#
+# graphify-out/ IS committed: the graph and the browsable pages are the artefacts
+# with enduring value, they are what the MCP server reads on a fresh clone, and
+# the published HTML should not be regenerated on every deploy.
+#
+# These two are the exception — pure machine state, no enduring value, and they
+# churn on every incremental run:
+graphify-out/cache/
+graphify-out/manifest.json
+graphify-out/.graphify_analysis.json
+# Scratch copy produced while building the ADR page; the page itself is committed.
+graphify-out/pages/adr/graphify-out/

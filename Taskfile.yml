@@ -203,9 +203,47 @@ tasks:
     cmds:
       - cd apps/vscode && npx vsce package --no-dependencies
 
+  # The ADR merge must always run LAST. `graphify cluster-only` rewrites
+  # graph.json with its own serialiser, which re-inflates the file (~14MB→18MB)
+  # and collapses same-endpoint edges — losing per-line citation multiplicity.
+  # Running the merge afterwards keeps the committed graph compact and complete.
+  graph:build:
+    desc: "Build the code knowledge graph (deterministic, offline, no API key) — see ADR-041"
+    cmds:
+      - uvx --from graphifyy==0.9.35 graphify extract . --code-only --out .
+      - uvx --from graphifyy==0.9.35 graphify cluster-only . --no-viz --no-label
+      - task: graph:adr
+
+  graph:adr:
+    desc: "Extract the ADR citation graph and merge it into graphify-out/graph.json (run last)"
+    cmds:
+      - uv run python scripts/extract-adr-graph.py --merge
+
+  graph:refresh:
+    desc: "Incrementally re-extract changed code files into the existing graph"
+    cmds:
+      - uvx --from graphifyy==0.9.35 graphify update . --no-cluster
+      - task: graph:adr
+
+  graph:report:
+    desc: "Regenerate GRAPH_REPORT.md (skips HTML — graph far exceeds the 5k-node viz limit)"
+    cmds:
+      - uvx --from graphifyy==0.9.35 graphify cluster-only . --no-viz --no-label
+      - task: graph:adr
+
+  graph:pages:
+    desc: "Build the publishable pages: repo-wide D3 tree + interactive ADR citation graph"
+    cmds:
+      - uvx --from graphifyy==0.9.35 graphify tree --output graphify-out/pages/index.html --root . --label "Debrief — code graph"
+      - mkdir -p graphify-out/pages/adr
+      - cp graphify-out/adr-graph.json graphify-out/pages/adr/graph.json
+      - uvx --from graphifyy==0.9.35 graphify cluster-only graphify-out/pages/adr --graph graphify-out/pages/adr/graph.json --no-label
+      - cp graphify-out/pages/adr/graphify-out/graph.html graphify-out/pages/adr/index.html
+
   clean:
     desc: "Remove build artifacts and caches"
     cmds:
       - rm -rf dist/ .task/ .pytest_cache/ .ruff_cache/
       - rm -rf **/dist/ **/.pytest_cache/ **/__pycache__/
       - rm -rf node_modules/.cache/
+      - rm -rf graphify-out/

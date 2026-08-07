@@ -1,0 +1,33 @@
+# Graphify corpus scoping — see docs/graphify-developer-guide.md and ADR-041.
+#
+# Graphify honours .gitignore by default, so build output and vendored code are
+# already excluded. This file narrows the corpus further to what is worth
+# graphing.
+
+# Implemented feature specs. 2,851 markdown files / ~2.6M words — 15x the size
+# of the living-documentation corpus, and their value was banked when the
+# features shipped. Deliberately out of scope; revisit as a separate graph.
+specs/
+
+# Generated from LinkML. These appear as heavily-imported hubs that no human
+# should edit, and the graph cannot link them back to the schema that produced
+# them anyway (no AST parser sees across a code generator).
+shared/schemas/src/generated/
+
+# Data and configuration files. tree-sitter parses JSON, but 882 of them
+# produced zero nodes on the first full run — pure noise in the graph.
+*.json
+*.geojson
+*.rep
+*.dpf
+
+# Test fixtures and sample corpora, including the vendored STAC Browser bundle
+# (minified third-party JS — parses fine, contributes only noise).
+preview/workspace/samples/
+apps/vscode/test-data/
+apps/web-shell/test-fixtures/
+**/__fixtures__/
+
+# Evidence artefacts (screenshots, videos, captured output).
+evidence/
+**/evidence/

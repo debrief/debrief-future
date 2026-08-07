@@ -1,0 +1,84 @@
+name: Publish Code Graph
+
+# Publishes the committed graphify pages to gh-pages alongside spec-navigator and
+# backlog-navigator (keep_files: true keeps the siblings intact).
+# See ADR-041 and docs/graphify-developer-guide.md.
+#
+# This deploys committed artefacts — it does NOT rebuild the graph. The pages in
+# graphify-out/pages/ are produced by `task graph:build && task graph:pages` and
+# committed, so publishing is a copy rather than a ~45s regeneration on every
+# deploy, and the deployed bytes are exactly the reviewed bytes.
+#
+# It is a publisher, not a gate: it never runs on pull requests and cannot block
+# a merge. Keeping the pages current is the author's job at rebuild time; the
+# freshness job below reports drift without failing anything.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'graphify-out/pages/**'
+      - 'graphify-out/GRAPH_REPORT.md'
+      - '.github/workflows/graphify-publish.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: graphify-publish
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: Publish committed pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Stage pages
+        run: |
+          set -euo pipefail
+          test -f graphify-out/pages/index.html \
+            || { echo "::error::graphify-out/pages/index.html missing — run 'task graph:build && task graph:pages' and commit."; exit 1; }
+          cp graphify-out/GRAPH_REPORT.md graphify-out/pages/GRAPH_REPORT.md
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./graphify-out/pages
+          destination_dir: code-graph
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+  freshness:
+    name: Report graph freshness
+    runs-on: ubuntu-latest
+    # Advisory only — never fails the build. The graph is committed, so it can
+    # drift behind source until someone re-runs `task graph:build`. This says so
+    # out loud in the Actions summary instead of letting it rot silently.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compare graph commit against HEAD
+        run: |
+          set -euo pipefail
+          built=$(grep -oE 'Built from commit: `[0-9a-f]+`' graphify-out/GRAPH_REPORT.md \
+                  | grep -oE '[0-9a-f]{6,}' || echo "unknown")
+          head=$(git rev-parse --short HEAD)
+          {
+            echo "### Code graph freshness"
+            echo ""
+            echo "- Graph built from: \`${built}\`"
+            echo "- Current HEAD: \`${head}\`"
+            echo ""
+            if git merge-base --is-ancestor "${built}" HEAD 2>/dev/null && [ "${built}" != "${head}" ]; then
+              echo "⚠️ The committed graph is behind \`main\`. Run \`task graph:build && task graph:pages\` and commit to refresh."
+            else
+              echo "✅ Graph is current."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
