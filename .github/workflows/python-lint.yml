@@ -29,8 +29,18 @@ jobs:
         with:
           version: "latest"
 
+      - name: Set up Python
+        run: uv python install 3.11
+
+      # `uv run` resolves ruff from uv.lock, so CI runs the same version as
+      # `task lint` and local development. Previously these used `uvx ruff`,
+      # which is unpinned and silently drifts to whatever is latest at run time
+      # — a newer ruff enabled Markdown code-block formatting by default and
+      # turned 104 untouched spec files red on the next PR to add a .py file.
+      # Pinning to the lockfile is Article IX.2 (pinned versions for
+      # reproducibility) and keeps local and CI in agreement.
       - name: Run ruff check
-        run: uvx ruff check .
+        run: uv run ruff check .
 
       - name: Run ruff format check
-        run: uvx ruff format --check .
+        run: uv run ruff format --check .

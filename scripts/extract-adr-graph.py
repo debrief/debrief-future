@@ -55,6 +55,12 @@ SCANNED_SUFFIXES = frozenset(
     {".md", ".ts", ".tsx", ".js", ".cjs", ".mjs", ".py", ".yaml", ".yml", ".sh", ".json"}
 )
 
+# graphify-out/ is committed (ADR-041), so it is git-tracked and would otherwise
+# be scanned as a citation source — the graph's own ADR node labels would come
+# back as citations of themselves on every rebuild, inflating the edge count and
+# never converging. Its own output is never an input.
+EXCLUDED_PREFIXES = ("graphify-out/",)
+
 
 def git_tracked_files() -> list[Path]:
     """Return repo-tracked files, so build artefacts and vendored code never leak in."""
@@ -88,13 +94,15 @@ def collect_citations(files: list[Path]) -> dict[str, list[tuple[str, int]]]:
     for path in files:
         if path.suffix not in SCANNED_SUFFIXES or not path.is_file():
             continue
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        if rel.startswith(EXCLUDED_PREFIXES):
+            continue
         try:
             text = path.read_text(encoding="utf-8")
         except (UnicodeDecodeError, OSError):
             continue
         if "ADR-" not in text:
             continue
-        rel = path.relative_to(REPO_ROOT).as_posix()
         is_decisions = path == DECISIONS_FILE
         for lineno, line in enumerate(text.splitlines(), start=1):
             if is_decisions and ADR_HEADING.match(line):
@@ -231,7 +239,9 @@ def merge_into(graph_path: Path, addition: dict[str, Any]) -> tuple[int, int]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument(
         "--graph",
         type=Path,
@@ -265,15 +275,15 @@ def main() -> int:
             shown = args.out.relative_to(REPO_ROOT)
         except ValueError:
             shown = args.out
-        print(
-            f"wrote {shown} — {adr_nodes} ADR node(s), {len(graph['edges'])} citation edge(s)"
-        )
+        print(f"wrote {shown} — {adr_nodes} ADR node(s), {len(graph['edges'])} citation edge(s)")
         if args.merge:
             if not args.graph.is_file():
                 print(f"error: --merge needs an existing graph at {args.graph}", file=sys.stderr)
                 return 1
             merged_nodes, merged_edges = merge_into(args.graph, graph)
-            print(f"merged into {args.graph.name} — +{merged_nodes} node(s), +{merged_edges} edge(s)")
+            print(
+                f"merged into {args.graph.name} — +{merged_nodes} node(s), +{merged_edges} edge(s)"
+            )
     return 0
 
 

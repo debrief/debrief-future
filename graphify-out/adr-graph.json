@@ -1066,7 +1066,7 @@
       "relation": "cites",
       "source": "file_docs_project_notes_decisions",
       "source_file": "docs/project_notes/decisions.md",
-      "source_location": "L2093",
+      "source_location": "L2110",
       "target": "adr_011",
       "weight": 1.0
     },
@@ -3564,6 +3564,16 @@
       "_origin": "adr-extractor",
       "confidence": "EXTRACTED",
       "relation": "cites",
+      "source": "file_docs_graphify_developer_guide",
+      "source_file": "docs/graphify-developer-guide.md",
+      "source_location": "L20",
+      "target": "adr_030",
+      "weight": 1.0
+    },
+    {
+      "_origin": "adr-extractor",
+      "confidence": "EXTRACTED",
+      "relation": "cites",
       "source": "file_docs_project_notes_decisions",
       "source_file": "docs/project_notes/decisions.md",
       "source_location": "L1281",
@@ -3607,6 +3617,16 @@
       "source": "scripts_check_adr_refs",
       "source_file": "scripts/check-adr-refs.sh",
       "source_location": "L96",
+      "target": "adr_030",
+      "weight": 1.0
+    },
+    {
+      "_origin": "adr-extractor",
+      "confidence": "EXTRACTED",
+      "relation": "cites",
+      "source": "scripts_extract_adr_graph",
+      "source_file": "scripts/extract-adr-graph.py",
+      "source_location": "L48",
       "target": "adr_030",
       "weight": 1.0
     },
@@ -4134,6 +4154,26 @@
       "_origin": "adr-extractor",
       "confidence": "EXTRACTED",
       "relation": "cites",
+      "source": "file_docs_graphify_developer_guide",
+      "source_file": "docs/graphify-developer-guide.md",
+      "source_location": "L21",
+      "target": "adr_033",
+      "weight": 1.0
+    },
+    {
+      "_origin": "adr-extractor",
+      "confidence": "EXTRACTED",
+      "relation": "cites",
+      "source": "file_docs_graphify_developer_guide",
+      "source_file": "docs/graphify-developer-guide.md",
+      "source_location": "L76",
+      "target": "adr_033",
+      "weight": 1.0
+    },
+    {
+      "_origin": "adr-extractor",
+      "confidence": "EXTRACTED",
+      "relation": "cites",
       "source": "file_docs_project_notes_decisions",
       "source_file": "docs/project_notes/decisions.md",
       "source_location": "L1299",
@@ -4186,7 +4226,7 @@
       "relation": "cites",
       "source": "file_docs_project_notes_decisions",
       "source_file": "docs/project_notes/decisions.md",
-      "source_location": "L2064",
+      "source_location": "L2077",
       "target": "adr_033",
       "weight": 1.0
     },
@@ -4196,7 +4236,7 @@
       "relation": "cites",
       "source": "file_docs_project_notes_decisions",
       "source_file": "docs/project_notes/decisions.md",
-      "source_location": "L2093",
+      "source_location": "L2110",
       "target": "adr_033",
       "weight": 1.0
     },
@@ -4984,6 +5024,16 @@
       "_origin": "adr-extractor",
       "confidence": "EXTRACTED",
       "relation": "cites",
+      "source": "file_github_workflows_graphify_publish",
+      "source_file": ".github/workflows/graphify-publish.yml",
+      "source_location": "L5",
+      "target": "adr_041",
+      "weight": 1.0
+    },
+    {
+      "_origin": "adr-extractor",
+      "confidence": "EXTRACTED",
+      "relation": "cites",
       "source": "file_backlog",
       "source_file": "BACKLOG.md",
       "source_location": "L167",
@@ -5004,9 +5054,49 @@
       "_origin": "adr-extractor",
       "confidence": "EXTRACTED",
       "relation": "cites",
+      "source": "file_docs_graphify_developer_guide",
+      "source_file": "docs/graphify-developer-guide.md",
+      "source_location": "L5",
+      "target": "adr_041",
+      "weight": 1.0
+    },
+    {
+      "_origin": "adr-extractor",
+      "confidence": "EXTRACTED",
+      "relation": "cites",
+      "source": "file_docs_graphify_developer_guide",
+      "source_file": "docs/graphify-developer-guide.md",
+      "source_location": "L48",
+      "target": "adr_041",
+      "weight": 1.0
+    },
+    {
+      "_origin": "adr-extractor",
+      "confidence": "EXTRACTED",
+      "relation": "cites",
       "source": "file_docs_project_notes_key_facts",
       "source_file": "docs/project_notes/key_facts.md",
       "source_location": "L304",
+      "target": "adr_041",
+      "weight": 1.0
+    },
+    {
+      "_origin": "adr-extractor",
+      "confidence": "EXTRACTED",
+      "relation": "cites",
+      "source": "scripts_extract_adr_graph",
+      "source_file": "scripts/extract-adr-graph.py",
+      "source_location": "L58",
+      "target": "adr_041",
+      "weight": 1.0
+    },
+    {
+      "_origin": "adr-extractor",
+      "confidence": "EXTRACTED",
+      "relation": "cites",
+      "source": "scripts_extract_adr_graph",
+      "source_file": "scripts/extract-adr-graph.py",
+      "source_location": "L232",
       "target": "adr_041",
       "weight": 1.0
     }
@@ -6573,6 +6663,17 @@
     {
       "_origin": "adr-extractor",
       "file_type": "doc",
+      "id": "file_docs_graphify_developer_guide",
+      "label": "graphify-developer-guide.md",
+      "metadata": {
+        "kind": "file"
+      },
+      "source_file": "docs/graphify-developer-guide.md",
+      "source_location": "L1"
+    },
+    {
+      "_origin": "adr-extractor",
+      "file_type": "doc",
       "id": "file_specs_244_navigator_mobile_pwa_media_shipped_post",
       "label": "shipped-post.md",
       "metadata": {
@@ -6931,6 +7032,17 @@
         "kind": "file"
       },
       "source_file": "docs/CHANGELOG.md",
+      "source_location": "L1"
+    },
+    {
+      "_origin": "adr-extractor",
+      "file_type": "code",
+      "id": "file_github_workflows_graphify_publish",
+      "label": "graphify-publish.yml",
+      "metadata": {
+        "kind": "file"
+      },
+      "source_file": ".github/workflows/graphify-publish.yml",
       "source_location": "L1"
     },
     {
