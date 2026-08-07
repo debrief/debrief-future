@@ -24,9 +24,10 @@ on:
   push:
     branches:
       - 'preview/**'
-    paths:
-      - 'graphify-out/pages/**'
-      - '.github/workflows/graphify-preview.yml'
+    # Deliberately no `paths:` filter. Pushing to preview/** is an explicit
+    # request to deploy, so there is nothing to filter on — and a paths filter
+    # does not match on branch *creation*, which is exactly when you most want
+    # the preview (first push of a new preview/ branch would silently no-op).
 
 jobs:
   build-and-publish-preview:
