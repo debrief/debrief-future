@@ -232,13 +232,9 @@ tasks:
       - task: graph:adr
 
   graph:pages:
-    desc: "Build the publishable pages: repo-wide D3 tree + interactive ADR citation graph"
+    desc: "Build the publishable pages: landing index, repo-wide D3 tree, ADR graph, per-package drill-downs"
     cmds:
-      - uvx --from graphifyy==0.9.35 graphify tree --output graphify-out/pages/index.html --root . --label "Debrief — code graph"
-      - mkdir -p graphify-out/pages/adr
-      - cp graphify-out/adr-graph.json graphify-out/pages/adr/graph.json
-      - uvx --from graphifyy==0.9.35 graphify cluster-only graphify-out/pages/adr --graph graphify-out/pages/adr/graph.json --no-label
-      - cp graphify-out/pages/adr/graphify-out/graph.html graphify-out/pages/adr/index.html
+      - bash scripts/build-graph-pages.sh
 
   clean:
     desc: "Remove build artifacts and caches"

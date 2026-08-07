@@ -2061,8 +2061,10 @@ code, nothing shipped changes.
    *committed* pages to `gh-pages` under `code-graph/` beside spec-navigator and
    backlog-navigator (`keep_files: true`) — a copy, not a rebuild, so the deployed bytes
    are the reviewed bytes. It never runs on pull requests and cannot block a merge. A
-   second advisory job compares `GRAPH_REPORT.md`'s recorded build commit against `HEAD`
-   and reports drift to the Actions summary without failing anything.
+   second advisory job compares `GRAPH_REPORT.md`'s recorded build commit against the
+   last commit touching graphed source and reports drift to the Actions summary without
+   failing anything — deliberately not against `HEAD`, since a graph can never carry the
+   SHA of the commit that contains it and would otherwise report stale on every run.
 
 7. **Task ordering is load-bearing.** `graphify cluster-only` rewrites `graph.json` with
    its own serialiser, re-inflating it and collapsing same-endpoint edges (501 citation

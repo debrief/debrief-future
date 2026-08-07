@@ -49,8 +49,8 @@ the accepted cost of the graph being available on clone (ADR-041). The SHA256 ca
 and incremental manifest stay ignored as machine state.
 
 **Order matters.** `graphify cluster-only` rewrites `graph.json` with its own
-serialiser, re-inflating it and collapsing same-endpoint edges — 501 ADR citation
-edges become 266, losing per-line multiplicity. The ADR merge therefore runs last in
+serialiser, re-inflating it and collapsing same-endpoint edges — the ADR citation
+edges drop by roughly half, losing per-line multiplicity. The ADR merge therefore runs last in
 every task. If you invoke graphify directly, finish with
 `python scripts/extract-adr-graph.py --merge`.
 
@@ -61,7 +61,7 @@ every task. If you invoke graphify directly, finish with
 
 - **Code** — `services/`, `shared/`, `apps/`: ~14,300 nodes and ~30,000 edges from
   tree-sitter AST across TypeScript, Python and shell.
-- **ADR citations** — 39 ADR nodes and 501 `cites` edges, extracted by
+- **ADR citations** — 39 ADR nodes and 510 `cites` edges, extracted by
   `scripts/extract-adr-graph.py` and merged in place.
 
 Scope is controlled by `.graphifyignore`.
@@ -100,8 +100,11 @@ non-zero token cost, something has enabled the semantic pass and the reproducibi
 guarantee no longer holds.
 
 **Staleness is the main hazard** — a stale graph answers confidently with
-yesterday's architecture. `GRAPH_REPORT.md` records `Built from commit: <sha>`;
-compare against `git rev-parse HEAD`. Optionally install the post-commit hook:
+yesterday's architecture. `GRAPH_REPORT.md` records `Built from commit: <sha>`.
+Compare it against the last commit that touched graphed source
+(`git log -1 --format=%h -- services shared apps`), not against `HEAD` — a graph
+can never carry the SHA of the commit that contains it, so it always trails `HEAD`
+by one. Optionally install the post-commit hook:
 
 ```sh
 uvx --from graphifyy==0.9.35 graphify hook install
@@ -116,16 +119,32 @@ unaffected and gives meaningful hub output.
 `.github/workflows/graphify-publish.yml` deploys the **committed** pages on pushes to
 `main` that touch them — a copy, not a rebuild, so what ships is what was reviewed. It
 is a **publisher, not a gate**: it never runs on pull requests and cannot block a merge.
-A second advisory job compares the graph's recorded build commit against `HEAD` and
-reports drift to the Actions summary without failing anything.
+A second advisory job compares the graph's recorded build commit against the last
+commit touching `services/`, `shared/` or `apps/`, and reports drift to the Actions
+summary without failing anything.
 
-- `https://debrief.github.io/debrief-future/code-graph/` — repo-wide D3 collapsible tree
-- `https://debrief.github.io/debrief-future/code-graph/adr/` — interactive ADR citation graph
+Published under `https://debrief.github.io/debrief-future/code-graph/`:
 
-There is deliberately no repo-wide force-directed page: graphify refuses that
+| Page | Scope |
+|---|---|
+| `/` | Landing index |
+| `/tree.html` | Whole repository, D3 collapsible tree (~14,300 nodes) |
+| `/adr/` | Interactive ADR citation graph (39 ADRs, 510 citations) |
+| `/packages/<slug>/` | Per-package force-directed drill-downs |
+| `/GRAPH_REPORT.md` | Hubs and communities |
+
+There is deliberately no repo-wide *force-directed* page: graphify refuses that
 rendering above 5,000 nodes and our graph is roughly 14,300. The collapsible tree
-suits a code hierarchy better anyway, and the ADR graph is small enough that the
-force-directed view is genuinely readable.
+handles the whole repo and suits a code hierarchy better anyway.
+
+Force-directed drill-downs exist for the five packages big enough to be worth
+exploring — `shared/components` (3,154 nodes), `apps/vscode` (1,784),
+`services/calc` (1,701), `services/io` (1,208) and `apps/web-shell` (863). The
+other ~18 workspace packages are all under 600 nodes and read fine from the tree.
+The list lives in `PACKAGES` in `scripts/build-graph-pages.sh`; add a package once
+it grows past roughly 800 nodes, and note the 5,000-node ceiling is per page —
+splitting by workspace package rather than by top-level directory is what keeps
+every page comfortably under it (`services/` as a whole is already at 4,744).
 
 ## The ADR citation graph
 

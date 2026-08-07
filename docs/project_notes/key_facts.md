@@ -339,8 +339,10 @@ against `git rev-parse HEAD`; re-run `task graph:refresh` if they differ.
 **Published pages** (rebuilt by `.github/workflows/graphify-publish.yml` on
 pushes to `main` that touch source or `decisions.md`):
 
-- `https://debrief.github.io/debrief-future/code-graph/` — repo-wide D3 tree
-- `https://debrief.github.io/debrief-future/code-graph/adr/` — ADR citation graph
+- `https://debrief.github.io/debrief-future/code-graph/` — landing index
+- `.../code-graph/tree.html` — whole-repo D3 tree
+- `.../code-graph/adr/` — ADR citation graph
+- `.../code-graph/packages/<slug>/` — per-package drill-downs (5 largest)
 
 `graphify-out/` **is committed** (~16MB; `graph.json` is 15MB of it) so a fresh
 clone can query the graph without building. Only `graphify-out/cache/` and the

@@ -37,12 +37,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Stage pages
+      - name: Verify pages are present
         run: |
           set -euo pipefail
-          test -f graphify-out/pages/index.html \
-            || { echo "::error::graphify-out/pages/index.html missing — run 'task graph:build && task graph:pages' and commit."; exit 1; }
-          cp graphify-out/GRAPH_REPORT.md graphify-out/pages/GRAPH_REPORT.md
+          # build-graph-pages.sh assembles the whole tree, GRAPH_REPORT.md included,
+          # so publishing is a pure copy. Fail loudly rather than deploying a
+          # half-built directory if someone commits without running it.
+          for required in index.html tree.html adr/index.html GRAPH_REPORT.md; do
+            test -f "graphify-out/pages/${required}" \
+              || { echo "::error::graphify-out/pages/${required} missing — run 'task graph:build && task graph:pages' and commit."; exit 1; }
+          done
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
@@ -64,21 +68,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Compare graph commit against HEAD
+      - name: Checkout full history
+        run: git fetch --unshallow origin main || true
+
+      - name: Compare graph commit against last graphed-source change
         run: |
           set -euo pipefail
+          # A graph can never carry the SHA of the commit that contains it, so
+          # comparing against HEAD would report "stale" on every single run.
+          # What matters is whether any *graphed source* has changed since the
+          # build — docs, workflows and the graph itself are irrelevant.
           built=$(grep -oE 'Built from commit: `[0-9a-f]+`' graphify-out/GRAPH_REPORT.md \
-                  | grep -oE '[0-9a-f]{6,}' || echo "unknown")
-          head=$(git rev-parse --short HEAD)
+                  | grep -oE '[0-9a-f]{6,}' || echo "")
+          last_src=$(git log -1 --format=%h -- services shared apps || echo "")
           {
             echo "### Code graph freshness"
             echo ""
+            if [ -z "$built" ]; then
+              echo "⚠️ Could not read a build commit from \`GRAPH_REPORT.md\`."
+              exit 0
+            fi
             echo "- Graph built from: \`${built}\`"
-            echo "- Current HEAD: \`${head}\`"
+            echo "- Last graphed-source commit: \`${last_src:-none}\`"
             echo ""
-            if git merge-base --is-ancestor "${built}" HEAD 2>/dev/null && [ "${built}" != "${head}" ]; then
-              echo "⚠️ The committed graph is behind \`main\`. Run \`task graph:build && task graph:pages\` and commit to refresh."
+            if [ -n "$last_src" ] \
+               && ! git merge-base --is-ancestor "$last_src" "$built" 2>/dev/null; then
+              behind=$(git rev-list --count "${built}..${last_src}" -- services shared apps 2>/dev/null || echo "?")
+              echo "⚠️ Source has moved ${behind} commit(s) since the graph was built."
+              echo "Run \`task graph:build && task graph:pages\` and commit to refresh."
             else
-              echo "✅ Graph is current."
+              echo "✅ Graph covers the current source."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
