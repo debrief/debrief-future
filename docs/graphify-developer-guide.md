@@ -171,13 +171,13 @@ git checkout <branch>
 open graphify-out/pages/index.html      # macOS; xdg-open on Linux
 ```
 
-Note the pages are **not self-contained**: the tree loads D3 from `d3js.org` and
-the force-directed views load vis-network from `unpkg.com`. They therefore need
-network access to render, whether opened locally or from `gh-pages`. That is fine
-for developer tooling on a public site, but it does mean these pages are not
-usable in an air-gapped environment — unlike the product, which is offline by
-default (Article III.4). Vendoring both libraries would remove the dependency if
-that ever matters.
+The pages are **not self-contained** and are not intended to be: the tree loads
+D3 from `d3js.org` and the force-directed views load vis-network from
+`unpkg.com`, so they need network access to render. This is accepted —
+maintenance and development tooling is expected to have internet access, and
+Article III.4's offline-by-default guarantee is about the product, not about the
+tools we build it with. Do not "fix" this by vendoring the libraries; it would
+add weight for no benefit.
 
 ## The ADR citation graph
 

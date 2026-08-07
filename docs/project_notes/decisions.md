@@ -2092,6 +2092,10 @@ code, nothing shipped changes.
   unwritten. They are cited from the #248/#249 extraction-kit runbooks; the numbering
   note in this file records the reservation. Remove the allowlist entries once the
   headings exist.
+- **The published pages require internet access, by design.** They load D3 and
+  vis-network from CDNs. Accepted: development and maintenance tooling is expected
+  to be online, and Article III.4 constrains the product, not the toolchain used to
+  build it. Not a candidate for vendoring.
 - **This complements rather than replaces the existing gates.** `knip`, the custom rules
   in `shared/eslint-rules/`, `pyright` and `tsc` answer closed questions and fail the
   build. The graph answers open ones — and its clearest payoff is surfacing couplings
