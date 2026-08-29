@@ -1,0 +1,93 @@
+# Repo Review Tier Map (spec 282, FR-003)
+#
+# Maps every top-level source directory to a review depth. Reviewer agents use
+# this to decide how hard to look; the coverage manifest asserts every mapped
+# area was reviewed at its tier or explicitly skipped with a reason.
+#
+# Tiers:
+#   1 = deepest — per-file review on all four dimensions. The data-integrity
+#       spine, where silent data loss and schema drift hurt most.
+#   2 = subsystem-level review — orchestration and write paths; churny code.
+#   3 = sweep pass — tooling, previews, doc apps; lint/dead-code leads only.
+#
+# `test_tier_map.py` asserts every top-level source directory below appears
+# here and that no path maps to an unknown tier.
+
+version: 1
+
+# Directories excluded from review entirely (with reason — surfaces in the manifest).
+excluded:
+  - path: "**/node_modules"
+    reason: "Third-party dependencies — not our code."
+  - path: "shared/schemas/src/generated"
+    reason: "Generated from LinkML; findings attributed to the generator/source (FR-014)."
+  - path: "**/dist"
+    reason: "Build output."
+  - path: "**/.venv"
+    reason: "Virtual environments."
+
+tiers:
+  # ---- Tier 1: data-integrity spine -------------------------------------
+  1:
+    - path: "shared/schemas"
+      note: "LinkML source + generate.py post-processors + adherence tests — everything derives from here."
+    - path: "services/stac"
+      note: "STAC catalog operations — persistence of record."
+    - path: "services/io"
+      note: "REP/legacy parsing to GeoJSON — import boundary, provenance."
+    - path: "services/calc"
+      note: "Analysis tools — provenance + numeric correctness."
+    - path: "services/config"
+      note: "Shared user state, XDG config — cross-cutting state."
+    - path: "services/session-state-py"
+      note: "Python session-state — cross-boundary state model."
+    - path: "services/debrief-tools"
+      note: "Tool framework — schema-validated tool I/O."
+    - path: "shared/data"
+      note: "Platform registry loader + build-time enum extraction."
+    - path: "shared/stac-writer"
+      note: "Unified writer abstraction (Article IV.4) — the persistence boundary; fs + IndexedDB adaptors."
+
+  # ---- Tier 2: orchestration, write paths, churny frontends -------------
+  2:
+    - path: "services/cli"
+      note: "CLI surface over the services."
+    - path: "shared/components"
+      note: "Shared React components — heavy recent churn (map, timeline, filter)."
+    - path: "shared/utils"
+      note: "SafeFeature and other canonical shared types (#172 consolidation target)."
+    - path: "shared/config-ts"
+      note: "TypeScript config surface."
+    - path: "shared/briefing-export"
+      note: "Briefing/storyboard export path."
+    - path: "shared/tools"
+      note: "Shared tool typings/utilities."
+    - path: "shared/eslint-rules"
+      note: "Custom lint rules (incl. no-direct-persistence-in-frontend — Article IV.4 enforcement)."
+    - path: "apps/vscode"
+      note: "VS Code extension host — message passing, webview lifecycle, adapter wiring."
+    - path: "apps/web-shell"
+      note: "Web-shell host — IndexedDB writer, Vite middleware, plot store."
+    - path: "apps/briefing-renderer"
+      note: "Briefing preview renderer (tunnel/proxy concerns, #273)."
+
+  # ---- Tier 3: sweep — tooling, previews, doc apps ----------------------
+  3:
+    - path: "apps/loader"
+      note: "Electron loader mini-app."
+    - path: "apps/nl-demo"
+      note: "NL demo app + live-LLM proxy sidecar."
+    - path: "apps/spec-navigator"
+      note: "Static SPA doc tool."
+    - path: "apps/backlog-navigator"
+      note: "Static SPA doc tool + PWA."
+    - path: "scripts"
+      note: "Repo tooling scripts (incl. this feature's review-ledger.py — no self-exemption)."
+    - path: "tools"
+      note: "Miscellaneous tooling."
+    - path: "preview"
+      note: "Preview workspace + sample data."
+    - path: "docker"
+      note: "Container definitions."
+    - path: "contrib"
+      note: "Organisation-specific extensions (present per planned structure; sweep if populated)."

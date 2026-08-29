@@ -95,7 +95,9 @@
       "Bash(git ls-tree *)",
       "Bash(echo \"exit=$?\")",
       "Bash(rm -rf /home/user/debrief-future/services/stac/tests/fixtures/stac-schemas/v1.1.0/*)",
-      "Bash(touch /home/user/debrief-future/services/stac/tests/fixtures/stac-schemas/v1.1.0/.gitkeep)"
+      "Bash(touch /home/user/debrief-future/services/stac/tests/fixtures/stac-schemas/v1.1.0/.gitkeep)",
+      "Bash(cp specs/282-repo-review-skill/contracts/ledger.schema.json .claude/review/ledger.schema.json)",
+      "Bash(python -c \"import json; json.load\\(open\\('.claude/review/ledger.schema.json'\\)\\); print\\('valid json'\\)\")"
     ]
   }
 }

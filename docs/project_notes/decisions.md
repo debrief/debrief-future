@@ -1992,3 +1992,64 @@ keys; deterministic regen; existing `src/generated` drift gate (no new gate).
 
 Related: ADR-011 (cast governance), ADR-033 (Article IV.5 — derived boundary
 types), #240 (LinkML-derived writer types + drift gate — deferral now closed).
+
+---
+
+### ADR-041: Repo-review findings ledger — YAML + JSON Schema (not LinkML), defect-identity reconciliation, verified-only bar (#282, 2026-07-11)
+
+**Status:** Accepted.
+
+**Context.** The `/repo-review` skill (spec 282) needs a durable, re-runnable
+record of findings so that repeat runs report deltas (new / fixed / still-open)
+rather than rediscovering the same issues, and so `accepted-risk` decisions
+stop reappearing. Three design questions had non-obvious answers: how to model
+the ledger, how to match findings across runs when line numbers churn, and what
+"verified" means for a finding.
+
+**Decision.**
+1. **Ledger is YAML validated by a hand-authored JSON Schema, not LinkML.** The
+   ledger is development-process metadata consumed only by this skill and its
+   Python helper (`scripts/review-ledger.py`); it never crosses the platform
+   data model or any Python↔TypeScript boundary. Modelling it in LinkML would
+   add the three-generator pipeline and adherence-test scaffolding for a
+   single-consumer internal file. Precedent: `knip.json`, `BACKLOG.md`, and
+   `tier-map.yaml` are likewise process artefacts outside LinkML. It is still
+   schema-gated — `contracts/ledger.schema.json` is enforced on every load
+   **and** write by a strict-typed helper with golden valid/invalid fixtures,
+   preserving the project's schema-test ethos (Article II in spirit). If the
+   ledger ever gains a second consumer surface (e.g. a navigator app), promote
+   it to LinkML then.
+2. **YAML over JSON** because FR-008 requires the ledger to be hand-editable
+   during triage (comments, multi-line `status_reason`), and the skill halts on
+   a corrupt ledger rather than regenerating it — the maintainer's status
+   history is the single source of truth.
+3. **Reconciliation matches on defect identity `(dimension, module_path,
+   defect_slug)`, never line numbers.** Line numbers churn far too fast across
+   ~1,500 files. A deterministic stage-1 mechanical match handles the common
+   case (unit-tested); a stage-2 agent-judgement pass pairs genuine
+   file-move/rename cases, and only its explicit pairings link them — otherwise
+   a candidate gets a fresh `RR-NNN`. `fixed` is terminal; a regression of the
+   same defect is a NEW id cross-referencing the old, keeping `fixed` honest as
+   the resolution-rate metric (FR-020).
+4. **Verified-only means confirmed, not merely unrefuted.** A candidate reaches
+   the report only after a *separate* adversarial verifier positively confirms
+   the defect; refuted AND undecidable candidates are counted in the methodology
+   section, not listed. This trades recall for precision deliberately — the
+   product is a report the maintainer can act on without re-checking each claim.
+
+**Consequence.** The review is report-only (FR-011) with exactly two whitelisted
+memory writes (`bugs.md` append, failure-pattern docs). Fixes flow through a
+separate `/repo-review.fix RR-NNN` command that records the PR on the ledger but
+leaves status `open` until a later run verifies the defect is gone. The
+orchestration is a plain-JS Workflow script (the Workflow runtime rejects
+TypeScript) — orchestration configuration, not domain logic, exercised
+end-to-end by the inaugural run.
+
+**Verification.** `tests/repo_review/` — ledger load/validate/save round-trip,
+invalid-ledger rejection, reconciliation cases (exact match, disappeared→fixed,
+line-drift, new-id, accepted-risk suppression, hand-edit honoured, stage-2
+pairing, dry-run reporting), `record-fix-pr` preconditions, playbook structural
+checks, tier-map coverage, and the deterministic tuning-recommendation logic.
+
+Related: ADR-033 (Article IV.5 — derived boundary types; the CB-03/CC-12
+finding class the review hunts for), #172 (the tech-debt regression baseline).
