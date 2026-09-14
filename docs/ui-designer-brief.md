@@ -745,7 +745,8 @@ Classic Debrief (stored under `docs/design/legacy/`):
 | 12 | `12-grid-editor.png` | Grid Editor with linked chart (fig 3.28) |
 | 13 | `13-tote-text.png` | Tote semantics (guide §4.1.1) |
 | 14 | `14-time-variable-plot.png` | Time-variable plot and waterfall mode (figs 4.10, 4.11) |
-| 15 | `15-symbology.png` | Built-in, indexed and non-indexed symbol sets (figs 6.1–6.3) |
+| 15 | `15-symbology.png` | Built-in symbol set (fig 6.1) |
+| 15b | `15b-symbology-svg.png` | Indexed and non-indexed SVG symbol sets (figs 6.2–6.3) |
 
 Current prototype (in the repository): whole-app layouts and component captures listed in `docs/claude-design-ui-brief.md` §6, plus the June 2026 re-review set under `docs/project_notes/evidence/ui-review-2026-06-06/`.
 

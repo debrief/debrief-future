@@ -2,9 +2,8 @@
 
 Reference images for the heritage section of `docs/ui-designer-brief.md`
 (Section 3 and Appendix E). They were supplied by the project lead from
-the Debrief v3 user guide and product imagery; drop the PNG files into this
-folder under the names below. The brief describes each image in text so it
-reads without them.
+the Debrief v3 user guide and product imagery. The brief describes each
+image in text so it reads without them.
 
 | # | Expected file | Content |
 |---|---|---|
@@ -22,4 +21,16 @@ reads without them.
 | 12 | `12-grid-editor.png` | Grid Editor (guide fig 3.28): tabular sensor cuts with a linked Frequency chart beside the map |
 | 13 | `13-tote-text.png` | Tote semantics (guide section 4.1.1): primary / secondary behaviour, annotations on the tote |
 | 14 | `14-time-variable-plot.png` | Time-variable plot with tracker bar and waterfall mode (guide figs 4.10, 4.11) |
-| 15 | `15-symbology.png` | Symbols provided by Debrief, indexed SVG symbols, non-indexed SVG symbols (guide figs 6.1 to 6.3) |
+| 15 | `15-symbology.png` | Symbols provided by Debrief (guide fig 6.1) |
+| 15b | `15b-symbology-svg.png` | Indexed SVG symbols and non-indexed SVG symbols (guide figs 6.2 and 6.3) |
+
+## Notes on the supplied set
+
+- Appendix E of the brief lists entry 15 as a single image covering guide figures
+  6.1 to 6.3. The capture arrived as two images, so it is stored as
+  `15-symbology.png` (fig 6.1) plus `15b-symbology-svg.png` (figs 6.2 and 6.3).
+- `05-mouse-modes-alt.png` is a second, narrower capture of the same guide
+  section 2.2 content as `05-mouse-modes.png`, with the body text cropped at the
+  right edge. `05-mouse-modes.png` is the full-width capture and is the one the
+  brief refers to; the alternate is kept only until the project lead confirms it
+  can be dropped.
