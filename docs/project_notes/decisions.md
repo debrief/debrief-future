@@ -1992,3 +1992,46 @@ keys; deterministic regen; existing `src/generated` drift gate (no new gate).
 
 Related: ADR-011 (cast governance), ADR-033 (Article IV.5 — derived boundary
 types), #240 (LinkML-derived writer types + drift gate — deferral now closed).
+
+### ADR-041: Tablet is a full-analysis target (VS Code in the browser); phone is a consumption-only target (web-shell PWA) (#286, 2026-09-14)
+
+**Status:** Accepted.
+
+**Context.** The April 2026 UI design brief (`docs/claude-design-ui-brief.md`
+§11) stated "Mobile-native (phone) layouts… out of scope. Tablet should degrade
+gracefully; phone is not a target." No other analyst-UI document addressed
+touch. The only touch/mobile work in the repository is the Backlog Navigator PWA
+(ADR-030, spec 244), an internal tool since extracted to its own repository.
+Commissioning an external UI design for the VS Code-based analyst experience
+required a decision on device scope before the requirements brief could be
+written.
+
+**Decision.**
+1. **Tablet is a full-analysis target.** The STAC Browser and the Plot Editor
+   with all control panels must be operable by touch on a tablet (10-inch
+   landscape primary, portrait secondary). The host is **VS Code in the
+   browser** (code-server / vscode.dev) so VS Code conventions continue to
+   apply; no separate tablet application.
+2. **Phone is a consumption-only target.** Catalog browsing, opening a plot
+   read-only, storyboard/briefing playback and reading results. No drawing,
+   tool execution or property editing on phone. The host is the standalone
+   **web shell** as an installable web app (the ADR-030 PWA approach), because
+   the VS Code workbench chrome does not fit a phone.
+3. Keyboard parity remains mandatory on tablet (spec 275 convention), and
+   every desktop interaction must have a named touch equivalent in the design
+   (no hover-only affordances; long-press for context menus; ≥44 px targets).
+
+**Alternatives considered.** Full parity on both tablet and phone (rejected:
+editing dense plots on a phone is not credible and would constrain the
+desktop design); tablet only (rejected: briefing recipients realistically use
+phones); read-only on both (rejected: analysts increasingly work on tablets in
+the field and during exercises).
+
+**Consequences.** `docs/ui-designer-brief.md` §8 carries the requirements
+(UI-200…213) and marks every requirement with D/T/P applicability. The April
+brief is marked superseded. Future component work in `shared/components/`
+must not introduce hover-only affordances. The web shell's existing
+`MobileTabLayout` (<767 px) is the starting point for the phone layout, not
+its design.
+
+Related: ADR-030 (PWA precedent), spec 244, spec 275, `docs/ui-designer-brief.md`.

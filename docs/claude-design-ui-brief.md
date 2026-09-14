@@ -1,5 +1,11 @@
 # Debrief-Future — UI Design Brief for Claude Design
 
+> **Superseded (2026-09-14).** This brief has been replaced by
+> [`docs/ui-designer-brief.md`](ui-designer-brief.md), which absorbs its still-valid
+> content, adds the two-mode (STAC Browser / Plot Editor) framing, business processes,
+> classic-Debrief heritage and tablet/phone requirements, and reverses the phone
+> out-of-scope statement in section 11 (see ADR-041). Kept for the historical record.
+
 > Audience: Claude Design (or any design partner).
 > Purpose: produce a UI model / layout strategy / interaction plan for the Debrief v4 analyst experience.
 > Status: working brief — feed this in as the primary context, then ask follow-up questions.
